@@ -352,6 +352,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     const showQueuedEvents = this.state.queuedEvents.length > 0 && !this.state.settingsOpen;
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
     const events = this.renderEvents(displayCount, renderAs, showRepliedMsg);
+
     return (
       <div className="mb-4">
         {showQueuedEvents && this.renderShowNewEvents()}
@@ -360,6 +361,30 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
             settings={this.state.settings}
             onChange={(settings) => this.setState({ settings })}
           />
+        )}
+        {['global', 'follows'].includes(this.props?.index || '') && (
+          <div className="flex items-center my-2">
+            <div
+              className={`btn btn-sm  mr-2 ${
+                this.state.settings.showReplies ? 'btn-neutral' : 'btn-primary'
+              }`}
+              onClick={() =>
+                this.setState({ settings: { ...this.state.settings, showReplies: false } })
+              }
+            >
+              {t('posts')}
+            </div>
+            <div
+              className={`btn btn-sm ${
+                this.state.settings.showReplies ? 'btn-primary' : 'btn-neutral'
+              }`}
+              onClick={() =>
+                this.setState({ settings: { ...this.state.settings, showReplies: true } })
+              }
+            >
+              {t('posts_and_replies')}
+            </div>
+          </div>
         )}
         {this.props.index !== 'notifications' && (
           <FeedTypeSelector
