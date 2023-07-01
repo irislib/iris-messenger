@@ -126,30 +126,32 @@ class Follows extends View {
     const showFollowAll =
       this.state.follows.length > 1 && !(this.props.id === this.myPub && !this.props.followers);
     return (
-      <div className="centered-container">
-        <h3 style={{ display: 'flex' }}>
-          <a href={`/${this.props.id}`}>
-            <Name pub={this.props.id} />
-          </a>
-          :<i> </i>
-          <span style={{ flex: 1 }} className="ml-1">
-            {this.props.followers ? t('followers') : t('following')}
+      <>
+        <div className="flex justify-between mb-4">
+          <span className="text-2xl font-bold">
+            <a className="link" href={`/${this.props.id}`}>
+              <Name pub={this.props.id} />
+            </a>
+            :<i> </i>
+            <span style={{ flex: 1 }} className="ml-1">
+              {this.props.followers ? t('followers') : t('following')}
+            </span>
           </span>
           {showFollowAll ? (
-            <span style="text-align: right" className="hidden-xs">
-              <Button small={true} onClick={() => this.followAll()}>
+            <span style="text-align: right" className="hidden md:inline">
+              <button className="btn btn-sm btn-neutral" onClick={() => this.followAll()}>
                 {t('follow_all')} ({this.state.follows.length})
-              </Button>
+              </button>
             </span>
           ) : (
             ''
           )}
-        </h3>
+        </div>
         {showFollowAll ? (
-          <p style="text-align: right" className="visible-xs-block">
-            <Button small={true} onClick={() => this.followAll()}>
+          <p style="text-align: right" className="inline md:hidden">
+            <button className="btn btn-sm btn-neutral" onClick={() => this.followAll()}>
               {t('follow_all')} ({this.state.follows.length})
-            </Button>
+            </button>
           </p>
         ) : (
           ''
@@ -158,7 +160,7 @@ class Follows extends View {
           {this.renderFollows() /* TODO limit if lots of follows */}
           {this.state.follows.length === 0 ? '—' : ''}
         </div>
-      </div>
+      </>
     );
   }
 }
