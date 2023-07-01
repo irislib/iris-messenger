@@ -1,42 +1,36 @@
 import { memo, useState } from 'react';
-import { Event, nip19 } from 'nostr-tools';
+import { nip19 } from 'nostr-tools';
 import { Link } from 'preact-router';
 
-import { decodeInvoice, formatAmount } from '../../Lightning';
-import Events from '../../nostr/Events';
+import { formatAmount } from '../../Lightning';
 import Identicon from '../Identicon';
 import Modal from '../modal/Modal';
 import Name from '../Name';
 
-const Reaction = memo(
-  ({ event }: { event: Event }) => {
-    const reactor = (event.kind === 9735 ? Events.getZappingUser(event.id) : event.pubkey) || '';
-    const invoice =
-      event.kind === 9735 ? event.tags?.find((tag) => tag[0] === 'bolt11')?.[1] : undefined;
-    const amount = invoice ? decodeInvoice(invoice)?.amount : undefined;
-    console.log('amount', amount, 'invoice', invoice, 'event', event);
-    return (
-      <Link
-        href={`/${nip19.npubEncode(reactor)}`}
-        key={event.id}
-        className="flex items-center gap-4"
-      >
-        <Identicon str={reactor} width={40} />
-        <div className="flex flex-col">
-          <Name pub={reactor} />
-          {amount && <small className="text-neutral-500">{formatAmount(amount / 1000)}</small>}
-        </div>
-      </Link>
-    );
-  },
-  (prevProps, nextProps) => prevProps.event.id === nextProps.event.id,
-);
+type ReactionData = {
+  pubkey: string;
+  text?: string;
+};
+
+const Reaction = memo(({ data }: { data: ReactionData }) => {
+  const npub = data.pubkey.startsWith('npub') ? data.pubkey : nip19.npubEncode(data.pubkey);
+  return (
+    <Link href={`/${npub}`} className="flex items-center gap-4">
+      <Identicon str={data.pubkey} width={40} />
+      <div className="flex flex-col">
+        <Name pub={data.pubkey} />
+        {data.text && <small className="text-neutral-500">{data.text}</small>}
+      </div>
+    </Link>
+  );
+});
+
+//formatAmount(amount / 1000)
 
 const ReactionsList = (props) => {
-  const { likes, reposts, zaps, totalZapAmount, formattedZapAmount } = props;
-  const [modalReactions, setModalReactions] = useState([] as Event[]);
+  const { likes, reposts, zapAmountByUser, formattedZapAmount } = props;
+  const [modalReactions, setModalReactions] = useState([] as ReactionData[]);
   const [modalTitle, setModalTitle] = useState('');
-  console.log(333, likes.length, reposts.length, zaps.length, totalZapAmount, formattedZapAmount);
   return (
     <>
       <hr className="-mx-4 opacity-10" />
@@ -46,8 +40,8 @@ const ReactionsList = (props) => {
             <h2 className="text-xl font-bold">{modalTitle}</h2>
           </div>
           <div className="flex flex-col gap-4 overflow-y-scroll max-h-[50vh] w-96">
-            {modalReactions.map((event) => (
-              <Reaction key={event.id} event={event} />
+            {modalReactions.map((data) => (
+              <Reaction key={data.pubkey} data={data} />
             ))}
           </div>
         </Modal>
@@ -57,7 +51,8 @@ const ReactionsList = (props) => {
           <div className="flex-shrink-0">
             <a
               onClick={() => {
-                setModalReactions(likes);
+                const data = likes.map((pubkey) => ({ pubkey }));
+                setModalReactions(data);
                 setModalTitle('Liked by');
               }}
               className="cursor-pointer hover:underline"
@@ -70,7 +65,8 @@ const ReactionsList = (props) => {
           <div className="flex-shrink-0">
             <a
               onClick={() => {
-                setModalReactions(reposts);
+                const data = reposts.map((pubkey) => ({ pubkey }));
+                setModalReactions(data);
                 setModalTitle('Reposted by');
               }}
               className="cursor-pointer hover:underline"
@@ -79,17 +75,22 @@ const ReactionsList = (props) => {
             </a>
           </div>
         )}
-        {zaps.length > 0 && (
+        {zapAmountByUser?.size > 0 && (
           <div className="flex-shrink-0">
             <a
               onClick={() => {
-                setModalReactions(zaps);
+                const data: ReactionData[] = [];
+                const sortedArray = [...zapAmountByUser.entries()].sort((a, b) => b[1] - a[1]);
+                for (const [pubkey, amount] of sortedArray) {
+                  data.push({ pubkey, text: formatAmount(amount) });
+                }
+                setModalReactions(data);
                 setModalTitle('Zapped by');
               }}
               className="cursor-pointer hover:underline"
             >
-              {zaps.length} <span className="text-neutral-500">Zaps</span>
-              {totalZapAmount > 0 && (
+              {zapAmountByUser.size} <span className="text-neutral-500">Zaps</span>
+              {formattedZapAmount && (
                 <small className="text-neutral-500"> ({formattedZapAmount})</small>
               )}
             </a>

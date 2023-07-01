@@ -18,7 +18,6 @@ import { decodeInvoice, formatAmount } from '../../Lightning';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
-import Identicon from '../Identicon';
 import ZapModal from '../modal/Zap';
 
 import ReactionsList from './ReactionsList';
@@ -28,16 +27,14 @@ const ReactionButtons = (props) => {
     reposts: 0,
     reposted: false,
     likes: 0,
-    zappers: null as string[] | null,
-    totalZapAmount: '',
+    zapAmountByUser: null as Map<string, number> | null,
+    totalZapAmount: 0,
+    formattedZapAmount: '',
     liked: false,
     zapped: false,
     repostedBy: new Set<string>(),
     likedBy: new Set<string>(),
     replyCount: 0,
-    showLikes: false,
-    showZaps: false,
-    showReposts: false,
     showZapModal: false,
     lightning: undefined,
   });
@@ -117,37 +114,6 @@ const ReactionButtons = (props) => {
     }
   }
 
-  function toggleLikes(e) {
-    console.log('toggle likes');
-    e.stopPropagation();
-    setState((prevState) => ({
-      ...prevState,
-      showLikes: !state.showLikes,
-      showZaps: false,
-      showReposts: false,
-    }));
-  }
-
-  function toggleReposts(e) {
-    e.stopPropagation();
-    setState((prevState) => ({
-      ...prevState,
-      showReposts: !state.showReposts,
-      showZaps: false,
-      showLikes: false,
-    }));
-  }
-
-  function toggleZaps(e) {
-    e.stopPropagation();
-    setState((prevState) => ({
-      ...prevState,
-      showZaps: !state.showZaps,
-      showReposts: false,
-      showLikes: false,
-    }));
-  }
-
   function handleRepliesAndReactions(
     replies: Set<string>,
     likedBy: Set<string>,
@@ -180,19 +146,23 @@ const ReactionButtons = (props) => {
       });
 
     const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.by('id', eventId));
-    const zappers = zapEvents
-      .map((event) => Events.getZappingUser(event.id))
-      .filter((user) => user !== null) as string[];
-    const totalZapAmount = zapEvents.reduce((acc, event) => {
+    const zapAmountByUser = new Map<string, number>();
+    let totalZapAmount = 0;
+    zapEvents.forEach((event) => {
       const bolt11 = event?.tags.find((tag) => tag[0] === 'bolt11')[1];
       if (!bolt11) {
         console.log('Invalid zap, missing bolt11 tag');
-        return acc;
+        return;
       }
       const decoded = decodeInvoice(bolt11);
       const amount = (decoded?.amount || 0) / 1000;
-      return acc + Number(amount);
-    }, 0);
+      totalZapAmount += amount;
+      const zapper = Events.getZappingUser(event.id);
+      if (zapper) {
+        const existing = zapAmountByUser.get(zapper) || 0;
+        zapAmountByUser.set(zapper, existing + amount);
+      }
+    });
 
     props.setReplies(sortedReplies);
 
@@ -202,8 +172,8 @@ const ReactionButtons = (props) => {
       reposted: repostedBy.has(myPub),
       likes: likedBy.size,
       totalZapAmount,
-      formattedZapAmount: totalZapAmount && formatAmount(totalZapAmount),
-      zappers,
+      formattedZapAmount: (totalZapAmount && formatAmount(totalZapAmount)) || '',
+      zapAmountByUser,
       liked: likedBy.has(myPub),
       likedBy,
       repostedBy,
@@ -211,29 +181,20 @@ const ReactionButtons = (props) => {
     }));
   }
 
-  function renderLikes() {
-    return (
-      <div className="likes">
-        {Array.from(state.likedBy).map((key) => {
-          const npub = Key.toNostrBech32Address(key, 'npub');
-          return (
-            <Identicon showTooltip={true} onClick={() => route(`/${npub}`)} str={npub} width={32} />
-          );
-        })}
-      </div>
-    );
-  }
-
   function renderReactionBtns() {
     const s = state;
     const likes = Array.from(s.likedBy) || [];
     const reposts = Array.from(s.repostedBy) || [];
-    const zaps = Array.from(s.zappers || []);
-    console.log('111', likes, reposts, zaps);
     return (
       <>
         {props.standalone && (
-          <ReactionsList event={props.event} likes={likes} zaps={zaps} reposts={reposts} />
+          <ReactionsList
+            event={props.event}
+            likes={likes}
+            zapAmountByUser={s.zapAmountByUser}
+            formattedZapAmount={s.formattedZapAmount}
+            reposts={reposts}
+          />
         )}
         <div className="flex">
           <a
@@ -252,12 +213,7 @@ const ReactionButtons = (props) => {
                 onClick={(e) => repostBtnClicked(e)}
               >
                 <ArrowPathIcon width={18} />
-                <span
-                  className={`${s.showReposts ? 'active' : ''}`}
-                  onClick={(e) => toggleReposts(e)}
-                >
-                  {s.reposts || ''}
-                </span>
+                {(!props.standalone && s.reposts) || ''}
               </a>
             </>
           ) : (
@@ -272,9 +228,7 @@ const ReactionButtons = (props) => {
                 onClick={(e) => likeBtnClicked(e)}
               >
                 {s.liked ? <HeartIconFull width={18} /> : <HeartIcon width={18} />}
-                <span className={`${s.showLikes ? 'active' : ''}`} onClick={(e) => toggleLikes(e)}>
-                  {s.likes || ''}
-                </span>
+                {(!props.standalone && s.likes) || ''}
               </a>
             </>
           ) : (
@@ -292,9 +246,7 @@ const ReactionButtons = (props) => {
               ${s.zapped ? 'text-iris-orange' : 'text-neutral-500 hover:text-iris-orange'}`}
               >
                 <BoltIcon width={18} />
-                <span className={`${s.showZaps ? 'active' : ''}`} onClick={(e) => toggleZaps(e)}>
-                  {s.totalZapAmount || ''}
-                </span>
+                {!props.standalone && s.formattedZapAmount}
               </a>
             </>
           ) : (
@@ -317,38 +269,10 @@ const ReactionButtons = (props) => {
     );
   }
 
-  function renderZaps() {
-    return (
-      <div className="likes">
-        {(state.zappers || []).map((npub) => {
-          return (
-            <Identicon showTooltip={true} onClick={() => route(`/${npub}`)} str={npub} width={32} />
-          );
-        })}
-      </div>
-    );
-  }
-
-  function renderReposts() {
-    return (
-      <div className="likes">
-        {Array.from(state.repostedBy).map((key) => {
-          const npub = Key.toNostrBech32Address(key, 'npub');
-          return (
-            <Identicon showTooltip={true} onClick={() => route(`/${npub}`)} str={npub} width={32} />
-          );
-        })}
-      </div>
-    );
-  }
-
   return (
     <>
       <hr className="-mx-4 opacity-10" />
       {renderReactionBtns()}
-      {state.showLikes && renderLikes()}
-      {state.showZaps && renderZaps()}
-      {state.showReposts && renderReposts()}
       {state.lightning && state.showZapModal && renderZapModal()}
     </>
   );

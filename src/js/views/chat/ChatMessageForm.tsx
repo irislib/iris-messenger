@@ -44,19 +44,16 @@ class ChatMessageForm extends BaseComponent<ChatMessageFormProps> {
     e.stopPropagation();
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val() as string;
-    console.log('text', text);
     if (!text.length) {
       return;
     }
 
     const content = await this.encrypt(text);
-    console.log('2text', text);
 
     const recipient = Key.toNostrHexAddress(this.props.activeChat);
     if (!recipient) {
       throw new Error('invalid public key ' + recipient);
     }
-    console.log('asdf');
     Events.publish({
       kind: 4,
       content,
