@@ -645,7 +645,9 @@ export default {
             return opts.showMentionedMessages ? (
               <EventComponent key={tagTarget + i} id={tagTarget} asInlineQuote={true} />
             ) : (
-              <a href={`/${Key.toNostrBech32Address(tagTarget, 'note')}`}>{tag[1]}</a>
+              <a className="link" href={`/${Key.toNostrBech32Address(tagTarget, 'note')}`}>
+                {tag[1]}
+              </a>
             );
           }
         }
@@ -655,7 +657,11 @@ export default {
 
     // highlight hashtags, link to /search/${encodeUriComponent(hashtag)}
     s = reactStringReplace(s, hashtagRegex, (match) => {
-      return <a href={`/search/${encodeURIComponent(match)}`}>{match}</a>;
+      return (
+        <a className="link" href={`/search/${encodeURIComponent(match)}`}>
+          {match}
+        </a>
+      );
     });
 
     return s;

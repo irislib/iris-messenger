@@ -1,3 +1,5 @@
+import { route } from 'preact-router';
+
 import SearchBox from '../components/SearchBox';
 
 import View from './View';
@@ -17,7 +19,12 @@ class Search extends View {
   renderView() {
     return (
       <div class="mt-2 mx-2 md:mx-0">
-        <SearchBox focus={true} />
+        <SearchBox
+          focus={true}
+          onSelect={({ key }) => {
+            route('/' + key);
+          }}
+        />
       </div>
     );
   }
