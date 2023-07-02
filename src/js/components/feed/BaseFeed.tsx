@@ -43,7 +43,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
 
   constructor(props: FeedProps) {
     super(props);
-    let savedSettings = { display: undefined };
+    let savedSettings = {};
     localState
       .get('settings')
       .get('feed')
@@ -58,7 +58,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     this.openedAt = Math.floor(Date.now() / 1000);
   }
 
-  getSettings(override = { display: undefined }) {
+  getSettings(override = {} as any) {
     // override default & saved settings with url params
     let settings = { ...DEFAULT_SETTINGS };
     if (['global', 'follows'].includes(this.props?.index || '')) {
@@ -88,10 +88,6 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       settings.showReplies = true;
     }
     return settings;
-  }
-
-  saveSettings() {
-    localState.get('settings').get('feed').put(this.state.settings);
   }
 
   updateSortedEvents = (sortedEvents) => {
@@ -382,9 +378,10 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           <FeedTypeSelector
             index={this.props.index}
             display={this.state.settings.display}
-            setDisplay={(display) =>
-              this.setState({ settings: { ...this.state.settings, display } })
-            }
+            setDisplay={(display) => {
+              this.setState({ settings: { ...this.state.settings, display } });
+              localState.get('settings').get('feed').get('display').put(display);
+            }}
           />
         )}
         {events.length === 0 && (
