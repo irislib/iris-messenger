@@ -24,6 +24,8 @@ import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation.mjs';
 
 import View from './View';
+import TrustProfileButtons from '../dwotr/TrustProfileButtons';
+import ProfileFollowers from '../components/ProfileFollowers';
 
 class Profile extends View {
   followedUsers: Set<string>;
@@ -34,8 +36,6 @@ class Profile extends View {
   constructor() {
     super();
     this.state = {
-      followedUserCount: 0,
-      followerCount: 0,
     };
     this.followedUsers = new Set();
     this.followers = new Set();
@@ -59,34 +59,17 @@ class Profile extends View {
     }
   }
 
+
   renderLinks() {
-    return html`
-      <div className="flex flex-1 flex-row align-center justify-center mt-2">
-        ${this.state.lightning
-          ? html`
-              <div className="flex-1">
-                <a
-                  className="btn btn-sm btn-neutral"
-                  href=${this.state.lightning}
-                  onClick=${(e) => Helpers.handleLightningLinkClick(e)}
-                >
-                  ⚡ ${t('tip_lightning')}
-                </a>
-              </div>
-            `
-          : ''}
-        ${this.state.website
-          ? html`
-              <div className="flex-1">
-                <a href=${this.state.website} target="_blank" className="link">
-                  ${this.state.website.replace(/^https?:\/\//, '')}
-                </a>
-              </div>
-            `
-          : ''}
-      </div>
-    `;
-  }
+      if(this.state.isMyProfile) return null;
+
+      return(  
+        <TrustProfileButtons props={ this.state } />);
+    }
+
+    renderFollowers() {
+      return (<ProfileFollowers hexPub={this.state.hexPub} npub={this.state.npub} />);
+    }
 
   async viewAs(event) {
     event.preventDefault();
@@ -217,23 +200,11 @@ class Profile extends View {
                     >`
                 : ''}
             </div>
-            <div>
-              <div className="text-sm flex gap-4">
-                <a href="/follows/${this.state.npub}">
-                  <b>${this.state.followedUserCount}</b> ${t('following')}
-                </a>
-                <a href="/followers/${this.state.npub}">
-                  <b>${this.state.followerCount}</b> ${t('followers')}
-                </a>
-              </div>
-              ${SocialNetwork.followedByUser.get(this.state.hexPub)?.has(Key.getPubKey())
-                ? html` <div><small>${t('follows_you')}</small></div> `
-                : ''}
-            </div>
             <div className="py-2">
               <p className="text-sm">${this.state.about}</p>
-              ${this.renderLinks()}
             </div>
+            ${this.renderLinks()}
+            ${this.renderFollowers()}
           </div>
         </div>
         ${this.state.showQR
@@ -345,36 +316,7 @@ class Profile extends View {
       false,
       false,
     );
-    fetch(`https://us.rbr.bio/${address}/info.json`).then((res) => {
-      if (!res.ok) {
-        return;
-      }
-      res.json().then((json) => {
-        if (json) {
-          this.setState({
-            followerCount: json.followerCount || this.state.followerCount,
-            followedUserCount: json.following?.length || this.state.followedUserCount,
-          });
-        }
-      });
-    });
-    const setFollowCounts = () => {
-      address &&
-        this.setState({
-          followedUserCount: Math.max(
-            SocialNetwork.followedByUser.get(address)?.size ?? 0,
-            this.state.followedUserCount,
-          ),
-          followerCount: Math.max(
-            SocialNetwork.followersByUser.get(address)?.size ?? 0,
-            this.state.followerCount,
-          ),
-        });
-    };
-    setTimeout(() => {
-      this.subscriptions.push(SocialNetwork.getFollowersByUser(address, setFollowCounts));
-      this.subscriptions.push(SocialNetwork.getFollowedByUser(address, setFollowCounts));
-    }, 1000); // this causes social graph recursive loading, so let some other stuff like feed load first
+
     const unsub = SocialNetwork.getProfile(
       address,
       (profile) => {

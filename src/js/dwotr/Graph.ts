@@ -1,0 +1,194 @@
+import TrustScore from "./TrustScore";
+
+export enum EntityType {
+    Key = 1,
+    Item = 2,
+    Unknown = 3,
+}
+
+export const UNDEFINED_DEGREE = 99;
+
+
+export type VerticeUnsubscribe = () => void;
+
+export class Vertice {
+    id: number |undefined = undefined; // The id of the vertice
+    key: string  = ""; // The public key of the subject or item
+    out = Object.create(null); // Map of edges going out from this vertice. Key is the id of the target vertice. Use Object.create(null) to avoid prototype pollution.
+    in = Object.create(null); // Map of edges going in to this vertice. Key is the id of the source vertice. Use Object.create(null) to avoid prototype pollution.
+    degree: number = UNDEFINED_DEGREE;
+    entityType: number = -1; // Type 1 is Key and 2 is item. Items cannot issue Trust claims.
+    timestamp = 0; // Timestamp of lasest update, used to limit subscription at the relays to only new events.
+    subscribed = 0; // True if subscribed to updates from relays
+    score: TrustScore = new TrustScore(); // The score of the vertice, calculated from the trust edges, used to subscribe to updates from relays when the score is positive.
+}
+
+export class Edge  {
+    id: number | undefined = undefined; // The id of the edge
+    out = 0; // The id of the source vertice
+    in = 0; // The id of the target vertice
+    val: any = undefined; // The value of the edge
+    context: string = ""; // The context of the edge
+    note: string = ""; // A note about the edge
+    timestamp = 0; // Timestamp of latest update, used to update the edge with only the latest values.
+}
+
+
+export default class Graph {
+    vertices = {};
+    edges = {};
+
+    verticeMap: Map<string, number> = new Map<string, number>(); // Map of key to vertice id
+
+    load(vertices: Vertice[], edges: Edge[]) {
+        vertices.forEach(v => this.addVertice(v));
+        edges.forEach(e => this.addEdge(e));
+    }
+   
+    addVertice(v: Vertice) : void {
+
+        if(!v.id) return;
+        const id = v.id;
+        
+        if(this.vertices[id] == undefined) {
+            this.vertices[id] = v;
+            this.verticeMap.set(v.key, id);
+        }
+    }
+
+    addEdge(e: Edge) : void {
+        //if(e.val != 0) { // Only add edges with a value to the vertices
+            const outV = this.vertices[e.out];
+            const inV = this.vertices[e.in];
+            if(outV) outV.out[inV.id] = e.id;
+            if(inV) inV.in[outV.id] = e.id;
+        //}
+        this.edges[e.id as number] = e;
+    }
+
+    removeEdge(e: Edge) : void {
+        const outV = this.vertices[e.out];
+        const inV = this.vertices[e.in];
+        if(outV) delete outV.out[inV.id];
+        if(inV) delete inV.in[outV.id];
+        delete this.edges[e.id as number];
+    }
+
+    getVertice(name: string) : Vertice | undefined {
+        const id = this.getVerticeId(name);
+        if(id == undefined) 
+            return undefined;
+        return this.vertices[id];
+    }
+
+    getEdge(id: number) : Edge | undefined {
+        return this.edges[id];
+    }
+
+
+    getVerticeId(key: string | undefined | null) : number | undefined {
+        if(!key) return undefined;
+        let id = this.verticeMap.get(key);
+        return id;
+    }
+
+    // Make sure all relevant vertices have score and degree set
+    calculateScore(sourceId: number, maxDegree: number) {
+
+        let queue = [] as Array<Vertice>;
+        let nextQueue = Object.create(null); // Use null to avoid prototype pollution
+
+        this.resetScore(); // Reset all scores in the graph
+
+        let startV = this.vertices[sourceId] as Vertice;
+        let degree = startV.degree = 0;
+
+        queue.push(startV); // Add the source vertice id to the queue as starting point
+
+        while (queue.length > 0 && degree <= maxDegree) {
+
+            for(let outV of queue) {
+
+                if(!outV.score.isTrusted() && outV.id != sourceId) continue; // Skip if the vertice is distrusted or not trusted and is not the start vertice
+        
+                for(const inId in outV.out) {
+
+                    const inV = this.vertices[inId] as Vertice;
+                    if(!inV || degree >= inV.degree) continue; // Skip if degree is already set by a shorter path
+
+                    const edge = this.edges[outV.out[inId]]; // Get the edge object
+                    if(!edge || edge.val === 0) continue; // Skip if the edge has no value / neutral
+
+                    inV.score.addValue(edge.val); // Add the edge value to the score
+                    inV.degree = degree + 1; // Set the degree to next level
+
+                    if(outV.id == sourceId)
+                        inV.score.setDirectValue(edge.val); // Set the direct value of the score (only for direct edges)
+
+                    if(degree < maxDegree 
+                        && inV.entityType === EntityType.Key 
+                        && !nextQueue[inId])  // Only add keys to the queue, setting values takes time
+                        nextQueue[inId] = inV; // Only add the in vertice to the queue once
+                }
+            }
+
+            queue = Object.values(nextQueue) as Array<Vertice>;
+            nextQueue = Object.create(null); // Clear the next queue
+            degree++;
+        }
+    }
+
+
+    // Calculate the score of a single item, used when a value is added to an item
+    // Theres no need to calculate the score of all vertices as the score of the item cannot affect the score of other items.
+    calculateItemScore(sourceId: number, id: number) {
+        let vertice = this.vertices[id] as Vertice;
+    
+        vertice.score = new TrustScore();
+
+        let lowestDegree = UNDEFINED_DEGREE;
+
+        // Find lowest degree
+        for(const key in vertice.in) {
+            const outV = this.vertices[key] as Vertice;
+            if(outV.degree < lowestDegree) lowestDegree = outV.degree;
+        }
+
+        vertice.degree = lowestDegree + 1;
+
+        // Calculate score
+        for(const key in vertice.in) {
+            const outV = this.vertices[key] as Vertice;
+            if(outV.degree > lowestDegree) continue;
+
+            const edge = this.edges[vertice.in[key]];
+            if(edge == undefined) continue;
+            vertice.score.addValue(edge.val);
+            if(outV.id == sourceId)  // Set the direct value of the score if the sourceId is the out vertice
+                vertice.score.setDirectValue(edge.val);
+        }
+    }
+
+    resetScore() {
+        for(let key in this.vertices) {
+            const v = this.vertices[key];
+            v.score = new TrustScore();
+            v.degree = UNDEFINED_DEGREE;
+        }
+    }
+
+    getUnsubscribedVertices(sourceId: number, maxDegree: number) : Array<Vertice> {
+        let vertices = new Array<Vertice>();
+        for(const key in this.vertices) {
+            const v = this.vertices[key] as Vertice;
+                if(v.degree <= maxDegree                                            // Is within degree 
+                && v.subscribed == 0                                                // Is not subscribed
+                && (v.score.trustCount > v.score.distrustCount || v.id == sourceId) // Is there a positive score on vertice 
+                && v.entityType == EntityType.Key)                                  // Is vertice a Key
+                vertices.push(v);
+        }
+        return vertices;
+    }
+
+               
+ }

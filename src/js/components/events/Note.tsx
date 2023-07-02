@@ -16,7 +16,8 @@ import Torrent from '../Torrent';
 
 import EventComponent from './EventComponent';
 import EventDropdown from './EventDropdown';
-import Reactions from './ReactionButtons';
+import Reactions from '../../dwotr/ReactionButtons';
+import useVerticeMonitor from '../../dwotr/useVerticeMonitor';
 
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
@@ -25,11 +26,16 @@ let loadReactions = true;
 let showLikes = true;
 let showZaps = true;
 let showReposts = true;
+let showTrusts = true;
+let showDistrusts = true;
+
 localState.get('settings').on((s) => {
   loadReactions = s.loadReactions !== false;
   showLikes = s.showLikes !== false;
   showZaps = s.showZaps !== false;
   showReposts = s.showReposts !== false;
+  showTrusts = s.showTrusts !== false;
+  showDistrusts = s.showDistruts !== false;
 });
 
 const Note = ({
@@ -49,6 +55,10 @@ const Note = ({
   const [replies, setReplies] = useState([]);
   const [translatedText, setTranslatedText] = useState('');
   const [name, setName] = useState('');
+
+  const wot = useVerticeMonitor(event.id, ["badMessage", "neutralMessage", "goodMessage"], "" ) as any;
+
+
   showReplies = showReplies || 0;
   if (!standalone && showReplies && replies.length) {
     isQuote = true;
@@ -325,7 +335,7 @@ const Note = ({
             {standalone && renderHelmet()}
             {meta.torrentId && <Torrent torrentId={meta.torrentId} autopause={!standalone} />}
             {text?.length > 0 && (
-              <div className={`preformatted-wrap py-2 ${emojiOnly && 'text-2xl'}`}>
+              <div className={`preformatted-wrap py-2 ${emojiOnly && 'text-2xl'} ${wot?.option}`}>
                 {text}
                 {translatedText && (
                   <p>
@@ -353,10 +363,11 @@ const Note = ({
             {!asInlineQuote && loadReactions && (
               <Reactions
                 key={event.id + 'reactions'}
-                settings={{ showLikes, showZaps, showReposts }}
+                settings={{ showLikes, showZaps, showReposts, showTrusts, showDistrusts }}
                 standalone={standalone}
                 event={event}
                 setReplies={(replies) => setReplies(replies)}
+                wot={wot}
               />
             )}
             {isQuote && !loadReactions && <div style={{ marginBottom: '15px' }}></div>}

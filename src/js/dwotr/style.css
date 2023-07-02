@@ -1,0 +1,66 @@
+.linkbutton {
+    background: none!important;
+    border: none;
+    padding: 0!important;
+    /*optional*/
+    font-family: arial, sans-serif;
+    /*input has OS specific font-family*/
+    color: #069;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+
+  .public-messages-view .msg .graphflag {
+    margin-left: 15px;
+    margin-top: 5px;
+    margin-bottom: 2px;
+    overflow-wrap: anywhere;
+  }
+  
+
+  .goodName {
+    text-decoration-line: underline;
+    text-decoration-color: green;
+  }
+
+  .neutralName {
+  }
+
+  .badName {
+    text-decoration-line: underline;
+    text-decoration-color: red;
+  }
+
+  .msg .trust .identicon-container {
+    margin-right: 5px;
+    margin-bottom: 5px;
+    float: left;
+  }
+  
+  .msg .trust {
+    margin: 5px 0;
+  }
+  
+  /* transition for btn colors */
+  
+  .msg .trust-btn.trusted, .msg .like-btn:hover {
+    color: var(--white);
+  }
+
+  .msg .trust-btn.distrusted, .msg .like-btn:hover {
+    color: var(--white);
+  }
+
+
+  .goodMessage {
+    border: 1px dotted green;
+  }
+
+  .neutralMessage {
+    border: 1px dotted yellow;
+  }
+
+  .badMessage {
+    border: 1px dotted darkred;
+  }

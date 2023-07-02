@@ -32,6 +32,8 @@ import localState from './LocalState';
 import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
 import '../css/cropper.min.css';
+import "./dwotr/style.css";
+import DWoTRSetup from './dwotr/DWoTRSetup';
 
 type Props = Record<string, unknown>;
 
@@ -157,6 +159,7 @@ class Main extends Component<Props, ReactState> {
               <NoteOrProfile path="/:id" />
             </Router>
           </div>
+          {s.loggedIn ? <DWoTRSetup /> : null}
           <MediaPlayer />
           <Footer />
         </section>
