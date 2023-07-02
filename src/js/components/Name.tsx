@@ -1,10 +1,10 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState } from 'react';
 
-import AnimalName from "../AnimalName";
-import Key from "../nostr/Key";
-import SocialNetwork from "../nostr/SocialNetwork";
+import AnimalName from '../AnimalName';
+import Key from '../nostr/Key';
+import SocialNetwork from '../nostr/SocialNetwork';
 
-import Badge from "./Badge";
+import Badge from './Badge';
 
 type Props = {
   pub: string;
@@ -14,14 +14,13 @@ type Props = {
 
 const Name = (props: Props) => {
   if (!props.pub) {
-    console.error("Name component requires a pub", props);
+    console.error('Name component requires a pub', props);
     return null;
   }
 
-
-  const [nostrAddr] = useState(Key.toNostrHexAddress(props.pub) || "");
+  const [nostrAddr] = useState(Key.toNostrHexAddress(props.pub) || '');
   const [profile, setProfile] = useState(profileInitializer);
-  
+
   function profileInitializer() {
     let name;
     let displayName;
@@ -30,13 +29,11 @@ const Name = (props: Props) => {
     const profile = SocialNetwork.profiles.get(nostrAddr);
     // should we change SocialNetwork.getProfile() and use it here?
     if (profile) {
-      name = profile.name?.trim().slice(0, 100) || "";
+      name = profile.name?.trim().slice(0, 100) || '';
       displayName = profile.display_name?.trim().slice(0, 100);
     }
     if (!name) {
-      name = AnimalName(
-        Key.toNostrBech32Address(props.pub, "npub") || props.pub
-      );
+      name = AnimalName(Key.toNostrBech32Address(props.pub, 'npub') || props.pub);
       isNameGenerated = true;
     }
 
@@ -45,13 +42,12 @@ const Name = (props: Props) => {
 
   useEffect(() => {
     if (!nostrAddr) return;
-    
-    let unsub = SocialNetwork.getProfile(nostrAddr, (p) => {
-      if (p) {
 
-        let name = p.name?.trim().slice(0, 100) || "";
-        let displayName =p.display_name?.trim().slice(0, 100) || "";
-        let isNameGenerated = p.name || p.display_name ? false : true;
+    const unsub = SocialNetwork.getProfile(nostrAddr, (p) => {
+      if (p) {
+        const name = p.name?.trim().slice(0, 100) || '';
+        const displayName = p.display_name?.trim().slice(0, 100) || '';
+        const isNameGenerated = p.name || p.display_name ? false : true;
 
         setProfile({ name, displayName, isNameGenerated });
       }
@@ -59,16 +55,16 @@ const Name = (props: Props) => {
 
     return () => {
       unsub();
-    }
+    };
   }, [nostrAddr]);
 
   return (
     <>
-        <span className={profile.isNameGenerated ? 'text-neutral-500' : ''}>
-          {profile.name || profile.displayName || props.placeholder}
-        </span>
-        {props.hideBadge ? '' : <Badge pub={props.pub} />}
-      </>
+      <span className={profile.isNameGenerated ? 'text-neutral-500' : ''}>
+        {profile.name || profile.displayName || props.placeholder}
+      </span>
+      {props.hideBadge ? '' : <Badge pub={props.pub} />}
+    </>
   );
 };
 
