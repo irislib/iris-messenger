@@ -107,12 +107,12 @@ export default class Header extends Component {
     return (
       <a
         href="/settings/network"
-        class={`connected-peers tooltip mobile-search-hidden ${
+        className={`ml-2 tooltip tooltip-bottom mobile-search-hidden ${
           this.state.showMobileSearch ? 'hidden-xs' : ''
         } ${this.state.connectedRelays > 0 ? 'connected' : ''}`}
+        data-tip={t('connected_relays')}
       >
-        <span class="tooltiptext right">{t('connected_relays')}</span>
-        <small>
+        <small className="flex items-center gap-2">
           <span class="icon">{Icons.network}</span>
           <span>{this.state.connectedRelays}</span>
         </small>
