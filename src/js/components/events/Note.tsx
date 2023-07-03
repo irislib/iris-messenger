@@ -279,7 +279,9 @@ const Note = ({
     if (standalone) {
       classNames.push('standalone');
     } else {
-      classNames.push('cursor-pointer');
+      classNames.push(
+        'cursor-pointer transition-all ease-in-out duration-200 hover:bg-neutral-999',
+      );
     }
     if (isQuote) classNames.push('quote pb-2');
     if (isQuoting) classNames.push('quoting pt-0');
@@ -299,12 +301,15 @@ const Note = ({
 
   function renderReplyForm() {
     return (
-      <PublicMessageForm
-        waitForFocus={true}
-        autofocus={!standalone}
-        replyingTo={event.id}
-        placeholder={t('write_your_reply')}
-      />
+      <>
+        <hr className="-mx-2 opacity-10 my-2" />
+        <PublicMessageForm
+          waitForFocus={true}
+          autofocus={!standalone}
+          replyingTo={event.id}
+          placeholder={t('write_your_reply')}
+        />
+      </>
     );
   }
 
@@ -313,7 +318,7 @@ const Note = ({
       {meta.replyingTo && showRepliedMsg && renderRepliedMsg()}
       <div
         key={event.id + 'note'}
-        className={`p-4 ${getClassName()}`}
+        className={`p-2 ${getClassName()}`}
         onClick={(e) => messageClicked(e)}
       >
         {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
@@ -364,6 +369,7 @@ const Note = ({
           </div>
         </div>
       </div>
+      {isQuote || asInlineQuote ? null : <hr className="-mx-2 opacity-10 mb-2" />}
       {showImageModal && renderImageModal()}
       {renderReplies()}
     </>
