@@ -198,7 +198,7 @@ const ReactionButtons = (props) => {
         )}
         <div className="flex">
           <a
-            className="btn-ghost flex-1 hover:bg-transparent hover:text-iris-blue btn content-center gap-2 rounded-none p-2 text-neutral-500"
+            className="btn-ghost btn-sm flex-1 hover:bg-transparent hover:text-iris-blue btn content-center gap-2 rounded-none text-neutral-500"
             onClick={() => replyBtnClicked()}
           >
             <ChatBubbleOvalLeftIcon width={18} />
@@ -207,7 +207,7 @@ const ReactionButtons = (props) => {
           {props.settings.showReposts ? (
             <>
               <a
-                className={`btn-ghost flex-1 hover:bg-transparent btn content-center gap-2 rounded-none p-2 ${
+                className={`btn-ghost btn-sm flex-1 hover:bg-transparent btn content-center gap-2 rounded-none ${
                   s.reposted ? 'text-iris-green' : 'hover:text-iris-green text-neutral-500'
                 }`}
                 onClick={(e) => repostBtnClicked(e)}
@@ -222,7 +222,7 @@ const ReactionButtons = (props) => {
           {props.settings.showLikes ? (
             <>
               <a
-                className={`btn-ghost flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none p-2 ${
+                className={`btn-ghost btn-sm flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none ${
                   s.liked ? 'text-iris-red' : 'hover:text-iris-red text-neutral-500'
                 }`}
                 onClick={(e) => likeBtnClicked(e)}
@@ -242,7 +242,7 @@ const ReactionButtons = (props) => {
                   e.stopPropagation();
                   setState((prevState) => ({ ...prevState, showZapModal: true }));
                 }}
-                className={`btn-ghost flex-1 hover:bg-transparent btn content-center gap-2 rounded-none p-2
+                className={`btn-ghost btn-sm flex-1 hover:bg-transparent btn content-center gap-2 rounded-none
               ${s.zapped ? 'text-iris-orange' : 'text-neutral-500 hover:text-iris-orange'}`}
               >
                 <BoltIcon width={18} />
@@ -271,7 +271,6 @@ const ReactionButtons = (props) => {
 
   return (
     <>
-      <hr className="-mx-4 opacity-10" />
       {renderReactionBtns()}
       {state.lightning && state.showZapModal && renderZapModal()}
     </>

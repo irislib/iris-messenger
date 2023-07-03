@@ -351,7 +351,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           />
         )}
         {['global', 'follows'].includes(this.props?.index || '') && (
-          <div className="flex items-center my-2">
+          <div className="flex items-center mx-2 md:mx-0 my-2">
             <div
               className={`btn btn-sm  mr-2 ${
                 this.state.settings.showReplies ? 'btn-neutral' : 'btn-primary'

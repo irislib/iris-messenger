@@ -313,7 +313,7 @@ const Note = ({
       {meta.replyingTo && showRepliedMsg && renderRepliedMsg()}
       <div
         key={event.id + 'note'}
-        className={`p-4 ${getClassName()}`}
+        className={`p-2 ${getClassName()}`}
         onClick={(e) => messageClicked(e)}
       >
         {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
@@ -364,6 +364,7 @@ const Note = ({
           </div>
         </div>
       </div>
+      {isQuote || asInlineQuote ? null : <hr className="-mx-2 opacity-10 mb-2" />}
       {showImageModal && renderImageModal()}
       {renderReplies()}
     </>
