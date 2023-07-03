@@ -286,8 +286,7 @@ const ReactionButtons = (props) => {
           {props.settings.showLikes ? (
             <>
               <a
-                className={`btn-ghost btn-sm flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none ${
-                  s.liked ? 'text-iris-red' : 'hover:text-iris-red text-neutral-500'
+                className={`btn-ghost btn-sm flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none ${s.liked ? 'text-iris-red' : 'hover:text-iris-red text-neutral-500'
                 }`}
                 onClick={(e) => likeBtnClicked(e)}
               >
@@ -319,17 +318,17 @@ const ReactionButtons = (props) => {
         {props.settings.showTrusts ? (
           <>
             <a
-              className={`msg-btn trust-btn ${s.trusted ? "trusted" : ""}`}
+              className={`btn-ghost trust-btn btn-sm flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none ${s.trusted ? "trusted" : 'hover:trusted text-neutral-500'}`}
               onClick={(e) => trustBtnClicked(e)}
               title={s.trusted ? "Trusted" : "Trust"}
             >
               {s.trusted ? (
-                <CheckCorrect size={24} fill="green" stroke='currentColor' />
+                <CheckCorrect size={18} fill="green" stroke='currentColor' />
               ) : (
-                <CheckCorrect size={24} fill="none" stroke='currentColor' />
+                <CheckCorrect size={18} fill="none" stroke='currentColor' />
               )}
+              {(!props.standalone && s.trustCount) || ""}
             </a>
-            {(!props.standalone && s.trustCount) || ""}
           </>
         ) : (
           ""
@@ -338,17 +337,17 @@ const ReactionButtons = (props) => {
         {props.settings.showDistrusts ? (
           <>
             <a
-              className={`msg-btn trust-btn ${s.distrusted ? "distrusted" : ""}`}
+              className={`btn-ghost trust-btn btn-sm flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none ${s.distrusted ? "distrusted" : 'hover:distrusted text-neutral-500'}`}
               onClick={(e) => distrustBtnClicked(e)}
               title={s.distrusted ? "Distrusted" : "Distrust"}
             >
               {s.distrusted ? (
-                <FlagMarkSolid size={24} fill="red" stroke='currentColor' /> 
+                <FlagMarkSolid size={18} fill="red" stroke='currentColor' /> 
               ) : (
-                <FlagMarkSolid size={24} fill="none" stroke='currentColor' />
+                <FlagMarkSolid size={18} fill="none" stroke='currentColor' />
               )}
+              {(!props.standalone && s.distrustCount) || ""}
             </a>
-            {(!props.standalone && s.distrustCount) || ""}
           </>
         ) : (
           ""

@@ -149,8 +149,6 @@ class GraphNetwork {
 
     // Calculate the score of all vertices within degree of maxDegree
     processScore() {
-        if(!graphNetwork.sourceId) return;
-        console.info("GraphNetwork.processScore()");
 
         let processItems = this.processGraph;
 
@@ -163,6 +161,7 @@ class GraphNetwork {
             }
         }
 
+        // If processGraph was false and there was no items to process, then return
         if(!processItems) return; // No need to process the monitors
 
         for (const key in graphNetwork.verticeMonitor) {
@@ -335,7 +334,8 @@ class GraphNetwork {
     subscribeToTrustEvents(vertices: Array<Vertice>) {
         if(vertices.length == 0) return; // Nothing to subscribe to
         
-        this.subscriptionsCounter++;
+        let self = this;
+        let id = this.subscriptionsCounter++;
         let since = 0;
         const authors = new Array<string>();
 
@@ -344,9 +344,12 @@ class GraphNetwork {
             authors.push(v.key);
         }
 
-        const unsubFn = this.wotPubSub?.subscribeTrust(authors, since, this.trustEvent); // Subscribe to trust events
-        this.unsubs[this.subscriptionsCounter] = unsubFn; // Store the unsubscribe function
-        vertices.forEach(v => v.subscribed = this.subscriptionsCounter); // Mark the vertices as subscribed with the current subscription counter
+        vertices.forEach(v => v.subscribed = id); // Mark the vertices as subscribed with the current subscription counter
+
+        // wait a little to the UI is done.
+        setTimeout(() => {
+            self.unsubs[id] = self.wotPubSub?.subscribeTrust(authors, since, self.trustEvent); // Subscribe to trust events
+        }, 1); 
     }
 
 

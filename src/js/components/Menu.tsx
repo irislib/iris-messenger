@@ -110,7 +110,7 @@ export default class Menu extends BaseComponent {
     return (
       <div>
         <Link href={`/${npub}`} className="btn btn-ghost md:max-lg:btn-circle">
-          <Identicon str={hex} width={34} />
+          <Identicon str={npub} width={34} />
           <div className="hidden lg:block ml-2">
             <Name pub={hex} hideBadge={true} />
           </div>
@@ -131,7 +131,7 @@ export default class Menu extends BaseComponent {
           <img src="/img/dwotr/logo30.png" style="padding-top:5px" />
           <h1 className="hidden lg:flex text-3xl">Dpeep</h1>
         </a>
-        <small className="pl-3">Iris clone with DWoTR</small>
+        <a href="https://github.com/DigitalTrustProtocol/DWoTR-Documentation/blob/main/Trust.md" target="_blank"><small className="pl-3">Iris clone with DWoTR</small></a>
         {APPLICATIONS.map((a: any) => {
           if (a.url && (!a.beta || this.state.showBetaFeatures)) {
             let isActive = this.state.activeRoute.startsWith(a.url);
@@ -160,7 +160,8 @@ export default class Menu extends BaseComponent {
             );
           }
         })}
-        <div class="py-2 flex-1">
+        <hr className="-mx-2 opacity-10 my-2" />
+        <div class="py-2">
           <button
             className="btn btn-primary md:max-lg:btn-circle"
             onClick={() => this.setState({ showNewPostModal: !this.state.showNewPostModal })}
@@ -170,6 +171,7 @@ export default class Menu extends BaseComponent {
           </button>
           {this.renderNewPostModal()}
         </div>
+        <hr className="-mx-2 opacity-10 my-2" />
         {this.renderProfileLink()}
       </div>
     );

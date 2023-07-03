@@ -17,7 +17,7 @@ const Reaction = memo(({ data }: { data: ReactionData }) => {
   const npub = data.pubkey.startsWith('npub') ? data.pubkey : nip19.npubEncode(data.pubkey);
   return (
     <Link href={`/${npub}`} className="flex items-center gap-4">
-      <Identicon str={data.pubkey} width={40} />
+      <Identicon str={npub} width={40} />
       <div className="flex flex-col">
         <Name pub={data.pubkey} />
         {data.text && <small className="text-neutral-500">{data.text}</small>}

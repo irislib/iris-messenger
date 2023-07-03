@@ -204,7 +204,8 @@ class Profile extends View {
             <div className="py-2">
               <p className="text-sm">${this.state.about}</p>
             </div>
-            ${this.renderLinks()} ${this.renderFollowers()}
+            ${this.renderLinks()} 
+            ${this.renderFollowers()}
           </div>
         </div>
         ${this.state.showQR
@@ -227,7 +228,7 @@ class Profile extends View {
       path === href ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-neutral';
 
     return html`
-      <div class="flex mx-2 md:mx-0 gap-2 mb-4 overflow-x-scroll">
+      <div class="flex mx-2 md:mx-0 gap-2 mb-4">
         <${Link} className="${linkClass('/' + currentProfileUrl)}" href="/${currentProfileUrl}"
           >${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//
         >
