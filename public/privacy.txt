@@ -1,14 +1,13 @@
-Iris Privacy policy
+Dpeep Privacy policy
 
-By default, the application connects to a number of relays in the Nostr network to send and receive messages. The relays are not operated by Iris developers. You can change the default relays at will.
+By default, the application connects to a number of relays in the Nostr network to send and receive messages. The relays are not operated by Dpeep developers. You can change the default relays at will.
 
 On Nostr, private messages are encrypted, but anyone can see who you're chatting with and when.
 
-The application wraps the web application at https://iris.to. The hosting provider logs user IP addresses and page-view counts, which are used to follow unique user count and usage by country.
+The application wraps the web application at https://dpeep.com. The hosting provider logs user IP addresses and page-view counts, which are used to follow unique user count and usage by country.
 
-Iris users can register an optional convenience username that redirects to their Nostr public profile https://iris.to/username. In this process, user IP address and country code are saved.
+Dpeep users can register an optional convenience username that redirects to their Nostr public profile https://dpeep.com/username. In this process, user IP address and country code are saved.
 
-Otherwise, Iris developers do not collect any information about you or your usage of the application.
+Otherwise, Dpeep developers do not collect any information about you or your usage of the application.
 
 We reserve the right to modify this Privacy Policy at any time and without prior notice. Your continued use of the app after the posting of any modified Privacy Policy indicates your acceptance of the terms of the modified Privacy Policy.
-If you have any questions about this Privacy Policy, please contact us at sirius@iris.to.

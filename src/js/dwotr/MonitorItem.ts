@@ -14,15 +14,14 @@ export class MonitorItem {
         this.oldDegree = vertice?.degree || 0;
     }
 
-    isChanged() {
+    hasChanged() {
         if(!this.vertice) return false;
         if(!this.oldScore) return true;
 
-        if(this.oldScore.directValue != this.vertice.score.directValue) return true;
-        if(this.oldScore.value != this.vertice.score.value) return true;
-        if(this.oldScore.trustCount != this.vertice.score.trustCount) return true;
-        if(this.oldScore.distrustCount != this.vertice.score.distrustCount) return true;
+        if(!this.oldScore.equals(this.vertice.score)) return true;
+
         if(this.oldDegree != this.vertice.degree) return true;
+        
         return false;
     }
 

@@ -7,6 +7,7 @@ import Identicon from '../Identicon';
 import Modal from '../modal/Modal';
 import Name from '../Name';
 import graphNetwork from '../../dwotr/GraphNetwork';
+import TrustScore from '../../dwotr/TrustScore';
 
 type ReactionData = {
   pubkey: string;
@@ -29,10 +30,15 @@ const Reaction = memo(({ data }: { data: ReactionData }) => {
 //formatAmount(amount / 1000)
 
 const ReactionsList = (props) => {
-  const { likes, reposts, zapAmountByUser, formattedZapAmount, wot, trustCount, distrustCount } = props;
+  const { likes, reposts, zapAmountByUser, formattedZapAmount, wot } = props;
   const [modalReactions, setModalReactions] = useState([] as ReactionData[]);
   const [modalTitle, setModalTitle] = useState('');
   const hasReactions = likes.length > 0 || reposts.length > 0 || zapAmountByUser?.size > 0;
+
+  const score = wot?.vertice?.score as TrustScore;
+  const hasTrust = score?.hasTrustScore();
+  const hasDistrust = score?.hasDistrustScore();
+
   if (!hasReactions) return null;
   return (
     <>
@@ -99,7 +105,7 @@ const ReactionsList = (props) => {
             </a>
           </div>
         )}
-        {trustCount > 0 && (
+        {hasTrust && (
           <div className="flex-shrink-0">
             <a
               onClick={() => {
@@ -110,11 +116,11 @@ const ReactionsList = (props) => {
               }}
               className="cursor-pointer hover:underline"
             >
-              {trustCount} <span className="text-neutral-500">Trusts</span>
+              {score.renderTrustCount()} <span className="text-neutral-500">Trusts</span>
             </a>
           </div>
         )}
-        {distrustCount > 0 && (
+        {hasDistrust && (
           <div className="flex-shrink-0">
             <a
               onClick={() => {
@@ -125,7 +131,7 @@ const ReactionsList = (props) => {
               }}
               className="cursor-pointer hover:underline"
             >
-              {distrustCount} <span className="text-neutral-500">Distrusts</span>
+              {score.renderDistrustCount()} <span className="text-neutral-500">Distrusts</span>
             </a>
           </div>
         )}

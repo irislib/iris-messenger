@@ -2,7 +2,7 @@ import { Event } from "nostr-tools";
 import Graph, { Edge, EntityType, Vertice } from './Graph';
 import WOTPubSub from './WOTPubSub';
 import Key from "../nostr/Key";
-import TrustScore from "./TrustScore";
+import { MAX_DEGREE } from "./TrustScore";
 import wotDB from "./WoTDB";
 import { debounce } from "lodash";
 import { MonitorItem } from "./MonitorItem";
@@ -39,7 +39,7 @@ class GraphNetwork {
     subscriptionsCounter = 0;
 
     verticeMonitor = Object.create(null); // Monitor vertices for changes
-    maxDegree = 2;
+    maxDegree = MAX_DEGREE;
     backlog: Array<Vertice> = [];
 
     processItems = {}; // Items to process
@@ -156,7 +156,7 @@ class GraphNetwork {
             graphNetwork.g.calculateScore(graphNetwork.sourceId, this.maxDegree);  // Calculate the score for all vertices within degree of maxDegree
         } else {
             for (const key in graphNetwork.processItems) {
-                graphNetwork.g.calculateItemScore(graphNetwork.sourceId, parseInt(key));  // Calculate the score each single vertice in the list
+                graphNetwork.g.calculateItemScore(parseInt(key));  // Calculate the score each single vertice in the list
                 processItems = true;
             }
         }
@@ -181,7 +181,7 @@ class GraphNetwork {
         let monitorItem = graphNetwork.verticeMonitor[key] as MonitorItem;
         
         if(!monitorItem.vertice) return; // No vertice found, no need to process Elements that are subscribed to this vertice
-        if(!monitorItem.isChanged()) return;
+        if(!monitorItem.hasChanged()) return;
 
         document.dispatchEvent(new TrustScoreEvent(monitorItem.clone())); // Dispatch event with an clone of the monitorItem so oldScore is not changed when the syncScore() is called
 
@@ -222,7 +222,7 @@ class GraphNetwork {
     }
 
     updateSubscriptions() {
-        let vertices = this.g.getUnsubscribedVertices(this.sourceId, this.maxDegree);
+        let vertices = this.g.getUnsubscribedVertices(this.maxDegree);
         this.subscribeToTrustEvents(vertices);
         console.info("Subscribed to trust events for " + vertices.length + " vertices");
     }
@@ -405,24 +405,28 @@ class GraphNetwork {
     }
 
 
-    findOption(score: TrustScore,  options: Array<any>| undefined) : any {
-        if(!options) return undefined;
+    findOption(vertice: Vertice,  options: Array<any>| undefined) : any {
+        if(!options || options.length === 0 || vertice.degree == 0) return undefined;
 
-        if (options.length === 0 || !score || score.count() === 0)
+        let score = vertice.score;
+        let degree = vertice.degree;
+        let val = score?.value(degree-1);
+        let count = score?.count(degree-1);
+
+        if (count === 0)  // No trust yet
             return undefined;
 
-        // If the score is direct, return the first or last option
-        if(score.directValue != 0) {
-            if(score.directValue > 0) 
+        // If the score is directly trust by degree 0, return the first or last option or undefined
+        if(degree === 1) {
+            if(val > 0) 
                 return options[options.length - 1];
-            else 
+            else if(val < 0) 
                 return options[0];
+            else
+                return undefined;
         } 
 
-        let count = score.count();
-        if(count === 0) return undefined; // No trust yet
-        
-        let percent = ((score.value + count) * 100) / (count * 2);
+        let percent = ((val + count) * 100) / (count * 2);
         let index = Math.ceil(percent / (100.0 / options.length));
 
         index = (index === 0) ? 1 : (index > options.length) ? options.length : index; // Ajust lower and upper out of bounce values.

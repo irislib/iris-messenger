@@ -14,7 +14,7 @@ const useVerticeMonitor = (key: string, options?: any, option?: any) => {
 
         function findOption(item: MonitorItem) {
             let vertice = item.vertice as Vertice;
-            let option = graphNetwork.findOption(vertice.score, options);
+            let option = graphNetwork.findOption(vertice, options);
             setState((prevState) => ({ ...prevState, ...item, option }));
         }
 

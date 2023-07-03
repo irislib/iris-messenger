@@ -1,59 +1,84 @@
-//import { Edge, Vertice } from "./Graph";
+export const MAX_DEGREE = 2;
+
 
 class TrustScore {
-    value = 0;
-    trustCount = 0;
-    distrustCount = 0;
-    directValue = 0;
+
+    trusts = Array(MAX_DEGREE+1).fill(0);
+    distrusts = Array(MAX_DEGREE+1).fill(0);
     
-    addValue(value: number) {
-        this.value += value;
-        if(value > 0) this.trustCount++;
-        if(value < 0) this.distrustCount++;
+    addValue(value: number, degree: number) {
+        if(value > 0) this.trusts[degree] ++;
+        if(value < 0) this.distrusts[degree] ++;
     }
 
-    setDirectValue(value : number) {
-        this.directValue = value;
+    count(degree: number) {
+        return this.trusts[degree] + this.distrusts[degree];
     }
 
-    count() {
-        return this.trustCount + this.distrustCount;
+    value(degree: number) {
+        return this.trusts[degree] - this.distrusts[degree];
     }
 
     isDirectTrusted() {
-        return this.directValue > 0;
+        return this.isTrusted(0);
     }
 
-    isTrusted() {
-
-        if(this.directValue > 0)
-            return true;
-
-        if(this.trustCount > this.distrustCount)
+    isTrusted(degree: number) {
+        if(this.value(degree) > 0)
             return true;
 
         return false;
     }
 
     isDirectDistrusted() {
-        return this.directValue < 0;
+        return this.isDistrusted(0);
     }
 
-    isDistrusted() {
-        if(this.directValue < 0)
-            return true;
-
-        if(this.distrustCount > this.trustCount)
+    isDistrusted(degree: number) {
+        if(this.value(degree) < 0)
             return true;
 
         return false;
     }
 
     clone() {
-        const clone = Object.create(Object.getPrototypeOf(this));
+        const clone = Object.create(Object.getPrototypeOf(this)) as TrustScore;
         Object.assign(clone, this);
+        clone.trusts = this.trusts.slice();
+        clone.distrusts = this.distrusts.slice();
         return clone;
     }
+
+    equals(other: TrustScore) {
+        for(let i = 0; i <= MAX_DEGREE; i++) {
+            if(this.trusts[i] != other.trusts[i]) return false;
+            if(this.distrusts[i] != other.distrusts[i]) return false;
+        }
+        return true;
+    }
+
+    hasTrustScore() {
+        return this.trusts.some((n: number) => n > 0);
+    }
+
+    hasDistrustScore() {
+        return this.distrusts.some((n: number) => n > 0);
+    }
+
+    renderTrustCount() {
+        if(!this.hasTrustScore())
+            return "";
+
+        return this.trusts.join("/");
+    }
+    
+    renderDistrustCount() {
+        if(!this.hasDistrustScore())
+            return "";
+
+        return this.distrusts.join("/");
+    }
+
 }
 
 export default TrustScore;

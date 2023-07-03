@@ -24,6 +24,7 @@ import ReactionsList from './ReactionsList';
 import { CheckCorrect, FlagMarkSolid } from '../../dwotr/Icons';
 import graphNetwork from '../../dwotr/GraphNetwork';
 import { EntityType } from '../../dwotr/Graph';
+import TrustScore from '../../dwotr/TrustScore';
 
 const ReactionButtons = (props) => {
   const [state, setState] = useState({
@@ -40,17 +41,11 @@ const ReactionButtons = (props) => {
     replyCount: 0,
     showZapModal: false,
     lightning: undefined,
+  });
 
-    showTrustsList: false,
-    trustCount: 0,
+  const [score, setScore] = useState({
     trusted: false,
-    trustedBy: new Set<string>(),
-    
-    showDistrustsList: false,
-    distrustCount: 0,
     distrusted: false,
-    distrustedBy: new Set<string>(),
-
   });
 
   const event = props.event;
@@ -79,22 +74,22 @@ const ReactionButtons = (props) => {
   }, [event]);
 
   useEffect(() => {
-    const score = wot?.vertice?.score;
-    setState((prevState) => ({
+    const v = wot?.vertice;
+    const s = v?.score as TrustScore;
+    setScore((prevState) => ({
       ...prevState,
       
-      trustCount: score?.trustCount,
-      trusted: score?.isDirectTrusted(),
-      
-      distrustCount: score?.distrustCount,
-      distrusted: score?.isDirectDistrusted(),
+      trusted: s?.isDirectTrusted(),
+      distrusted: s?.isDirectDistrusted(),
     }));
-  }, [wot])
+  }, [wot]); // Everytime the wot changes, its a new object
+
 
   function trustBtnClicked(e) {
     e.preventDefault();
     e.stopPropagation();
-    setState((prevState) => {
+
+    setScore((prevState) => {
       let val = (!prevState.trusted) ? 1 : 0;
       graphNetwork.publishTrust(event.id, val, EntityType.Item);
 
@@ -111,7 +106,7 @@ const ReactionButtons = (props) => {
     e.preventDefault();
     e.stopPropagation();
 
-    setState((prevState) => {
+    setScore((prevState) => {
         let val = (!prevState.distrusted) ? -1 : 0;
         graphNetwork.publishTrust(event.id, val, EntityType.Item);
   
@@ -256,8 +251,6 @@ const ReactionButtons = (props) => {
             formattedZapAmount={s.formattedZapAmount}
             reposts={reposts}
             wot={wot}
-            trustCount={s.trustCount}
-            distrustCount={s.distrustCount}
           />
         )}
         <div className="flex">
@@ -318,16 +311,16 @@ const ReactionButtons = (props) => {
         {props.settings.showTrusts ? (
           <>
             <a
-              className={`btn-ghost trust-btn btn-sm flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none ${s.trusted ? "trusted" : 'hover:trusted text-neutral-500'}`}
+              className={`btn-ghost trust-btn btn-sm flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none ${score.trusted ? "trusted" : 'hover:trusted text-neutral-500'}`}
               onClick={(e) => trustBtnClicked(e)}
-              title={s.trusted ? "Trusted" : "Trust"}
+              title={score.trusted ? "Trusted" : "Trust"}
             >
-              {s.trusted ? (
+              {score.trusted ? (
                 <CheckCorrect size={18} fill="green" stroke='currentColor' />
               ) : (
                 <CheckCorrect size={18} fill="none" stroke='currentColor' />
               )}
-              {(!props.standalone && s.trustCount) || ""}
+              {(!props.standalone && wot?.vertice?.score?.renderTrustCount()) || ""}
             </a>
           </>
         ) : (
@@ -337,16 +330,16 @@ const ReactionButtons = (props) => {
         {props.settings.showDistrusts ? (
           <>
             <a
-              className={`btn-ghost trust-btn btn-sm flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none ${s.distrusted ? "distrusted" : 'hover:distrusted text-neutral-500'}`}
+              className={`btn-ghost trust-btn btn-sm flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none ${score.distrusted ? "distrusted" : 'hover:distrusted text-neutral-500'}`}
               onClick={(e) => distrustBtnClicked(e)}
-              title={s.distrusted ? "Distrusted" : "Distrust"}
+              title={score.distrusted ? "Distrusted" : "Distrust"}
             >
-              {s.distrusted ? (
+              {score.distrusted ? (
                 <FlagMarkSolid size={18} fill="red" stroke='currentColor' /> 
               ) : (
                 <FlagMarkSolid size={18} fill="none" stroke='currentColor' />
               )}
-              {(!props.standalone && s.distrustCount) || ""}
+              {(!props.standalone && wot?.vertice?.score?.renderDistrustCount()) || ""}
             </a>
           </>
         ) : (

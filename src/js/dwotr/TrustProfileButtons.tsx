@@ -10,33 +10,31 @@ import { translate as t } from "../translations/Translation.mjs";
 import Identicon from "../components/Identicon";
 import { route } from "preact-router";
 import Key from '../nostr/Key';
+import TrustScore from './TrustScore';
 
 
 const TrustProfileButtons = ({props}: any) => {
 
   const [state, setState] = useState({
     showTrustsList: false,
-    trustCount: 0,
     trusted: false,
 
     showDistrustsList: false,
-    distrustCount: 0,
     distrusted: false,
   });
 
   const { hexPub, lightning, website } = props;
   const wot = useVerticeMonitor(hexPub) as any;
+  const score = wot?.vertice?.score as TrustScore;
 
   useEffect(() => {
+    if (!score) return;
+
     // Get the direct trust, dont search the graph
       setState((prevState) => ({
         ...prevState,
-
-        trustCount: wot?.vertice?.score?.trustCount,
-        trusted: wot?.vertice?.score?.isDirectTrusted(),
-
-        distrustCount: wot?.vertice?.score?.distrustCount,
-        distrusted: wot?.vertice?.score?.isDirectDistrusted(),
+        trusted: score?.isDirectTrusted(),
+        distrusted: score?.isDirectDistrusted(),
       }));
 
   }, [wot]);
@@ -146,7 +144,7 @@ const TrustProfileButtons = ({props}: any) => {
         )}
       </a>
       <ReactionCount active={state.showTrustsList} onClick={(e) => toggleTrusts(e)}>
-        {state.trustCount || ""}
+        {score?.renderTrustCount() || ""}
       </ReactionCount>
 
       <a
@@ -161,7 +159,7 @@ const TrustProfileButtons = ({props}: any) => {
         )}
       </a>
       <ReactionCount active={state.showDistrustsList} onClick={(e) => toggleDistrusts(e)}>
-        {state.distrustCount || ""}
+        {score?.renderDistrustCount() || ""}
       </ReactionCount>
     </ReactionButtons>
     {lightning ? 

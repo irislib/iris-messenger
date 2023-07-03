@@ -109,21 +109,22 @@ export default class Graph {
 
             for(let outV of queue) {
 
-                if(!outV.score.isTrusted() && outV.id != sourceId) continue; // Skip if the vertice is distrusted or not trusted and is not the start vertice
+                if(degree > 0 && !outV.score.isTrusted(degree-1)) continue; // Skip if the vertice is distrusted or not trusted and is not the start vertice
         
+                let nextDegree = degree + 1;
+
                 for(const inId in outV.out) {
 
                     const inV = this.vertices[inId] as Vertice;
-                    if(!inV || degree >= inV.degree) continue; // Skip if degree is already set by a shorter path
 
                     const edge = this.edges[outV.out[inId]]; // Get the edge object
                     if(!edge || edge.val === 0) continue; // Skip if the edge has no value / neutral
 
-                    inV.score.addValue(edge.val); // Add the edge value to the score
-                    inV.degree = degree + 1; // Set the degree to next level
+                    inV.score.addValue(edge.val, degree); // Add the edge value to the score
 
-                    if(outV.id == sourceId)
-                        inV.score.setDirectValue(edge.val); // Set the direct value of the score (only for direct edges)
+                    if(degree >= inV.degree) continue; // Skip if degree is already set by a shorter path
+
+                    inV.degree = nextDegree; // Set the degree to next level
 
                     if(degree < maxDegree 
                         && inV.entityType === EntityType.Key 
@@ -141,7 +142,7 @@ export default class Graph {
 
     // Calculate the score of a single item, used when a value is added to an item
     // Theres no need to calculate the score of all vertices as the score of the item cannot affect the score of other items.
-    calculateItemScore(sourceId: number, id: number) {
+    calculateItemScore(id: number) {
         let vertice = this.vertices[id] as Vertice;
     
         vertice.score = new TrustScore();
@@ -149,24 +150,17 @@ export default class Graph {
         let lowestDegree = UNDEFINED_DEGREE;
 
         // Find lowest degree
-        for(const key in vertice.in) {
-            const outV = this.vertices[key] as Vertice;
+        for(const outId in vertice.in) {
+            const outV = this.vertices[outId] as Vertice;
+            const edge = this.edges[vertice.in[outId]];
+            if(!edge || edge.val == 0) continue; // Skip if the edge has no value / neutral
+
             if(outV.degree < lowestDegree) lowestDegree = outV.degree;
+
+            vertice.score.addValue(edge.val, outV.degree);
         }
 
         vertice.degree = lowestDegree + 1;
-
-        // Calculate score
-        for(const key in vertice.in) {
-            const outV = this.vertices[key] as Vertice;
-            if(outV.degree > lowestDegree) continue;
-
-            const edge = this.edges[vertice.in[key]];
-            if(edge == undefined) continue;
-            vertice.score.addValue(edge.val);
-            if(outV.id == sourceId)  // Set the direct value of the score if the sourceId is the out vertice
-                vertice.score.setDirectValue(edge.val);
-        }
     }
 
     resetScore() {
@@ -177,14 +171,15 @@ export default class Graph {
         }
     }
 
-    getUnsubscribedVertices(sourceId: number, maxDegree: number) : Array<Vertice> {
+    getUnsubscribedVertices(maxDegree: number) : Array<Vertice> {
         let vertices = new Array<Vertice>();
         for(const key in this.vertices) {
             const v = this.vertices[key] as Vertice;
-                if(v.degree <= maxDegree                                            // Is within degree 
+            
+            if(v.degree <= maxDegree                                                // Is within degree 
                 && v.subscribed == 0                                                // Is not subscribed
-                && (v.score.trustCount > v.score.distrustCount || v.id == sourceId) // Is there a positive score on vertice 
-                && v.entityType == EntityType.Key)                                  // Is vertice a Key
+                && v.entityType == EntityType.Key
+                && (v.degree == 0 || v.score.isTrusted(v.degree - 1)))
                 vertices.push(v);
         }
         return vertices;
