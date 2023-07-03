@@ -12,13 +12,12 @@ type Props = {
   hideBadge?: boolean;
 };
 
-
 const Name = (props: Props) => {
   if (!props.pub) {
     console.error('Name component requires a pub', props);
     return null;
   }
-  
+
   const [nostrAddr] = useState(Key.toNostrHexAddress(props.pub) || '');
   const [profile, setProfile] = useState(profileInitializer);
 
