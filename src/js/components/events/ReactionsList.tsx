@@ -31,9 +31,11 @@ const ReactionsList = (props) => {
   const { likes, reposts, zapAmountByUser, formattedZapAmount } = props;
   const [modalReactions, setModalReactions] = useState([] as ReactionData[]);
   const [modalTitle, setModalTitle] = useState('');
+  const hasReactions = likes.length > 0 || reposts.length > 0 || zapAmountByUser?.size > 0;
+  if (!hasReactions) return null;
   return (
     <>
-      <hr className="-mx-4 opacity-10" />
+      <hr className="-mx-2 opacity-10" />
       {modalReactions.length > 0 && (
         <Modal showContainer={true} onClose={() => setModalReactions([])}>
           <div className="flex items-center justify-between mb-4">
@@ -97,6 +99,7 @@ const ReactionsList = (props) => {
           </div>
         )}
       </div>
+      <hr className="-mx-2 opacity-10 mb-2" />
     </>
   );
 };
