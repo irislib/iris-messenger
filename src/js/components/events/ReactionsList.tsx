@@ -99,7 +99,7 @@ const ReactionsList = (props) => {
           </div>
         )}
       </div>
-      <hr className="-mx-4 opacity-10" />
+      <hr className="-mx-2 opacity-10 mb-2" />
     </>
   );
 };

@@ -3,6 +3,9 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      colors: {
+        'neutral-999': '#010101',
+      },
       textColor: {
         'iris-blue': '#1d9bf0',
         'iris-green': '#34ba7c',
