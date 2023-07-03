@@ -53,23 +53,25 @@ const ProfileFollowers = (props: any) => {
   }, [hexPub]);
 
   return (
-    <div class="profile-actions" style="padding-top:10px">
-      <div class="follow-count">
+    <>
+      <span className="text-sm">
         <a href={'/follows/' + npub}>
           <span>{state.followedUserCount}</span> {t('following')}
         </a>
+      </span>
+      <span className="text-sm">
         <a href={'/followers/' + npub}>
           <span>{state.followerCount}</span> {t('followers')}
         </a>
-      </div>
+      </span>
       {state.followsYou ? (
-        <div>
+        <span className="text-sm">
           <small> {t('follows_you')}</small>
-        </div>
+        </span>
       ) : (
         ''
       )}
-    </div>
+    </>
   );
 };
 

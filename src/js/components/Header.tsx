@@ -183,10 +183,13 @@ export default class Header extends Component {
   renderBackBtnOrLogo() {
     const isHome = this.state.activeRoute === '/';
     return isHome ? (
-      <div className="flex flex-row items-center gap-2 md:hidden">
-        <img src="/img/icon128.png" width="30" height="30" />
-        <h1 className=" text-3xl">iris</h1>
-      </div>
+      <>
+        <div className="flex flex-row items-center gap-2 md:hidden">
+          <img src="/img/dwotr/logo30.png" style="padding-top:5px" />
+          <h1 className="text-3xl">Dpeep</h1>
+        </div>
+        <h6>Iris clone with DWoTR</h6>
+      </>
     ) : (
       <ArrowLeftIcon width={24} onClick={() => this.backButtonClicked()} />
     );

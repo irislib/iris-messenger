@@ -6,6 +6,7 @@ import { formatAmount } from '../../Lightning';
 import Identicon from '../Identicon';
 import Modal from '../modal/Modal';
 import Name from '../Name';
+import graphNetwork from '../../dwotr/GraphNetwork';
 
 type ReactionData = {
   pubkey: string;
@@ -28,7 +29,7 @@ const Reaction = memo(({ data }: { data: ReactionData }) => {
 //formatAmount(amount / 1000)
 
 const ReactionsList = (props) => {
-  const { likes, reposts, zapAmountByUser, formattedZapAmount } = props;
+  const { likes, reposts, zapAmountByUser, formattedZapAmount, wot, trustCount, distrustCount } = props;
   const [modalReactions, setModalReactions] = useState([] as ReactionData[]);
   const [modalTitle, setModalTitle] = useState('');
   const hasReactions = likes.length > 0 || reposts.length > 0 || zapAmountByUser?.size > 0;
@@ -95,6 +96,36 @@ const ReactionsList = (props) => {
               {formattedZapAmount && (
                 <small className="text-neutral-500"> ({formattedZapAmount})</small>
               )}
+            </a>
+          </div>
+        )}
+        {trustCount > 0 && (
+          <div className="flex-shrink-0">
+            <a
+              onClick={() => {
+                let list = graphNetwork.getTrustList(wot?.vertice, 1);
+                const data = list.map(({outV, edge}) => ({ pubkey: outV.key, text: edge.note }));
+                setModalReactions(data);
+                setModalTitle('Trusted by');
+              }}
+              className="cursor-pointer hover:underline"
+            >
+              {trustCount} <span className="text-neutral-500">Trusts</span>
+            </a>
+          </div>
+        )}
+        {distrustCount > 0 && (
+          <div className="flex-shrink-0">
+            <a
+              onClick={() => {
+                let list = graphNetwork.getTrustList(wot?.vertice, -1);
+                const data = list.map(({outV, edge}) => ({ pubkey: outV.key, text: edge.note }));
+                setModalReactions(data);
+                setModalTitle('Distrusted by');
+              }}
+              className="cursor-pointer hover:underline"
+            >
+              {distrustCount} <span className="text-neutral-500">Distrusts</span>
             </a>
           </div>
         )}

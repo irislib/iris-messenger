@@ -35,8 +35,7 @@ class Profile extends View {
 
   constructor() {
     super();
-    this.state = {
-    };
+    this.state = {};
     this.followedUsers = new Set();
     this.followers = new Set();
     this.id = 'profile';
@@ -59,17 +58,19 @@ class Profile extends View {
     }
   }
 
-
   renderLinks() {
-      if(this.state.isMyProfile) return null;
+    if (this.state.isMyProfile) return null;
 
-      return(  
-        <TrustProfileButtons props={ this.state } />);
-    }
+    return <TrustProfileButtons props={this.state} />;
+  }
 
-    renderFollowers() {
-      return (<ProfileFollowers hexPub={this.state.hexPub} npub={this.state.npub} />);
-    }
+  renderFollowers() {
+    return (
+      <div className="flex justify-left mb-4 pt-10">
+        <ProfileFollowers hexPub={this.state.hexPub} npub={this.state.npub} />
+      </div>
+    );
+  }
 
   async viewAs(event) {
     event.preventDefault();
@@ -203,8 +204,7 @@ class Profile extends View {
             <div className="py-2">
               <p className="text-sm">${this.state.about}</p>
             </div>
-            ${this.renderLinks()}
-            ${this.renderFollowers()}
+            ${this.renderLinks()} ${this.renderFollowers()}
           </div>
         </div>
         ${this.state.showQR

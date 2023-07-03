@@ -1,9 +1,12 @@
 {
+  "homepage": "http://digitaltrustprotocol.github.io/dpeep/",
   "name": "iris-vite-preact",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predeploy": "vite build",
+    "deploy": "gh-pages -d dist",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",

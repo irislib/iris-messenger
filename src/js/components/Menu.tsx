@@ -128,9 +128,10 @@ export default class Menu extends BaseComponent {
           href="/"
           onClick={(e) => this.menuLinkClicked(e, undefined, true)}
         >
-          <img src="/img/icon128.png" width="30" height="30" />
-          <h1 className="hidden lg:flex text-3xl">iris</h1>
+          <img src="/img/dwotr/logo30.png" style="padding-top:5px" />
+          <h1 className="hidden lg:flex text-3xl">Dpeep</h1>
         </a>
+        <small className="pl-3">Iris clone with DWoTR</small>
         {APPLICATIONS.map((a: any) => {
           if (a.url && (!a.beta || this.state.showBetaFeatures)) {
             let isActive = this.state.activeRoute.startsWith(a.url);

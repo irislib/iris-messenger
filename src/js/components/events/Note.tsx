@@ -16,7 +16,7 @@ import Torrent from '../Torrent';
 
 import EventComponent from './EventComponent';
 import EventDropdown from './EventDropdown';
-import Reactions from '../../dwotr/ReactionButtons';
+import Reactions from './ReactionButtons';
 import useVerticeMonitor from '../../dwotr/useVerticeMonitor';
 
 const MSG_TRUNCATE_LENGTH = 500;
