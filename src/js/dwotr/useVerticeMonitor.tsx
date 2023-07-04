@@ -11,11 +11,13 @@ const useVerticeMonitor = (key: string, options?: any, option?: any) => {
     useEffect(() => {
         if (!key) return;
         //console.log("useVerticeMonitor", key, options);
+        let eventID = TrustScoreEventName+key;
 
         function findOption(item: MonitorItem) {
             let vertice = item.vertice as Vertice;
             let option = graphNetwork.findOption(vertice, options);
             setState((prevState) => ({ ...prevState, ...item, option }));
+            
         }
 
         const cb = (e: any) => {
@@ -27,7 +29,7 @@ const useVerticeMonitor = (key: string, options?: any, option?: any) => {
         }
 
         graphNetwork.addVerticeMonitor(key);
-        document.addEventListener(TrustScoreEventName, cb);
+        document.addEventListener(eventID, cb);
 
         // Call manually the graphNetwork.resolveTrust the first time
         let eventItem = graphNetwork.getTrustScoreEvent(key);
@@ -36,7 +38,7 @@ const useVerticeMonitor = (key: string, options?: any, option?: any) => {
 
         return () => {
             graphNetwork.removeVerticeMonitor(key);
-            document.removeEventListener(TrustScoreEventName, cb);
+            document.removeEventListener(eventID, cb);
         }
     }, [key]);
 

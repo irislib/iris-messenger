@@ -96,8 +96,8 @@ class Main extends Component<Props, ReactState> {
     if (s.activeRoute && s.activeRoute.length > 1) {
       title = Helpers.capitalize(s.activeRoute.replace('/', '').split('?')[0]);
     }
-    const titleTemplate = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) %s | iris` : '%s | iris';
-    const defaultTitle = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) iris` : 'iris';
+    const titleTemplate = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) %s | Dpeep` : '%s | Dpeep';
+    const defaultTitle = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) Dpeep` : 'Dpeep';
     if (!s.translationLoaded) {
       return <div />;
     }

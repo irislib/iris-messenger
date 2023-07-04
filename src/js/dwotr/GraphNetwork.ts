@@ -15,8 +15,8 @@ export type ResolveTrustCallback = (result: any) => any;
 export const TrustScoreEventName = 'trustScoreEvent';
 
 export class TrustScoreEvent extends CustomEvent<MonitorItem> {
-    constructor(item: MonitorItem) {
-        super(TrustScoreEventName, { detail: item });
+    constructor(key:string, item: MonitorItem) {
+        super(TrustScoreEventName+key, { detail: item });
     }
 }
 
@@ -85,11 +85,12 @@ class GraphNetwork {
 
     async publishTrust(to: string, val: number = 0, entityType:EntityType = EntityType.Key, comment?:string, context: string = "nostr") {
 
+        // console.time("GraphNetwork.publishTrust");
         // Add the trust to the local graph, and update the score
         const timestamp = this.wotPubSub?.getTimestamp();
         const props = { from: this.sourceKey, to, val, entityType, context, note: comment, timestamp };
+
         const { outV, inV, preVal } = await this.setTrust(props, false);
-        console.log("GraphNetwork.publishTrust: " + to + "  preVal: " + preVal + "  val: " + val + "  context: " + context + "  comment: " + comment + "  entityType: " + entityType + " isExternal: false" );
 
         // Update the vertice monitors
         graphNetwork.updateVerticeMonitor(outV); // Update the monitor for the source vertice before recalculating the score
@@ -106,8 +107,6 @@ class GraphNetwork {
 
         if(!publishTrustDebounce) {
             publishTrustDebounce = debounce(async (currentVal: number) => {
-                    //console.log("GraphNetwork.publishTrust.debounce Fn: " + to + "  preVal: " + preVal + "  currentVal: " + currentVal);
-
                     // Test if anything has changed to the trust, as the user may have changed his mind within the X seconds
                     // preVal will contain the value from when the function first was created.
                     if(preVal == currentVal) return; // In the end, if trust value has not changed, then don't publish the trust to the network
@@ -124,6 +123,8 @@ class GraphNetwork {
         } 
 
         publishTrustDebounce(val); // Call the debounce function, which will only call the publishTrust() function after X seconds, if no other call is made within that time
+
+        //console.timeEnd("GraphNetwork.publishTrust");
     }
 
     addToProcessScoreQueue(outV: Vertice, inV: Vertice) {
@@ -150,10 +151,12 @@ class GraphNetwork {
     // Calculate the score of all vertices within degree of maxDegree
     processScore() {
 
+
         let processItems = this.processGraph;
 
         if(this.processGraph) {
             graphNetwork.g.calculateScore(graphNetwork.sourceId, this.maxDegree);  // Calculate the score for all vertices within degree of maxDegree
+           
         } else {
             for (const key in graphNetwork.processItems) {
                 graphNetwork.g.calculateItemScore(parseInt(key));  // Calculate the score each single vertice in the list
@@ -163,13 +166,17 @@ class GraphNetwork {
 
         // If processGraph was false and there was no items to process, then return
         if(!processItems) return; // No need to process the monitors
-
-        for (const key in graphNetwork.verticeMonitor) {
+        
+        for (const key in graphNetwork.verticeMonitor) 
+        {
             graphNetwork.callMonitor(key);
         }
 
-        if(this.processGraph) // TODO: Make this async as it is slow
+        
+        if(this.processGraph) { // TODO: Make this async as it is slow 
             graphNetwork.updateSubscriptions();
+        }
+            
 
         this.processGraph = false;
         this.processItems = {};
@@ -181,11 +188,16 @@ class GraphNetwork {
         let monitorItem = graphNetwork.verticeMonitor[key] as MonitorItem;
         
         if(!monitorItem.vertice) return; // No vertice found, no need to process Elements that are subscribed to this vertice
-        if(!monitorItem.hasChanged()) return;
+        if(!monitorItem.hasChanged()) {
+            return;
+        }
 
-        document.dispatchEvent(new TrustScoreEvent(monitorItem.clone())); // Dispatch event with an clone of the monitorItem so oldScore is not changed when the syncScore() is called
-
+        let clone = monitorItem.clone();
         monitorItem.syncScore(); // Reset the old score to the current score
+
+        document.dispatchEvent(new TrustScoreEvent(key, clone)); // Dispatch event with an clone of the monitorItem so oldScore is not changed when the syncScore() is called
+
+        
     }
 
     
@@ -193,7 +205,7 @@ class GraphNetwork {
         let vertice = this.g.getVertice(key);
         if(!vertice) return; // No vertice found
 
-        return new TrustScoreEvent(new MonitorItem(vertice));
+        return new TrustScoreEvent(key, new MonitorItem(vertice));
     }
 
     addVerticeMonitor(key: string) {
@@ -207,8 +219,8 @@ class GraphNetwork {
     }
 
     updateVerticeMonitor(v: Vertice) {
-        let monitorItem = this.verticeMonitor[v.key];
-        if(!monitorItem || monitorItem.vertice) return; // Dont update if a vertice is already set
+        let monitorItem = this.verticeMonitor[v.key] as MonitorItem;
+        if(!monitorItem) return; // Dont update if a vertice is already set
         monitorItem.vertice = v;
     }
 
@@ -224,7 +236,7 @@ class GraphNetwork {
     updateSubscriptions() {
         let vertices = this.g.getUnsubscribedVertices(this.maxDegree);
         this.subscribeToTrustEvents(vertices);
-        console.info("Subscribed to trust events for " + vertices.length + " vertices");
+        //console.info("Subscribed to trust events for " + vertices.length + " vertices");
     }
 
 
@@ -289,7 +301,10 @@ class GraphNetwork {
             edge = this.g.getEdge(edgeId) as Edge;
             preVal = edge.val;
 
-            if(edge.timestamp < timestamp) {
+            // If data is older or the same as the current data and value, then ignore it.
+            // Sometimes the value is different but the timestamp is the same, so we need to update the timestamp and value. Very fast hitting the trust / distrust buttons.
+            if(edge.timestamp < timestamp || (edge.val != val && edge.timestamp == timestamp)) {
+
                 // Always update the edge as timestamp is always updated.
 
                 let updateObject = { timestamp: 0 };
@@ -348,7 +363,9 @@ class GraphNetwork {
 
         // wait a little to the UI is done.
         setTimeout(() => {
+            console.time("Subscribing to trust events")
             self.unsubs[id] = self.wotPubSub?.subscribeTrust(authors, since, self.trustEvent); // Subscribe to trust events
+            console.timeEnd("Subscribing to trust events")
         }, 1); 
     }
 

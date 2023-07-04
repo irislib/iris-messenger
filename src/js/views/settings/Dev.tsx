@@ -51,7 +51,7 @@ export default class DevSettings extends Component {
       <>
         <div class="centered-container">
           <h3>Developer</h3>
-          <p>Settings intended for Iris developers.</p>
+          <p>Settings intended for Dpeep developers.</p>
           {checkboxes.map(({ key, label, defaultValue }) =>
             renderCheckbox(key, label, defaultValue),
           )}

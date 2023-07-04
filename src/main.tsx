@@ -1,3 +1,5 @@
+import "preact/debug";
+
 import { render } from 'preact';
 
 import Main from './js/Main';

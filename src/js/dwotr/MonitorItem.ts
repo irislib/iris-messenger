@@ -27,7 +27,7 @@ export class MonitorItem {
 
     clone() {
         let item = new MonitorItem(this.vertice as Vertice);
-        item.oldScore = this.oldScore;
+        item.oldScore = this.oldScore?.clone();
         item.oldDegree = this.oldDegree;
         item.counter = this.counter;
         return item;

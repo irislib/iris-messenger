@@ -13,7 +13,7 @@ const ProfileFollowers = (props: any) => {
   useEffect(() => {
     if (!hexPub) return;
 
-    fetch(`https://us.rbr.bio/${hexPub}/info.json`).then((res) => {
+    fetch(`https://eu.rbr.bio/${hexPub}/info.json`).then((res) => {
       if (!res.ok) {
         return;
       }

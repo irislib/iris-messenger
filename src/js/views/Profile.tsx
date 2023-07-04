@@ -277,7 +277,7 @@ class Profile extends View {
       return html`<div></div>`;
     }
     const title = this.state.display_name || this.state.name || 'Profile';
-    const ogTitle = `${title} | Iris`;
+    const ogTitle = `${title} | Dpeep`;
     const description = `Latest posts by ${this.state.display_name || this.state.name || 'user'}. ${
       this.state.profile?.about || ''
     }`;

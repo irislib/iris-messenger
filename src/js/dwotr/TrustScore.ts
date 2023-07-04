@@ -43,7 +43,7 @@ class TrustScore {
 
     clone() {
         const clone = Object.create(Object.getPrototypeOf(this)) as TrustScore;
-        Object.assign(clone, this);
+        //Object.assign(clone, this);
         clone.trusts = this.trusts.slice();
         clone.distrusts = this.distrusts.slice();
         return clone;
@@ -69,14 +69,18 @@ class TrustScore {
         if(!this.hasTrustScore())
             return "";
 
-        return this.trusts.join("/");
+        let r = this.trusts.join("/");
+        //console.log("renderTrustCount", r);
+        return r;
     }
     
     renderDistrustCount() {
         if(!this.hasDistrustScore())
             return "";
 
-        return this.distrusts.join("/");
+        let r = this.distrusts.join("/");
+        //console.log("renderDistrustCount", r);
+        return r;
     }
 
 }

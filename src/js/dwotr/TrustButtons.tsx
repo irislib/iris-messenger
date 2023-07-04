@@ -22,7 +22,7 @@ export const ReactionCount = styled.span`
   flex: 3;
   margin-left: 5px;
   cursor: pointer;
-  min-width: 2em;
+  min-width: 4em;
   text-align: left;
   user-select: none;
   white-space: nowrap;
