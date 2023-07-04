@@ -23,7 +23,7 @@ const noteRegex =
   /(?:^|\s|nostr:|(?:https?:\/\/[\w./]+)|iris\.to\/|snort\.social\/e\/|damus\.io\/)+((?:@)?note[a-zA-Z0-9]{59,60})(?![\w/])/gi;
 const nip19Regex = /\bnostr:(n(?:event|profile)1\w+)\b/g;
 
-const hashtagRegex = /(#\w+)/g;
+const hashtagRegex = /(#[^\s!@#$%^&*()=+./,[{\]};:'"?><]+)/g;
 
 let settings: any = {};
 localState.get('settings').on((s) => (settings = s));

@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        'neutral-999': '#010101',
+        'neutral-999': '#090909',
       },
       textColor: {
         'iris-blue': '#1d9bf0',

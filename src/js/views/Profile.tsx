@@ -317,7 +317,6 @@ class Profile extends View {
       false,
       false,
     );
-
     const unsub = SocialNetwork.getProfile(
       address,
       (profile) => {
