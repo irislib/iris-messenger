@@ -153,7 +153,7 @@ class SearchBox extends Component<Props, State> {
   }
 
   searchFromServer = debounce((query) => {
-    fetch(`https://rbr.bio/search/${query}.json`).then((res) => {
+    fetch(`https://eu.rbr.bio/search/${query}.json`).then((res) => {
       res.json().then((json) => {
         if (json && Array.isArray(json)) {
           json.forEach((item) => {
