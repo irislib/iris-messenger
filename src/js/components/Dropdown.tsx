@@ -42,7 +42,7 @@ const Dropdown = ({ children }: Props) => {
       onMouseEnter={(e) => toggle(e, true)}
       onMouseLeave={(e) => toggle(e, false)}
     >
-      <button className="dropbtn btn btn-circle text-neutral-500">…</button>
+      <button className="dropbtn btn btn-circle btn-ghost text-neutral-500">…</button>
       {open ? (
         <div className="absolute z-10 p-2 flex flex-col gap-2 right-0 w-56 rounded-md shadow-lg bg-black border-neutral-500 border-2">
           {children}
