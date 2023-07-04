@@ -65,11 +65,7 @@ class Profile extends View {
   }
 
   renderFollowers() {
-    return (
-      <div className="flex justify-left mb-4 pt-10">
-        <ProfileFollowers hexPub={this.state.hexPub} npub={this.state.npub} />
-      </div>
-    );
+    return <ProfileFollowers hexPub={this.state.hexPub} npub={this.state.npub} />;
   }
 
   async viewAs(event) {
@@ -204,8 +200,10 @@ class Profile extends View {
             <div className="py-2">
               <p className="text-sm">${this.state.about}</p>
             </div>
+            <div className="text-sm flex gap-4">
+              ${this.renderFollowers()}
+            </div>
             ${this.renderLinks()} 
-            ${this.renderFollowers()}
           </div>
         </div>
         ${this.state.showQR
