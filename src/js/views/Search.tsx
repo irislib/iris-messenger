@@ -9,6 +9,8 @@ import useCachedFetch from '../hooks/useCachedFetch';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 
+import FollowButton from '../components/buttons/Follow';
+
 const FollowSuggestionsAPI = () => {
   const url = `https://api.nostr.band/v0/suggested/profiles/${Key.getPubKey()}`;
   const suggestions = useCachedFetch(url, 'followSuggestions', (data) => data.profiles || []);
@@ -19,22 +21,25 @@ const FollowSuggestionsAPI = () => {
     <div className="card-body p-4">
       <h2 className="card-title">Follow suggestions</h2>
       <hr className="opacity-10" />
-      <div className="-ml-2 flex flex-wrap gap-2 text-xs overflow-y-scroll overflow-x-hidden max-h-screen">
+      <div className="-ml-2 flex flex-wrap gap-4 items-center text-xs overflow-y-scroll overflow-x-hidden max-h-screen">
         {suggestions.map((profile: any) => (
           <Link
             href={`/${nip19.npubEncode(profile.pubkey)}`}
             key={profile.pubkey}
-            className="flex gap-2 w-full break-words"
+            className="flex flex-row gap-2 w-full break-words"
           >
             <span className="flex-shrink-0">
               <Identicon str={profile.pubkey} width={30} />
             </span>
-            <span className="w-full">
+            <span className="flex-1">
               <b>
                 <Name pub={profile.pubkey} />
               </b>
               <br />
               <span className="text-neutral-400">{profile.bio}</span>
+            </span>
+            <span className="flex-shrink-0">
+              <FollowButton className="btn btn-sm" id={profile.pubkey} />
             </span>
           </Link>
         ))}
