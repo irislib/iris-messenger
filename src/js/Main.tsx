@@ -130,7 +130,7 @@ class Main extends Component<Props, ReactState> {
           <div className="pb-16 md:pb-0 relative flex h-full flex-grow flex-col w-1/2">
             <Router onChange={(e) => this.handleRoute(e)}>
               <FeedList path="/" />
-              <Search path="/search" />
+              <Search path="/search" focus={true} />
               <KeyConverter path="/key" />
               <Feed path="/following" index="follows" />
               <Feed path="/global" index="global" />

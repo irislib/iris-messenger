@@ -43,7 +43,7 @@ const FollowSuggestionsAPI = () => {
   );
 };
 
-const Search = (_props: any) => {
+const Search = (props: any) => {
   const url = 'https://api.nostr.band/v0/trending/notes';
   const dataProcessor = (data) => {
     const newTrendingPosts = data.notes.map((e) => e.event);
@@ -57,7 +57,7 @@ const Search = (_props: any) => {
   return (
     <div class="mt-2 p-2 mx-2 md:mx-0 flex flex-col gap-4">
       <SearchBox
-        focus={true}
+        focus={props.focus}
         onSelect={({ key }) => {
           route('/' + key);
         }}

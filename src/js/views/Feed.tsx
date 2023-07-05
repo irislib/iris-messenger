@@ -31,7 +31,7 @@ class Feed extends View {
             <>
               <OnboardingNotification />
               <div className="hidden md:block">
-                <PublicMessageForm placeholder={t('whats_on_your_mind')} />
+                <PublicMessageForm autofocus={false} placeholder={t('whats_on_your_mind')} />
               </div>
             </>
           )}
@@ -43,7 +43,7 @@ class Feed extends View {
           />
         </div>
         <div className="sticky flex-col hidden lg:flex lg:w-1/3">
-          <Search />
+          <Search focus={false} />
         </div>
       </div>
     );
