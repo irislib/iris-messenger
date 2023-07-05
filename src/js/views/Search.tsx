@@ -2,6 +2,7 @@ import { route } from 'preact-router';
 
 import SmallFeed from '../components/feed/SmallFeed';
 import SearchBox from '../components/SearchBox';
+import Events from '../nostr/Events';
 
 import View from './View';
 
@@ -19,7 +20,11 @@ class Search extends View {
       .then((res) => res.json())
       .then((data) => {
         if (!data?.notes) return;
-        this.setState({ trendingPosts: data.notes.map((e) => e.event) });
+        const trendingPosts = data.notes.map((e) => e.event);
+        trendingPosts.forEach((e) => {
+          Events.handle(e);
+        });
+        this.setState({ trendingPosts });
       });
   }
 
