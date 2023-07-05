@@ -391,11 +391,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
             </div>
           </div>
         )}
-        {renderAs === 'NoteImage' ? (
-          <ImageGrid>{events}</ImageGrid>
-        ) : (
-          <div className="w-full md:w-3/4">{events}</div>
-        )}
+        {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
         {displayCount < this.state.sortedEvents.length ? this.renderShowMore() : ''}
       </div>
     );
