@@ -30,7 +30,9 @@ class Feed extends View {
           ) : (
             <>
               <OnboardingNotification />
-              <PublicMessageForm placeholder={t('whats_on_your_mind')} />
+              <div className="hidden md:block">
+                <PublicMessageForm placeholder={t('whats_on_your_mind')} />
+              </div>
             </>
           )}
           <FeedComponent
