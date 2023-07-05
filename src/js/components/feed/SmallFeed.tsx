@@ -22,9 +22,11 @@ const SmallFeed = ({ events }: { events: Event[] }) => {
           .filter((event) => !mutedUsers[event.pubkey])
           .map((event) => (
             <div key={event.id} className="flex gap-2 w-full break-words">
-              <Link href={`/${nip19.npubEncode(event.pubkey)}`}>
-                <Identicon str={event.pubkey} width={30} />
-              </Link>
+              <div className="flex-shrink-0">
+                <Link href={`/${nip19.npubEncode(event.pubkey)}`}>
+                  <Identicon str={event.pubkey} width={30} />
+                </Link>
+              </div>
               <Link href={`/${nip19.noteEncode(event.id)}`} className="w-full">
                 <b>
                   <Name pub={event.pubkey} />

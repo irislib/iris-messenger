@@ -118,10 +118,10 @@ class Main extends Component<Props, ReactState> {
           {s.loggedIn ? <Menu /> : null}
           <Helmet titleTemplate={titleTemplate} defaultTitle={defaultTitle}>
             <title>{title}</title>
-            <meta name="description" content="Social Networking Freedom" />
+            <meta name="description" content="Connecting People" />
             <meta property="og:type" content="website" />
             <meta property="og:title" content={title} />
-            <meta property="og:description" content="Social Networking Freedom" />
+            <meta property="og:description" content="Connecting People" />
             <meta property="og:image" content="https://iris.to/assets/img/irisconnects.png" />
             <meta name="twitter:card" content="summary_large_image" />
             <meta name="twitter:image" content="https://iris.to/assets/img/irisconnects.png" />
