@@ -1,6 +1,7 @@
 import { nip19 } from 'nostr-tools';
 import { Link, route } from 'preact-router';
 
+import FollowButton from '../components/buttons/Follow';
 import SmallFeed from '../components/feed/SmallFeed';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
@@ -8,8 +9,6 @@ import SearchBox from '../components/SearchBox';
 import useCachedFetch from '../hooks/useCachedFetch';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
-
-import FollowButton from '../components/buttons/Follow';
 
 const FollowSuggestionsAPI = () => {
   const url = `https://api.nostr.band/v0/suggested/profiles/${Key.getPubKey()}`;
