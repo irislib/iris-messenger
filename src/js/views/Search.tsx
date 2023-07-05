@@ -1,60 +1,58 @@
-import { useEffect, useState } from 'preact/hooks';
-import { route } from 'preact-router';
+import { nip19 } from 'nostr-tools';
+import { Link, route } from 'preact-router';
 
 import SmallFeed from '../components/feed/SmallFeed';
+import Identicon from '../components/Identicon';
+import Name from '../components/Name';
 import SearchBox from '../components/SearchBox';
+import useCachedFetch from '../hooks/useCachedFetch';
 import Events from '../nostr/Events';
+import Key from '../nostr/Key';
+
+const FollowSuggestionsAPI = () => {
+  const url = `https://api.nostr.band/v0/suggested/profiles/${Key.getPubKey()}`;
+  const suggestions = useCachedFetch(url, 'followSuggestions', (data) => data.profiles || []);
+
+  if (!suggestions.length) return null;
+
+  return (
+    <div className="card-body p-4">
+      <h2 className="card-title">Follow suggestions</h2>
+      <hr className="opacity-10" />
+      <div className="-ml-2 flex flex-wrap gap-2 text-xs overflow-y-scroll overflow-x-hidden max-h-screen">
+        {suggestions.map((profile: any) => (
+          <Link
+            href={`/${nip19.npubEncode(profile.pubkey)}`}
+            key={profile.pubkey}
+            className="flex gap-2 w-full break-words"
+          >
+            <span className="flex-shrink-0">
+              <Identicon str={profile.pubkey} width={30} />
+            </span>
+            <span className="w-full">
+              <b>
+                <Name pub={profile.pubkey} />
+              </b>
+              <br />
+              <span className="text-neutral-400">{profile.bio}</span>
+            </span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const Search = (_props: any) => {
-  const [trendingPosts, setTrendingPosts] = useState([]);
-
-  useEffect(() => {
-    const storageKey = 'trendingNotes';
-    const cachedData = localStorage.getItem(storageKey);
-
-    const fetchData = () => {
-      fetch('https://api.nostr.band/v0/trending/notes')
-        .then((res) => res.json())
-        .then((data) => {
-          if (!data?.notes) return;
-          const newTrendingPosts = data.notes.map((e) => e.event);
-          newTrendingPosts.forEach((e) => {
-            Events.handle(e);
-          });
-
-          setTrendingPosts(newTrendingPosts);
-
-          // Store fetched data in localStorage with current timestamp
-          localStorage.setItem(
-            storageKey,
-            JSON.stringify({ data: newTrendingPosts, timestamp: new Date().getTime() }),
-          );
-        })
-        .catch(() => {
-          // Network request failed. Try to use cached data
-          if (cachedData) {
-            const { data } = JSON.parse(cachedData);
-            setTrendingPosts(data);
-          }
-        });
-    };
-
-    if (cachedData) {
-      const { data, timestamp } = JSON.parse(cachedData);
-      const age = (new Date().getTime() - timestamp) / 1000 / 60; // convert timestamp difference from milliseconds to minutes
-
-      if (age < 15) {
-        // Use cached data if it's less than 15 minutes old
-        setTrendingPosts(data);
-      } else {
-        // Fetch new data if cached data is older than 15 minutes
-        fetchData();
-      }
-    } else {
-      // Fetch new data if no cached data
-      fetchData();
-    }
-  }, []); // Empty dependency array ensures this effect runs only once (on component mount)
+  const url = 'https://api.nostr.band/v0/trending/notes';
+  const dataProcessor = (data) => {
+    const newTrendingPosts = data.notes.map((e) => e.event);
+    newTrendingPosts.forEach((e) => {
+      Events.handle(e);
+    });
+    return newTrendingPosts;
+  };
+  const trendingPosts = useCachedFetch(url, 'trendingNotes', dataProcessor);
 
   return (
     <div class="mt-2 p-2 mx-2 md:mx-0 flex flex-col gap-4">
@@ -65,6 +63,7 @@ const Search = (_props: any) => {
         }}
       />
       <SmallFeed events={trendingPosts} />
+      <FollowSuggestionsAPI />
     </div>
   );
 };
