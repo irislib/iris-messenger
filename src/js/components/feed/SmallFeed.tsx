@@ -5,6 +5,7 @@ import { Link } from 'preact-router';
 import Identicon from '../Identicon';
 import Name from '../Name';
 import RelativeTime from '../RelativeTime';
+import {memo} from "react";
 
 const SmallFeed = ({ events }: { events: Event[] }) => {
   const mutedUsers = [];
@@ -45,4 +46,4 @@ const SmallFeed = ({ events }: { events: Event[] }) => {
   );
 };
 
-export default SmallFeed;
+export default memo(SmallFeed);

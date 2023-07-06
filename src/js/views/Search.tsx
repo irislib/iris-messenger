@@ -9,8 +9,9 @@ import SearchBox from '../components/SearchBox';
 import useCachedFetch from '../hooks/useCachedFetch';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
+import { memo } from 'react';
 
-const FollowSuggestionsAPI = () => {
+const FollowSuggestionsAPI = memo(() => {
   const url = `https://api.nostr.band/v0/suggested/profiles/${Key.getPubKey()}`;
   const suggestions = useCachedFetch(url, 'followSuggestions', (data) => data.profiles || []);
 
@@ -45,7 +46,7 @@ const FollowSuggestionsAPI = () => {
       </div>
     </div>
   );
-};
+});
 
 const Search = (props: any) => {
   const url = 'https://api.nostr.band/v0/trending/notes';
