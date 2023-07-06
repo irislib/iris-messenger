@@ -2,7 +2,7 @@
   "homepage": "http://digitaltrustprotocol.github.io/dpeep/",
   "name": "dpeep-preact",
   "private": true,
-  "version": "0.2.2",
+  "version": "0.2.4",
   "type": "module",
   "scripts": {
     "predeploy": "vite build",

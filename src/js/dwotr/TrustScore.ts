@@ -23,6 +23,7 @@ class TrustScore {
         return this.isTrusted(0);
     }
 
+
     isTrusted(degree: number) {
         if(this.value(degree) > 0)
             return true;

@@ -10,7 +10,6 @@ const useVerticeMonitor = (key: string, options?: any, option?: any) => {
 
     useEffect(() => {
         if (!key) return;
-        //console.log("useVerticeMonitor", key, options);
         let eventID = TrustScoreEventName+key;
 
         function findOption(item: MonitorItem) {

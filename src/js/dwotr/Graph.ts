@@ -1,4 +1,4 @@
-import TrustScore from "./TrustScore";
+import TrustScore, { MAX_DEGREE } from "./TrustScore";
 
 export enum EntityType {
     Key = 1,
@@ -169,6 +169,32 @@ export default class Graph {
             v.score = new TrustScore();
             v.degree = UNDEFINED_DEGREE;
         }
+    }
+
+
+    findVertices(entityType:EntityType = EntityType.Key, maxDegree:number = MAX_DEGREE) : Array<Vertice> {
+        let result = [] as Array<Vertice>;
+
+        for(const key in this.vertices) {
+            const v = this.vertices[key] as Vertice;
+
+            if(v.degree <= maxDegree && v.entityType === entityType) {
+                result.push(v);
+            }
+        }   
+        return result;
+    }
+
+    trustedBy(vId: number) : Array<{ inV:Vertice, edge: Edge}> {
+        let result = [] as Array<{ inV:Vertice, edge: Edge}>;
+        const v = this.vertices[vId] as Vertice;
+        for(const key in v.in) {
+            const inV = this.vertices[key] as Vertice;
+            const edge = this.edges[v.in[key]];
+            if(!edge || edge.val == 0) continue; // Skip if the edge has no value / neutral
+                result.push({inV, edge});
+        }
+        return result;
     }
 
     getUnsubscribedVertices(maxDegree: number) : Array<Vertice> {

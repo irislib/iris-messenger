@@ -26,6 +26,7 @@ import { translate as t } from '../translations/Translation.mjs';
 import View from './View';
 import TrustProfileButtons from '../dwotr/TrustProfileButtons';
 import ProfileFollowers from '../components/ProfileFollowers';
+import ProfileTrustLink from '../dwotr/ProfileTrustLink';
 
 class Profile extends View {
   followedUsers: Set<string>;
@@ -66,6 +67,10 @@ class Profile extends View {
 
   renderFollowers() {
     return <ProfileFollowers hexPub={this.state.hexPub} npub={this.state.npub} />;
+  }
+
+  renderTrustLink() {
+    return <ProfileTrustLink npub={this.state.npub} />;
   }
 
   async viewAs(event) {
@@ -204,6 +209,7 @@ class Profile extends View {
               ${this.renderFollowers()}
             </div>
             ${this.renderLinks()} 
+            ${this.renderTrustLink()}
           </div>
         </div>
         ${this.state.showQR

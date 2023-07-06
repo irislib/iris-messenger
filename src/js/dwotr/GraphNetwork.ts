@@ -10,7 +10,7 @@ import { MonitorItem } from "./MonitorItem";
 
 export type ResolveTrustCallback = (result: any) => any;
 
-
+export type ReadyCallback = () => void;
 
 export const TrustScoreEventName = 'trustScoreEvent';
 
@@ -40,7 +40,7 @@ class GraphNetwork {
 
     verticeMonitor = Object.create(null); // Monitor vertices for changes
     maxDegree = MAX_DEGREE;
-    backlog: Array<Vertice> = [];
+    readyCallbacks: ReadyCallback[] = [];
 
     processItems = {}; // Items to process
     processGraph = false;   // True if graph has to reprocessed
@@ -78,10 +78,20 @@ class GraphNetwork {
         this.processScore(); // Process score for all vertices within degree of maxDegree and subscribe to trust events
        
         this.localDataLoaded = true;
+        for(let callback of this.readyCallbacks) {
+            callback();
+        }
+        this.readyCallbacks = [];
     }
 
-
-
+    // Load of vertices from the DB can take some time and is done async, so this function calls back when the data is loaded
+    whenReady(callback: ReadyCallback) {
+        if(this.localDataLoaded) {
+            callback();
+        } else {
+            this.readyCallbacks.push(callback);
+        }
+    }
 
     async publishTrust(to: string, val: number = 0, entityType:EntityType = EntityType.Key, comment?:string, context: string = "nostr") {
 
@@ -128,7 +138,7 @@ class GraphNetwork {
     }
 
     addToProcessScoreQueue(outV: Vertice, inV: Vertice) {
-        if(outV.degree > this.maxDegree || outV.degree >= inV.degree) return; // No need to update the score
+        if(outV.degree > this.maxDegree) return; // No need to update the score
 
         if(outV.degree == this.maxDegree) {
             this.processItems[inV.id as number] = true; // Add the vertice to the list of items to process

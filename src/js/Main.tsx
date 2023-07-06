@@ -34,6 +34,7 @@ import '@fontsource/lato/700.css';
 import '../css/cropper.min.css';
 import "./dwotr/style.css";
 import DWoTRSetup from './dwotr/DWoTRSetup';
+import TrustListView from './dwotr/TrustListView';
 
 type Props = Record<string, unknown>;
 
@@ -156,6 +157,7 @@ class Main extends Component<Props, ReactState> {
               <Profile path="/:id/likes" tab="likes" />
               <Follows path="/follows/:id" />
               <Follows followers={true} path="/followers/:id" />
+              <TrustListView path="/trust/:id" view="trust" title="Trusted" description="Keys that you trust" />
               <NoteOrProfile path="/:id" />
             </Router>
           </div>
