@@ -61,8 +61,10 @@ const Modal: FC<Props> = ({
   };
 
   useEffect(() => {
+    document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', handleKeyDown);
     return () => {
+      document.body.style.overflow = 'unset';
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleKeyDown]);

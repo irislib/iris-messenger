@@ -253,7 +253,7 @@ class SearchBox extends Component<Props, State> {
                 placeholder={t('search')}
                 tabIndex={1}
                 onInput={() => this.onInput()}
-                className="input-bordered border-neutral-500 input input-sm w-64"
+                className="input-bordered border-neutral-500 input input-sm w-full"
               />
             </label>
           </form>
