@@ -135,14 +135,32 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     }
   };
 
+  handleScrollKeys = (e) => {
+    const name = e.key;
+    if (name === 'j')
+      window.scrollBy({
+        top: document.documentElement.clientHeight / 2,
+        left: 0,
+        behavior: 'smooth',
+      });
+    if (name === 'k')
+      window.scrollBy({
+        top: -document.documentElement.clientHeight / 2,
+        left: 0,
+        behavior: 'smooth',
+      });
+  };
+
   componentWillUnmount() {
     super.componentWillUnmount();
     window.removeEventListener('scroll', this.handleScroll);
+    window.removeEventListener('keyup', this.handleScrollKeys);
     this.unsub && this.unsub();
   }
 
   componentDidMount() {
     window.addEventListener('scroll', this.handleScroll);
+    window.addEventListener('keyup', this.handleScrollKeys);
     this.subscribe();
     if (isEqual(this.state.settings, DEFAULT_SETTINGS)) {
       // no settings saved in history state, load from localstorage
@@ -391,11 +409,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
             </div>
           </div>
         )}
-        {renderAs === 'NoteImage' ? (
-          <ImageGrid>{events}</ImageGrid>
-        ) : (
-          <div className="w-full md:w-3/4">{events}</div>
-        )}
+        {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
         {displayCount < this.state.sortedEvents.length ? this.renderShowMore() : ''}
       </div>
     );

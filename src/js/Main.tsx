@@ -117,14 +117,14 @@ class Main extends Component<Props, ReactState> {
     // TODO /username /username/likes and /username/replies should be under the same component to avoid refresh / rerender between them
     return (
       <div className="flex justify-center">
-        <section className="flex w-full max-w-screen-lg justify-between relative">
+        <section className="flex w-full max-w-screen-xl justify-between relative">
           {s.loggedIn ? <Menu /> : null}
           <Helmet titleTemplate={titleTemplate} defaultTitle={defaultTitle}>
             <title>{title}</title>
-            <meta name="description" content="Social Networking Freedom" />
+            <meta name="description" content="Connecting People" />
             <meta property="og:type" content="website" />
             <meta property="og:title" content={title} />
-            <meta property="og:description" content="Social Networking Freedom" />
+            <meta property="og:description" content="Connecting People" />
             <meta property="og:image" content="https://iris.to/assets/img/irisconnects.png" />
             <meta name="twitter:card" content="summary_large_image" />
             <meta name="twitter:image" content="https://iris.to/assets/img/irisconnects.png" />
@@ -133,7 +133,7 @@ class Main extends Component<Props, ReactState> {
           <div className="pb-16 md:pb-0 relative flex h-full flex-grow flex-col w-1/2">
             <Router onChange={(e) => this.handleRoute(e)}>
               <FeedList path="/" />
-              <Search path="/search" />
+              <Search path="/search" focus={true} />
               <KeyConverter path="/key" />
               <Feed path="/following" index="follows" />
               <Feed path="/global" index="global" />
