@@ -109,9 +109,9 @@ export default class Menu extends BaseComponent {
     const npub = Key.toNostrBech32Address(hex, 'npub');
     return (
       <div>
-        <Link href={`/${npub}`} className="btn btn-ghost md:max-lg:btn-circle">
+        <Link href={`/${npub}`} className="btn btn-ghost md:max-xl:btn-circle">
           <Identicon str={hex} width={34} />
-          <div className="hidden lg:block ml-2">
+          <div className="hidden xl:block ml-2">
             <Name pub={hex} hideBadge={true} />
           </div>
         </Link>
@@ -121,7 +121,7 @@ export default class Menu extends BaseComponent {
 
   render() {
     return (
-      <div className="sticky top-0 z-20 h-screen max-h-screen hidden md:w-16 lg:w-56 flex-col px-2 py-4 md:flex flex-shrink-0">
+      <div className="sticky top-0 z-20 h-screen max-h-screen hidden md:w-16 xl:w-56 flex-col px-2 py-4 md:flex flex-shrink-0">
         <a
           className="flex items-center gap-3 px-2 mb-4"
           tabIndex={3}
@@ -129,7 +129,7 @@ export default class Menu extends BaseComponent {
           onClick={(e) => this.menuLinkClicked(e, undefined, true)}
         >
           <img src="/img/icon128.png" width="30" height="30" />
-          <h1 className="hidden lg:flex text-3xl">iris</h1>
+          <h1 className="hidden xl:flex text-3xl">iris</h1>
         </a>
         {APPLICATIONS.map((a: any) => {
           if (a.url && (!a.beta || this.state.showBetaFeatures)) {
@@ -153,7 +153,7 @@ export default class Menu extends BaseComponent {
                     ''
                   )}
                   <Icon width={24} />
-                  <span className="hidden lg:flex">{t(a.text)}</span>
+                  <span className="hidden xl:flex">{t(a.text)}</span>
                 </a>
               </div>
             );
@@ -161,11 +161,11 @@ export default class Menu extends BaseComponent {
         })}
         <div class="py-2 flex-1">
           <button
-            className="btn btn-primary md:max-lg:btn-circle"
+            className="btn btn-primary md:max-xl:btn-circle"
             onClick={() => this.setState({ showNewPostModal: !this.state.showNewPostModal })}
           >
             <PlusIcon width={24} />
-            <span className="hidden lg:flex">{t('new_post')}</span>
+            <span className="hidden xl:flex">{t('new_post')}</span>
           </button>
           {this.renderNewPostModal()}
         </div>
