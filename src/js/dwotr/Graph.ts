@@ -172,30 +172,49 @@ export default class Graph {
     }
 
 
-    findVertices(entityType:EntityType = EntityType.Key, maxDegree:number = MAX_DEGREE) : Array<Vertice> {
+    outTrust(entityType?:EntityType, maxDegree:number = MAX_DEGREE+1) : Array<Vertice> {
         let result = [] as Array<Vertice>;
 
         for(const key in this.vertices) {
             const v = this.vertices[key] as Vertice;
 
-            if(v.degree <= maxDegree && v.entityType === entityType) {
+            if(v.degree <= maxDegree && (!entityType || v.entityType === entityType)) {
                 result.push(v);
             }
         }   
         return result;
     }
 
-    trustedBy(vId: number) : Array<{ inV:Vertice, edge: Edge}> {
-        let result = [] as Array<{ inV:Vertice, edge: Edge}>;
-        const v = this.vertices[vId] as Vertice;
-        for(const key in v.in) {
-            const inV = this.vertices[key] as Vertice;
+    outTrustById(sourceId: number, entityType?:EntityType, trust1?:number) : Array<{ v:Vertice, edge: Edge}> {
+        let result = [] as Array<{ v:Vertice, edge: Edge}>;
+        const sourceV = this.vertices[sourceId] as Vertice;
+        for(const key in sourceV.out) {
+            const v = this.vertices[key] as Vertice;
+            
             const edge = this.edges[v.in[key]];
-            if(!edge || edge.val == 0) continue; // Skip if the edge has no value / neutral
-                result.push({inV, edge});
+            if(!edge || edge.val == 0 || (trust1 && edge.val != trust1)) continue; // Skip if the edge has no value / neutral
+            
+            if(!entityType || v.entityType === entityType)
+                result.push({v, edge});
         }
         return result;
     }
+
+    trustedBy(sourceId: number, trust1?:number, maxDegree:number = MAX_DEGREE) : Array<{ v:Vertice, edge: Edge}> {
+        let result = [] as Array<{ v:Vertice, edge: Edge}>;
+        const sourceV = this.vertices[sourceId] as Vertice;
+        for(const key in sourceV.in) {
+            const v = this.vertices[key] as Vertice;
+            if(!v || v.degree > maxDegree) continue; // Skip if the in vertice has no degree or above max degree
+
+            const edge = this.edges[v.in[key]];
+            if(!edge || edge.val == 0 || (trust1 && edge.val != trust1)) continue; // Skip if the edge has no value / neutral
+            
+            result.push({v, edge});
+        }
+        return result;
+    }
+
 
     getUnsubscribedVertices(maxDegree: number) : Array<Vertice> {
         let vertices = new Array<Vertice>();

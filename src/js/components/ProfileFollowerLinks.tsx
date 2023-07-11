@@ -5,7 +5,7 @@ import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation.mjs';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ProfileFollowers = (props: any) => {
+const ProfileFollowerLinks = (props: any) => {
   const [state, setState] = useState({ followedUserCount: 0, followerCount: 0, followsYou: false });
 
   const { hexPub, npub } = props;
@@ -71,4 +71,4 @@ const ProfileFollowers = (props: any) => {
   );
 };
 
-export default ProfileFollowers;
+export default ProfileFollowerLinks;

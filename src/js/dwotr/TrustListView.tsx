@@ -15,14 +15,15 @@ import Identicon from '../components/Identicon';
 type TrustListViewProps = {
   id?: string;
   path?: string;
-  view?: string;
-  title?: string;
-  description?: string;
+  trust1?: string;
+  dir?: string;
+  entitytype?: string;
 };
 
 const TrustListView = (props: TrustListViewProps) => {
     
   const [hexKey] = useState(Key.toNostrHexAddress(props.id || Key.getPubKey()));
+  const [npub] = useState(Key.toNostrBech32Address(hexKey as string, 'npub'));
   const [state, setState] = useState({ startDegree: 1, maxDegree: 3, title: "" });
   const [vertices, setVertices] = useState<Array<Vertice>>([]);
   const [trustedBy, setTrustedBy] = useState<Array<{ inV:Vertice, edge: Edge}>>([]);
@@ -39,7 +40,7 @@ const TrustListView = (props: TrustListViewProps) => {
             setTrustedBy(list);
         } else {
             setState((prevState) => ({ ...prevState, startDegree:1,maxDegree: 3, title: "Trusted" }));
-            setVertices(graphNetwork.g.findVertices(EntityType.Key, 3));
+            setVertices(graphNetwork.g.outTrust(EntityType.Key, 3));
         }
     });
 
@@ -108,13 +109,6 @@ const TrustListView = (props: TrustListViewProps) => {
   return (
     <>
       <Header />
-
-      <div className="w-full">
-        <div className="flex items-center justify-between h-12">
-          <div>{props.title}</div>
-          <div className="text-neutral-500 text-sm">{props.description}</div>
-        </div>
-      </div>
       <div className="flex justify-between mb-4">
         <span className="text-2xl font-bold">
           <a className="link" href={`/${props.id}`}>

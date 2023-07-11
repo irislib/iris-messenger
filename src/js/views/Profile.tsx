@@ -25,8 +25,8 @@ import { translate as t } from '../translations/Translation.mjs';
 
 import View from './View';
 import TrustProfileButtons from '../dwotr/TrustProfileButtons';
-import ProfileFollowers from '../components/ProfileFollowers';
-import ProfileTrustLink from '../dwotr/ProfileTrustLink';
+import ProfileFollowerLinks from '../components/ProfileFollowerLinks';
+import ProfileTrustLinks from '../dwotr/ProfileTrustLinks';
 
 class Profile extends View {
   followedUsers: Set<string>;
@@ -59,18 +59,49 @@ class Profile extends View {
     }
   }
 
-  renderLinks() {
-    if (this.state.isMyProfile) return null;
-
-    return <TrustProfileButtons props={this.state} />;
+  renderWebSiteLink(state:any) {
+    return (
+      <>
+      {state.website ? (
+        <div style="flex:1">
+          <a href={state.website} target="_blank">
+            {state.website.replace(/^https?:\/\//, '')}
+          </a>
+        </div>
+      ) : (
+        ''
+      )}
+      </>
+    );
   }
 
-  renderFollowers() {
-    return <ProfileFollowers hexPub={this.state.hexPub} npub={this.state.npub} />;
+  renderActionButtons(state: any) {
+    if (this.state.isMyProfile) return this.renderWebSiteLink(state);
+
+    return (
+      <>
+        <TrustProfileButtons props={this.state} />
+        {state.lightning ? (
+          <div style="flex:1">
+            <a href={state.lightning} onClick={(e) => Helpers.handleLightningLinkClick(e)}>
+              ⚡ {t('tip_lightning')}
+            </a>
+          </div>
+        ) : (
+          ''
+        )}
+        {this.renderWebSiteLink(state)}
+      </>
+    );
   }
 
-  renderTrustLink() {
-    return <ProfileTrustLink npub={this.state.npub} />;
+  renderInfoLinks() {
+    return (
+      <>
+        <ProfileFollowerLinks hexPub={this.state.hexPub} npub={this.state.npub} />
+        <ProfileTrustLinks id={this.state.hexPub} />
+      </>
+    );
   }
 
   async viewAs(event) {
@@ -205,11 +236,8 @@ class Profile extends View {
             <div className="py-2">
               <p className="text-sm">${this.state.about}</p>
             </div>
-            <div className="text-sm flex gap-4">
-              ${this.renderFollowers()}
-            </div>
-            ${this.renderLinks()} 
-            ${this.renderTrustLink()}
+            <div className="text-sm flex gap-4">${this.renderInfoLinks()}</div>
+            <div className="text-sm flex gap-4">${this.renderActionButtons(this.state)}</div>
           </div>
         </div>
         ${this.state.showQR

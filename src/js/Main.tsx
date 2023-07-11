@@ -35,6 +35,7 @@ import '../css/cropper.min.css';
 import "./dwotr/style.css";
 import DWoTRSetup from './dwotr/DWoTRSetup';
 import TrustListView from './dwotr/TrustListView';
+import Score from './dwotr/Score';
 
 type Props = Record<string, unknown>;
 
@@ -157,7 +158,14 @@ class Main extends Component<Props, ReactState> {
               <Profile path="/:id/likes" tab="likes" />
               <Follows path="/follows/:id" />
               <Follows followers={true} path="/followers/:id" />
-              <TrustListView path="/trust/:id" view="trust" title="Trusted" description="Keys that you trust" />
+
+              <TrustListView path="/trust/account/:id" trust1="1" entitytype="key"  />
+              <TrustListView path="/trust/post/:id" trust1="1" entitytype="item"  />
+              <Score path="/trustedby/:id" trust1={1} dir="in" title="Trusted by" />
+              <Score path="/distrustedby/:id" trust1={-1} dir="in" title="Distrusted by" />
+              <Score path="/trusting/:id" trust1={1} dir="out" title="Trusting" />
+              <Score path="/distrusting/:id" trust1={-1} dir="out" title="Distrusting" />
+
               <NoteOrProfile path="/:id" />
             </Router>
           </div>
