@@ -35,7 +35,7 @@ localState.get('mutedNotes').on((v) => {
 });
 
 const DEFAULT_GLOBAL_FILTER = {
-  maxFollowDistance: 4,
+  maxFollowDistance: 3,
   minFollowersAtMaxDistance: 5,
 };
 let globalFilter = DEFAULT_GLOBAL_FILTER;
@@ -426,23 +426,26 @@ const Events = {
         callback(e);
       });
   },
-  handle(event: Event & { id: string }, force = false, saveToIdb = true, retry = true): boolean {
+  handle(event: Event & { id: string }, force = false, saveToIdb = true, retries = 2): boolean {
     if (!event) return false;
     if (!force && this.seen.has(event.id)) {
       return false;
     }
     if (!force && !this.acceptEvent(event)) {
-      if (retry) {
+      if (retries) {
         // should we retry only if iris has been opened within the last few seconds or the social graph changed?
         setTimeout(() => {
-          this.handle(event, force, saveToIdb, false);
+          this.handle(event, force, saveToIdb, retries - 1);
         }, 3000);
       }
       return false;
     }
-    if (!retry) {
+    if (retries === 1) {
+      //console.log('accepted event on 1st retry', event);
+    }
+    if (!retries) {
       // we get some of these
-      console.log('accepted event on retry', event);
+      //console.log('accepted event on 2nd retry', event);
     }
     // Accepting metadata so we still get their name. But should we instead save the name on our own list?
     // They might spam with 1 MB events and keep changing their name or something.
