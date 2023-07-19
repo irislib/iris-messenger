@@ -426,13 +426,23 @@ const Events = {
         callback(e);
       });
   },
-  handle(event: Event & { id: string }, force = false, saveToIdb = true): boolean {
+  handle(event: Event & { id: string }, force = false, saveToIdb = true, retry = true): boolean {
     if (!event) return false;
     if (!force && this.seen.has(event.id)) {
       return false;
     }
     if (!force && !this.acceptEvent(event)) {
+      if (retry) {
+        // should we retry only if iris has been opened within the last few seconds or the social graph changed?
+        setTimeout(() => {
+          this.handle(event, force, saveToIdb, false);
+        }, 3000);
+      }
       return false;
+    }
+    if (!retry) {
+      // we get some of these
+      console.log('accepted event on retry', event);
     }
     // Accepting metadata so we still get their name. But should we instead save the name on our own list?
     // They might spam with 1 MB events and keep changing their name or something.
