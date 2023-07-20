@@ -847,34 +847,6 @@ export default {
     }
   }, 100),
 
-  animateScrollTop: (selector?: string): void => {
-    const el = selector ? $(selector) : $(window);
-    el.css({ overflow: 'hidden' });
-    setTimeout(() => {
-      el.css({ overflow: '' });
-      el.on('scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart', (e) => {
-        if (
-          e.which > 0 ||
-          e.type === 'mousedown' ||
-          e.type === 'mousewheel' ||
-          e.type === 'touchstart'
-        ) {
-          el.stop(true);
-        }
-      });
-      el.stop().animate(
-        { scrollTop: 0 },
-        {
-          duration: 400,
-          queue: false,
-          always: () => {
-            el.off('scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart');
-          },
-        },
-      );
-    }, 10);
-  },
-
   getMyProfileLink(): string {
     const user = existingIrisToAddress.name || Key.toNostrBech32Address(Key.getPubKey(), 'npub');
     return `${window.location.origin}/${user}`;

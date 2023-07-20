@@ -49,7 +49,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       .get('feed')
       .once((s) => (savedSettings = s));
     this.state = {
-      sortedEvents: [],
+      events: [],
       queuedEvents: [],
       displayCount: INITIAL_PAGE_SIZE,
       eventsShownTime: Math.floor(Date.now() / 1000),
@@ -90,37 +90,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     return settings;
   }
 
-  updateSortedEvents = (sortedEvents) => {
-    if (this.unmounted || !sortedEvents) {
-      return;
-    }
-    const settings = this.state.settings;
-    // iterate over sortedEvents and add newer than eventsShownTime to queue
-    const queuedEvents = [] as string[];
-    let hasMyEvent;
-    if (settings.sortDirection === 'desc' && !settings.realtime) {
-      for (let i = 0; i < sortedEvents.length; i++) {
-        const id = sortedEvents[i];
-        const event = Events.db.by('id', id);
-        if (event && event.created_at > this.state.eventsShownTime) {
-          if (event.pubkey === Key.getPubKey() && !Events.isRepost(event)) {
-            hasMyEvent = true;
-            break;
-          }
-          queuedEvents.push(id);
-        }
-      }
-    }
-    if (!hasMyEvent) {
-      sortedEvents = sortedEvents.filter((id) => !queuedEvents.includes(id));
-    }
-    const eventsShownTime = hasMyEvent ? Math.floor(Date.now() / 1000) : this.state.eventsShownTime;
-    this.setState({ sortedEvents, queuedEvents, eventsShownTime });
-  };
-
   handleScroll = () => {
     // increase page size when scrolling down
-    if (this.state.displayCount < this.state.sortedEvents.length) {
+    if (this.state.displayCount < this.state.events.length) {
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
       const clientHeight = document.documentElement.clientHeight;
       const scrollHeight = document.documentElement.scrollHeight;
@@ -177,7 +149,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     let first = true;
     localState.get('scrollUp').on(
       this.sub(() => {
-        !first && Helpers.animateScrollTop();
+        !first && window.scrollTo(0, 0);
         first = false;
       }),
     );
@@ -196,30 +168,37 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       this.state.settings.sortBy,
       this.state.settings.sortDirection,
     );
+    let twoSecondsPassed = false;
+    setTimeout(() => {
+      twoSecondsPassed = true;
+    }, 2000);
     const update = () => {
-      this.updateSortedEvents(
-        results
-          .events()
-          .filter((event) => {
-            if (SocialNetwork.blockedUsers.has(event.pubkey)) {
+      const events = results
+        .events()
+        .filter((event) => {
+          if (SocialNetwork.blockedUsers.has(event.pubkey)) {
+            return false;
+          }
+          const repliedMsg = Events.getEventReplyingTo(event);
+          if (repliedMsg) {
+            if (!this.state.settings.showReplies) {
               return false;
             }
-            const repliedMsg = Events.getEventReplyingTo(event);
-            if (repliedMsg) {
-              if (!this.state.settings.showReplies) {
-                return false;
-              }
-              const author = Events.db.by('id', repliedMsg)?.pubkey;
-              if (author && SocialNetwork.blockedUsers.has(author)) {
-                return false;
-              }
+            const author = Events.db.by('id', repliedMsg)?.pubkey;
+            if (author && SocialNetwork.blockedUsers.has(author)) {
+              return false;
             }
-            return true;
-          })
-          .map((event) => event.id),
-      );
+          }
+          return true;
+        })
+        .map((event) => event.id);
+      if (twoSecondsPassed && !this.state.settings.realtime) {
+        this.setState({ queuedEvents: events });
+      } else {
+        this.setState({ events, queuedEvents: [] });
+      }
     };
-    const throttledUpdate = throttle(update, 1000);
+    const throttledUpdate = throttle(update, 1000, { leading: true });
     let updated = false;
     const callback = (event) => {
       if (results.has(event.id)) {
@@ -283,26 +262,22 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     this.handleScroll();
     this.replaceState();
     if (!this.state.queuedEvents.length && prevState.queuedEvents.length) {
-      Helpers.animateScrollTop();
+      window.scrollTo(0, 0);
     }
     if (this.props.filter !== prevProps.filter || this.props.keyword !== prevProps.keyword) {
-      this.setState({ sortedEvents: [] });
+      this.setState({ events: [] });
       this.componentDidMount();
     }
   }
 
   showQueuedEvents() {
-    const sortedEvents = this.state.sortedEvents;
-    console.log('sortedEvents.length', sortedEvents.length);
-    sortedEvents.unshift(...this.state.queuedEvents);
-    console.log('queuedEvents.length', this.state.queuedEvents.length);
     this.setState({
-      sortedEvents,
+      events: this.state.queuedEvents,
       queuedEvents: [],
       eventsShownTime: Math.floor(Date.now() / 1000),
       displayCount: INITIAL_PAGE_SIZE,
     });
-    Helpers.animateScrollTop();
+    window.scrollTo(0, 0);
   }
 
   renderShowNewEvents() {
@@ -312,7 +287,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           className="btn btn-sm opacity-90 hover:opacity-100 hover:bg-iris-blue bg-iris-blue text-white"
           onClick={() => this.showQueuedEvents()}
         >
-          {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
+          {t('show_n_new_messages').replace('{n} ', '')}
         </div>
       </div>
     );
@@ -334,7 +309,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   }
 
   renderEvents(displayCount, renderAs, showRepliedMsg) {
-    return this.state.sortedEvents.slice(0, displayCount).map((id) => (
+    return this.state.events.slice(0, displayCount).map((id) => (
       <ErrorBoundary>
         <EventComponent
           key={id}
@@ -410,7 +385,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           </div>
         )}
         {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
-        {displayCount < this.state.sortedEvents.length ? this.renderShowMore() : ''}
+        {displayCount < this.state.events.length ? this.renderShowMore() : ''}
       </div>
     );
   }
