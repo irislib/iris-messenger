@@ -173,40 +173,35 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       twoSecondsPassed = true;
     }, 2000);
     const update = () => {
-      const events = results
-        .events()
-        .filter((event) => {
-          if (SocialNetwork.blockedUsers.has(event.pubkey)) {
-            return false;
-          }
-          const repliedMsg = Events.getEventReplyingTo(event);
-          if (repliedMsg) {
-            if (!this.state.settings.showReplies) {
-              return false;
-            }
-            const author = Events.db.by('id', repliedMsg)?.pubkey;
-            if (author && SocialNetwork.blockedUsers.has(author)) {
-              return false;
-            }
-          }
-          return true;
-        })
-        .map((event) => event.id);
+      const events = results.events().map((event) => event.id);
       if (twoSecondsPassed && !this.state.settings.realtime) {
         this.setState({ queuedEvents: events });
       } else {
         this.setState({ events, queuedEvents: [] });
       }
     };
-    const throttledUpdate = throttle(update, 1000, { leading: true });
+    const throttledUpdate = throttle(update, 2000, { leading: true });
     let updated = false;
     const callback = (event) => {
       if (results.has(event.id)) {
         return;
       }
+      if (SocialNetwork.blockedUsers.has(event.pubkey)) {
+        return;
+      }
+      const repliedMsg = Events.getEventReplyingTo(event);
+      if (repliedMsg) {
+        if (!this.state.settings.showReplies) {
+          return;
+        }
+        const author = Events.db.by('id', repliedMsg)?.pubkey;
+        if (author && SocialNetwork.blockedUsers.has(author)) {
+          return;
+        }
+      }
       results.add(event);
       if (results.size > 50 && !updated) {
-        // TODO should filter results, only count what's shown
+        // TODO should filter results (e.g. for images), only count what's shown
         updated = true;
         update();
       } else {

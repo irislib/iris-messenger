@@ -426,7 +426,7 @@ const Events = {
         callback(e);
       });
   },
-  handle(event: Event & { id: string }, force = false, saveToIdb = true, retries = 2): boolean {
+  handle(event: Event & { id: string }, force = false, saveToIdb = true, retries = 0): boolean {
     if (!event) return false;
     if (!force && this.seen.has(event.id)) {
       return false;
