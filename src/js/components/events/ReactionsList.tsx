@@ -31,7 +31,7 @@ const ReactionsList = (props) => {
   const { likes, reposts, zapAmountByUser, formattedZapAmount } = props;
   const [modalReactions, setModalReactions] = useState([] as ReactionData[]);
   const [modalTitle, setModalTitle] = useState('');
-  const hasReactions = likes.length > 0 || reposts.length > 0 || zapAmountByUser?.size > 0;
+  const hasReactions = likes.size > 0 || reposts.size > 0 || zapAmountByUser?.size > 0;
   if (!hasReactions) return null;
   return (
     <>
@@ -49,7 +49,7 @@ const ReactionsList = (props) => {
         </Modal>
       )}
       <div className="flex items-center gap-4 py-2">
-        {likes.length > 0 && (
+        {likes.size > 0 && (
           <div className="flex-shrink-0">
             <a
               onClick={() => {
@@ -59,11 +59,11 @@ const ReactionsList = (props) => {
               }}
               className="cursor-pointer hover:underline"
             >
-              {likes.length} <span className="text-neutral-500">Likes</span>
+              {likes.size} <span className="text-neutral-500">Likes</span>
             </a>
           </div>
         )}
-        {reposts.length > 0 && (
+        {reposts.size > 0 && (
           <div className="flex-shrink-0">
             <a
               onClick={() => {
@@ -73,7 +73,7 @@ const ReactionsList = (props) => {
               }}
               className="cursor-pointer hover:underline"
             >
-              {reposts.length} <span className="text-neutral-500">Reposts</span>
+              {reposts.size} <span className="text-neutral-500">Reposts</span>
             </a>
           </div>
         )}

@@ -183,17 +183,15 @@ const ReactionButtons = (props) => {
 
   function renderReactionBtns() {
     const s = state;
-    const likes = Array.from(s.likedBy) || [];
-    const reposts = Array.from(s.repostedBy) || [];
     return (
       <>
         {props.standalone && (
           <ReactionsList
             event={props.event}
-            likes={likes}
+            likes={s.likedBy}
             zapAmountByUser={s.zapAmountByUser}
             formattedZapAmount={s.formattedZapAmount}
-            reposts={reposts}
+            reposts={s.repostedBy}
           />
         )}
         <div className="flex">

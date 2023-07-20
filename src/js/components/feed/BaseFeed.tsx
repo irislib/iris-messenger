@@ -1,4 +1,4 @@
-import { throttle } from 'lodash';
+import { debounce } from 'lodash';
 import isEqual from 'lodash/isEqual';
 
 import BaseComponent from '../../BaseComponent';
@@ -180,7 +180,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         this.setState({ events, queuedEvents: [] });
       }
     };
-    const throttledUpdate = throttle(update, 2000, { leading: true });
+    const debouncedUpdate = debounce(update, 2000, { leading: true });
     let updated = false;
     const callback = (event) => {
       if (results.has(event.id)) {
@@ -205,7 +205,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         updated = true;
         update();
       } else {
-        throttledUpdate();
+        debouncedUpdate();
       }
     };
     const go = () => {
@@ -238,7 +238,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     };
   }
 
-  replaceState = throttle(
+  replaceState = debounce(
     () => {
       window.history.replaceState({ ...window.history.state, state: this.state }, '');
     },
