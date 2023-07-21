@@ -12,7 +12,7 @@ const Appearance = () => {
 
   useEffect(() => {
     // TODO use Nostr.private
-    Session.public?.get('settings/colorScheme', (_entry) => {
+    Session.public?.get('settings/colorScheme', (/*entry*/) => {
       //setColorScheme(entry.value);
     });
     localState.get('showConnectedRelays').on(setShowConnectedRelays);

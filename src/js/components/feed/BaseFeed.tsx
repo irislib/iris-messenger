@@ -1,4 +1,4 @@
-import { throttle } from 'lodash';
+import { debounce } from 'lodash';
 import isEqual from 'lodash/isEqual';
 
 import BaseComponent from '../../BaseComponent';
@@ -9,12 +9,13 @@ import Key from '../../nostr/Key';
 import PubSub, { Unsubscribe } from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
-import ErrorBoundary from '../ErrorBoundary';
-import EventComponent from '../events/EventComponent';
 
+import EventList from './EventList';
 import FeedSettings from './FeedSettings';
 import FeedTypeSelector from './FeedTypeSelector';
 import ImageGrid from './ImageGrid';
+import ShowMore from './ShowMore';
+import ShowNewEvents from './ShowNewEvents';
 import SortedEventMap from './SortedEventMap';
 import { FeedProps, FeedState } from './types';
 
@@ -49,7 +50,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       .get('feed')
       .once((s) => (savedSettings = s));
     this.state = {
-      sortedEvents: [],
+      events: [],
       queuedEvents: [],
       displayCount: INITIAL_PAGE_SIZE,
       eventsShownTime: Math.floor(Date.now() / 1000),
@@ -90,37 +91,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     return settings;
   }
 
-  updateSortedEvents = (sortedEvents) => {
-    if (this.unmounted || !sortedEvents) {
-      return;
-    }
-    const settings = this.state.settings;
-    // iterate over sortedEvents and add newer than eventsShownTime to queue
-    const queuedEvents = [] as string[];
-    let hasMyEvent;
-    if (settings.sortDirection === 'desc' && !settings.realtime) {
-      for (let i = 0; i < sortedEvents.length; i++) {
-        const id = sortedEvents[i];
-        const event = Events.db.by('id', id);
-        if (event && event.created_at > this.state.eventsShownTime) {
-          if (event.pubkey === Key.getPubKey() && !Events.isRepost(event)) {
-            hasMyEvent = true;
-            break;
-          }
-          queuedEvents.push(id);
-        }
-      }
-    }
-    if (!hasMyEvent) {
-      sortedEvents = sortedEvents.filter((id) => !queuedEvents.includes(id));
-    }
-    const eventsShownTime = hasMyEvent ? Math.floor(Date.now() / 1000) : this.state.eventsShownTime;
-    this.setState({ sortedEvents, queuedEvents, eventsShownTime });
-  };
-
   handleScroll = () => {
     // increase page size when scrolling down
-    if (this.state.displayCount < this.state.sortedEvents.length) {
+    if (this.state.displayCount < this.state.events.length) {
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
       const clientHeight = document.documentElement.clientHeight;
       const scrollHeight = document.documentElement.scrollHeight;
@@ -177,7 +150,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     let first = true;
     localState.get('scrollUp').on(
       this.sub(() => {
-        !first && Helpers.animateScrollTop();
+        !first && window.scrollTo(0, 0);
         first = false;
       }),
     );
@@ -196,42 +169,44 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       this.state.settings.sortBy,
       this.state.settings.sortDirection,
     );
+    let twoSecondsPassed = false;
+    setTimeout(() => {
+      twoSecondsPassed = true;
+    }, 2000);
     const update = () => {
-      this.updateSortedEvents(
-        results
-          .events()
-          .filter((event) => {
-            if (SocialNetwork.blockedUsers.has(event.pubkey)) {
-              return false;
-            }
-            const repliedMsg = Events.getEventReplyingTo(event);
-            if (repliedMsg) {
-              if (!this.state.settings.showReplies) {
-                return false;
-              }
-              const author = Events.db.by('id', repliedMsg)?.pubkey;
-              if (author && SocialNetwork.blockedUsers.has(author)) {
-                return false;
-              }
-            }
-            return true;
-          })
-          .map((event) => event.id),
-      );
+      const events = results.events().map((event) => event.id);
+      if (twoSecondsPassed && !this.state.settings.realtime && this.state.events.length > 5) {
+        this.setState({ queuedEvents: events });
+      } else {
+        this.setState({ events, queuedEvents: [] });
+      }
     };
-    const throttledUpdate = throttle(update, 1000);
+    const debouncedUpdate = debounce(update, 1000, { leading: true });
     let updated = false;
     const callback = (event) => {
       if (results.has(event.id)) {
         return;
       }
+      if (SocialNetwork.blockedUsers.has(event.pubkey)) {
+        return;
+      }
+      const repliedMsg = Events.getEventReplyingTo(event);
+      if (repliedMsg) {
+        if (!this.state.settings.showReplies) {
+          return;
+        }
+        const author = Events.db.by('id', repliedMsg)?.pubkey;
+        if (author && SocialNetwork.blockedUsers.has(author)) {
+          return;
+        }
+      }
       results.add(event);
-      if (results.size > 50 && !updated) {
-        // TODO should filter results, only count what's shown
+      if (results.size > 10 && !updated) {
+        // TODO should filter results (e.g. for images), only count what's shown
         updated = true;
         update();
       } else {
-        throttledUpdate();
+        debouncedUpdate();
       }
     };
     const go = () => {
@@ -258,13 +233,14 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getEvents(_callback): Unsubscribe {
     return () => {
       // override this
     };
   }
 
-  replaceState = throttle(
+  replaceState = debounce(
     () => {
       window.history.replaceState({ ...window.history.state, state: this.state }, '');
     },
@@ -283,70 +259,22 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     this.handleScroll();
     this.replaceState();
     if (!this.state.queuedEvents.length && prevState.queuedEvents.length) {
-      Helpers.animateScrollTop();
+      window.scrollTo(0, 0);
     }
     if (this.props.filter !== prevProps.filter || this.props.keyword !== prevProps.keyword) {
-      this.setState({ sortedEvents: [] });
+      this.setState({ events: [] });
       this.componentDidMount();
     }
   }
 
   showQueuedEvents() {
-    const sortedEvents = this.state.sortedEvents;
-    console.log('sortedEvents.length', sortedEvents.length);
-    sortedEvents.unshift(...this.state.queuedEvents);
-    console.log('queuedEvents.length', this.state.queuedEvents.length);
     this.setState({
-      sortedEvents,
+      events: this.state.queuedEvents,
       queuedEvents: [],
       eventsShownTime: Math.floor(Date.now() / 1000),
       displayCount: INITIAL_PAGE_SIZE,
     });
-    Helpers.animateScrollTop();
-  }
-
-  renderShowNewEvents() {
-    return (
-      <div className="fixed bottom-16 md:bottom-8 justify-center items-center z-10 flex w-full md:w-1/2">
-        <div
-          className="btn btn-sm opacity-90 hover:opacity-100 hover:bg-iris-blue bg-iris-blue text-white"
-          onClick={() => this.showQueuedEvents()}
-        >
-          {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
-        </div>
-      </div>
-    );
-  }
-
-  renderShowMore() {
-    return (
-      <button
-        className="btn btn-neutral btn-sm my-4"
-        onClick={() =>
-          this.setState({
-            displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
-          })
-        }
-      >
-        {t('show_more')}
-      </button>
-    );
-  }
-
-  renderEvents(displayCount, renderAs, showRepliedMsg) {
-    return this.state.sortedEvents.slice(0, displayCount).map((id) => (
-      <ErrorBoundary>
-        <EventComponent
-          key={id}
-          id={id}
-          showRepliedMsg={showRepliedMsg}
-          renderAs={renderAs}
-          feedOpenedAt={this.openedAt}
-          showReplies={0}
-          fullWidth={!this.state.settings.showReplies}
-        />
-      </ErrorBoundary>
-    ));
+    window.scrollTo(0, 0);
   }
 
   render() {
@@ -357,11 +285,20 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
     const showQueuedEvents = this.state.queuedEvents.length > 0 && !this.state.settingsOpen;
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
-    const events = this.renderEvents(displayCount, renderAs, showRepliedMsg);
+    const events = (
+      <EventList
+        events={this.state.events}
+        displayCount={displayCount}
+        renderAs={renderAs}
+        showRepliedMsg={showRepliedMsg}
+        openedAt={this.openedAt}
+        settings={this.state.settings}
+      />
+    );
 
     return (
       <div className="mb-4">
-        {showQueuedEvents && this.renderShowNewEvents()}
+        {showQueuedEvents && <ShowNewEvents onClick={() => this.showQueuedEvents()} />}
         {this.props.index !== 'notifications' && this.state.settingsOpen && (
           <FeedSettings
             settings={this.state.settings}
@@ -402,7 +339,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
             }}
           />
         )}
-        {events.length === 0 && (
+        {this.state.events.length === 0 && (
           <div className="msg">
             <div className="msg-content notification-msg">
               {this.props.emptyMessage || t('no_events_yet')}
@@ -410,7 +347,17 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           </div>
         )}
         {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
-        {displayCount < this.state.sortedEvents.length ? this.renderShowMore() : ''}
+        {displayCount < this.state.events.length ? (
+          <ShowMore
+            onClick={() =>
+              this.setState({
+                displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
+              })
+            }
+          />
+        ) : (
+          ''
+        )}
       </div>
     );
   }

@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet';
+import { debounce } from 'lodash';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
@@ -52,7 +53,7 @@ const Note = ({
 }) => {
   const [showMore, setShowMore] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
-  const [replies, setReplies] = useState([]);
+  const [replies, setReplies] = useState([] as string[]);
   const [translatedText, setTranslatedText] = useState('');
   const [name, setName] = useState('');
 
@@ -77,11 +78,28 @@ const Note = ({
 
   useEffect(() => {
     if (standalone) {
-      return SocialNetwork.getProfile(event.pubkey, (profile) => {
+      SocialNetwork.getProfile(event.pubkey, (profile) => {
         setName(profile?.display_name || profile?.name || '');
       });
+
+      return Events.getReplies(
+        event.id,
+        debounce(
+          (replies) => {
+            const arr = Array.from(replies).slice(0, showReplies) as string[];
+            arr.sort((a, b) => {
+              const aEvent = Events.db.by('id', a);
+              const bEvent = Events.db.by('id', b);
+              return aEvent.created_at - bEvent.created_at;
+            });
+            setReplies(arr);
+          },
+          500,
+          { leading: true, trailing: true },
+        ),
+      );
     }
-  });
+  }, [event.id, standalone, showReplies]);
 
   // TODO fetch replies in useEffect
 
@@ -302,11 +320,9 @@ const Note = ({
   }
 
   function renderReplies() {
-    return replies
-      .slice(0, showReplies)
-      .map((r) => (
-        <EventComponent key={r} id={r} isReply={true} isQuoting={!standalone} showReplies={1} />
-      ));
+    return replies.map((r) => (
+      <EventComponent key={r} id={r} isReply={true} isQuoting={!standalone} showReplies={1} />
+    ));
   }
 
   function renderReplyForm() {
