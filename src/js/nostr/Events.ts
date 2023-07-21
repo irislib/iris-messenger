@@ -711,7 +711,6 @@ const Events = {
     const npub = Key.toNostrBech32Address(obj.pubkey, 'npub');
     return npub;
   },
-  // TODO break into separate methods for different kinds of cb params
   getRepliesAndReactions(
     id: string,
     cb?: (

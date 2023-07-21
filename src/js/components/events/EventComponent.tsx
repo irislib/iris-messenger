@@ -125,6 +125,7 @@ const EventComponent = (props: EventComponentProps) => {
     return null;
   }
   if (!state.event) {
+    if (props.renderAs === 'NoteImage') return null;
     return (
       <div key={props.id} className={getClassName()}>
         <div
