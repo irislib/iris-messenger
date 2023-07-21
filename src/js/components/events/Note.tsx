@@ -72,7 +72,7 @@ const Note = ({
         setName(profile?.display_name || profile?.name || '');
       });
 
-      Events.getRepliesAndReactions(
+      return Events.getRepliesAndReactions(
         event.id,
         debounce(
           (replies) => {
