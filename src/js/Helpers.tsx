@@ -166,7 +166,8 @@ export default {
     }
 
     if (settings.enableVideos !== false) {
-      const videoRegex = /(https?:\/\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm))\b/gi;
+      const videoRegex =
+        /(https?:\/\/[^?\s]+\/[^?\s]+\.(?:mp4|mkv|avi|flv|wmv|mov|webm)(?:\?\S*)?)\b/gi;
       replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
         return (
           <video

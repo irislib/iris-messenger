@@ -1,8 +1,9 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link } from 'preact-router';
 
-import { formatAmount } from '../../Lightning';
+import { decodeInvoice, formatAmount } from '../../Lightning';
+import Events from '../../nostr/Events'; // Import Events module
 import Identicon from '../Identicon';
 import Modal from '../modal/Modal';
 import Name from '../Name';
@@ -25,14 +26,48 @@ const Reaction = memo(({ data }: { data: ReactionData }) => {
   );
 });
 
-//formatAmount(amount / 1000)
-
-const ReactionsList = (props) => {
-  const { likes, reposts, zapAmountByUser, formattedZapAmount } = props;
+const ReactionsList = ({ event }) => {
+  const [likes, setLikes] = useState(new Set());
+  const [reposts, setReposts] = useState(new Set());
+  const [zapAmountByUser, setZapAmountByUser] = useState(new Map());
+  const [formattedZapAmount, setFormattedZapAmount] = useState('');
   const [modalReactions, setModalReactions] = useState([] as ReactionData[]);
   const [modalTitle, setModalTitle] = useState('');
-  const hasReactions = likes.size > 0 || reposts.size > 0 || zapAmountByUser?.size > 0;
+
+  useEffect(() => {
+    const handleRepliesAndReactions = (_replies, likedBy, _threadReplyCount, repostedBy, zaps) => {
+      setLikes(new Set(likedBy));
+      setReposts(new Set(repostedBy));
+
+      const zapData = new Map<string, number>();
+      let totalZapAmount = 0;
+      const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.by('id', eventId));
+      zapEvents.forEach((zapEvent) => {
+        const bolt11 = zapEvent?.tags.find((tag) => tag[0] === 'bolt11')[1];
+        if (!bolt11) {
+          console.log('Invalid zap, missing bolt11 tag');
+          return;
+        }
+        const decoded = decodeInvoice(bolt11);
+        const amount = (decoded?.amount || 0) / 1000;
+        totalZapAmount += amount;
+        const zapper = Events.getZappingUser(zapEvent.id);
+        if (zapper) {
+          const existing = zapData.get(zapper) || 0;
+          zapData.set(zapper, existing + amount);
+        }
+      });
+
+      setZapAmountByUser(zapData);
+      setFormattedZapAmount(totalZapAmount > 0 ? formatAmount(totalZapAmount) : '');
+    };
+
+    return Events.getRepliesAndReactions(event.id, handleRepliesAndReactions);
+  }, [event]);
+
+  const hasReactions = likes.size > 0 || reposts.size > 0 || zapAmountByUser.size > 0;
   if (!hasReactions) return null;
+
   return (
     <>
       <hr className="-mx-2 opacity-10" />
