@@ -106,7 +106,7 @@ const ReactionsList = (props) => {
           </div>
         )}
         {hasTrust && (
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0" title="Degree 0/1/2">
             <a
               onClick={() => {
                 let list = graphNetwork.getTrustList(wot?.vertice, 1);
@@ -121,7 +121,7 @@ const ReactionsList = (props) => {
           </div>
         )}
         {hasDistrust && (
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0" title="Degree 0/1/2">
             <a
               onClick={() => {
                 let list = graphNetwork.getTrustList(wot?.vertice, -1);

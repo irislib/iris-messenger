@@ -1,0 +1,230 @@
+import { Network } from 'vis-network';
+import { DataSet } from 'vis-data';
+import { useEffect, useState, useRef } from 'preact/hooks';
+import Header from '../components/Header';
+import Name from '../components/Name';
+import Key from '../nostr/Key';
+import graphNetwork from './GraphNetwork';
+import { Edge, EntityType, Vertice } from './Graph';
+import { Link } from 'preact-router';
+import { RenderTrust1Color, renderEntityKeyName } from './RenderGraph';
+import { filterByName, renderScoreLine } from './WotView';
+import WOTPubSub from './WOTPubSub';
+
+type VisGraphProps = {
+  id?: string;
+  entitytype?: string;
+  trust1?: string;
+  dir?: string;
+  filter?: string;
+  view?: string;
+  path?: string;
+};
+
+const defaultOptions = {
+  physics: {
+    stabilization: false,
+  },
+  autoResize: false,
+  nodes: {
+    borderWidth: 2,
+    //size: 30,
+    //shape: "circularImage",
+    color: {
+      border: '#222222',
+      background: '#666666',
+    },
+    font: { color: '#eeeeee' },
+  },
+  edges: {
+    smooth: false,
+    color: 'lightgray',
+    width: 1,
+    arrows: {
+      to: {
+        enabled: true,
+        scaleFactor: 0.5,
+      },
+    },
+  },
+};
+
+// const nodes = [
+//   { id: 1, label: 'Node 1' },
+//   { id: 2, label: 'Node 2' },
+//   { id: 3, label: 'Node 3' },
+//   { id: 4, label: 'Node 4' },
+//   { id: 5, label: 'Node 5' },
+// ];
+
+// const edges = [
+//   { from: 1, to: 3 },
+//   { from: 1, to: 2 },
+//   { from: 2, to: 4 },
+//   { from: 2, to: 5 },
+//   { from: 3, to: 3 },
+// ];
+
+const VisGraph = (props: VisGraphProps) => {
+  // Create a ref to provide DOM access
+  const visJsRef = useRef<HTMLDivElement>(null);
+  const [network, setNetwork] = useState<Network | null>();
+  const [state, setState] = useState<any>(null);
+  const [vertices, setVertices] = useState<Array<Vertice>>([]);
+  const [nodes, setNodes] = useState<DataSet<any>>(new DataSet());
+  const [edges, setEdges] = useState<DataSet<any>>(new DataSet());
+  //const [name, setName] = useState<string | undefined>('...');
+
+  useEffect(() => {
+    if (!visJsRef.current) return;
+
+    var data = {
+      nodes: nodes,
+      edges: edges,
+    };
+
+    const instance = visJsRef.current && new Network(visJsRef.current, data, defaultOptions);
+
+    setNetwork(instance);
+    return () => {
+      // Cleanup the network on component unmount
+      network?.destroy();
+    };
+  }, [visJsRef, state]);
+
+  useEffect(() => {
+    graphNetwork.whenReady(() => {
+      const npub = props.id || Key.getPubKey();
+      const hexKey = Key.toNostrHexAddress(npub) as string;
+      const trust1 = props.trust1 == 'trust' ? 1 : props.trust1 == 'distrust' ? -1 : 0;
+      const dir = props.dir || 'both';
+      const entitytype = props?.entitytype == 'item' ? EntityType.Item : EntityType.Key;
+      const view = props.view || 'list';
+      const filter = props.filter || '';
+      const me = hexKey == Key.getPubKey();
+
+      let vId = graphNetwork.g.getVerticeId(hexKey);
+      if (!vId) return;
+      let v = graphNetwork.g.vertices[vId];
+      let score = v?.score;
+
+      nodes.add({ id: vId, label: 'Me' });
+
+      setState((prevState) => ({
+        ...prevState,
+        npub,
+        hexKey,
+        entitytype,
+        trust1,
+        dir,
+        view,
+        filter,
+        vId,
+        me,
+        v,
+        score,
+      }));
+
+      loadNode(vId);
+    });
+  }, [props.id]);
+
+  function loadNode(vId: number) {
+    let v = graphNetwork.g.vertices[vId] as Vertice;
+    if (!v) return;
+
+    let list: Vertice[] = [];
+
+    list = graphNetwork.g.inOutTrustById(vId, EntityType.Key, undefined);
+
+    //let addresses = list.map((v) => v.key);
+    //WOTPubSub.loadProfiles(addresses); // make sure to load the profiles into memory.
+
+    let filterResults = filterByName(list, ''); // make sure to add name and picture to the vertices.
+
+    for (let item of filterResults) {
+      nodes.add({ id: item.id, label: item['profile']?.name, image: item['profile']?.picture });
+
+      let outEdge = graphNetwork.g.edges[v.out[item.id as number]] as Edge;
+      if (outEdge) {
+        let color = RenderTrust1Color(outEdge.val);
+        edges.add({ from: vId, to: item.id, color });
+      }
+
+      let inEdge = graphNetwork.g.edges[v.in[item.id as number]] as Edge;
+      if (inEdge) {
+        let color = RenderTrust1Color(inEdge.val);
+        edges.add({ from: item.id, to: vId, color });
+      }
+    }
+  }
+
+  // useEffect(() => {
+  // 	const hexKey = Key.toNostrHexAddress(props.id || Key.getPubKey()) as string;
+  // 	return SocialNetwork.getProfile(hexKey, (profile) => {
+  // 	  //setProfile(profile);
+  // 	  setName(() => profile?.display_name || profile?.name || '...');
+  // 	});
+  //   }, [props.id]);
+
+  function setSearch(params: any) {
+    const p = {
+      npub: state.npub,
+      entitytype: state.entitytype,
+      trust1: state.trust1,
+      dir: state.dir,
+      view: state.view,
+      filter: '',
+      page: 'wot',
+      ...params,
+    };
+    return `/${p.page}/${p.npub}/${renderEntityKeyName(p.entitytype)}/${p.dir}/${
+      p.trust1 == 1 ? 'trust' : p.trust1 == -1 ? 'distrust' : 'both'
+    }/${p.view}${p.filter ? '/' + p.filter : ''}`;
+  }
+
+  const selected = 'link link-active'; // linkSelected
+  const unselected = 'text-neutral-500';
+
+  //return { network, visJsRef };
+  //return <div ref={visJsRef} />;
+  if (!state) return null;
+  return (
+    <>
+      <Header />
+      <div className="flex justify-between mb-4">
+        <span className="text-2xl font-bold">
+          <a className="link" href={`/${state.npub}`}>
+            <Name pub={state.npub as string} />
+          </a>
+          <span style={{ flex: 1 }} className="ml-1">
+            Web of Trust Graph
+          </span>
+        </span>
+      </div>
+      {renderScoreLine(state?.score, state.npub)}
+      <hr className="-mx-2 opacity-10 my-2" />
+      <div className="flex flex-wrap gap-4">
+        <Link
+          href={setSearch({ page: 'wot', view: 'list' })}
+          className={state.view == 'list' ? selected : unselected}
+        >
+          List
+        </Link>
+        <Link
+          href={setSearch({ page: 'vis', view: 'graph' })}
+          className={state.view == 'graph' ? selected : unselected}
+        >
+          Graph
+        </Link>
+      </div>
+
+      <hr className="-mx-2 opacity-10 my-2" />
+      <div className="h-full w-full flex items-stretch justify-center">
+        <div className="flex-grow" ref={visJsRef} />
+      </div>
+    </>
+  );
+};
+
+export default VisGraph;

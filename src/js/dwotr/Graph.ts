@@ -172,45 +172,75 @@ export default class Graph {
     }
 
 
-    outTrust(entityType?:EntityType, maxDegree:number = MAX_DEGREE+1) : Array<Vertice> {
+    wotNetwork(entityType?:EntityType, maxDegree:number = MAX_DEGREE+1) : Array<Vertice> {
         let result = [] as Array<Vertice>;
 
         for(const key in this.vertices) {
             const v = this.vertices[key] as Vertice;
 
-            if(v.degree <= maxDegree && (!entityType || v.entityType === entityType)) {
+            if(v.degree <= maxDegree                                // Only add vertices with a degree less than maxDegree
+                && v.degree > 0                                     // Skip the source vertice
+                && (!entityType || v.entityType === entityType)) {  // Only add vertices of the specified type
                 result.push(v);
             }
         }   
         return result;
     }
 
-    outTrustById(sourceId: number, entityType?:EntityType, trust1?:number) : Array<{ v:Vertice, edge: Edge}> {
-        let result = [] as Array<{ v:Vertice, edge: Edge}>;
+
+    inOutTrustById(sourceId: number, entityType?:EntityType, trust1?:number) : Array<Vertice> {
+        let obj = Object.create(null) as {[key: string]: Vertice};
         const sourceV = this.vertices[sourceId] as Vertice;
-        for(const key in sourceV.out) {
-            const v = this.vertices[key] as Vertice;
-            
-            const edge = this.edges[v.in[key]];
+        for(const key in sourceV.in) {
+            const outV = this.vertices[key] as Vertice;
+            if(!outV || outV.degree > MAX_DEGREE) continue; // Skip if the in vertice has no degree or above max degree
+
+            const edge = this.edges[sourceV.in[key]];
             if(!edge || edge.val == 0 || (trust1 && edge.val != trust1)) continue; // Skip if the edge has no value / neutral
             
-            if(!entityType || v.entityType === entityType)
-                result.push({v, edge});
+            obj[key] = outV;
+        }
+        for(const key in sourceV.out) {
+            const edge = this.edges[sourceV.out[key]];
+            if(!edge || edge.val == 0 || (trust1 && edge.val != trust1)) continue; // Skip if the edge has no value / neutral
+
+            const inV = this.vertices[key] as Vertice;
+            if(!entityType || inV.entityType === entityType)
+                obj[key] = inV;
+        }
+        return Object.values(obj);
+    }
+
+
+
+    outTrustById(sourceId: number, entityType?:EntityType, trust1?:number) : Array<Vertice> {
+        let result = [] as Array<Vertice>;
+        const sourceV = this.vertices[sourceId] as Vertice;
+        for(const key in sourceV.out) {
+            const inV = this.vertices[key] as Vertice;
+            
+            const edge = this.edges[sourceV.out[key]];
+            if(!edge || edge.val == 0 || (trust1 && edge.val != trust1)) continue; // Skip if the edge has no value / neutral
+            
+            if(!entityType || inV.entityType === entityType)
+                result.push(inV);
         }
         return result;
     }
 
-    trustedBy(sourceId: number, trust1?:number, maxDegree:number = MAX_DEGREE) : Array<{ v:Vertice, edge: Edge}> {
-        let result = [] as Array<{ v:Vertice, edge: Edge}>;
+    trustedBy(sourceId: number, entityType?:EntityType, trust1?:number, maxDegree:number = MAX_DEGREE) : Array<Vertice> {
+        let result = [] as Array<Vertice>;
         const sourceV = this.vertices[sourceId] as Vertice;
-        for(const key in sourceV.in) {
-            const v = this.vertices[key] as Vertice;
-            if(!v || v.degree > maxDegree) continue; // Skip if the in vertice has no degree or above max degree
 
-            const edge = this.edges[v.in[key]];
+        for(const key in sourceV.in) {
+            const outV = this.vertices[key] as Vertice;
+            if(!outV || outV.degree > maxDegree) continue; // Skip if the in vertice has no degree or above max degree
+
+            const edge = this.edges[sourceV.in[key]];
             if(!edge || edge.val == 0 || (trust1 && edge.val != trust1)) continue; // Skip if the edge has no value / neutral
             
-            result.push({v, edge});
+            if(!entityType || outV.entityType === entityType)
+                result.push(outV);
         }
         return result;
     }

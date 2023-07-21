@@ -66,21 +66,19 @@ class TrustScore {
         return this.distrusts.some((n: number) => n > 0);
     }
 
-    renderTrustCount() {
-        if(!this.hasTrustScore())
+    renderTrustCount(forceRender: boolean = false) {
+        if(!this.hasTrustScore() && !forceRender)
             return "";
 
         let r = this.trusts.join("/");
-        //console.log("renderTrustCount", r);
         return r;
     }
     
-    renderDistrustCount() {
-        if(!this.hasDistrustScore())
+    renderDistrustCount(forceRender: boolean = false) {
+        if(!this.hasDistrustScore() && !forceRender)
             return "";
 
         let r = this.distrusts.join("/");
-        //console.log("renderDistrustCount", r);
         return r;
     }
 

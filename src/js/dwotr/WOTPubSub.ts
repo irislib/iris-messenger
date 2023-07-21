@@ -4,6 +4,7 @@ import Relays from "../nostr/Relays";
 import Events from "../nostr/Events";
 import { EntityType } from "./Graph";
 import Key from "../nostr/Key";
+import SocialNetwork from "../nostr/SocialNetwork";
 
 
 export type OnEvent = (
@@ -88,6 +89,27 @@ const WOTPubSub = {
     getTimestamp(date: number = Date.now()) : number {
         return Math.floor(date / 1000);
     },
+
+    // Load up profiles form the IndexedDB and subscribe to new ones
+    // Makes sure we have all the known profiles in memory
+    loadProfiles(
+        addresses: string[],
+      ): Unsubscribe {
+        let missingAddresses = addresses.filter((a) => !SocialNetwork.profiles.has(a));
+
+        let callback = (event: Event) => { 
+                
+            if (!event.content) return; // no content
+            let existing = SocialNetwork.profiles.get(event.pubkey);
+            if (existing) return; // already have it
+
+            let profile = JSON.parse(event.content) as any;
+
+            SocialNetwork.profiles.set(event.pubkey, profile); 
+        }
+
+        return PubSub.subscribe({ kinds: [0], authors: missingAddresses }, callback, false);
+      }
 }
 
 

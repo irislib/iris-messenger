@@ -15,22 +15,17 @@ type TrustListViewProps = {
   dir?: string;
   entitytype?: EntityType;
   title?: string;
+  url?: string;
 };
 
 const Score = (props: TrustListViewProps) => {
   const [hexKey] = useState(Key.toNostrHexAddress(props.id || Key.getPubKey()));
   const [npub] = useState(Key.toNostrBech32Address(hexKey as string, 'npub'));
-  //const [state, setState] = useState({ startDegree: 1, maxDegree: 3, title: '' });
   const [trustedBy, setTrustedBy] = useState<Array<{ v: Vertice; edge: Edge }>>([]);
 
   useEffect(() => {
     graphNetwork.whenReady(() => {
-      // setState((prevState) => ({
-      //   ...prevState,
-      //   startDegree: 0,
-      //   maxDegree: 1,
-      //   title: 'Trusted by',
-      // }));
+
       let vId = graphNetwork.g.getVerticeId(hexKey as string);
       if (!vId) return;
       let list = {} as Array<{ v: Vertice; edge: Edge }>;
@@ -57,7 +52,7 @@ const Score = (props: TrustListViewProps) => {
           <div>
             <Name pub={itemNpub} />
             <br />
-            <span className="text-sm">{edge.val? "Trusted" : "Distrusted" }</span>
+            {/* <span className="text-sm">{edge.val? "Trusted" : "Distrusted" }</span> */}
             {/* <span className="text-sm">Degree {degree}</span> */}
           </div>
 

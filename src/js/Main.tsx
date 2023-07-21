@@ -34,8 +34,10 @@ import '@fontsource/lato/700.css';
 import '../css/cropper.min.css';
 import "./dwotr/style.css";
 import DWoTRSetup from './dwotr/DWoTRSetup';
-import TrustListView from './dwotr/TrustListView';
+import WotView from './dwotr/WotView';
 import Score from './dwotr/Score';
+import { EntityType } from './dwotr/Graph';
+import VisGraph from './dwotr/VisGraph';
 
 type Props = Record<string, unknown>;
 
@@ -159,8 +161,9 @@ class Main extends Component<Props, ReactState> {
               <Follows path="/follows/:id" />
               <Follows followers={true} path="/followers/:id" />
 
-              <TrustListView path="/trust/account/:id" trust1="1" entitytype="key"  />
-              <TrustListView path="/trust/post/:id" trust1="1" entitytype="item"  />
+              <WotView path="/wot/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?"  />
+              <VisGraph path="/vis/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
+              {/* <WotView path="/wot/events/:id"  entitytype={EntityType.Item} /> */}
               <Score path="/trustedby/:id" trust1={1} dir="in" title="Trusted by" />
               <Score path="/distrustedby/:id" trust1={-1} dir="in" title="Distrusted by" />
               <Score path="/trusting/:id" trust1={1} dir="out" title="Trusting" />

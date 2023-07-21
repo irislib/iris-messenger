@@ -88,31 +88,8 @@ const TrustProfileButtons = ({ props }: any) => {
     })();
   }
 
-  // function toggleTrusts(e) {
-  //   e.stopPropagation();
-  //   setState((prevState) => ({
-  //     ...prevState,
-  //     showTrustsList: !state.showTrustsList,
-  //     showDistrustsList: false,
-  //   }));
-  // }
-
-  // function toggleDistrusts(e) {
-  //   e.stopPropagation();
-  //   setState((prevState) => ({
-  //     ...prevState,
-  //     showTrustsList: false,
-  //     showDistrustsList: !state.showDistrustsList,
-  //   }));
-  // }
-
   return (
     <>
-      <div
-        class="profile-links"
-        style="flex:1; display: flex; flex-direction: row; align-items: center;"
-      >
-        <ReactionButtons>
           <a
             className={`msg-btn trust-btn ${state.trusted ? 'trusted' : ''}`}
             onClick={(e) => trustBtnClicked(e)}
@@ -144,9 +121,6 @@ const TrustProfileButtons = ({ props }: any) => {
             {state.renderDistrustScore || ''}
             {state.processing && state.distrusted ? <span id="loading"></span> : null}
           </ReactionCount> */}
-        </ReactionButtons>
-
-      </div>
     </>
   );
 };

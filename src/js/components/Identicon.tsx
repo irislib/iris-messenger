@@ -11,7 +11,6 @@ import SafeImg from './SafeImg';
 
 type Props = {
   str: unknown;
-  hexKey?: string;
   hidePicture?: boolean;
   showTooltip?: boolean;
   activity?: string;

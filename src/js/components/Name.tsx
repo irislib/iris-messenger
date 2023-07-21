@@ -9,65 +9,73 @@ import useVerticeMonitor from '../dwotr/useVerticeMonitor';
 
 type Props = {
   pub: string;
+  hexKey?: string;
   placeholder?: string;
   hideBadge?: boolean;
 };
 
+type Profile = {
+  name: string;
+  displayName: string;
+  isNameGenerated: boolean;
+};
+
+export function sanitizeProfile(p: any, npub:string) {
+  if (!p) 
+    p = { name: '', displayName: '', isNameGenerated: false, dummy: true };
+
+  let name = p.name?.trim().slice(0, 100) || '';
+  let isNameGenerated = p.name || p.display_name ? false : true;
+  let picture = p.picture;
+
+  if (!name) {
+    name = AnimalName(Key.toNostrBech32Address(npub, 'npub') || npub);
+    isNameGenerated = true;
+  }
+
+  let displayName = p.display_name?.trim().slice(0, 100) || name;
+
+  return { name, displayName, picture, isNameGenerated, dummy: false };
+}
+
 const Name = (props: Props) => {
-  if (!props.pub) {
-    console.error('Name component requires a pub', props);
-    return null;
-  }
+  const hexKey = props.hexKey || Key.toNostrHexAddress(props.pub) || '';
 
-  const [nostrAddr] = useState(Key.toNostrHexAddress(props.pub) || '');
-  const [profile, setProfile] = useState(profileInitializer);
+  const [profile, setProfile] = useState<Profile>(() =>
+    sanitizeProfile(SocialNetwork.profiles.get(hexKey), props.pub),
+  );
 
-  const wot = useVerticeMonitor(nostrAddr, ["badName", "neutralName", "goodName"], "");
+  const wot = useVerticeMonitor(hexKey, ['badName', 'neutralName', 'goodName'], '');
 
 
-  function profileInitializer() {
-    let name;
-    let displayName;
-    let isNameGenerated = false;
-
-    const profile = SocialNetwork.profiles.get(nostrAddr);
-    // should we change SocialNetwork.getProfile() and use it here?
-    if (profile) {
-      name = profile.name?.trim().slice(0, 100) || '';
-      displayName = profile.display_name?.trim().slice(0, 100);
-    }
-    if (!name) {
-      name = AnimalName(Key.toNostrBech32Address(props.pub, 'npub') || props.pub);
-      isNameGenerated = true;
-    }
-
-    return { name, displayName, isNameGenerated };
-  }
 
   useEffect(() => {
-    if (!nostrAddr) return;
+    if (!hexKey) return;
 
-    const unsub = SocialNetwork.getProfile(nostrAddr, (p) => {
-      if (p) {
-        const name = p.name?.trim().slice(0, 100) || '';
-        const displayName = p.display_name?.trim().slice(0, 100) || '';
-        const isNameGenerated = p.name || p.display_name ? false : true;
+    const p = SocialNetwork.profiles.get(hexKey);
+    if (p) {
+      let sanitized = sanitizeProfile(p, props.pub);
+      if (
+        sanitized.name !== profile.name ||
+        sanitized.displayName !== profile.displayName ||
+        sanitized.isNameGenerated !== profile.isNameGenerated
+      )
+        setProfile(sanitized);
+    } else {
+      return SocialNetwork.getProfile(hexKey, (p) => {
+        setProfile(sanitizeProfile(p, props.pub));
+      });
+    }
+  }, [props.pub]);
 
-        setProfile({ name, displayName, isNameGenerated });
-      }
-    });
-
-    return () => {
-      unsub();
-    };
-  }, [nostrAddr]);
+  if (!props.pub) return null;
 
   return (
     <>
-      <span className={(profile.isNameGenerated ? 'text-neutral-500' : '') + ' ' + wot?.option }>
+      <span className={(profile.isNameGenerated ? 'text-neutral-500' : '') + ' ' + wot?.option}>
         {profile.name || profile.displayName || props.placeholder}
       </span>
-      {props.hideBadge ? '' : <Badge pub={props.pub} />}
+      {props.hideBadge ? '' : <Badge pub={props.pub} hexKey={hexKey} />}
     </>
   );
 };

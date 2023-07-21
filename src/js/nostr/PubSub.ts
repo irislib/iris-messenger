@@ -150,8 +150,8 @@ const PubSub = {
       });
     }
 
-    //debugger;
-    callback && Events.find(filter, callback);
+    //debugger; 
+    callback && Events.find(filter, callback); 
 
     if (filter.ids) {
       filter.ids = filter.ids.filter((id) => !Events.seen.has(id));

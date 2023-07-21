@@ -63,11 +63,9 @@ class Profile extends View {
     return (
       <>
       {state.website ? (
-        <div style="flex:1">
           <a href={state.website} target="_blank">
             {state.website.replace(/^https?:\/\//, '')}
           </a>
-        </div>
       ) : (
         ''
       )}
@@ -82,11 +80,9 @@ class Profile extends View {
       <>
         <TrustProfileButtons props={this.state} />
         {state.lightning ? (
-          <div style="flex:1">
             <a href={state.lightning} onClick={(e) => Helpers.handleLightningLinkClick(e)}>
               ⚡ {t('tip_lightning')}
             </a>
-          </div>
         ) : (
           ''
         )}
@@ -156,8 +152,10 @@ class Profile extends View {
             <div>${profilePicture}</div>
             <div className="flex-1 justify-end flex">
               <div onClick=${() => !loggedIn && localState.get('showLoginModal').put(true)}>
+                <a href=${"/wot/"+ this.state.npub} className="link px-2" >Web of Trust</a>
                 ${this.state.isMyProfile
-                  ? html`<button
+                  ? html`
+                  <button
                       className="btn btn-sm btn-neutral"
                       onClick=${() => loggedIn && route('/profile/edit')}
                     >
@@ -236,8 +234,8 @@ class Profile extends View {
             <div className="py-2">
               <p className="text-sm">${this.state.about}</p>
             </div>
-            <div className="text-sm flex gap-4">${this.renderInfoLinks()}</div>
-            <div className="text-sm flex gap-4">${this.renderActionButtons(this.state)}</div>
+            <div className="text-sm flex gap-4 py-2">${this.renderInfoLinks()}</div>
+            <div className="text-sm flex gap-4 py-2">${this.renderActionButtons(this.state)}</div>
           </div>
         </div>
         ${this.state.showQR

@@ -10,6 +10,16 @@
     cursor: pointer;
   }
 
+  .linkSelected {
+    text-decoration: underline;
+  }
+
+
+  /* .linkUnselected {
+    text-neutral-500
+  }
+   */
+
 
   .public-messages-view .msg .graphflag {
     margin-left: 15px;

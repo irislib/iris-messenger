@@ -55,10 +55,10 @@ const ProfileFollowerLinks = (props: any) => {
   return (
     <>
         <a href={'/follows/' + npub}>
-          <span>{state.followedUserCount}</span> {t('following')}
+          <span>{state.followedUserCount}</span><span className="text-neutral-500"> {t('following')}</span>
         </a>
         <a href={'/followers/' + npub}>
-          <span>{state.followerCount}</span> {t('followers')}
+          <span>{state.followerCount}</span><span className="text-neutral-500">&nbsp;{t('followers')}</span>
         </a>
       {state.followsYou ? (
         <span className="text-sm flex-1 text-left">

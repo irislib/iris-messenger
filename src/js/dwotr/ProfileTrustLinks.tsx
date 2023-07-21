@@ -2,6 +2,7 @@ import { useEffect, useState } from 'preact/hooks';
 import Key from '../nostr/Key';
 import TrustScore from './TrustScore';
 import useVerticeMonitor from './useVerticeMonitor';
+import { RenderScoreDistrustLink, RenderScoreTrustLink } from './RenderGraph';
 
 type ProfileTrustLinkProps = {
   id?: string;
@@ -9,7 +10,7 @@ type ProfileTrustLinkProps = {
 
 const ProfileTrustLinks = (props: ProfileTrustLinkProps) => {
   const [hexKey] = useState(Key.toNostrHexAddress(props.id || Key.getPubKey()));
-  const [npub] = useState(Key.toNostrBech32Address(hexKey as string, 'npub'));
+  const [npub] = useState(Key.toNostrBech32Address(hexKey as string, 'npub') as string);
   const [state, setState] = useState<any>();
   const wot = useVerticeMonitor(
     hexKey as string,
@@ -35,20 +36,8 @@ const ProfileTrustLinks = (props: ProfileTrustLinkProps) => {
 
   return (
     <>
-      {state?.hasTrust && (
-        <div className="flex-shrink-0">
-          <a href={'/trustedby/' + npub} className="cursor-pointer hover:underline">
-            {state?.score?.renderTrustCount()} Trusts
-          </a>
-        </div>
-      )}
-      {state?.hasDistrust && (
-        <div className="flex-shrink-0">
-          <a href={'/distrustedby/' + npub} className="cursor-pointer hover:underline">
-            {state?.score?.renderDistrustCount()} Distrusts
-          </a>
-        </div>
-      )}
+      { RenderScoreTrustLink(state?.score, npub, false) }
+      { RenderScoreDistrustLink(state?.score, npub, false) }
     </>
   );
 };

@@ -44,7 +44,9 @@
     "react-helmet": "^6.1.0",
     "react-string-replace": "^1.1.0",
     "react-virtualized": "^9.22.5",
-    "styled-components": "^5.3.11"
+    "styled-components": "^5.3.11",
+    "vis-data": "^7.1.6",
+    "vis-network": "^9.1.6"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",
