@@ -53,7 +53,7 @@ const ReactionsList = (props) => {
           <div className="flex-shrink-0">
             <a
               onClick={() => {
-                const data = likes.map((pubkey) => ({ pubkey }));
+                const data = Array.from(likes).map((pubkey) => ({ pubkey })) as ReactionData[];
                 setModalReactions(data);
                 setModalTitle('Liked by');
               }}
@@ -67,7 +67,7 @@ const ReactionsList = (props) => {
           <div className="flex-shrink-0">
             <a
               onClick={() => {
-                const data = reposts.map((pubkey) => ({ pubkey }));
+                const data = Array.from(reposts).map((pubkey) => ({ pubkey })) as ReactionData[];
                 setModalReactions(data);
                 setModalTitle('Reposted by');
               }}
