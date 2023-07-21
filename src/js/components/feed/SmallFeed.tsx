@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { FireIcon } from '@heroicons/react/24/solid';
 import { Event, nip19 } from 'nostr-tools';
 import { Link } from 'preact-router';
@@ -5,7 +6,6 @@ import { Link } from 'preact-router';
 import Identicon from '../Identicon';
 import Name from '../Name';
 import RelativeTime from '../RelativeTime';
-import {memo} from "react";
 
 const SmallFeed = ({ events }: { events: Event[] }) => {
   const mutedUsers = [];

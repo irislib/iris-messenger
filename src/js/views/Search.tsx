@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link, route } from 'preact-router';
 
@@ -9,7 +10,6 @@ import SearchBox from '../components/SearchBox';
 import useCachedFetch from '../hooks/useCachedFetch';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
-import { memo } from 'react';
 
 const FollowSuggestionsAPI = memo(() => {
   const url = `https://api.nostr.band/v0/suggested/profiles/${Key.getPubKey()}`;

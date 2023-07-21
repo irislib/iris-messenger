@@ -35,7 +35,7 @@ localState.get('mutedNotes').on((v) => {
 });
 
 const DEFAULT_GLOBAL_FILTER = {
-  maxFollowDistance: 4,
+  maxFollowDistance: 3,
   minFollowersAtMaxDistance: 5,
 };
 let globalFilter = DEFAULT_GLOBAL_FILTER;
@@ -426,13 +426,26 @@ const Events = {
         callback(e);
       });
   },
-  handle(event: Event & { id: string }, force = false, saveToIdb = true): boolean {
+  handle(event: Event & { id: string }, force = false, saveToIdb = true, retries = 2): boolean {
     if (!event) return false;
     if (!force && this.seen.has(event.id)) {
       return false;
     }
     if (!force && !this.acceptEvent(event)) {
+      if (retries) {
+        // should we retry only if iris has been opened within the last few seconds or the social graph changed?
+        setTimeout(() => {
+          this.handle(event, force, saveToIdb, retries - 1);
+        }, 3000);
+      }
       return false;
+    }
+    if (retries === 1) {
+      //console.log('accepted event on 1st retry', event);
+    }
+    if (!retries) {
+      // we get some of these
+      //console.log('accepted event on 2nd retry', event);
     }
     // Accepting metadata so we still get their name. But should we instead save the name on our own list?
     // They might spam with 1 MB events and keep changing their name or something.
@@ -558,11 +571,14 @@ const Events = {
     if (!nextEvent) {
       return;
     }
-    this.futureEventTimeout = setTimeout(() => {
-      this.futureEventIds.delete(nextEvent.id);
-      this.handle(nextEvent, true);
-      this.handleNextFutureEvent();
-    }, (nextEvent.created_at - Date.now() / 1000) * 1000);
+    this.futureEventTimeout = setTimeout(
+      () => {
+        this.futureEventIds.delete(nextEvent.id);
+        this.handle(nextEvent, true);
+        this.handleNextFutureEvent();
+      },
+      (nextEvent.created_at - Date.now() / 1000) * 1000,
+    );
   },
   isMuted(event: Event) {
     let muted = false;
@@ -695,28 +711,46 @@ const Events = {
     const npub = Key.toNostrBech32Address(obj.pubkey, 'npub');
     return npub;
   },
-  getRepliesAndReactions(
-    id: string,
-    cb?: (
-      replies: Set<string>,
-      likedBy: Set<string>,
-      threadReplyCount: number,
-      repostedBy: Set<string>,
-      zaps: Set<string> | SortedLimitedEventSet,
-    ) => void,
-  ): Unsubscribe {
+  getReplies(id: string, cb?: (replies: Set<string>) => void): Unsubscribe {
     const callback = () => {
-      cb?.(
-        this.directRepliesByMessageId.get(id) ?? new Set(),
-        this.likesByMessageId.get(id) ?? new Set(),
-        this.threadRepliesByMessageId.get(id)?.size ?? 0,
-        this.repostsByMessageId.get(id) ?? new Set(),
-        this.zapsByNote.get(id) ?? new Set(),
-      );
+      cb?.(this.directRepliesByMessageId.get(id) ?? new Set());
     };
     callback();
-    return PubSub.subscribe({ '#e': [id], kinds: [1, 6, 7, 9735] }, callback, false);
+    return PubSub.subscribe({ '#e': [id], kinds: [1] }, callback, false);
   },
+
+  getLikes(id: string, cb?: (likedBy: Set<string>) => void): Unsubscribe {
+    const callback = () => {
+      cb?.(this.likesByMessageId.get(id) ?? new Set());
+    };
+    callback();
+    return PubSub.subscribe({ '#e': [id], kinds: [7] }, callback, false);
+  },
+
+  getThreadRepliesCount(id: string, cb?: (threadReplyCount: number) => void): Unsubscribe {
+    const callback = () => {
+      cb?.(this.threadRepliesByMessageId.get(id)?.size ?? 0);
+    };
+    callback();
+    return PubSub.subscribe({ '#e': [id], kinds: [1] }, callback, false);
+  },
+
+  getReposts(id: string, cb?: (repostedBy: Set<string>) => void): Unsubscribe {
+    const callback = () => {
+      cb?.(this.repostsByMessageId.get(id) ?? new Set());
+    };
+    callback();
+    return PubSub.subscribe({ '#e': [id], kinds: [1, 6] }, callback, false);
+  },
+
+  getZaps(id: string, cb?: (zaps: Set<string> | SortedLimitedEventSet) => void): Unsubscribe {
+    const callback = () => {
+      cb?.(this.zapsByNote.get(id) ?? new Set());
+    };
+    callback();
+    return PubSub.subscribe({ '#e': [id], kinds: [9735] }, callback, false);
+  },
+
   // TODO: return Unsubscribe
   getEventById(id: string, proxyFirst = false, cb?: (event: Event) => void) {
     const event = this.db.by('id', id);

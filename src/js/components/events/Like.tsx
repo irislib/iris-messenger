@@ -39,12 +39,9 @@ export default function Like(props: Props) {
 
   useEffect(() => {
     if (likedId) {
-      return Events.getRepliesAndReactions(
-        likedId,
-        (_replies: Set<string>, likedBy: Set<string>) => {
-          setAllLikes(Array.from(likedBy));
-        },
-      );
+      return Events.getLikes(likedId, (likedBy: Set<string>) => {
+        setAllLikes(Array.from(likedBy));
+      });
     }
   }, [likedId]);
 

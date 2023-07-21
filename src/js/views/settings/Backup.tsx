@@ -144,7 +144,7 @@ export default class Backup extends Component {
       const file = target.files?.[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (_e) => {
+        reader.onload = () => {
           // 'reader.result' contains the content of the file
           this.import(reader.result as string);
         };

@@ -1,8 +1,9 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link } from 'preact-router';
 
-import { formatAmount } from '../../Lightning';
+import { decodeInvoice, formatAmount } from '../../Lightning';
+import Events from '../../nostr/Events'; // Import Events module
 import Identicon from '../Identicon';
 import Modal from '../modal/Modal';
 import Name from '../Name';
@@ -25,14 +26,63 @@ const Reaction = memo(({ data }: { data: ReactionData }) => {
   );
 });
 
-//formatAmount(amount / 1000)
-
-const ReactionsList = (props) => {
-  const { likes, reposts, zapAmountByUser, formattedZapAmount } = props;
+const ReactionsList = ({ event }) => {
+  const [likes, setLikes] = useState(new Set());
+  const [reposts, setReposts] = useState(new Set());
+  const [zapAmountByUser, setZapAmountByUser] = useState(new Map());
+  const [formattedZapAmount, setFormattedZapAmount] = useState('');
   const [modalReactions, setModalReactions] = useState([] as ReactionData[]);
   const [modalTitle, setModalTitle] = useState('');
-  const hasReactions = likes.length > 0 || reposts.length > 0 || zapAmountByUser?.size > 0;
+
+  useEffect(() => {
+    const unsubFuncs = [] as any[]; // To store unsubscribe functions
+
+    const handleLikes = (likedBy) => {
+      setLikes(new Set(likedBy));
+    };
+
+    const handleReposts = (repostedBy) => {
+      setReposts(new Set(repostedBy));
+    };
+
+    const handleZaps = (zaps) => {
+      const zapData = new Map<string, number>();
+      let totalZapAmount = 0;
+      const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.by('id', eventId));
+      zapEvents.forEach((zapEvent) => {
+        const bolt11 = zapEvent?.tags.find((tag) => tag[0] === 'bolt11')[1];
+        if (!bolt11) {
+          console.log('Invalid zap, missing bolt11 tag');
+          return;
+        }
+        const decoded = decodeInvoice(bolt11);
+        const amount = (decoded?.amount || 0) / 1000;
+        totalZapAmount += amount;
+        const zapper = Events.getZappingUser(zapEvent.id);
+        if (zapper) {
+          const existing = zapData.get(zapper) || 0;
+          zapData.set(zapper, existing + amount);
+        }
+      });
+
+      setZapAmountByUser(zapData);
+      setFormattedZapAmount(totalZapAmount > 0 ? formatAmount(totalZapAmount) : '');
+    };
+
+    // Subscribe to each event and store unsubscribe function
+    unsubFuncs.push(Events.getLikes(event.id, handleLikes));
+    unsubFuncs.push(Events.getReposts(event.id, handleReposts));
+    unsubFuncs.push(Events.getZaps(event.id, handleZaps));
+
+    // Return cleanup function
+    return () => {
+      unsubFuncs.forEach((unsub) => unsub());
+    };
+  }, [event]);
+
+  const hasReactions = likes.size > 0 || reposts.size > 0 || zapAmountByUser.size > 0;
   if (!hasReactions) return null;
+
   return (
     <>
       <hr className="-mx-2 opacity-10" />
@@ -49,31 +99,31 @@ const ReactionsList = (props) => {
         </Modal>
       )}
       <div className="flex items-center gap-4 py-2">
-        {likes.length > 0 && (
+        {likes.size > 0 && (
           <div className="flex-shrink-0">
             <a
               onClick={() => {
-                const data = likes.map((pubkey) => ({ pubkey }));
+                const data = Array.from(likes).map((pubkey) => ({ pubkey })) as ReactionData[];
                 setModalReactions(data);
                 setModalTitle('Liked by');
               }}
               className="cursor-pointer hover:underline"
             >
-              {likes.length} <span className="text-neutral-500">Likes</span>
+              {likes.size} <span className="text-neutral-500">Likes</span>
             </a>
           </div>
         )}
-        {reposts.length > 0 && (
+        {reposts.size > 0 && (
           <div className="flex-shrink-0">
             <a
               onClick={() => {
-                const data = reposts.map((pubkey) => ({ pubkey }));
+                const data = Array.from(reposts).map((pubkey) => ({ pubkey })) as ReactionData[];
                 setModalReactions(data);
                 setModalTitle('Reposted by');
               }}
               className="cursor-pointer hover:underline"
             >
-              {reposts.length} <span className="text-neutral-500">Reposts</span>
+              {reposts.size} <span className="text-neutral-500">Reposts</span>
             </a>
           </div>
         )}

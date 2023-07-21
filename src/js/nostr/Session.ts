@@ -48,7 +48,7 @@ const Session = {
       location.reload();
     });
   },
-  unsubscribe(..._args) {
+  unsubscribe() {
     // wat dis
   },
   onLoggedIn() {
@@ -77,7 +77,7 @@ const Session = {
     this.private = new Path(
       (...args) => Events.publish(...args),
       subscribe,
-      (...args) => this.unsubscribe(...args),
+      () => this.unsubscribe(),
       { authors: [myPub] },
       (...args) => Key.encrypt(...args),
       (...args) => Key.decrypt(...args),
@@ -85,7 +85,7 @@ const Session = {
     this.public = new Path(
       (...args) => Events.publish(...args),
       subscribe,
-      (...args) => this.unsubscribe(...args),
+      () => this.unsubscribe(),
       { authors: [myPub] },
     );
     this.public.get('notifications/lastOpened', (time) => {

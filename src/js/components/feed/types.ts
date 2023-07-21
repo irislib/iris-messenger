@@ -8,7 +8,7 @@ export interface FeedProps {
 }
 
 export interface FeedState {
-  sortedEvents: string[];
+  events: string[];
   queuedEvents: string[];
   displayCount: number;
   eventsShownTime: number;
