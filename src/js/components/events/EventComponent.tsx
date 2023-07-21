@@ -129,7 +129,9 @@ const EventComponent = (props: EventComponentProps) => {
     return (
       <div key={props.id} className={getClassName()}>
         <div
-          className={`msg-content retrieving ${state.retrieving ? 'visible' : ''}`}
+          className={`msg-content retrieving ${
+            state.retrieving ? 'opacity-100' : 'opacity-0'
+          } transition-opacity duration-700 ease-in-out`}
           style={{ display: 'flex', alignItems: 'center' }}
         >
           <div className="text">{t('looking_up_message')}</div>
