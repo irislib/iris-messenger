@@ -571,11 +571,14 @@ const Events = {
     if (!nextEvent) {
       return;
     }
-    this.futureEventTimeout = setTimeout(() => {
-      this.futureEventIds.delete(nextEvent.id);
-      this.handle(nextEvent, true);
-      this.handleNextFutureEvent();
-    }, (nextEvent.created_at - Date.now() / 1000) * 1000);
+    this.futureEventTimeout = setTimeout(
+      () => {
+        this.futureEventIds.delete(nextEvent.id);
+        this.handle(nextEvent, true);
+        this.handleNextFutureEvent();
+      },
+      (nextEvent.created_at - Date.now() / 1000) * 1000,
+    );
   },
   isMuted(event: Event) {
     let muted = false;

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import reactStringReplace from 'react-string-replace';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 import { bech32 } from 'bech32';
 import $ from 'jquery';
 import throttle from 'lodash/throttle';
 import { nip19 } from 'nostr-tools';
+import { ComponentChild } from 'preact';
 import { route } from 'preact-router';
 
 import EventComponent from './components/events/EventComponent';
@@ -552,7 +552,7 @@ export default {
   })(),
 
   // hashtags, usernames, links
-  highlightText(s: string, event?: any, opts: any = {}) {
+  highlightText(s: ComponentChild[], event?: any, opts: any = {}) {
     s = reactStringReplace(s, pubKeyRegex, (match, i) => {
       match = match.replace(/@/g, '');
       const link = `/${match}`;

@@ -232,6 +232,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getEvents(_callback): Unsubscribe {
     return () => {
       // override this
