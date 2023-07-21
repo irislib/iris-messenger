@@ -711,28 +711,46 @@ const Events = {
     const npub = Key.toNostrBech32Address(obj.pubkey, 'npub');
     return npub;
   },
-  getRepliesAndReactions(
-    id: string,
-    cb?: (
-      replies: Set<string>,
-      likedBy: Set<string>,
-      threadReplyCount: number,
-      repostedBy: Set<string>,
-      zaps: Set<string> | SortedLimitedEventSet,
-    ) => void,
-  ): Unsubscribe {
+  getReplies(id: string, cb?: (replies: Set<string>) => void): Unsubscribe {
     const callback = () => {
-      cb?.(
-        this.directRepliesByMessageId.get(id) ?? new Set(),
-        this.likesByMessageId.get(id) ?? new Set(),
-        this.threadRepliesByMessageId.get(id)?.size ?? 0,
-        this.repostsByMessageId.get(id) ?? new Set(),
-        this.zapsByNote.get(id) ?? new Set(),
-      );
+      cb?.(this.directRepliesByMessageId.get(id) ?? new Set());
     };
     callback();
-    return PubSub.subscribe({ '#e': [id], kinds: [1, 6, 7, 9735] }, callback, false);
+    return PubSub.subscribe({ '#e': [id], kinds: [1] }, callback, false);
   },
+
+  getLikes(id: string, cb?: (likedBy: Set<string>) => void): Unsubscribe {
+    const callback = () => {
+      cb?.(this.likesByMessageId.get(id) ?? new Set());
+    };
+    callback();
+    return PubSub.subscribe({ '#e': [id], kinds: [7] }, callback, false);
+  },
+
+  getThreadRepliesCount(id: string, cb?: (threadReplyCount: number) => void): Unsubscribe {
+    const callback = () => {
+      cb?.(this.threadRepliesByMessageId.get(id)?.size ?? 0);
+    };
+    callback();
+    return PubSub.subscribe({ '#e': [id], kinds: [1] }, callback, false);
+  },
+
+  getReposts(id: string, cb?: (repostedBy: Set<string>) => void): Unsubscribe {
+    const callback = () => {
+      cb?.(this.repostsByMessageId.get(id) ?? new Set());
+    };
+    callback();
+    return PubSub.subscribe({ '#e': [id], kinds: [1, 6] }, callback, false);
+  },
+
+  getZaps(id: string, cb?: (zaps: Set<string> | SortedLimitedEventSet) => void): Unsubscribe {
+    const callback = () => {
+      cb?.(this.zapsByNote.get(id) ?? new Set());
+    };
+    callback();
+    return PubSub.subscribe({ '#e': [id], kinds: [9735] }, callback, false);
+  },
+
   // TODO: return Unsubscribe
   getEventById(id: string, proxyFirst = false, cb?: (event: Event) => void) {
     const event = this.db.by('id', id);

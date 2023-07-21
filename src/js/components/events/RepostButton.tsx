@@ -17,15 +17,15 @@ const RepostButton = ({ event }) => {
       if (!profile) return;
     });
 
-    const unsubReactions = Events.getRepliesAndReactions(event.id, handleRepliesAndReactions);
+    const unsubReposts = Events.getReposts(event.id, handleReposts);
 
     return () => {
       unsubProfile();
-      unsubReactions();
+      unsubReposts();
     };
   }, [event]);
 
-  const handleRepliesAndReactions = (_replies, _likedBy, _threadReplyCount, repostedBy) => {
+  const handleReposts = (repostedBy) => {
     const myPub = Key.getPubKey();
     setState((prevState) => ({
       ...prevState,

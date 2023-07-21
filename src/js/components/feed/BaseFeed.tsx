@@ -9,12 +9,13 @@ import Key from '../../nostr/Key';
 import PubSub, { Unsubscribe } from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
-import ErrorBoundary from '../ErrorBoundary';
-import EventComponent from '../events/EventComponent';
 
+import EventList from './EventList';
 import FeedSettings from './FeedSettings';
 import FeedTypeSelector from './FeedTypeSelector';
 import ImageGrid from './ImageGrid';
+import ShowMore from './ShowMore';
+import ShowNewEvents from './ShowNewEvents';
 import SortedEventMap from './SortedEventMap';
 import { FeedProps, FeedState } from './types';
 
@@ -180,7 +181,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         this.setState({ events, queuedEvents: [] });
       }
     };
-    const debouncedUpdate = debounce(update, 2000, { leading: true });
+    const debouncedUpdate = debounce(update, 1000, { leading: true });
     let updated = false;
     const callback = (event) => {
       if (results.has(event.id)) {
@@ -200,7 +201,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         }
       }
       results.add(event);
-      if (results.size > 50 && !updated) {
+      if (results.size > 10 && !updated) {
         // TODO should filter results (e.g. for images), only count what's shown
         updated = true;
         update();
@@ -276,50 +277,6 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     window.scrollTo(0, 0);
   }
 
-  renderShowNewEvents() {
-    return (
-      <div className="fixed bottom-16 md:bottom-8 justify-center items-center z-10 flex w-full md:w-1/2">
-        <div
-          className="btn btn-sm opacity-90 hover:opacity-100 hover:bg-iris-blue bg-iris-blue text-white"
-          onClick={() => this.showQueuedEvents()}
-        >
-          {t('show_n_new_messages').replace('{n} ', '')}
-        </div>
-      </div>
-    );
-  }
-
-  renderShowMore() {
-    return (
-      <button
-        className="btn btn-neutral btn-sm my-4"
-        onClick={() =>
-          this.setState({
-            displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
-          })
-        }
-      >
-        {t('show_more')}
-      </button>
-    );
-  }
-
-  renderEvents(displayCount, renderAs, showRepliedMsg) {
-    return this.state.events.slice(0, displayCount).map((id) => (
-      <ErrorBoundary>
-        <EventComponent
-          key={id}
-          id={id}
-          showRepliedMsg={showRepliedMsg}
-          renderAs={renderAs}
-          feedOpenedAt={this.openedAt}
-          showReplies={0}
-          fullWidth={!this.state.settings.showReplies}
-        />
-      </ErrorBoundary>
-    ));
-  }
-
   render() {
     if (this.unmounted) {
       return;
@@ -328,11 +285,20 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
     const showQueuedEvents = this.state.queuedEvents.length > 0 && !this.state.settingsOpen;
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
-    const events = this.renderEvents(displayCount, renderAs, showRepliedMsg);
+    const events = (
+      <EventList
+        events={this.state.events}
+        displayCount={displayCount}
+        renderAs={renderAs}
+        showRepliedMsg={showRepliedMsg}
+        openedAt={this.openedAt}
+        settings={this.state.settings}
+      />
+    );
 
     return (
       <div className="mb-4">
-        {showQueuedEvents && this.renderShowNewEvents()}
+        {showQueuedEvents && <ShowNewEvents onClick={() => this.showQueuedEvents()} />}
         {this.props.index !== 'notifications' && this.state.settingsOpen && (
           <FeedSettings
             settings={this.state.settings}
@@ -373,7 +339,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
             }}
           />
         )}
-        {events.length === 0 && (
+        {this.state.events.length === 0 && (
           <div className="msg">
             <div className="msg-content notification-msg">
               {this.props.emptyMessage || t('no_events_yet')}
@@ -381,7 +347,17 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           </div>
         )}
         {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
-        {displayCount < this.state.events.length ? this.renderShowMore() : ''}
+        {displayCount < this.state.events.length ? (
+          <ShowMore
+            onClick={() =>
+              this.setState({
+                displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
+              })
+            }
+          />
+        ) : (
+          ''
+        )}
       </div>
     );
   }

@@ -20,14 +20,10 @@ const ReactionButtons = (props) => {
   const event = props.event;
 
   useEffect(() => {
-    const unsubReactions = Events.getRepliesAndReactions(event.id, handleRepliesAndReactions);
-
-    return () => {
-      unsubReactions();
-    };
+    return Events.getThreadRepliesCount(event.id, handleThreadReplyCount);
   }, [event]);
 
-  const handleRepliesAndReactions = (_replies, _likedBy, threadReplyCount) => {
+  const handleThreadReplyCount = (threadReplyCount) => {
     setState((prevState) => ({
       ...prevState,
       replyCount: threadReplyCount,

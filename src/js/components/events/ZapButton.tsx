@@ -26,16 +26,16 @@ const ZapButton = ({ event }) => {
       }));
     });
 
-    const unsubReactions = Events.getRepliesAndReactions(event.id, handleRepliesAndReactions);
+    const unsubZaps = Events.getZaps(event.id, handleZaps);
 
     return () => {
       unsubProfile();
-      unsubReactions();
+      unsubZaps();
     };
   }, [event]);
 
-  const handleRepliesAndReactions = debounce(
-    (_replies, _likedBy, _threadReplyCount, _repostedBy, zaps) => {
+  const handleZaps = debounce(
+    (zaps) => {
       const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.by('id', eventId));
       let totalZapAmount = 0;
       zapEvents.forEach((event) => {

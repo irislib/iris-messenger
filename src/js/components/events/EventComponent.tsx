@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 import Icons from '../../Icons';
@@ -203,4 +204,4 @@ const EventComponent = (props: EventComponentProps) => {
   return renderComponent();
 };
 
-export default EventComponent;
+export default memo(EventComponent);

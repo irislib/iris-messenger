@@ -18,15 +18,15 @@ const LikeButton = ({ event }) => {
       if (!profile) return;
     });
 
-    const unsubReactions = Events.getRepliesAndReactions(event.id, handleRepliesAndReactions);
+    const unsubLikes = Events.getLikes(event.id, handleLikes);
 
     return () => {
       unsubProfile();
-      unsubReactions();
+      unsubLikes();
     };
   }, [event]);
 
-  const handleRepliesAndReactions = (_replies, likedBy) => {
+  const handleLikes = (likedBy) => {
     const myPub = Key.getPubKey();
     setState((prevState) => ({
       ...prevState,

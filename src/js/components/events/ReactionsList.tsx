@@ -35,10 +35,17 @@ const ReactionsList = ({ event }) => {
   const [modalTitle, setModalTitle] = useState('');
 
   useEffect(() => {
-    const handleRepliesAndReactions = (_replies, likedBy, _threadReplyCount, repostedBy, zaps) => {
-      setLikes(new Set(likedBy));
-      setReposts(new Set(repostedBy));
+    const unsubFuncs = [] as any[]; // To store unsubscribe functions
 
+    const handleLikes = (likedBy) => {
+      setLikes(new Set(likedBy));
+    };
+
+    const handleReposts = (repostedBy) => {
+      setReposts(new Set(repostedBy));
+    };
+
+    const handleZaps = (zaps) => {
       const zapData = new Map<string, number>();
       let totalZapAmount = 0;
       const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.by('id', eventId));
@@ -62,7 +69,15 @@ const ReactionsList = ({ event }) => {
       setFormattedZapAmount(totalZapAmount > 0 ? formatAmount(totalZapAmount) : '');
     };
 
-    return Events.getRepliesAndReactions(event.id, handleRepliesAndReactions);
+    // Subscribe to each event and store unsubscribe function
+    unsubFuncs.push(Events.getLikes(event.id, handleLikes));
+    unsubFuncs.push(Events.getReposts(event.id, handleReposts));
+    unsubFuncs.push(Events.getZaps(event.id, handleZaps));
+
+    // Return cleanup function
+    return () => {
+      unsubFuncs.forEach((unsub) => unsub());
+    };
   }, [event]);
 
   const hasReactions = likes.size > 0 || reposts.size > 0 || zapAmountByUser.size > 0;

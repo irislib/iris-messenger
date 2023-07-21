@@ -21,12 +21,9 @@ export default function Repost(props: Props) {
 
   useEffect(() => {
     if (props.notification) {
-      const unsub = Events.getRepliesAndReactions(
-        repostedEventId,
-        (_a: Set<string>, _b: Set<string>, _c: number, repostedBy: Set<string>) => {
-          setAllReposts(Array.from(repostedBy));
-        },
-      );
+      const unsub = Events.getReposts(repostedEventId, (repostedBy: Set<string>) => {
+        setAllReposts(Array.from(repostedBy));
+      });
       return () => unsub();
     }
   }, [props.notification, repostedEventId]);
