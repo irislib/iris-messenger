@@ -174,7 +174,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     }, 2000);
     const update = () => {
       const events = results.events().map((event) => event.id);
-      if (twoSecondsPassed && !this.state.settings.realtime) {
+      if (twoSecondsPassed && !this.state.settings.realtime && this.state.events.length > 5) {
         this.setState({ queuedEvents: events });
       } else {
         this.setState({ events, queuedEvents: [] });
