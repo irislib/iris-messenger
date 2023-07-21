@@ -39,12 +39,9 @@ export default function Zap(props: Props) {
 
   useEffect(() => {
     return zappedId
-      ? Events.getRepliesAndReactions(
-          zappedId,
-          (_a: Set<string>, _b: Set<string>, _c: number, _d: Set<string>, zappedBy: any) => {
-            setAllZaps(Array.from(zappedBy.values()));
-          },
-        )
+      ? Events.getZaps(zappedId, (zappedBy: any) => {
+          setAllZaps(Array.from(zappedBy.values()));
+        })
       : () => null;
   }, [zappedId]);
 

@@ -36,7 +36,7 @@ const EventDropdown = (props: EventDropdownProps) => {
 
   const closeModal = () => setShowingDetails(false);
 
-  const onBlock = (_e: any) => {
+  const onBlock = () => {
     // TODO hide msg
   };
 

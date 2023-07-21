@@ -26,7 +26,7 @@ type State = {
   hasError: boolean;
 };
 
-const IdenticonContainer = styled.div`
+const IdenticonContainer = styled.div<Props>`
   max-width: ${(props: Props) => props.width}px;
   max-height: ${(props: Props) => props.width}px;
   display: inline-block;

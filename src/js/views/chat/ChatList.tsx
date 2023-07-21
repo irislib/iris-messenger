@@ -1,7 +1,6 @@
 import $ from 'jquery';
 
 import BaseComponent from '../../BaseComponent';
-import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import { translate as t } from '../../translations/Translation.mjs';
@@ -57,7 +56,7 @@ class ChatList extends BaseComponent<ChatListProps, ChatListState> {
       this.setState({ chats, sortedChats });
     });
 
-    localState.get('scrollUp').on(this.sub(() => Helpers.animateScrollTop('.chat-list')));
+    localState.get('scrollUp').on(this.sub(() => window.scrollTo(0, 0)));
 
     if (
       window.Notification &&

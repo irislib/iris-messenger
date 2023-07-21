@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import reactStringReplace from 'react-string-replace';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 import { bech32 } from 'bech32';
 import $ from 'jquery';
 import throttle from 'lodash/throttle';
 import { nip19 } from 'nostr-tools';
+import { ComponentChild } from 'preact';
 import { route } from 'preact-router';
 
 import EventComponent from './components/events/EventComponent';
@@ -166,7 +166,8 @@ export default {
     }
 
     if (settings.enableVideos !== false) {
-      const videoRegex = /(https?:\/\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm))\b/gi;
+      const videoRegex =
+        /(https?:\/\/[^?\s]+\/[^?\s]+\.(?:mp4|mkv|avi|flv|wmv|mov|webm)(?:\?\S*)?)\b/gi;
       replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
         return (
           <video
@@ -504,7 +505,7 @@ export default {
 
     // find .jpg .jpeg .gif .png .webp urls in msg.text and create img tag
     if (settings.enableImages !== false) {
-      const imgRegex = /(https?:\/\/[^\s]*\.(?:jpg|jpeg|gif|png|webp))/gi;
+      const imgRegex = /(https?:\/\/[^\s]*\.(?:jpg|jpeg|gif|png|webp)(\?[^\s]*)?$)/gi;
       replacedText = reactStringReplace(replacedText, imgRegex, (match, i) => {
         return (
           <SafeImg
@@ -552,7 +553,7 @@ export default {
   })(),
 
   // hashtags, usernames, links
-  highlightText(s: string, event?: any, opts: any = {}) {
+  highlightText(s: ComponentChild[], event?: any, opts: any = {}) {
     s = reactStringReplace(s, pubKeyRegex, (match, i) => {
       match = match.replace(/@/g, '');
       const link = `/${match}`;
@@ -846,34 +847,6 @@ export default {
       );
     }
   }, 100),
-
-  animateScrollTop: (selector?: string): void => {
-    const el = selector ? $(selector) : $(window);
-    el.css({ overflow: 'hidden' });
-    setTimeout(() => {
-      el.css({ overflow: '' });
-      el.on('scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart', (e) => {
-        if (
-          e.which > 0 ||
-          e.type === 'mousedown' ||
-          e.type === 'mousewheel' ||
-          e.type === 'touchstart'
-        ) {
-          el.stop(true);
-        }
-      });
-      el.stop().animate(
-        { scrollTop: 0 },
-        {
-          duration: 400,
-          queue: false,
-          always: () => {
-            el.off('scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart');
-          },
-        },
-      );
-    }, 10);
-  },
 
   getMyProfileLink(): string {
     const user = existingIrisToAddress.name || Key.toNostrBech32Address(Key.getPubKey(), 'npub');
