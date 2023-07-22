@@ -505,7 +505,7 @@ export default {
 
     // find .jpg .jpeg .gif .png .webp urls in msg.text and create img tag
     if (settings.enableImages !== false) {
-      const imgRegex = /(https?:\/\/[^\s]*\.(?:jpg|jpeg|gif|png|webp)(\?[^\s]*)?($|\n))/gi;
+      const imgRegex = /(https?:\/\/[^\s]*\.(?:jpg|jpeg|gif|png|webp)(\?[^\s]*)?( |$|\n))/gi;
       replacedText = reactStringReplace(replacedText, imgRegex, (match, i) => {
         return (
           <SafeImg
