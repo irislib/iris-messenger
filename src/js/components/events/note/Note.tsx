@@ -2,38 +2,15 @@ import { debounce } from 'lodash';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
-import Helpers from '../../../Helpers';
-import localState from '../../../LocalState';
 import Events from '../../../nostr/Events';
 import Key from '../../../nostr/Key';
-import SocialNetwork from '../../../nostr/SocialNetwork';
 import { translate as t } from '../../../translations/Translation.mjs';
 import For from '../../helpers/For';
 import Show from '../../helpers/Show';
-import ImageModal from '../../modal/Image';
-import PublicMessageForm from '../../PublicMessageForm';
-import Torrent from '../../Torrent';
-import Reactions from '../buttons/ReactionButtons';
 import EventComponent from '../EventComponent';
 
-import Author from './Author';
 import Avatar from './Avatar';
-import Helmet from './Helmet';
-import ReplyingToUsers from './ReplyingToUsers';
-
-const MSG_TRUNCATE_LENGTH = 500;
-const MSG_TRUNCATE_LINES = 8;
-
-let loadReactions = true;
-let showLikes = true;
-let showZaps = true;
-let showReposts = true;
-localState.get('settings').on((s) => {
-  loadReactions = s.loadReactions !== false;
-  showLikes = s.showLikes !== false;
-  showZaps = s.showZaps !== false;
-  showReposts = s.showReposts !== false;
-});
+import Content from './Content';
 
 const Note = ({
   event,
@@ -47,11 +24,8 @@ const Note = ({
   standalone,
   fullWidth,
 }) => {
-  const [showMore, setShowMore] = useState(false);
-  const [showImageModal, setShowImageModal] = useState(false);
   const [replies, setReplies] = useState([] as string[]);
-  const [translatedText, setTranslatedText] = useState('');
-  const [name, setName] = useState('');
+
   showReplies = showReplies || 0;
   if (!standalone && showReplies && replies.length) {
     isQuote = true;
@@ -70,10 +44,6 @@ const Note = ({
 
   useEffect(() => {
     if (standalone) {
-      SocialNetwork.getProfile(event.pubkey, (profile) => {
-        setName(profile?.display_name || profile?.name || '');
-      });
-
       return Events.getReplies(
         event.id,
         debounce(
@@ -93,50 +63,11 @@ const Note = ({
     }
   }, [event.id, standalone, showReplies]);
 
-  let text = event.content || '';
   meta = meta || {};
-  const attachments = [] as any[];
-  const urls = text.match(/(https?:\/\/[^\s]+)/g);
-  if (urls) {
-    urls.forEach((url) => {
-      let parsedUrl;
-      try {
-        parsedUrl = new URL(url);
-      } catch (e) {
-        console.log('invalid url', url);
-        return;
-      }
-      if (parsedUrl.pathname.toLowerCase().match(/\.(jpg|jpeg|gif|png|webp)$/)) {
-        attachments.push({ type: 'image', data: `${parsedUrl.href}` });
-      }
-    });
-  }
-  const emojiOnly = event.content?.length === 2 && Helpers.isEmoji(event.content);
-
-  text =
-    text.length > MSG_TRUNCATE_LENGTH && !showMore && !standalone
-      ? `${text.slice(0, MSG_TRUNCATE_LENGTH)}...`
-      : text;
-
-  const lines = text.split('\n');
-  text =
-    lines.length > MSG_TRUNCATE_LINES && !showMore && !standalone
-      ? `${lines.slice(0, MSG_TRUNCATE_LINES).join('\n')}...`
-      : text;
-
-  text = Helpers.highlightEverything(text.trim(), event, {
-    showMentionedMessages: !asInlineQuote,
-    onImageClick: (e) => imageClicked(e),
-  });
 
   let rootMsg = Events.getEventRoot(event);
   if (!rootMsg) {
     rootMsg = meta.replyingTo;
-  }
-
-  function imageClicked(e) {
-    e.preventDefault();
-    setShowImageModal(true);
   }
 
   function messageClicked(clickEvent) {
@@ -155,14 +86,6 @@ const Note = ({
       return route(`/${likedId}`);
     }
     route(`/${Key.toNostrBech32Address(event.id, 'note')}`);
-  }
-
-  function isTooLong() {
-    return (
-      attachments?.length > 1 ||
-      event.content?.length > MSG_TRUNCATE_LENGTH ||
-      event.content.split('\n').length > MSG_TRUNCATE_LINES
-    );
   }
 
   function getClassName() {
@@ -205,67 +128,6 @@ const Note = ({
     </Show>
   );
 
-  // TODO extract to component
-  const content = (
-    <div className="flex-grow">
-      <Author
-        standalone={standalone}
-        event={event}
-        isQuote={isQuote}
-        fullWidth={fullWidth}
-        setTranslatedText={setTranslatedText}
-      />
-      <ReplyingToUsers event={event} isQuoting={isQuoting} />
-      <Show when={standalone}>
-        <Helmet name={name} text={text} attachments={attachments} />
-      </Show>
-      <Show when={meta.torrentId}>
-        <Torrent torrentId={meta.torrentId} autopause={!standalone} />
-      </Show>
-      <Show when={text?.length > 0}>
-        <div className={`preformatted-wrap py-2 ${emojiOnly && 'text-2xl'}`}>
-          {text}
-          <Show when={translatedText}>
-            <p>
-              <i>{translatedText}</i>
-            </p>
-          </Show>
-        </div>
-      </Show>
-      <Show when={!asInlineQuote && !standalone && isTooLong()}>
-        <a
-          className="text-sm link mb-2"
-          onClick={(e) => {
-            e.preventDefault();
-            setShowMore(!showMore);
-          }}
-        >
-          {t(`show_${showMore ? 'less' : 'more'}`)}
-        </a>
-      </Show>
-      <Show when={!asInlineQuote && loadReactions}>
-        <Reactions
-          key={event.id + 'reactions'}
-          settings={{ showLikes, showZaps, showReposts }}
-          standalone={standalone}
-          event={event}
-        />
-      </Show>
-      <Show when={isQuote && !loadReactions}>
-        <div style={{ marginBottom: '15px' }}></div>
-      </Show>
-      <Show when={standalone}>
-        <hr className="-mx-2 opacity-10 my-2" />
-        <PublicMessageForm
-          waitForFocus={true}
-          autofocus={!standalone}
-          replyingTo={event.id}
-          placeholder={t('write_your_reply')}
-        />
-      </Show>
-    </div>
-  );
-
   return (
     <>
       {repliedMsg}
@@ -279,17 +141,19 @@ const Note = ({
           <Show when={!fullWidth}>
             <Avatar event={event} isQuote={isQuote} standalone={standalone} />
           </Show>
-          {content}
+          <Content
+            event={event}
+            meta={meta}
+            standalone={standalone}
+            isQuote={isQuote}
+            isQuoting={isQuoting}
+            asInlineQuote={asInlineQuote}
+            fullWidth={fullWidth}
+          />
         </div>
       </div>
       <Show when={!(isQuote || asInlineQuote)}>
         <hr className="-mx-2 opacity-10 mb-2" />
-      </Show>
-      <Show when={showImageModal}>
-        <ImageModal
-          images={attachments?.map((a) => a.data)}
-          onClose={() => setShowImageModal(false)}
-        />
       </Show>
       <For each={replies}>
         {(r) => (
