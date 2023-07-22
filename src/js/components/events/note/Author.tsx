@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import Helpers from '../../../Helpers';
 import Key from '../../../nostr/Key';
 import Show from '../../helpers/Show';
@@ -7,16 +9,20 @@ import EventDropdown from '../EventDropdown';
 import Avatar from './Avatar';
 
 const Author = ({ event, fullWidth, isQuote, standalone, setTranslatedText }) => {
-  const time = new Date(event.created_at * 1000);
-  const dateStr = time.toLocaleString(window.navigator.language, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  const timeStr = time.toLocaleTimeString(window.navigator.language, {
-    timeStyle: 'short',
-  });
+  const { time, dateStr, timeStr } = useMemo(() => {
+    const t = new Date(event.created_at * 1000);
+    const dStr = t.toLocaleString(window.navigator.language, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+    const tStr = t.toLocaleTimeString(window.navigator.language, {
+      timeStyle: 'short',
+    });
+
+    return { time: t, dateStr: dStr, timeStr: tStr };
+  }, [event.created_at]);
 
   return (
     <div className="flex items-center gap-2 justify-between">

@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 import Key from '../../../nostr/Key';
 import { translate as t } from '../../../translations/Translation.mjs';
 import For from '../../helpers/For';
@@ -30,4 +32,4 @@ const ReplyingToUsers = ({ event, isQuoting }) => {
   );
 };
 
-export default ReplyingToUsers;
+export default memo(ReplyingToUsers);

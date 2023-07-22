@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Helmet } from 'react-helmet';
 
 const NoteHelmet = ({ attachments, name, text }) => {
@@ -18,4 +19,4 @@ const NoteHelmet = ({ attachments, name, text }) => {
   );
 };
 
-export default NoteHelmet;
+export default memo(NoteHelmet);
