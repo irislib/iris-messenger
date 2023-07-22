@@ -12,7 +12,7 @@ import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 
-import Identicon from './Identicon';
+import Avatar from './Avatar';
 
 type Props = Record<string, unknown>;
 
@@ -116,7 +116,7 @@ class Footer extends Component<Props, State> {
                 this.state.isMyProfile ? 'border-white' : 'border-black'
               } flex rounded-full border-2`}
             >
-              <Identicon str={key} width={28} />
+              <Avatar str={key} width={28} />
             </span>
           </a>
         </div>

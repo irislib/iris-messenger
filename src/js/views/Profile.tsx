@@ -3,6 +3,7 @@ import { html } from 'htm/preact';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
+import Avatar from '../components/Avatar';
 import Block from '../components/buttons/Block';
 import { Button } from '../components/buttons/Button';
 import Copy from '../components/buttons/Copy';
@@ -10,7 +11,6 @@ import Follow from '../components/buttons/Follow';
 import Report from '../components/buttons/Report';
 import Dropdown from '../components/Dropdown';
 import Feed from '../components/feed/Feed';
-import Identicon from '../components/Identicon';
 import QRModal from '../components/modal/QRModal';
 import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
@@ -106,8 +106,8 @@ class Profile extends View {
         onError=${() => this.setState({ profilePictureError: true })}
       />`;
     } else {
-      profilePicture = html`<${Identicon}
-        key="${this.state.npub}identicon"
+      profilePicture = html`<${Avatar}
+        key="${this.state.npub}avatar"
         str=${this.state.npub}
         hidePicture=${true}
         width=${128}

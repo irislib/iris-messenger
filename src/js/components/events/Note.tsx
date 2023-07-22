@@ -9,7 +9,7 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
-import Identicon from '../Identicon';
+import Avatar from '../Avatar';
 import ImageModal from '../modal/Image';
 import Name from '../Name';
 import PublicMessageForm from '../PublicMessageForm';
@@ -254,12 +254,12 @@ const Note = ({
     );
   }
 
-  function renderIdenticon() {
+  function renderAvatar() {
     return (
       <span className="flex flex-col items-center flex-shrink-0 mr-2">
         {event.pubkey ? (
           <a href={`/${event.pubkey}`}>
-            <Identicon str={Key.toNostrBech32Address(event.pubkey, 'npub')} width={40} />
+            <Avatar str={Key.toNostrBech32Address(event.pubkey, 'npub')} width={40} />
           </a>
         ) : (
           ''
@@ -272,7 +272,7 @@ const Note = ({
   function renderMsgSender() {
     return (
       <div className="flex items-center gap-2 justify-between">
-        {fullWidth && renderIdenticon()}
+        {fullWidth && renderAvatar()}
         <a href={`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`} className="font-bold">
           <Name pub={event.pubkey} />
         </a>
@@ -339,7 +339,7 @@ const Note = ({
       >
         {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
         <div className="flex flex-row" onClick={(e) => messageClicked(e)}>
-          {!fullWidth && renderIdenticon()}
+          {!fullWidth && renderAvatar()}
           <div className="flex-grow">
             {renderMsgSender()}
             {(replyingToUsers?.length && !isQuoting && renderReplyingTo()) || null}

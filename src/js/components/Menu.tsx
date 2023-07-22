@@ -21,7 +21,7 @@ import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
 import Modal from './modal/Modal';
-import Identicon from './Identicon';
+import Avatar from './Avatar';
 import Name from './Name';
 import PublicMessageForm from './PublicMessageForm';
 
@@ -110,7 +110,7 @@ export default class Menu extends BaseComponent {
     return (
       <div>
         <Link href={`/${npub}`} className="btn btn-ghost md:max-xl:btn-circle">
-          <Identicon str={hex} width={34} />
+          <Avatar str={hex} width={34} />
           <div className="hidden xl:block ml-2">
             <Name pub={hex} hideBadge={true} />
           </div>
