@@ -52,7 +52,7 @@ class Note extends View {
         />
       );
     }
-    return <div className="w-full md:w-3/4">{content}</div>;
+    return <div className="w-full">{content}</div>;
   }
 }
 
