@@ -21,6 +21,7 @@ export class Vertice {
     timestamp = 0; // Timestamp of lasest update, used to limit subscription at the relays to only new events.
     subscribed = 0; // True if subscribed to updates from relays
     score: TrustScore = new TrustScore(); // The score of the vertice, calculated from the trust edges, used to subscribe to updates from relays when the score is positive.
+    profile: any = undefined; // The profile of the vertice, used to display the name and avatar of the vertice.
 }
 
 export class Edge  {

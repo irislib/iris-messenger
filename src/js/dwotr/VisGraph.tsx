@@ -10,6 +10,7 @@ import { Link } from 'preact-router';
 import { RenderTrust1Color, renderEntityKeyName } from './RenderGraph';
 import { filterByName, renderScoreLine } from './WotView';
 import WOTPubSub from './WOTPubSub';
+import SocialNetwork from '../nostr/SocialNetwork';
 
 type VisGraphProps = {
   id?: string;
@@ -129,7 +130,7 @@ const VisGraph = (props: VisGraphProps) => {
     });
   }, [props.id]);
 
-  function loadNode(vId: number) {
+  async function loadNode(vId: number) {
     let v = graphNetwork.g.vertices[vId] as Vertice;
     if (!v) return;
 
@@ -137,24 +138,35 @@ const VisGraph = (props: VisGraphProps) => {
 
     list = graphNetwork.g.inOutTrustById(vId, EntityType.Key, undefined);
 
-    //let addresses = list.map((v) => v.key);
-    //WOTPubSub.loadProfiles(addresses); // make sure to load the profiles into memory.
+    let addresses = list.filter((v) => !v.profile).map((v) => v.key);
+    let unsub = await SocialNetwork.getProfiles(addresses, (profiles) => {
+      
+      for (let profile of profiles) {
+        let id = graphNetwork.g.getVerticeId(profile.key);
+        if(!id) continue;
+        let v = graphNetwork.g.vertices[id];
+        if (v) {
+          v.profile = profile;
+        }
+      }
+      
+    });
 
-    let filterResults = filterByName(list, ''); // make sure to add name and picture to the vertices.
+    //let filterResults = filterByName(list, ''); // make sure to add name and picture to the vertices.
 
-    for (let item of filterResults) {
-      nodes.add({ id: item.id, label: item['profile']?.name, image: item['profile']?.picture });
+    for (let item of list) {
+      nodes.get(item.id as number) || nodes.add({ id: item.id, label: item['profile']?.name, image: item['profile']?.picture });
 
       let outEdge = graphNetwork.g.edges[v.out[item.id as number]] as Edge;
       if (outEdge) {
         let color = RenderTrust1Color(outEdge.val);
-        edges.add({ from: vId, to: item.id, color });
+        edges.get(outEdge.id as number) || edges.add({ id: outEdge.id, from: vId, to: item.id, color });
       }
 
       let inEdge = graphNetwork.g.edges[v.in[item.id as number]] as Edge;
       if (inEdge) {
         let color = RenderTrust1Color(inEdge.val);
-        edges.add({ from: item.id, to: vId, color });
+        edges.get(inEdge.id as number) || edges.add({ id: inEdge.id, from: item.id, to: vId, color });
       }
     }
   }
