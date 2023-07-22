@@ -7,8 +7,8 @@ import Key from '../nostr/Key';
 import { Unsubscribe } from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
 
+import Show from './helpers/Show';
 import SafeImg from './SafeImg';
-import Show from './Show';
 
 type Props = {
   str: unknown;

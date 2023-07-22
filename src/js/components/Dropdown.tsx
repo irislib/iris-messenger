@@ -1,7 +1,7 @@
 import { JSX } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 
-import Show from './Show';
+import Show from './helpers/Show';
 
 type Props = {
   children: JSX.Element | JSX.Element[];

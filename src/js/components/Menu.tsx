@@ -20,11 +20,11 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
+import Show from './helpers/Show';
 import Modal from './modal/Modal';
 import Avatar from './Avatar';
 import Name from './Name';
 import PublicMessageForm from './PublicMessageForm';
-import Show from './Show';
 
 const MENU_ITEMS = [
   { url: '/', text: 'home', icon: HomeIcon, activeIcon: HomeIconFull },

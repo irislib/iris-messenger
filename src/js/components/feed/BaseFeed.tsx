@@ -9,7 +9,7 @@ import Key from '../../nostr/Key';
 import PubSub, { Unsubscribe } from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
-import Show from '../Show';
+import Show from '../helpers/Show';
 
 import EventList from './EventList';
 import FeedSettings from './FeedSettings';
