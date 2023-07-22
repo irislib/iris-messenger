@@ -156,10 +156,10 @@ class Main extends Component<Props, ReactState> {
               <WotView path="/wot/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?"  />
               <VisGraph path="/vis/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
               {/* <WotView path="/wot/events/:id"  entitytype={EntityType.Item} /> */}
-              <Score path="/trustedby/:id" trust1={1} dir="in" title="Trusted by" />
+              {/* <Score path="/trustedby/:id" trust1={1} dir="in" title="Trusted by" />
               <Score path="/distrustedby/:id" trust1={-1} dir="in" title="Distrusted by" />
               <Score path="/trusting/:id" trust1={1} dir="out" title="Trusting" />
-              <Score path="/distrusting/:id" trust1={-1} dir="out" title="Distrusting" />
+              <Score path="/distrusting/:id" trust1={-1} dir="out" title="Distrusting" /> */}
 
               <NoteOrProfile path="/:id" />
             </Router>

@@ -5,12 +5,13 @@ import ScrollView from '../components/ScrollView';
 import Key from '../nostr/Key';
 import graphNetwork from './GraphNetwork';
 import { Edge, EntityType, Vertice } from './Graph';
-import Identicon from '../components/Identicon';
+
 import { translate as t } from '../translations/Translation.mjs';
 import { Link } from 'preact-router';
 import SocialNetwork from '../nostr/SocialNetwork';
 import TrustScore from './TrustScore';
 import { RenderScoreDistrustLink, RenderScoreTrustLink, RenderTrust1Value, renderEntityKeyName } from './RenderGraph';
+import MyAvatar from '../components/Avatar';
 
 
 type TrustListViewProps = {
@@ -157,7 +158,7 @@ const WotView = (props: TrustListViewProps) => {
     return (
       <div key={itemKey} className="flex w-full py-2">
         <Link href={setSearch({ npub: itemNpub })} className="flex flex-1 gap-2">
-          <Identicon str={itemNpub} width={49} />
+          <MyAvatar str={itemNpub} width={49} />
           <div>
             <Name pub={itemNpub} hexKey={itemKey} />
             <br />
