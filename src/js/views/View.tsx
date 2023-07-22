@@ -5,6 +5,8 @@ import Component from '../BaseComponent';
 import ErrorBoundary from '../components/ErrorBoundary';
 import Header from '../components/Header';
 
+import Search from './Search';
+
 let isInitialLoad = true;
 const listener = function () {
   isInitialLoad = false;
@@ -22,12 +24,17 @@ abstract class View extends Component {
 
   render() {
     return (
-      <>
-        <Header />
-        <div class={this.class} id={this.id}>
-          <ErrorBoundary>{this.renderView()}</ErrorBoundary>
+      <div className="flex flex-row">
+        <div className="flex flex-col w-full lg:w-2/3">
+          <Header />
+          <div class={this.class} id={this.id}>
+            <ErrorBoundary>{this.renderView()}</ErrorBoundary>
+          </div>
         </div>
-      </>
+        <div className="sticky flex-col hidden lg:flex lg:w-1/3">
+          <Search focus={false} />
+        </div>
+      </div>
     );
   }
 
