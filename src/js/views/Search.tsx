@@ -21,7 +21,7 @@ const FollowSuggestionsAPI = memo(() => {
     <div className="card-body p-4">
       <h2 className="card-title">Follow suggestions</h2>
       <hr className="opacity-10" />
-      <div className="-ml-2 flex flex-wrap gap-4 items-center text-xs overflow-y-scroll overflow-x-hidden max-h-screen">
+      <div className="-ml-2 flex flex-wrap gap-4 items-center text-xs overflow-y-scroll overflow-x-hidden max-h-[50vh]">
         {suggestions.map((profile: any) => (
           <Link
             href={`/${nip19.npubEncode(profile.pubkey)}`}

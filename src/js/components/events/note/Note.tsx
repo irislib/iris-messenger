@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { debounce } from 'lodash';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
@@ -14,19 +15,18 @@ import Content from './Content';
 
 const Note = ({
   event,
-  meta,
-  asInlineQuote,
-  isReply, // message that is rendered under a standalone message, separated by a small margin
-  isQuote, // message that connects to the next message with a line
-  isQuoting, // message that is under an isQuote message, no margin
-  showReplies,
-  showRepliedMsg,
-  standalone,
-  fullWidth,
+  meta = {} as any,
+  asInlineQuote = false,
+  isReply = false, // message that is rendered under a standalone message, separated by a small margin
+  isQuote = false, // message that connects to the next message with a line
+  isQuoting = false, // message that is under an isQuote message, no margin
+  showReplies = 0,
+  showRepliedMsg = false,
+  standalone = false,
+  fullWidth = false,
 }) => {
   const [replies, setReplies] = useState([] as string[]);
 
-  showReplies = showReplies || 0;
   if (!standalone && showReplies && replies.length) {
     isQuote = true;
   }
@@ -41,6 +41,24 @@ const Note = ({
   if (fullWidth === undefined) {
     fullWidth = !isReply && !isQuoting && !isQuote && !asInlineQuote;
   }
+
+  const className = useMemo(() => {
+    const classNames = ['msg'];
+
+    if (standalone) {
+      classNames.push('standalone');
+    } else {
+      classNames.push(
+        'cursor-pointer transition-all ease-in-out duration-200 hover:bg-neutral-999',
+      );
+    }
+    if (isQuote) classNames.push('quote pb-2');
+    if (isQuoting) classNames.push('quoting pt-0');
+    if (asInlineQuote) classNames.push('inline-quote border-2 border-neutral-900 rounded-lg my-2');
+    if (fullWidth) classNames.push('full-width');
+
+    return classNames.join(' ');
+  }, [standalone, isQuote, isQuoting, asInlineQuote, fullWidth]);
 
   useEffect(() => {
     if (standalone) {
@@ -63,8 +81,6 @@ const Note = ({
     }
   }, [event.id, standalone, showReplies]);
 
-  meta = meta || {};
-
   let rootMsg = Events.getEventRoot(event);
   if (!rootMsg) {
     rootMsg = meta.replyingTo;
@@ -86,24 +102,6 @@ const Note = ({
       return route(`/${likedId}`);
     }
     route(`/${Key.toNostrBech32Address(event.id, 'note')}`);
-  }
-
-  function getClassName() {
-    const classNames = ['msg'];
-
-    if (standalone) {
-      classNames.push('standalone');
-    } else {
-      classNames.push(
-        'cursor-pointer transition-all ease-in-out duration-200 hover:bg-neutral-999',
-      );
-    }
-    if (isQuote) classNames.push('quote pb-2');
-    if (isQuoting) classNames.push('quoting pt-0');
-    if (asInlineQuote) classNames.push('inline-quote border-2 border-neutral-900 rounded-lg my-2');
-    if (fullWidth) classNames.push('full-width');
-
-    return classNames.join(' ');
   }
 
   const repliedMsg = (
@@ -133,7 +131,7 @@ const Note = ({
       {repliedMsg}
       <div
         key={event.id + 'note'}
-        className={`p-2 ${getClassName()}`}
+        className={`p-2 ${className}`}
         onClick={(e) => messageClicked(e)}
       >
         {showThreadBtn}

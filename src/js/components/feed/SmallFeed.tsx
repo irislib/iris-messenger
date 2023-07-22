@@ -18,7 +18,7 @@ const SmallFeed = ({ events }: { events: Event[] }) => {
 
       <hr className="opacity-10" />
 
-      <div className="-ml-2 flex flex-wrap gap-6 text-xs overflow-y-scroll overflow-x-hidden max-h-screen">
+      <div className="-ml-2 flex flex-wrap gap-6 text-xs overflow-y-scroll overflow-x-hidden max-h-[50vh]">
         {events
           .filter((event) => !mutedUsers[event.pubkey])
           .map((event) => (
