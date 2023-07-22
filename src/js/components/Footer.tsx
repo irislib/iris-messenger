@@ -13,6 +13,7 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 
 import Avatar from './Avatar';
+import Show from './Show';
 
 type Props = Record<string, unknown>;
 
@@ -54,12 +55,21 @@ class Footer extends Component<Props, State> {
     });
   }
 
+  renderButton(href, icon, iconActive) {
+    const isActive = new RegExp(`^${href}(/|$)`).test(this.state.activeRoute);
+    return (
+      <a href={href} className={`btn flex-grow ${isActive ? 'active' : ''}`}>
+        <Show when={isActive}>{iconActive}</Show>
+        <Show when={!isActive}>{icon}</Show>
+      </a>
+    );
+  }
+
   render() {
     const key = Key.toNostrBech32Address(Key.getPubKey(), 'npub');
     if (!key) {
       return;
     }
-    const activeRoute = this.state.activeRoute;
 
     if (this.state.chatId) {
       return '';
@@ -68,48 +78,22 @@ class Footer extends Component<Props, State> {
     return (
       <footer className="fixed md:hidden bottom-0 z-10 w-full bg-base-200 pb-safe-area">
         <div onClick={() => localState.get('scrollUp').put(true)} className="flex">
-          <a
-            href="/"
-            onClick={(e) => this.handleFeedClick(e)}
-            className={`btn flex flex-grow ${activeRoute === '/' ? 'active' : ''}`}
-          >
-            {activeRoute === '/' ? <HomeIconFull width={24} /> : <HomeIcon width={24} />}
-          </a>
-          <a
-            href="/chat"
-            className={`btn flex-grow ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}
-          >
-            {this.state.unseenMsgsTotal ? (
-              <span className="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
-            ) : (
-              ''
-            )}
-            {activeRoute.indexOf('/chat') === 0 ? (
-              <PaperAirplaneIconFull width={24} />
-            ) : (
-              <PaperAirplaneIcon width={24} />
-            )}
-          </a>
-          <a
-            href="/post/new"
-            className={`btn flex flex-grow ${activeRoute === '/post/new' ? 'active' : ''}`}
-          >
-            {activeRoute === '/post/new' ? (
-              <PlusCircleIconFull width={24} />
-            ) : (
-              <PlusCircleIcon width={24} />
-            )}
-          </a>
-          <a
-            href="/search"
-            className={`btn flex flex-grow ${activeRoute === '/post/new' ? 'active' : ''}`}
-          >
-            {activeRoute === '/search' ? (
-              <Icons.magnifyingGlassBold width={24} />
-            ) : (
-              <MagnifyingGlassIcon width={24} />
-            )}
-          </a>
+          {this.renderButton('/', <HomeIcon width={24} />, <HomeIconFull width={24} />)}
+          {this.renderButton(
+            '/chat',
+            <PaperAirplaneIcon width={24} />,
+            <PaperAirplaneIconFull width={24} />,
+          )}
+          {this.renderButton(
+            '/post/new',
+            <PlusCircleIcon width={24} />,
+            <PlusCircleIconFull width={24} />,
+          )}
+          {this.renderButton(
+            '/search',
+            <MagnifyingGlassIcon width={24} />,
+            <Icons.magnifyingGlassBold width={24} />,
+          )}
           <a href={`/${key}`} className="rounded-full btn flex flex-grow">
             <span
               className={`${

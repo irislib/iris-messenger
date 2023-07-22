@@ -13,6 +13,7 @@ import Avatar from '../Avatar';
 import ImageModal from '../modal/Image';
 import Name from '../Name';
 import PublicMessageForm from '../PublicMessageForm';
+import Show from '../Show';
 import Torrent from '../Torrent';
 
 import EventComponent from './EventComponent';
@@ -90,8 +91,6 @@ const Note = ({
       );
     }
   }, [event.id, standalone, showReplies]);
-
-  // TODO fetch replies in useEffect
 
   let text = event.content || '';
   meta = meta || {};
@@ -331,31 +330,33 @@ const Note = ({
 
   return (
     <>
-      {meta.replyingTo && showRepliedMsg && renderRepliedMsg()}
+      <Show when={meta.replyingTo && showRepliedMsg}>{renderRepliedMsg()}</Show>
       <div
         key={event.id + 'note'}
         className={`p-2 ${getClassName()}`}
         onClick={(e) => messageClicked(e)}
       >
-        {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
+        <Show when={!standalone && !isReply && !isQuoting && rootMsg}>{renderShowThread()}</Show>
         <div className="flex flex-row" onClick={(e) => messageClicked(e)}>
-          {!fullWidth && renderAvatar()}
+          <Show when={!fullWidth}>{renderAvatar()}</Show>
           <div className="flex-grow">
             {renderMsgSender()}
-            {(replyingToUsers?.length && !isQuoting && renderReplyingTo()) || null}
-            {standalone && renderHelmet()}
-            {meta.torrentId && <Torrent torrentId={meta.torrentId} autopause={!standalone} />}
-            {text?.length > 0 && (
+            <Show when={replyingToUsers?.length && !isQuoting}>{renderReplyingTo()}</Show>
+            <Show when={standalone}>{renderHelmet()}</Show>
+            <Show when={meta.torrentId}>
+              <Torrent torrentId={meta.torrentId} autopause={!standalone} />
+            </Show>
+            <Show when={text?.length > 0}>
               <div className={`preformatted-wrap py-2 ${emojiOnly && 'text-2xl'}`}>
                 {text}
-                {translatedText && (
+                <Show when={translatedText}>
                   <p>
                     <i>{translatedText}</i>
                   </p>
-                )}
+                </Show>
               </div>
-            )}
-            {!asInlineQuote && !standalone && isTooLong() && (
+            </Show>
+            <Show when={!asInlineQuote && !standalone && isTooLong()}>
               <a
                 className="text-sm link mb-2"
                 onClick={(e) => {
@@ -365,27 +366,26 @@ const Note = ({
               >
                 {t(`show_${showMore ? 'less' : 'more'}`)}
               </a>
-            )}
-            {meta.url && (
-              <a href={meta.url} target="_blank" rel="noopener noreferrer">
-                {meta.url}
-              </a>
-            )}
-            {!asInlineQuote && loadReactions && (
+            </Show>
+            <Show when={!asInlineQuote && loadReactions}>
               <Reactions
                 key={event.id + 'reactions'}
                 settings={{ showLikes, showZaps, showReposts }}
                 standalone={standalone}
                 event={event}
               />
-            )}
-            {isQuote && !loadReactions && <div style={{ marginBottom: '15px' }}></div>}
-            {standalone && renderReplyForm()}
+            </Show>
+            <Show when={isQuote && !loadReactions}>
+              <div style={{ marginBottom: '15px' }}></div>
+            </Show>
+            <Show when={standalone}>{renderReplyForm()}</Show>
           </div>
         </div>
       </div>
-      {isQuote || asInlineQuote ? null : <hr className="-mx-2 opacity-10 mb-2" />}
-      {showImageModal && renderImageModal()}
+      <Show when={!(isQuote || asInlineQuote)}>
+        <hr className="-mx-2 opacity-10 mb-2" />
+      </Show>
+      <Show when={showImageModal}>{renderImageModal()}</Show>
       {renderReplies()}
     </>
   );

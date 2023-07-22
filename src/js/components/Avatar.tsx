@@ -8,6 +8,7 @@ import { Unsubscribe } from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
 
 import SafeImg from './SafeImg';
+import Show from './Show';
 
 type Props = {
   str: unknown;
@@ -108,7 +109,7 @@ class MyAvatar extends Component<Props, State> {
         className={`${hasPictureStyle} ${showTooltip} ${activity}`}
       >
         <div>
-          {hasPicture ? (
+          <Show when={hasPicture}>
             <SafeImg
               className="rounded-full"
               src={this.state.picture as string}
@@ -117,19 +118,18 @@ class MyAvatar extends Component<Props, State> {
               style={{ objectFit: 'cover' }}
               onError={() => this.setState({ hasError: true })}
             />
-          ) : (
+          </Show>
+          <Show when={!hasPicture}>
             <img
               width={width}
               style="max-width:100%; border-radius: 50%"
               src={this.state.avatar || ''}
             />
-          )}
+          </Show>
         </div>
-        {this.props.showTooltip && this.state.name ? (
+        <Show when={this.props.showTooltip && this.state.name}>
           <span class="tooltiptext">{this.state.name}</span>
-        ) : (
-          ''
-        )}
+        </Show>
       </AvatarContainer>
     );
   }
