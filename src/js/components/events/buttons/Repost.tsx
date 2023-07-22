@@ -1,11 +1,11 @@
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'preact/hooks';
 
-import Events from '../../nostr/Events';
-import Key from '../../nostr/Key';
-import SocialNetwork from '../../nostr/SocialNetwork';
+import Events from '../../../nostr/Events';
+import Key from '../../../nostr/Key';
+import SocialNetwork from '../../../nostr/SocialNetwork';
 
-const RepostButton = ({ event }) => {
+const Repost = ({ event }) => {
   const [state, setState] = useState({
     reposts: 0,
     reposted: false,
@@ -71,4 +71,4 @@ const RepostButton = ({ event }) => {
   );
 };
 
-export default RepostButton;
+export default Repost;

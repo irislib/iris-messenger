@@ -3,7 +3,7 @@ import { FireIcon } from '@heroicons/react/24/solid';
 import { Event, nip19 } from 'nostr-tools';
 import { Link } from 'preact-router';
 
-import Identicon from '../Identicon';
+import Avatar from '../Avatar';
 import Name from '../Name';
 import RelativeTime from '../RelativeTime';
 
@@ -25,7 +25,7 @@ const SmallFeed = ({ events }: { events: Event[] }) => {
             <div key={event.id} className="flex gap-2 w-full break-words">
               <div className="flex-shrink-0">
                 <Link href={`/${nip19.npubEncode(event.pubkey)}`}>
-                  <Identicon str={event.pubkey} width={30} />
+                  <Avatar str={event.pubkey} width={30} />
                 </Link>
               </div>
               <Link href={`/${nip19.noteEncode(event.id)}`} className="w-full">

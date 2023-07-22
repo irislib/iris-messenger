@@ -7,6 +7,7 @@ import Key from '../nostr/Key';
 import { Unsubscribe } from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
 
+import Show from './helpers/Show';
 import SafeImg from './SafeImg';
 
 type Props = {
@@ -22,11 +23,11 @@ type State = {
   picture: string | null;
   name: string | null;
   activity: string | null;
-  identicon: string | null;
+  avatar: string | null;
   hasError: boolean;
 };
 
-const IdenticonContainer = styled.div<Props>`
+const AvatarContainer = styled.div<Props>`
   max-width: ${(props: Props) => props.width}px;
   max-height: ${(props: Props) => props.width}px;
   display: inline-block;
@@ -37,11 +38,11 @@ const IdenticonContainer = styled.div<Props>`
   user-select: none;
 `;
 
-class MyIdenticon extends Component<Props, State> {
+class MyAvatar extends Component<Props, State> {
   activityTimeout?: ReturnType<typeof setTimeout>;
   unsub: Unsubscribe | undefined;
 
-  updateIdenticon() {
+  updateAvatar() {
     const hash = sha256(this.props.str as string);
     // convert to hex
     const hex = Array.from(new Uint8Array(hash))
@@ -53,7 +54,7 @@ class MyIdenticon extends Component<Props, State> {
       format: `svg`,
     });
     this.setState({
-      identicon: `data:image/svg+xml;base64,${identicon.toString()}`,
+      avatar: `data:image/svg+xml;base64,${identicon.toString()}`,
     });
   }
 
@@ -63,7 +64,7 @@ class MyIdenticon extends Component<Props, State> {
       return;
     }
 
-    this.updateIdenticon();
+    this.updateAvatar();
 
     const nostrAddr = Key.toNostrHexAddress(pub);
     if (nostrAddr) {
@@ -101,14 +102,14 @@ class MyIdenticon extends Component<Props, State> {
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
 
     return (
-      <IdenticonContainer
+      <AvatarContainer
         width={width}
         onClick={this.props.onClick}
         style={{ cursor: this.props.onClick ? 'pointer' : undefined }}
         className={`${hasPictureStyle} ${showTooltip} ${activity}`}
       >
         <div>
-          {hasPicture ? (
+          <Show when={hasPicture}>
             <SafeImg
               className="rounded-full"
               src={this.state.picture as string}
@@ -117,22 +118,21 @@ class MyIdenticon extends Component<Props, State> {
               style={{ objectFit: 'cover' }}
               onError={() => this.setState({ hasError: true })}
             />
-          ) : (
+          </Show>
+          <Show when={!hasPicture}>
             <img
               width={width}
               style="max-width:100%; border-radius: 50%"
-              src={this.state.identicon || ''}
+              src={this.state.avatar || ''}
             />
-          )}
+          </Show>
         </div>
-        {this.props.showTooltip && this.state.name ? (
+        <Show when={this.props.showTooltip && this.state.name}>
           <span class="tooltiptext">{this.state.name}</span>
-        ) : (
-          ''
-        )}
-      </IdenticonContainer>
+        </Show>
+      </AvatarContainer>
     );
   }
 }
 
-export default MyIdenticon;
+export default MyAvatar;

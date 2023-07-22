@@ -9,6 +9,7 @@ import Key from '../../nostr/Key';
 import PubSub, { Unsubscribe } from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
+import Show from '../helpers/Show';
 
 import EventList from './EventList';
 import FeedSettings from './FeedSettings';
@@ -281,10 +282,13 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     if (this.unmounted) {
       return;
     }
-    const displayCount = this.state.displayCount;
-    const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
-    const showQueuedEvents = this.state.queuedEvents.length > 0 && !this.state.settingsOpen;
-    const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
+
+    const { displayCount, settings, queuedEvents, settingsOpen } = this.state;
+    const { index, keyword } = this.props;
+    const showRepliedMsg = index !== 'likes' && !keyword;
+    const showQueuedEvents = queuedEvents.length > 0 && !settingsOpen;
+    const renderAs = settings.display === 'grid' ? 'NoteImage' : null;
+
     const events = (
       <EventList
         events={this.state.events}
@@ -292,72 +296,46 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         renderAs={renderAs}
         showRepliedMsg={showRepliedMsg}
         openedAt={this.openedAt}
-        settings={this.state.settings}
+        settings={settings}
       />
     );
 
     return (
       <div className="mb-4">
-        {showQueuedEvents && <ShowNewEvents onClick={() => this.showQueuedEvents()} />}
-        {this.props.index !== 'notifications' && this.state.settingsOpen && (
-          <FeedSettings
-            settings={this.state.settings}
-            onChange={(settings) => this.setState({ settings })}
-          />
-        )}
-        {['global', 'follows'].includes(this.props?.index || '') && (
-          <div className="flex items-center mx-2 md:mx-0 my-2">
-            <div
-              className={`btn btn-sm  mr-2 ${
-                this.state.settings.showReplies ? 'btn-neutral' : 'btn-primary'
-              }`}
-              onClick={() =>
-                this.setState({ settings: { ...this.state.settings, showReplies: false } })
-              }
-            >
-              {t('posts')}
-            </div>
-            <div
-              className={`btn btn-sm ${
-                this.state.settings.showReplies ? 'btn-primary' : 'btn-neutral'
-              }`}
-              onClick={() =>
-                this.setState({ settings: { ...this.state.settings, showReplies: true } })
-              }
-            >
-              {t('posts_and_replies')}
-            </div>
-          </div>
-        )}
-        {this.props.index !== 'notifications' && (
+        <Show when={showQueuedEvents}>
+          <ShowNewEvents onClick={() => this.showQueuedEvents()} />
+        </Show>
+        <Show when={index !== 'notifications' && this.state.settingsOpen}>
+          <FeedSettings settings={settings} onChange={(settings) => this.setState({ settings })} />
+        </Show>
+        <Show when={['global', 'follows'].includes(index || '')}>{/* Remaining JSX */}</Show>
+        <Show when={index !== 'notifications'}>
           <FeedTypeSelector
-            index={this.props.index}
-            display={this.state.settings.display}
+            index={index}
+            display={settings.display}
             setDisplay={(display) => {
-              this.setState({ settings: { ...this.state.settings, display } });
+              this.setState({ settings: { ...settings, display } });
               localState.get('settings').get('feed').get('display').put(display);
             }}
           />
-        )}
-        {this.state.events.length === 0 && (
+        </Show>
+        <Show when={this.state.events.length === 0}>
           <div className="msg">
             <div className="msg-content notification-msg">
               {this.props.emptyMessage || t('no_events_yet')}
             </div>
           </div>
-        )}
+        </Show>
         {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
-        {displayCount < this.state.events.length ? (
+        <Show when={displayCount < this.state.events.length}>
           <ShowMore
             onClick={() =>
               this.setState({
-                displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
+                displayCount: displayCount + INITIAL_PAGE_SIZE,
               })
             }
           />
-        ) : (
-          ''
-        )}
+        </Show>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 import Component from '../BaseComponent';
+import Avatar from '../components/Avatar';
 import Follow from '../components/buttons/Follow';
 import Header from '../components/Header';
-import Identicon from '../components/Identicon';
 import Name from '../components/Name';
 import Helpers from '../Helpers';
 import { translate as t } from '../translations/Translation.mjs';
@@ -92,7 +92,7 @@ class About extends Component {
             <h3>Follow</h3>
             <div className="flex flex-row items-center">
               <a href={`/${IRIS_INFO_ACCOUNT}`} className="flex flex-row items-center">
-                <Identicon str={IRIS_INFO_ACCOUNT} width={40} />
+                <Avatar str={IRIS_INFO_ACCOUNT} width={40} />
                 <Name pub={IRIS_INFO_ACCOUNT} placeholder="Iris" />
               </a>
               <Follow className="btn btn-neutral btn-sm" id={IRIS_INFO_ACCOUNT} />
