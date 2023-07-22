@@ -1,7 +1,7 @@
 import throttle from 'lodash/throttle';
 
+import Avatar from '../components/Avatar';
 import Follow from '../components/buttons/Follow';
-import Identicon from '../components/Identicon';
 import Name from '../components/Name';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
@@ -104,7 +104,7 @@ class Follows extends View {
       return (
         <div key={npub} className="flex w-full">
           <a href={`/${npub}`} className="flex flex-1 gap-2">
-            <Identicon str={npub} width={49} />
+            <Avatar str={npub} width={49} />
             <div>
               <Name pub={npub} />
               <br />

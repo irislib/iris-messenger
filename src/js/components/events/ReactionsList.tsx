@@ -4,7 +4,7 @@ import { Link } from 'preact-router';
 
 import { decodeInvoice, formatAmount } from '../../Lightning';
 import Events from '../../nostr/Events'; // Import Events module
-import Identicon from '../Identicon';
+import Avatar from '../Avatar';
 import Modal from '../modal/Modal';
 import Name from '../Name';
 
@@ -17,7 +17,7 @@ const Reaction = memo(({ data }: { data: ReactionData }) => {
   const npub = data.pubkey.startsWith('npub') ? data.pubkey : nip19.npubEncode(data.pubkey);
   return (
     <Link href={`/${npub}`} className="flex items-center gap-4">
-      <Identicon str={data.pubkey} width={40} />
+      <Avatar str={data.pubkey} width={40} />
       <div className="flex flex-col">
         <Name pub={data.pubkey} />
         {data.text && <small className="text-neutral-500">{data.text}</small>}

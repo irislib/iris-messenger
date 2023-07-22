@@ -7,10 +7,10 @@ import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
 
+import Note from './note/Note';
 import EventDropdown from './EventDropdown';
 import Follow from './Follow';
 import Like from './Like';
-import Note from './Note';
 import NoteImage from './NoteImage';
 import Repost from './Repost';
 import Zap from './Zap';
