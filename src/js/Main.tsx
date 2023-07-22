@@ -57,8 +57,6 @@ class Main extends Component<Props, ReactState> {
       // this makes sure that window.nostr is there
       localState.get('loggedIn').on(this.inject());
     };
-    localState.get('toggleMenu').put(false);
-    localState.get('toggleMenu').on((show: boolean) => this.toggleMenu(show));
     // iris.electron && iris.electron.get('platform').on(this.inject());
     localState.get('unseenMsgsTotal').on(this.inject());
     translationLoaded.then(() => this.setState({ translationLoaded: true }));
@@ -75,12 +73,6 @@ class Main extends Component<Props, ReactState> {
     if (this.state.showMenu) {
       this.setState({ showMenu: false });
     }
-  }
-
-  toggleMenu(show: boolean): void {
-    this.setState({
-      showMenu: typeof show === 'undefined' ? !this.state.showMenu : show,
-    });
   }
 
   electronCmd(name: string): void {
