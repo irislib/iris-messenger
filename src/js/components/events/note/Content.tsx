@@ -29,7 +29,7 @@ localState.get('settings').on((s) => {
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
 
-const Content = ({ standalone, isQuote, fullWidth, isQuoting, asInlineQuote, event, meta }) => {
+const Content = ({ standalone, isQuote, fullWidth, isQuoting, asInlineQuote, event, meta, wot }) => {
   const [translatedText, setTranslatedText] = useState('');
   const [showMore, setShowMore] = useState(false);
   const [name, setName] = useState('');
@@ -110,7 +110,7 @@ const Content = ({ standalone, isQuote, fullWidth, isQuoting, asInlineQuote, eve
         <Torrent torrentId={meta.torrentId} autopause={!standalone} />
       </Show>
       <Show when={text?.length > 0}>
-        <div className={`preformatted-wrap py-2 ${emojiOnly && 'text-2xl'}`}>
+        <div className={`preformatted-wrap py-2 ${emojiOnly && 'text-2xl'} ${wot?.option}`}>
           {text}
           <Show when={translatedText}>
             <p>
@@ -136,6 +136,7 @@ const Content = ({ standalone, isQuote, fullWidth, isQuoting, asInlineQuote, eve
           settings={{ showLikes, showZaps, showReposts }}
           standalone={standalone}
           event={event}
+          wot={wot}
         />
       </Show>
       <Show when={isQuote && !loadReactions}>

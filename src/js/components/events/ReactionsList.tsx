@@ -28,15 +28,6 @@ const Reaction = memo(({ data }: { data: ReactionData }) => {
   );
 });
 
-//formatAmount(amount / 1000)
-
-//const ReactionsList = (props) => {
-//  const { likes, reposts, zapAmountByUser, formattedZapAmount, wot } = props;
-//  const [modalReactions, setModalReactions] = useState([] as ReactionData[]);
-//  const [modalTitle, setModalTitle] = useState('');
-//  const hasReactions = likes.length > 0 || reposts.length > 0 || zapAmountByUser?.size > 0;
-
-
 const ReactionsList = ({ event, wot }) => {
 
   const [likes, setLikes] = useState(new Set());
