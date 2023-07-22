@@ -1,7 +1,7 @@
 import { route } from 'preact-router';
 
 import BaseComponent from '../../BaseComponent';
-import Identicon from '../../components/Identicon';
+import Avatar from '../../components/Avatar';
 import Name from '../../components/Name';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
@@ -91,7 +91,7 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
         className={`flex flex-row gap-2 ${hasUnseen} ${active}`}
         onClick={() => route(`/chat/${npub}`)}
       >
-        <Identicon str={npub} width={49} />
+        <Avatar str={npub} width={49} />
         <div className="flex flex-row">
           <div className="flex flex-col">
             <span className="name">

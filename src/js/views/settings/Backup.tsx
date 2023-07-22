@@ -1,7 +1,7 @@
 import Component from '../../BaseComponent';
+import Avatar from '../../components/Avatar';
 import Copy from '../../components/buttons/Copy';
 import Follow from '../../components/buttons/Follow';
-import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
 import Events from '../../nostr/Events';
 import IndexedDB from '../../nostr/IndexedDB';
@@ -105,7 +105,7 @@ export default class Backup extends Component {
               {this.state.restoredFollows.map((hex) => (
                 <div className="profile-link-container">
                   <a href={`/${Key.toNostrBech32Address(hex, 'npub')}`} className="profile-link">
-                    <Identicon str={hex} width={40} />
+                    <Avatar str={hex} width={40} />
                     <Name pub={hex} />
                   </a>
                   <Follow id={hex} />

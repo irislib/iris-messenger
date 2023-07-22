@@ -4,17 +4,17 @@ import { memo } from 'preact/compat';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
-import Events from '../../nostr/Events';
-import Key from '../../nostr/Key';
+import Events from '../../../nostr/Events';
+import Key from '../../../nostr/Key';
+import ReactionsList from '../ReactionsList';
 
-import LikeButton from './LikeButton';
-import ReactionsList from './ReactionsList';
-import { CheckCorrect, FlagMarkSolid } from '../../dwotr/Icons';
-import graphNetwork from '../../dwotr/GraphNetwork';
-import { EntityType } from '../../dwotr/Graph';
-import TrustScore from '../../dwotr/TrustScore';
-import RepostButton from './RepostButton';
-import ZapButton from './ZapButton';
+import { CheckCorrect, FlagMarkSolid } from '../../../dwotr/Icons';
+import graphNetwork from '../../../dwotr/GraphNetwork';
+import { EntityType } from '../../../dwotr/Graph';
+import TrustScore from '../../../dwotr/TrustScore';
+import Like from './Like';
+import Repost from './Repost';
+import Zap from './Zap';
 
 const ReactionButtons = (props) => {
   const [state, setState] = useState({
@@ -146,9 +146,9 @@ const ReactionButtons = (props) => {
           <ChatBubbleOvalLeftIcon width={18} />
           <span>{state.replyCount || ''}</span>
         </a>
-        <RepostButton event={props.event} />
-        <LikeButton event={props.event} />
-        <ZapButton event={props.event} />
+        <Repost event={props.event} />
+        <Like event={props.event} />
+        <Zap event={props.event} />
         {trustBtns()}
       </div>
     </>

@@ -5,124 +5,97 @@ import {
   PaperAirplaneIcon as PaperAirplaneIconFull,
   PlusCircleIcon as PlusCircleIconFull,
 } from '@heroicons/react/24/solid';
+import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
-import Component from '../BaseComponent';
 import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 
-import Identicon from './Identicon';
+import Show from './helpers/Show';
+import Avatar from './Avatar';
 
-type Props = Record<string, unknown>;
+const MENU_ITEMS = [
+  { url: '/', icon: HomeIcon, activeIcon: HomeIconFull },
+  { url: '/chat', icon: PaperAirplaneIcon, activeIcon: PaperAirplaneIconFull },
+  { url: '/post/new', icon: PlusCircleIcon, activeIcon: PlusCircleIconFull },
+  { url: '/search', icon: MagnifyingGlassIcon, activeIcon: Icons.magnifyingGlassBold },
+];
 
-type State = {
-  activeRoute: string;
-  unseenMsgsTotal: number;
-  chatId?: string;
-  isMyProfile?: boolean;
-};
+const Footer = () => {
+  const [isMyProfile, setIsMyProfile] = useState(false);
+  const [activeRoute, setActiveRoute] = useState('/');
+  const [chatId, setChatId] = useState(null);
 
-class Footer extends Component<Props, State> {
-  constructor() {
-    super();
-    this.state = { unseenMsgsTotal: 0, activeRoute: '/' };
-  }
+  useEffect(() => {
+    localState.get('isMyProfile').on((value) => setIsMyProfile(value));
+    localState.get('activeRoute').on((activeRoute) => {
+      const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
+      const chatId = replaced.length < activeRoute.length ? replaced : null;
+      setActiveRoute(activeRoute);
+      setChatId(chatId);
+    });
+  }, []);
 
-  componentDidMount() {
-    localState.get('unseenMsgsTotal').on(this.inject());
-    localState.get('isMyProfile').on(this.inject());
-    localState.get('activeRoute').on(
-      this.sub((activeRoute) => {
-        const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
-        const chatId = replaced.length < activeRoute.length ? replaced : null;
-        this.setState({ activeRoute, chatId });
-      }),
-    );
-  }
-
-  handleFeedClick(e) {
+  const handleFeedClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
     localState.get('lastOpenedFeed').once((lastOpenedFeed) => {
-      if (lastOpenedFeed !== this.state.activeRoute.replace('/', '')) {
+      if (lastOpenedFeed !== activeRoute.replace('/', '')) {
         route('/' + (lastOpenedFeed || ''));
       } else {
         localState.get('lastOpenedFeed').put('');
         route('/');
       }
     });
-  }
+  };
 
-  render() {
-    const key = Key.toNostrBech32Address(Key.getPubKey(), 'npub');
-    if (!key) {
-      return;
-    }
-    const activeRoute = this.state.activeRoute;
+  const renderButton = (href, Icon, IconActive) => {
+    const isActive = new RegExp(`^${href}(/|$)`).test(activeRoute);
 
-    if (this.state.chatId) {
-      return '';
-    }
+    const handleClick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (href === '/') {
+        handleFeedClick(e);
+      } else {
+        route(href);
+      }
+    };
 
     return (
+      <a onClick={handleClick} className={`btn flex-grow ${isActive ? 'active' : ''}`}>
+        <Show when={isActive}>
+          <IconActive width={24} />
+        </Show>
+        <Show when={!isActive}>
+          <Icon width={24} />
+        </Show>
+      </a>
+    );
+  };
+
+  const key = Key.toNostrBech32Address(Key.getPubKey(), 'npub');
+
+  return (
+    <Show when={key && !chatId}>
       <footer className="fixed md:hidden bottom-0 z-10 w-full bg-base-200 pb-safe-area">
-        <div onClick={() => localState.get('scrollUp').put(true)} className="flex">
-          <a
-            href="/"
-            onClick={(e) => this.handleFeedClick(e)}
-            className={`btn flex flex-grow ${activeRoute === '/' ? 'active' : ''}`}
-          >
-            {activeRoute === '/' ? <HomeIconFull width={24} /> : <HomeIcon width={24} />}
-          </a>
-          <a
-            href="/chat"
-            className={`btn flex-grow ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}
-          >
-            {this.state.unseenMsgsTotal ? (
-              <span className="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
-            ) : (
-              ''
-            )}
-            {activeRoute.indexOf('/chat') === 0 ? (
-              <PaperAirplaneIconFull width={24} />
-            ) : (
-              <PaperAirplaneIcon width={24} />
-            )}
-          </a>
-          <a
-            href="/post/new"
-            className={`btn flex flex-grow ${activeRoute === '/post/new' ? 'active' : ''}`}
-          >
-            {activeRoute === '/post/new' ? (
-              <PlusCircleIconFull width={24} />
-            ) : (
-              <PlusCircleIcon width={24} />
-            )}
-          </a>
-          <a
-            href="/search"
-            className={`btn flex flex-grow ${activeRoute === '/post/new' ? 'active' : ''}`}
-          >
-            {activeRoute === '/search' ? (
-              <Icons.magnifyingGlassBold width={24} />
-            ) : (
-              <MagnifyingGlassIcon width={24} />
-            )}
-          </a>
+        <div className="flex">
+          {MENU_ITEMS.map((item) => renderButton(item.url, item.icon, item.activeIcon))}
           <a href={`/${key}`} className="rounded-full btn flex flex-grow">
             <span
               className={`${
-                this.state.isMyProfile ? 'border-white' : 'border-black'
+                isMyProfile ? 'border-white' : 'border-black'
               } flex rounded-full border-2`}
             >
-              <Identicon str={key} width={28} />
+              <Avatar str={key} width={28} />
             </span>
           </a>
         </div>
       </footer>
-    );
-  }
-}
+    </Show>
+  );
+};
 
 export default Footer;

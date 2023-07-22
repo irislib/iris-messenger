@@ -2,11 +2,11 @@ import { HeartIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'preact/hooks';
 
-import Events from '../../nostr/Events';
-import Key from '../../nostr/Key';
-import SocialNetwork from '../../nostr/SocialNetwork';
+import Events from '../../../nostr/Events';
+import Key from '../../../nostr/Key';
+import SocialNetwork from '../../../nostr/SocialNetwork';
 
-const LikeButton = ({ event }) => {
+const Like = ({ event }) => {
   const [state, setState] = useState({
     likes: 0,
     liked: false,
@@ -72,4 +72,4 @@ const LikeButton = ({ event }) => {
   );
 };
 
-export default LikeButton;
+export default Like;

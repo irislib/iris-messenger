@@ -2,9 +2,9 @@ import { memo } from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link, route } from 'preact-router';
 
+import Avatar from '../components/Avatar';
 import FollowButton from '../components/buttons/Follow';
 import SmallFeed from '../components/feed/SmallFeed';
-import Identicon from '../components/Identicon';
 import Name from '../components/Name';
 import SearchBox from '../components/SearchBox';
 import useCachedFetch from '../hooks/useCachedFetch';
@@ -29,7 +29,7 @@ const FollowSuggestionsAPI = memo(() => {
             className="flex flex-row gap-2 w-full break-words"
           >
             <span className="flex-shrink-0">
-              <Identicon str={profile.pubkey} width={30} />
+              <Avatar str={profile.pubkey} width={30} />
             </span>
             <span className="flex-1">
               <b>

@@ -11,7 +11,7 @@ import { translate as t } from '../translations/Translation.mjs';
 import Copy from './buttons/Copy';
 import Follow from './buttons/Follow';
 import QRModal from './modal/QRModal';
-import Identicon from './Identicon';
+import Avatar from './Avatar';
 import Name from './Name';
 
 const SUGGESTED_FOLLOWS = [
@@ -75,7 +75,7 @@ export default class OnboardingNotification extends Component {
           <div className="flex items-center space-x-4">
             <a href={`/${pub}`} className="flex flex-grow items-center space-x-2">
               <div className="w-10 h-10">
-                <Identicon str={pub} width={40} />
+                <Avatar str={pub} width={40} />
               </div>
               <div className="flex-grow">
                 <Name pub={pub} placeholder="Suggested follow" />

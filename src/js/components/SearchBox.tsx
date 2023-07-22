@@ -10,7 +10,7 @@ import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
-import Identicon from './Identicon';
+import Avatar from './Avatar';
 import Name from './Name';
 import SafeImg from './SafeImg';
 
@@ -274,7 +274,7 @@ class SearchBox extends Component<Props, State> {
               }
               href={`/search/${encodeURIComponent(this.state.query)}`}
             >
-              <div class="identicon-container">
+              <div class="avatar-container">
                 <div style="font-size: 1.5em; width: 40px">&#128269;</div>
               </div>
               <div>
@@ -313,7 +313,7 @@ class SearchBox extends Component<Props, State> {
                 {i.picture ? (
                   <SafeImg src={i.picture} className="rounded-full" width={40} />
                 ) : (
-                  <Identicon key={`${npub}ic`} str={npub} width={40} />
+                  <Avatar key={`${npub}ic`} str={npub} width={40} />
                 )}
                 <div>
                   <Name pub={i.key} key={i.key + 'searchResult'} />

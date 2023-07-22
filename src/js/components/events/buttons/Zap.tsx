@@ -2,12 +2,12 @@ import { BoltIcon } from '@heroicons/react/24/outline';
 import { debounce } from 'lodash';
 import { useEffect, useState } from 'preact/hooks';
 
-import { decodeInvoice, formatAmount } from '../../Lightning';
-import Events from '../../nostr/Events';
-import SocialNetwork from '../../nostr/SocialNetwork';
-import ZapModal from '../modal/Zap';
+import { decodeInvoice, formatAmount } from '../../../Lightning';
+import Events from '../../../nostr/Events';
+import SocialNetwork from '../../../nostr/SocialNetwork';
+import ZapModal from '../../modal/Zap';
 
-const ZapButton = ({ event }) => {
+const Zap = ({ event }) => {
   const [state, setState] = useState({
     totalZapAmount: 0,
     formattedZapAmount: '',
@@ -86,4 +86,4 @@ const ZapButton = ({ event }) => {
   ) : null;
 };
 
-export default ZapButton;
+export default Zap;
