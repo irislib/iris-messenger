@@ -308,7 +308,30 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         <Show when={index !== 'notifications' && this.state.settingsOpen}>
           <FeedSettings settings={settings} onChange={(settings) => this.setState({ settings })} />
         </Show>
-        <Show when={['global', 'follows'].includes(index || '')}>{/* Remaining JSX */}</Show>
+        <Show when={['global', 'follows'].includes(index || '')}>
+          <div className="flex items-center mx-2 md:mx-0 my-2">
+            <div
+              className={`btn btn-sm  mr-2 ${
+                this.state.settings.showReplies ? 'btn-neutral' : 'btn-primary'
+              }`}
+              onClick={() =>
+                this.setState({ settings: { ...this.state.settings, showReplies: false } })
+              }
+            >
+              {t('posts')}
+            </div>
+            <div
+              className={`btn btn-sm ${
+                this.state.settings.showReplies ? 'btn-primary' : 'btn-neutral'
+              }`}
+              onClick={() =>
+                this.setState({ settings: { ...this.state.settings, showReplies: true } })
+              }
+            >
+              {t('posts_and_replies')}
+            </div>
+          </div>
+        </Show>
         <Show when={index !== 'notifications'}>
           <FeedTypeSelector
             index={index}
