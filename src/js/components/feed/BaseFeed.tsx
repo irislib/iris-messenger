@@ -8,6 +8,7 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import PubSub, { Unsubscribe } from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
+import { ID } from '../../nostr/UserIds';
 import { translate as t } from '../../translations/Translation.mjs';
 import Show from '../helpers/Show';
 
@@ -188,7 +189,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       if (results.has(event.id)) {
         return;
       }
-      if (SocialNetwork.blockedUsers.has(event.pubkey)) {
+      if (SocialNetwork.isBlocked(event.pubkey)) {
         return;
       }
       const repliedMsg = Events.getEventReplyingTo(event);
@@ -197,7 +198,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           return;
         }
         const author = Events.db.by('id', repliedMsg)?.pubkey;
-        if (author && SocialNetwork.blockedUsers.has(author)) {
+        if (author && SocialNetwork.isBlocked(author)) {
           return;
         }
       }
@@ -218,10 +219,11 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         });
       } else {
         this.unsub = this.getEvents(callback);
-        const followCount = SocialNetwork.followedByUser.get(Key.getPubKey())?.size;
+        const myId = ID(Key.getPubKey());
+        const followCount = SocialNetwork.followedByUser.get(myId)?.size;
         const unsub = PubSub.subscribe({ authors: [Key.getPubKey()], kinds: [3] }, () => {
           // is this needed?
-          if (followCount !== SocialNetwork.followedByUser.get(Key.getPubKey())?.size) {
+          if (followCount !== SocialNetwork.followedByUser.get(myId)?.size) {
             unsub();
             this.subscribe();
           }

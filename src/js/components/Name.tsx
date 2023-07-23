@@ -3,6 +3,7 @@ import { memo, useEffect, useState } from 'react';
 import AnimalName from '../AnimalName';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
+import { ID } from '../nostr/UserIds';
 
 import Badge from './Badge';
 
@@ -26,7 +27,7 @@ const Name = (props: Props) => {
     let displayName;
     let isNameGenerated = false;
 
-    const profile = SocialNetwork.profiles.get(nostrAddr);
+    const profile = SocialNetwork.profiles.get(ID(nostrAddr));
     // should we change SocialNetwork.getProfile() and use it here?
     if (profile) {
       name = profile.name?.trim().slice(0, 100) || '';

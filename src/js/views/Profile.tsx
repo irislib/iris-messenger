@@ -226,7 +226,7 @@ class Profile extends View {
                   <b>${this.state.followerCount}</b> ${t('followers')}
                 </a>
               </div>
-              ${SocialNetwork.followedByUser.get(this.state.hexPub)?.has(Key.getPubKey())
+              ${SocialNetwork.isFollowing(this.state.hexPub, Key.getPubKey())
                 ? html` <div><small>${t('follows_you')}</small></div> `
                 : ''}
             </div>

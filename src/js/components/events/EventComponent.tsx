@@ -142,7 +142,7 @@ const EventComponent = (props: EventComponentProps) => {
     );
   }
 
-  if (SocialNetwork.blockedUsers.has(state.event.pubkey)) {
+  if (SocialNetwork.isBlocked(state.event.pubkey)) {
     if (props.standalone || props.isQuote) {
       return (
         <div className="msg">

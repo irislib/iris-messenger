@@ -2,6 +2,7 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import PubSub from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
+import { ID, PUB } from '../../nostr/UserIds';
 
 import BaseFeed from './BaseFeed';
 
@@ -65,7 +66,9 @@ class Feed extends BaseFeed {
 
   subscribeToFollows(since, callback) {
     const myPub = Key.getPubKey();
-    const followedUsers = Array.from(SocialNetwork.followedByUser.get(myPub) || []);
+    const followedUsers = Array.from(SocialNetwork.followedByUser.get(ID(myPub)) || []).map(
+      (user) => PUB(user),
+    );
     followedUsers.push(myPub);
     const filter = {
       kinds: [1, 6],
@@ -79,7 +82,7 @@ class Feed extends BaseFeed {
     return PubSub.subscribe(
       filter,
       (e) => {
-        if (e.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(e.pubkey)) {
+        if (e.pubkey === myPub || SocialNetwork.isFollowing(myPub, e.pubkey)) {
           callback(e);
         }
       },

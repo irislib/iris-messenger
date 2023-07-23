@@ -117,7 +117,7 @@ class PrivateChat extends PureComponent<PrivateChatProps, PrivateChatState> {
       if (
         this.chat &&
         !this.chat.uuid &&
-        Key.toNostrHexAddress(this.props.id) !== Key.getPubKey()()
+        Key.toNostrHexAddress(this.props.id) !== Key.getPubKey()
       ) {
         if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
           $('#not-seen-by-them').slideDown();
