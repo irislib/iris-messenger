@@ -63,16 +63,15 @@ type Props = {
 
 export default function ({ onAccept, onDecline }: Props) {
   return (
-    <div class="eula">
-      <div
-        class="eula__content"
-        style="margin: 5px; background-color: var(--login-background); overflow-y: scroll;position:absolute;left:0;top:0;right:0;bottom:0"
-      >
-        <div class="eula__content__text">{text}</div>
-        <p>
-          <Button onClick={onAccept}>Accept</Button>
-          <Button onClick={onDecline}>Decline</Button>
-        </p>
+    <div class="m-1 bg-black overflow-y-scroll absolute inset-0 pb-safe-area">
+      <div className="prose">{text}</div>
+      <div className="flex gap-2 my-2">
+        <button className="btn btn-primary" onClick={onAccept}>
+          Accept
+        </button>
+        <button className="btn btn-default" onClick={onDecline}>
+          Decline
+        </button>
       </div>
     </div>
   );
