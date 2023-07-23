@@ -1,5 +1,3 @@
-import { PrimaryButton as Button } from './buttons/Button';
-
 const text = (
   <>
     <b>End User Licence Agreement</b>
