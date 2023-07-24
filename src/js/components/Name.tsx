@@ -43,30 +43,15 @@ const Name = (props: Props) => {
   const hexKey = props.hexKey || Key.toNostrHexAddress(props.pub) || '';
 
   const [profile, setProfile] = useState<Profile>(() =>
-    sanitizeProfile(SocialNetwork.profiles.get(hexKey), props.pub),
+    sanitizeProfile(SocialNetwork.profiles.get(ID(hexKey)), props.pub),
   );
 
   const wot = useVerticeMonitor(hexKey, ['badName', 'neutralName', 'goodName'], '');
 
-<<<<<<< HEAD
-=======
-    const profile = SocialNetwork.profiles.get(ID(nostrAddr));
-    // should we change SocialNetwork.getProfile() and use it here?
-    if (profile) {
-      name = profile.name?.trim().slice(0, 100) || '';
-      displayName = profile.display_name?.trim().slice(0, 100);
-    }
-    if (!name) {
-      name = AnimalName(Key.toNostrBech32Address(props.pub, 'npub') || props.pub);
-      isNameGenerated = true;
-    }
->>>>>>> master
-
-
   useEffect(() => {
     if (!hexKey) return;
 
-    const p = SocialNetwork.profiles.get(hexKey);
+    const p = SocialNetwork.profiles.get(ID(hexKey));
     if (p) {
       let sanitized = sanitizeProfile(p, props.pub);
       if (

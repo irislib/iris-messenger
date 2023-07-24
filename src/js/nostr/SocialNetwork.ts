@@ -350,7 +350,8 @@ export default {
 
     // First load from memory
     for (const address of addresses) {
-      const item = this.profiles.get(address);
+      const id = ID(address);
+      const item = this.profiles.get(id);
       if (item)
         list.push(item);
       else 
@@ -393,7 +394,8 @@ export default {
     
     // Then subscribe to updates via nostr relays
     const callback = (event: Event) => {
-      let profile = this.profiles.get(event.pubkey);
+      const id = ID(event.pubkey);
+      let profile = this.profiles.get(id);
       cb?.([profile]);
     };
 
@@ -452,13 +454,13 @@ export default {
 
       let profile = this.sanitizeProfile(rawProfile, event.pubkey);
 
-      this.profiles.set(event.pubkey, profile);
+      this.profiles.set(ID(event.pubkey), profile);
       //const key = Key.toNostrBech32Address(event.pubkey, 'npub');
       FuzzySearch.add({
         key: event.pubkey,
         name: profile.name,
         display_name: profile.display_name,
-        followers: this.followersByUser.get(event.pubkey) ?? new Set(),
+        followers: this.followersByUser.get(ID(event.pubkey)) ?? new Set(),
       });
       return profile;
 
