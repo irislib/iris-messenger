@@ -19,7 +19,7 @@ export default function Badge(props): JSX.Element | null {
   if (!hexKey) {
     return null;
   }
-  const following = SocialNetwork.followedByUser.get(myPub)?.has(hexKey);
+  const following = SocialNetwork.isFollowing(myPub, hexAddress);
   if (following) {
     return (
       <span class="mx-2 text-iris-blue tooltip" data-tip={t('following')}>

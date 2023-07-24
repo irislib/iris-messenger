@@ -8,6 +8,7 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import PubSub, { Unsubscribe } from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
+import { ID } from '../../nostr/UserIds';
 import { translate as t } from '../../translations/Translation.mjs';
 import Show from '../helpers/Show';
 
@@ -188,7 +189,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       if (results.has(event.id)) {
         return;
       }
-      if (SocialNetwork.blockedUsers.has(event.pubkey)) {
+      if (SocialNetwork.isBlocked(event.pubkey)) {
         return;
       }
       const repliedMsg = Events.getEventReplyingTo(event);
@@ -197,7 +198,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           return;
         }
         const author = Events.db.by('id', repliedMsg)?.pubkey;
-        if (author && SocialNetwork.blockedUsers.has(author)) {
+        if (author && SocialNetwork.isBlocked(author)) {
           return;
         }
       }
@@ -218,10 +219,11 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         });
       } else {
         this.unsub = this.getEvents(callback);
-        const followCount = SocialNetwork.followedByUser.get(Key.getPubKey())?.size;
+        const myId = ID(Key.getPubKey());
+        const followCount = SocialNetwork.followedByUser.get(myId)?.size;
         const unsub = PubSub.subscribe({ authors: [Key.getPubKey()], kinds: [3] }, () => {
           // is this needed?
-          if (followCount !== SocialNetwork.followedByUser.get(Key.getPubKey())?.size) {
+          if (followCount !== SocialNetwork.followedByUser.get(myId)?.size) {
             unsub();
             this.subscribe();
           }
@@ -308,7 +310,30 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         <Show when={index !== 'notifications' && this.state.settingsOpen}>
           <FeedSettings settings={settings} onChange={(settings) => this.setState({ settings })} />
         </Show>
-        <Show when={['global', 'follows'].includes(index || '')}>{/* Remaining JSX */}</Show>
+        <Show when={['global', 'follows'].includes(index || '')}>
+          <div className="flex items-center mx-2 md:mx-0 my-2">
+            <div
+              className={`btn btn-sm  mr-2 ${
+                this.state.settings.showReplies ? 'btn-neutral' : 'btn-primary'
+              }`}
+              onClick={() =>
+                this.setState({ settings: { ...this.state.settings, showReplies: false } })
+              }
+            >
+              {t('posts')}
+            </div>
+            <div
+              className={`btn btn-sm ${
+                this.state.settings.showReplies ? 'btn-primary' : 'btn-neutral'
+              }`}
+              onClick={() =>
+                this.setState({ settings: { ...this.state.settings, showReplies: true } })
+              }
+            >
+              {t('posts_and_replies')}
+            </div>
+          </div>
+        </Show>
         <Show when={index !== 'notifications'}>
           <FeedTypeSelector
             index={index}

@@ -3,6 +3,7 @@ import { memo, useEffect, useState } from 'react';
 import AnimalName from '../AnimalName';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
+import { ID } from '../nostr/UserIds';
 
 import Badge from './Badge';
 import useVerticeMonitor from '../dwotr/components/useVerticeMonitor';
@@ -47,6 +48,19 @@ const Name = (props: Props) => {
 
   const wot = useVerticeMonitor(hexKey, ['badName', 'neutralName', 'goodName'], '');
 
+<<<<<<< HEAD
+=======
+    const profile = SocialNetwork.profiles.get(ID(nostrAddr));
+    // should we change SocialNetwork.getProfile() and use it here?
+    if (profile) {
+      name = profile.name?.trim().slice(0, 100) || '';
+      displayName = profile.display_name?.trim().slice(0, 100);
+    }
+    if (!name) {
+      name = AnimalName(Key.toNostrBech32Address(props.pub, 'npub') || props.pub);
+      isNameGenerated = true;
+    }
+>>>>>>> master
 
 
   useEffect(() => {

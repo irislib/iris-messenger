@@ -24,9 +24,9 @@ const Note = ({
   isQuote = false, // message that connects to the next message with a line
   isQuoting = false, // message that is under an isQuote message, no margin
   showReplies = 0,
-  showRepliedMsg = false,
+  showRepliedMsg,
   standalone = false,
-  fullWidth = false,
+  fullWidth,
 }) => {
   const [replies, setReplies] = useState([] as string[]);
 

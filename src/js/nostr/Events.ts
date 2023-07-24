@@ -15,6 +15,7 @@ import Relays from './Relays';
 import Session from './Session';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
+import { ID, PUB, UserId, UserIds } from './UserIds';
 
 const startTime = Date.now() / 1000;
 
@@ -26,6 +27,13 @@ const events = db.addCollection('events', {
   indices: ['created_at', 'pubkey', 'kind'],
   unique: ['id'],
 });
+
+// print event db size
+/*
+setInterval(() => {
+  console.log('event db size', events.count());
+}, 1000);
+ */
 
 // add collections for Tags and Users?
 
@@ -52,7 +60,7 @@ localState.get('dev').on((d) => {
 const Events = {
   DEFAULT_GLOBAL_FILTER,
   getEventHash,
-  db: events,
+  db: events, // TODO gb2 own indexing with Maps. easier to evict & understand what it actually does
   eventsMetaDb: new EventMetaStore(),
   seen: new Set<string>(),
   deletedEvents: new Set<string>(),
@@ -102,7 +110,7 @@ const Events = {
         if (
           event.created_at > startTime ||
           event.pubkey === myPub ||
-          SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)
+          SocialNetwork.isFollowing(myPub, event.pubkey)
         ) {
           //Events.getEventById(id); // generates lots of subscriptions
         }
@@ -180,7 +188,7 @@ const Events = {
     this.insert(event);
     const myPub = Key.getPubKey();
 
-    if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
+    if (event.pubkey === myPub || SocialNetwork.isFollowing(myPub, event.pubkey)) {
       LocalForage.loaded && LocalForage.saveProfilesAndFollows();
     }
 
@@ -190,22 +198,25 @@ const Events = {
           const pub = tag[1];
           // ensure pub is hex
           if (pub.length === 64 && /^[0-9a-f]+$/.test(pub)) {
-            SocialNetwork.addFollower(tag[1], event.pubkey);
+            SocialNetwork.addFollower(ID(tag[1]), ID(event.pubkey));
           } else {
             // console.error('non-hex follow tag', tag, 'by', event.pubkey);
           }
         }
       }
     }
-    if (SocialNetwork.followedByUser.has(event.pubkey)) {
-      for (const previouslyFollowed of SocialNetwork.followedByUser.get(event.pubkey) || []) {
-        if (!event.tags || !event.tags?.find((t) => t[0] === 'p' && t[1] === previouslyFollowed)) {
-          SocialNetwork.removeFollower(previouslyFollowed, event.pubkey);
+    if (SocialNetwork.followedByUser.has(ID(event.pubkey))) {
+      for (const previouslyFollowed of SocialNetwork.followedByUser.get(ID(event.pubkey)) || []) {
+        if (
+          !event.tags ||
+          !event.tags?.find((t) => t[0] === 'p' && t[1] === PUB(previouslyFollowed))
+        ) {
+          SocialNetwork.removeFollower(previouslyFollowed, ID(event.pubkey));
         }
       }
     }
     if (event.pubkey === myPub && event.tags?.length) {
-      if ((SocialNetwork.followedByUser.get(myPub)?.size || 0) > 10) {
+      if ((SocialNetwork.followedByUser.get(ID(myPub))?.size || 0) > 10) {
         localState.get('showFollowSuggestions').put(false);
       }
     }
@@ -241,7 +252,11 @@ const Events = {
       try {
         content = await Key.decrypt(event.content);
         const blockList = JSON.parse(content);
-        SocialNetwork.blockedUsers = new Set(blockList);
+        const set = new Set<UserId>();
+        for (const id of blockList) {
+          set.add(ID(id));
+        }
+        SocialNetwork.blockedUsers = set;
       } catch (e) {
         console.log('failed to parse your block list', content, event);
       }
@@ -275,7 +290,7 @@ const Events = {
       return;
     }
     try {
-      const existing = SocialNetwork.profiles.get(event.pubkey);
+      const existing = SocialNetwork.profiles.get(ID(event.pubkey));
       if (existing?.created_at >= event.created_at) {
         return false;
       }
@@ -386,8 +401,12 @@ const Events = {
     if (globalFilter.maxFollowDistance && !!Key.getPubKey()) {
       if (!PubSub.subscribedAuthors.has(event.pubkey) && !PubSub.subscribedEventIds.has(event.id)) {
         // unless we specifically subscribed to the user or post, ignore long follow distance users
-        if (SocialNetwork.followDistanceByUser.has(event.pubkey)) {
-          const distance = SocialNetwork.followDistanceByUser.get(event.pubkey);
+        if (!event.pubkey) {
+          console.log('what', event);
+          return false;
+        }
+        if (UserIds.has(event.pubkey) && SocialNetwork.getFollowDistance(event.pubkey)) {
+          const distance = SocialNetwork.followDistanceByUser.get(ID(event.pubkey));
           if (distance && distance > globalFilter.maxFollowDistance) {
             // follow distance too high, reject
             return false;
@@ -395,7 +414,7 @@ const Events = {
           if (distance === globalFilter.maxFollowDistance) {
             // require at least 5 followers
             // TODO followers should be follow distance 2
-            const followerCount = SocialNetwork.followersByUser.get(event.pubkey)?.size || 0;
+            const followerCount = SocialNetwork.followersByUser.get(ID(event.pubkey))?.size || 0;
             if (
               followerCount <
               (globalFilter.minFollowersAtMaxDistance ||
@@ -463,7 +482,7 @@ const Events = {
     }
     // Accepting metadata so we still get their name. But should we instead save the name on our own list?
     // They might spam with 1 MB events and keep changing their name or something.
-    if (SocialNetwork.blockedUsers.has(event.pubkey) && event.kind !== 0) {
+    if (SocialNetwork.isBlocked(event.pubkey) && event.kind !== 0) {
       return false;
     }
     if (this.deletedEvents.has(event.id)) {
@@ -549,7 +568,7 @@ const Events = {
     // TODO since we're only querying relays since lastSeen, we need to store all beforeseen events and correctly query them on demand
     // otherwise feed will be incomplete
     if (saveToIdb) {
-      const followDistance = SocialNetwork.followDistanceByUser.get(event.pubkey) || Infinity;
+      const followDistance = SocialNetwork.followDistanceByUser.get(ID(event.pubkey)) || Infinity;
       if (followDistance <= 1) {
         // save all our own events and events from people we follow
         if (dev.indexedDbSave !== false) {
@@ -630,8 +649,8 @@ const Events = {
     if (event.pubkey !== myPub && event.tags?.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
       if (event.kind === 3) {
         // only notify if we know that they previously weren't following us
-        const existingFollows = SocialNetwork.followedByUser.get(event.pubkey);
-        if (!existingFollows || existingFollows.has(myPub)) {
+        const existingFollows = SocialNetwork.followedByUser.get(ID(event.pubkey));
+        if (!existingFollows || existingFollows.has(ID(myPub))) {
           return;
         }
       }
