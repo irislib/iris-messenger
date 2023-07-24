@@ -21,7 +21,7 @@ const ProfilePicture = ({ picture, onError }: Props) => {
   }
 
   return (
-    <>
+    <div className="rounded-full border-4 border-black">
       <SafeImg
         width={128}
         square={true}
@@ -40,7 +40,7 @@ const ProfilePicture = ({ picture, onError }: Props) => {
           />
         </Modal>
       )}
-    </>
+    </div>
   );
 };
 

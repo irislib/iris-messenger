@@ -13,6 +13,7 @@ import { Path } from './path';
 import PubSub from './PubSub';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
+import { ID } from './UserIds';
 
 try {
   localStorage.setItem('gunPeers', JSON.stringify({})); // quick fix to not connect gun
@@ -53,9 +54,10 @@ const Session = {
   },
   onLoggedIn() {
     const myPub = Key.getPubKey();
-    SocialNetwork.followDistanceByUser.set(myPub, 0);
-    SocialNetwork.followersByUser.set(myPub, new Set());
-    SocialNetwork.usersByFollowDistance.set(0, new Set([myPub]));
+    const myId = ID(myPub);
+    SocialNetwork.followDistanceByUser.set(myId, 0);
+    SocialNetwork.followersByUser.set(myId, new Set());
+    SocialNetwork.usersByFollowDistance.set(0, new Set([myId]));
     const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
       const filter = filters[0];
       const key = filter['#d']?.[0];

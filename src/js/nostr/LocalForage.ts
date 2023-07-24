@@ -17,7 +17,7 @@ const getLatestByFollows = () => {
   latestByFollows.applyFind({ kind: 1 });
   latestByFollows.applySimpleSort('created_at', { desc: true });
   latestByFollows.applyWhere((event: Event) => {
-    const distance = SocialNetwork.followDistanceByUser.get(event.pubkey) || Infinity;
+    const distance = SocialNetwork.getFollowDistance(event.pubkey);
     return distance <= 1;
   });
   return latestByFollows;
@@ -73,7 +73,7 @@ export default {
       ...Events.db.find({ kind: 0 }),
     ];
     const followEvents = Events.db.find({ kind: 3 }).filter((e: Event) => {
-      return e.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(e.pubkey);
+      return e.pubkey === myPub || SocialNetwork.isFollowing(myPub, e.pubkey);
     });
     const followEvents2 = [Events.db.findOne({ kind: 3, pubkey: myPub })];
     let size = 0;

@@ -135,9 +135,9 @@ class Profile extends View {
     // TODO: on Follow / Message btn click open login modal if not logged in
     return html`
       <div key="${this.state.hexPub}details">
-        <div className="mb-2 mx-2 md:mx-0 flex flex-col gap-2">
+        <div className="mb-2 mx-2 md:px-2 md:mx-0 flex flex-col gap-2">
           <div className="flex flex-row">
-            <div>${profilePicture}</div>
+            <div className=${this.state.banner ? '-mt-20' : ''}>${profilePicture}</div>
             <div className="flex-1 justify-end flex">
               <div onClick=${() => !loggedIn && localState.get('showLoginModal').put(true)}>
                 ${this.state.isMyProfile
@@ -226,7 +226,7 @@ class Profile extends View {
                   <b>${this.state.followerCount}</b> ${t('followers')}
                 </a>
               </div>
-              ${SocialNetwork.followedByUser.get(this.state.hexPub)?.has(Key.getPubKey())
+              ${SocialNetwork.isFollowing(this.state.hexPub, Key.getPubKey())
                 ? html` <div><small>${t('follows_you')}</small></div> `
                 : ''}
             </div>
@@ -313,9 +313,14 @@ class Profile extends View {
     }`;
     return html`
       ${this.state.banner
-        ? html` <div style="background-image: url(${this.state.banner})"></div> `
+        ? html`
+            <div
+              className="mb-2 h-48 bg-cover bg-center"
+              style="background-image: url(${this.state.banner})"
+            ></div>
+          `
         : ''}
-      <div className="content">
+      <div>
         <${Helmet}>
           <title>${title}</title>
           <meta name="description" content=${description} />

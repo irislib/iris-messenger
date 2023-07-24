@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Router, RouterOnChangeArgs } from 'preact-router';
 
 import Footer from './components/Footer';
+import Show from './components/helpers/Show';
 import MediaPlayer from './components/MediaPlayer';
 import Menu from './components/Menu';
 import Modal from './components/modal/Modal';
@@ -107,7 +108,9 @@ class Main extends Component<Props, ReactState> {
     return (
       <div className="flex justify-center">
         <section className="flex w-full max-w-screen-xl justify-between relative">
-          {s.loggedIn ? <Menu /> : null}
+          <Show when={s.loggedIn}>
+            <Menu />
+          </Show>
           <Helmet titleTemplate={titleTemplate} defaultTitle={defaultTitle}>
             <title>{title}</title>
             <meta name="description" content="Connecting People" />
@@ -153,7 +156,7 @@ class Main extends Component<Props, ReactState> {
           <Footer />
         </section>
 
-        {this.state.showLoginModal && (
+        <Show when={s.showLoginModal}>
           <Modal
             centerVertically={true}
             showContainer={true}
@@ -161,7 +164,7 @@ class Main extends Component<Props, ReactState> {
           >
             <Login />
           </Modal>
-        )}
+        </Show>
       </div>
     );
   }

@@ -19,7 +19,7 @@ const ReplyingToUsers = ({ event, isQuoting }) => {
     <Show when={replyingToUsers?.length && !isQuoting}>
       <small className="text-neutral-500">
         {t('replying_to') + ' '}
-        <For each={replyingToUsers.slice(3)}>
+        <For each={replyingToUsers.slice(0, 3)}>
           {(u) => (
             <a href={`/${Key.toNostrBech32Address(u, 'npub')}`}>
               @<Name pub={u} hideBadge={true} />{' '}

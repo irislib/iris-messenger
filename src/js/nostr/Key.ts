@@ -78,11 +78,11 @@ export default {
       return false;
     }
   },
-  getPubKey() {
-    return this.key?.rpub;
+  getPubKey(): string {
+    return this.key?.rpub || '';
   },
-  getPrivKey() {
-    return this.key?.priv;
+  getPrivKey(): string {
+    return this.key?.priv || '';
   },
   encrypt: async function (data: string, pub?: string): Promise<string> {
     const k = this.key;
