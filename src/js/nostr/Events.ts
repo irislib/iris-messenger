@@ -16,6 +16,7 @@ import Session from './Session';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 import { ID, PUB, UserId, UserIds } from './UserIds';
+import profileManager from '../dwotr/ProfileManager';
 
 const startTime = Date.now() / 1000;
 
@@ -294,24 +295,26 @@ const Events = {
       if (existing?.created_at >= event.created_at) {
         return false;
       }
-      
-      let savedEvent = Events.db.findOne({ kind: event.kind, pubkey: event.pubkey });
-      
-      if (savedEvent) {
-        if(savedEvent.created_at >= event.created_at) return false;
 
-        this.db.findAndRemove({ pubkey: event.pubkey, kind: 0 });
-        //savedEvent = IndexedDB.db.events.get({ pubkey: event.pubkey, kind: 0 }) as any;
-        //if (savedEvent) {
-          IndexedDB.db.events.update(savedEvent.id, event as Event & { id: string });
-        //} 
-      } 
-      if(!savedEvent) {
-        IndexedDB.saveEvent(event as Event & { id: string });
-      }
+      
+      // MemoryDB
+      // let savedEvent = Events.db.findOne({ kind: event.kind, pubkey: event.pubkey });
+      
+      // if (savedEvent) {
+      //   if(savedEvent.created_at >= event.created_at) return false;
 
-      this.insert(event);
-      SocialNetwork.addProfile(event);
+      //   this.db.findAndRemove({ pubkey: event.pubkey, kind: 0 });
+      //   //savedEvent = IndexedDB.db.events.get({ pubkey: event.pubkey, kind: 0 }) as any;
+      //   //if (savedEvent) {
+      //     IndexedDB.db.events.update(savedEvent.id, event as Event & { id: string });
+      //   //} 
+      // } 
+      // if(!savedEvent) {
+      //IndexedDB.saveEvent(event as Event & { id: string });
+      // }
+
+      //this.insert(event);
+      profileManager.addProfileEvent(event); 
       // const profile = JSON.parse(event.content);
       // // if we have previously deleted our account, log out. appease app store.
       // if (event.pubkey === Key.getPubKey() && profile.deleted) {
