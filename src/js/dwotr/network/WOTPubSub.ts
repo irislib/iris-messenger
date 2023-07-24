@@ -1,10 +1,10 @@
 import { Event, EventTemplate } from "nostr-tools";
-import PubSub, { Unsubscribe } from "../nostr/PubSub";
-import Relays from "../nostr/Relays";
-import Events from "../nostr/Events";
-import { EntityType } from "./Graph";
-import Key from "../nostr/Key";
-import SocialNetwork from "../nostr/SocialNetwork";
+import PubSub, { Unsubscribe } from "../../nostr/PubSub";
+import Relays from "../../nostr/Relays";
+import Events from "../../nostr/Events";
+import { EntityType } from "../model/Graph";
+import Key from "../../nostr/Key";
+import SocialNetwork from "../../nostr/SocialNetwork";
 
 
 export type OnEvent = (

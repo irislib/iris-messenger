@@ -8,10 +8,10 @@ import Events from '../../../nostr/Events';
 import Key from '../../../nostr/Key';
 import ReactionsList from '../ReactionsList';
 
-import { CheckCorrect, FlagMarkSolid } from '../../../dwotr/Icons';
+import { CheckCorrect, FlagMarkSolid } from '../../../dwotr/components/Icons';
 import graphNetwork from '../../../dwotr/GraphNetwork';
-import { EntityType } from '../../../dwotr/Graph';
-import TrustScore from '../../../dwotr/TrustScore';
+import { EntityType } from '../../../dwotr/model/Graph';
+import TrustScore from '../../../dwotr/model/TrustScore';
 import Like from './Like';
 import Repost from './Repost';
 import Zap from './Zap';

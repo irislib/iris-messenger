@@ -8,7 +8,7 @@ import Avatar from '../Avatar';
 import Modal from '../modal/Modal';
 import Name from '../Name';
 import graphNetwork from '../../dwotr/GraphNetwork';
-import TrustScore from '../../dwotr/TrustScore';
+import TrustScore from '../../dwotr/model/TrustScore';
 
 type ReactionData = {
   pubkey: string;

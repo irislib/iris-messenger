@@ -32,12 +32,10 @@ import localState from './LocalState';
 import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
 import '../css/cropper.min.css';
-import "./dwotr/style.css";
-import DWoTRSetup from './dwotr/DWoTRSetup';
-import WotView from './dwotr/WotView';
-import Score from './dwotr/Score';
-import { EntityType } from './dwotr/Graph';
-import VisGraph from './dwotr/VisGraph';
+import "./dwotr/views/style.css";
+import DWoTRSetup from './dwotr/components/DWoTRSetup';
+import WotView from './dwotr/views/WotView';
+import VisGraph from './dwotr/views/VisGraph';
 
 type Props = Record<string, unknown>;
 

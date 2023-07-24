@@ -1,16 +1,15 @@
 import { Network } from 'vis-network';
 import { DataSet } from 'vis-data';
 import { useEffect, useState, useRef } from 'preact/hooks';
-import Header from '../components/Header';
-import Name from '../components/Name';
-import Key from '../nostr/Key';
-import graphNetwork from './GraphNetwork';
-import { Edge, EntityType, Vertice } from './Graph';
+import Header from '../../components/Header';
+import Name from '../../components/Name';
+import Key from '../../nostr/Key';
+import graphNetwork from '../GraphNetwork';
+import { Edge, EntityType, Vertice } from '../model/Graph';
 import { Link } from 'preact-router';
-import { RenderTrust1Color, renderEntityKeyName } from './RenderGraph';
-import { filterByName, renderScoreLine } from './WotView';
-import WOTPubSub from './WOTPubSub';
-import SocialNetwork from '../nostr/SocialNetwork';
+import { RenderTrust1Color, renderEntityKeyName } from '../components/RenderGraph';
+import { renderScoreLine } from './WotView';
+import SocialNetwork from '../../nostr/SocialNetwork';
 
 type VisGraphProps = {
   id?: string;

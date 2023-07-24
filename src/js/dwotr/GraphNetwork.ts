@@ -1,11 +1,11 @@
 import { Event } from 'nostr-tools';
-import Graph, { Edge, EntityType, Vertice } from './Graph';
-import WOTPubSub from './WOTPubSub';
+import Graph, { Edge, EntityType, Vertice } from './model/Graph';
+import WOTPubSub from './network/WOTPubSub';
 import Key from '../nostr/Key';
-import { MAX_DEGREE } from './TrustScore';
-import wotDB from './WoTDB';
+import { MAX_DEGREE } from './model/TrustScore';
+import wotDB from './network/WoTDB';
 import { debounce } from 'lodash';
-import { MonitorItem } from './MonitorItem';
+import { MonitorItem } from './model/MonitorItem';
 import IndexedDB from '../nostr/IndexedDB';
 import Events from '../nostr/Events';
 import SocialNetwork from '../nostr/SocialNetwork';

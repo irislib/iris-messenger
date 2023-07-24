@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'preact/hooks';
-import Header from '../components/Header';
-import Name, { sanitizeProfile } from '../components/Name';
-import ScrollView from '../components/ScrollView';
-import Key from '../nostr/Key';
-import graphNetwork from './GraphNetwork';
-import { Edge, EntityType, Vertice } from './Graph';
+import Header from '../../components/Header';
+import Name, { sanitizeProfile } from '../../components/Name';
+import ScrollView from '../../components/ScrollView';
+import Key from '../../nostr/Key';
+import graphNetwork from '../GraphNetwork';
+import { Edge, EntityType, Vertice } from '../model/Graph';
 
-import { translate as t } from '../translations/Translation.mjs';
+import { translate as t } from '../../translations/Translation.mjs';
 import { Link } from 'preact-router';
-import SocialNetwork from '../nostr/SocialNetwork';
-import TrustScore from './TrustScore';
-import { RenderScoreDistrustLink, RenderScoreTrustLink, RenderTrust1Value, renderEntityKeyName } from './RenderGraph';
-import MyAvatar from '../components/Avatar';
+import SocialNetwork from '../../nostr/SocialNetwork';
+import TrustScore from '../model/TrustScore';
+import { RenderScoreDistrustLink, RenderScoreTrustLink, RenderTrust1Value, renderEntityKeyName } from '../components/RenderGraph';
+import MyAvatar from '../../components/Avatar';
 
 
 type TrustListViewProps = {

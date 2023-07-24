@@ -4,8 +4,8 @@
 //     return (renderNeutral) ? "Neutral" : "";
 // }
 
-import { EntityType } from './Graph';
-import TrustScore from './TrustScore';
+import { EntityType } from '../model/Graph';
+import TrustScore from '../model/TrustScore';
 
 export const RenderTrust1Value = (
   val: number,

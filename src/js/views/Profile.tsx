@@ -24,9 +24,9 @@ import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation.mjs';
 
 import View from './View';
-import TrustProfileButtons from '../dwotr/TrustProfileButtons';
+import TrustProfileButtons from '../dwotr/components/TrustProfileButtons';
 import ProfileFollowerLinks from '../components/ProfileFollowerLinks';
-import ProfileTrustLinks from '../dwotr/ProfileTrustLinks';
+import ProfileTrustLinks from '../dwotr/components/ProfileTrustLinks';
 
 class Profile extends View {
   followedUsers: Set<string>;

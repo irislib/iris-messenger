@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
-import graphNetwork, { TrustScoreEventName } from "./GraphNetwork";
-import { MonitorItem } from "./MonitorItem";
-import { Vertice } from "./Graph";
+import graphNetwork, { TrustScoreEventName } from "../GraphNetwork";
+import { MonitorItem } from "../model/MonitorItem";
+import { Vertice } from "../model/Graph";
 
 
 const useVerticeMonitor = (key: string, options?: any, option?: any) => {

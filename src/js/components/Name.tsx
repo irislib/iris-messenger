@@ -5,7 +5,7 @@ import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 
 import Badge from './Badge';
-import useVerticeMonitor from '../dwotr/useVerticeMonitor';
+import useVerticeMonitor from '../dwotr/components/useVerticeMonitor';
 
 type Props = {
   pub: string;

@@ -13,7 +13,7 @@ import EventComponent from '../EventComponent';
 import Avatar from './Avatar';
 import Content from './Content';
 
-import useVerticeMonitor from '../../../dwotr/useVerticeMonitor';
+import useVerticeMonitor from '../../../dwotr/components/useVerticeMonitor';
 
 
 const Note = ({

@@ -1,16 +1,16 @@
 import { useEffect,  useState } from 'react';
 import { ReactionButtons } from './TrustButtons';
 
-import graphNetwork from './GraphNetwork';
+import graphNetwork from '../GraphNetwork';
 import { CheckCorrect, FlagMarkSolid } from './Icons';
-import { EntityType } from './Graph';
+import { EntityType } from '../model/Graph';
 import useVerticeMonitor from './useVerticeMonitor';
 // import Helpers from '../Helpers';
 // import { translate as t } from '../translations/Translation.mjs';
 // import Identicon from '../components/Identicon';
 // import { route } from 'preact-router';
 // import Key from '../nostr/Key';
-import TrustScore from './TrustScore';
+import TrustScore from '../model/TrustScore';
 
 const TrustProfileButtons = ({ props }: any) => {
   const [state, setState] = useState({

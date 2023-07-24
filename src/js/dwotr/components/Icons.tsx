@@ -1,5 +1,3 @@
-import React from 'react'
-
 // // Source https://www.svgrepo.com/
 
 // export default {
