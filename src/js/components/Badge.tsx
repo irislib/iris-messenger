@@ -6,17 +6,16 @@ import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation.mjs';
 
 export default function Badge(props): JSX.Element | null {
-  
   const myPub = Key.getPubKey();
-  const hexKey = props.hexKey || Key.toNostrHexAddress(props.pub);
-  if (hexKey === myPub) {
+  const hexAddress = Key.toNostrHexAddress(props.pub);
+  if (hexAddress === myPub) {
     return (
       <span class="mx-2 text-iris-blue tooltip" data-tip={t('you')}>
         {Icons.checkmark}
       </span>
     );
   }
-  if (!hexKey) {
+  if (!hexAddress) {
     return null;
   }
   const following = SocialNetwork.isFollowing(myPub, hexAddress);
@@ -27,7 +26,7 @@ export default function Badge(props): JSX.Element | null {
       </span>
     );
   } else {
-    const count = SocialNetwork.followedByFriendsCount(hexKey);
+    const count = SocialNetwork.followedByFriendsCount(hexAddress);
     if (count > 0) {
       const className = count > 10 ? 'text-iris-orange' : '';
       return (
