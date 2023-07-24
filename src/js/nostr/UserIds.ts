@@ -34,10 +34,15 @@ export class UserIds {
     return pub;
   }
 
+  static bech32(id: number): string {
+    return Key.toNostrBech32Address(UserIds.pub(id), 'npub') || '';
+  }
+
   static has(pubKey: string): boolean {
     return UserIds.pubKeyToUserId.has(pubKey);
   }
 }
 
 export const PUB = UserIds.pub;
+export const BECH32 = UserIds.bech32;
 export const ID = UserIds.id;

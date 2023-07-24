@@ -1,13 +1,14 @@
-import { Event } from 'nostr-tools';
+//import { Event } from 'nostr-tools';
 import localState from '../LocalState';
 import Key from './Key';
 import LocalForage from './LocalForage';
 import PubSub, { Unsubscribe } from './PubSub';
-import FuzzySearch from '../FuzzySearch';
+//import FuzzySearch from '../FuzzySearch';
 import Events from './Events';
-import IndexedDB from './IndexedDB';
-import AnimalName from '../AnimalName';
+//import IndexedDB from './IndexedDB';
+//import AnimalName from '../AnimalName';
 import { ID, PUB, UserId } from './UserIds';
+import profileManager from '../dwotr/ProfileManager';
 
 export default {
   followDistanceByUser: new Map<UserId, number>(),
@@ -313,7 +314,7 @@ export default {
         });
       }
     } else {
-      this.fetchProfile(address).then((profile) => {
+      profileManager.fetchProfile(address).then((profile) => {
         if (!profile) return;
         Events.handle(profile);
         callback();
@@ -329,150 +330,6 @@ export default {
       // });
     }
     return PubSub.subscribe({ kinds: [0], authors: [address] }, callback, false);
-  },
-  fetchProfile: async function (address: string) {
-    const profile = await fetch(`https://api.iris.to/profile/${address}`).then((res) => {
-      if (res.status === 200)
-        return res.json();
-      else 
-        return undefined;
-    });
-    return profile;
-  },
-
-  getProfiles: async function (addresses: string[],     
-    cb?: (profiles: Array<any>) => void,
-  ):  Promise<Unsubscribe> {
-    if(!addresses || addresses.length === 0) return () => {};
-
-    let list: Array<any> = [];
-    let dbLookups: Array<string> = [];
-
-    // First load from memory
-    for (const address of addresses) {
-      const id = ID(address);
-      const item = this.profiles.get(id);
-      if (item)
-        list.push(item);
-      else 
-        dbLookups.push(address);
-    }
-
-    // Then load from DB
-    let lookupSet = new Set(dbLookups);
-    const dbProfiles = await this.loadProfiles(lookupSet);
-
-    if (dbProfiles && dbProfiles.length > 0) {
-      list = list.concat(dbProfiles);
-      for (const profile of dbProfiles) {
-        lookupSet.delete(profile.key);
-      }
-    }
-
-    // Then load from API
-    if (lookupSet.size > 0 && lookupSet.size <= 100) {
-      const apiProfiles = await Promise.all(Array.from(lookupSet).map((address) => this.fetchProfile(address)));
-      if (apiProfiles && apiProfiles.length > 0) {
-        for (const profile of apiProfiles) {
-          if (profile) {
-            Events.handle(profile);
-            list.push(profile);
-            lookupSet.delete(profile.key);
-          }
-        }
-      }
-    }
-
-    // Fill in default profile for missing profiles
-    for (const address of lookupSet) {
-      list.push(this.sanitizeProfile({}, address)); // Fill in default profile with animal names
-    }
-
-    // Then callback
-    if(list.length > 0) // The list should contain a profile for each address
-      cb?.(list);
-    
-    // Then subscribe to updates via nostr relays
-    const callback = (event: Event) => {
-      const id = ID(event.pubkey);
-      let profile = this.profiles.get(id);
-      cb?.([profile]);
-    };
-
-    return PubSub.subscribe({ kinds: [0], authors: addresses }, callback, false);
-  },
-
-  loadProfiles: async function (addresses: Set<string>) {
-    const list = await IndexedDB.db.events.where({kind: 0}).filter((event) => addresses.has(event.pubkey)).toArray();
-    if (!list) return undefined;
-    const profiles = list.map((event) => this.addProfile(event)).filter((p) => p);
-    return profiles;
-  },
-
-
-  loadProfile: async function (address: string) {
-    const event = await IndexedDB.db.events.get({ kind: 0, pubkey: address });
-    if (!event) return undefined;
-    return this.addProfile(event);
-  },
-
-  loadAllProfiles: async function () {
-    console.time('Loading profiles from IndexedDB');
-    let events = await IndexedDB.db.events.where({ kind: 0 }).toArray();
-    if (!events) return;
-
-    for (const event of events) {
-      this.addProfile(event);
-    }
-    //this.profilesLoaded = true;
-    console.timeEnd('Loading profiles from IndexedDB');
-    console.log('Loaded profiles from IndexedDB - ' + events.length + ' events');
-  },
-
-  sanitizeProfile: function(p: any, npub:string) {
-    if (!p) 
-      p = { name: '', displayName: '', isNameGenerated: false, dummy: true };
-  
-    let name = p.name?.trim().slice(0, 100) || '';
-    let isNameGenerated = p.name || p.display_name ? false : true;
-    let picture = p.picture;
-  
-    if (!name) {
-      name = AnimalName(Key.toNostrBech32Address(npub, 'npub') || npub);
-      isNameGenerated = true;
-    }
-  
-    let displayName = p.display_name?.trim().slice(0, 100) || name;
-  
-    return { ...p, key:npub, name, displayName, picture, isNameGenerated, dummy: false };
-  },
-  
-  addProfile: function (event: Event) {
-    try {
-      const rawProfile = JSON.parse(event.content);
-      rawProfile.created_at = event.created_at;
-
-      let profile = this.sanitizeProfile(rawProfile, event.pubkey);
-
-      this.profiles.set(ID(event.pubkey), profile);
-      //const key = Key.toNostrBech32Address(event.pubkey, 'npub');
-      FuzzySearch.add({
-        key: event.pubkey,
-        name: profile.name,
-        display_name: profile.display_name,
-        followers: this.followersByUser.get(ID(event.pubkey)) ?? new Set(),
-      });
-      return profile;
-
-    } catch (e) {
-      // Remove the event from IndexedDB if it has an id wich means it was saved there
-      if(event.id) {
-        IndexedDB.db.events.delete(event.id);
-      }
-      console.error(e);
-      //return this.sanitizeProfile({}, event.pubkey); // return a dummy profile as replacement
-      return undefined;
-    }
   },
 
   setMetadata(data: any) {

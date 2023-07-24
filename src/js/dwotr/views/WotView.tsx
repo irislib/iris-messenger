@@ -12,6 +12,7 @@ import SocialNetwork from '../../nostr/SocialNetwork';
 import TrustScore from '../model/TrustScore';
 import { RenderScoreDistrustLink, RenderScoreTrustLink, RenderTrust1Value, renderEntityKeyName } from '../components/RenderGraph';
 import MyAvatar from '../../components/Avatar';
+import { PUB } from '../../nostr/UserIds';
 
 
 type TrustListViewProps = {
@@ -29,8 +30,8 @@ export function filterByName(list: Vertice[], filter: string) {
   let result = list.filter((v) => {
     if (!v['profile'] || v['profile'].dummy) {
       if (v.entityType == EntityType.Key) {
-        let rawP = SocialNetwork.profiles.get(v.key);
-        v['profile'] = sanitizeProfile(rawP, v.key);
+        let rawP = SocialNetwork.profiles.get(v.id as number);
+        v['profile'] = sanitizeProfile(rawP, PUB(v.id));
       }
     }
 
@@ -146,7 +147,7 @@ const WotView = (props: TrustListViewProps) => {
   }
 
   const renderEntityKey = (v: Vertice, hexKey: string) => {
-    const itemKey = v.key;
+    const itemKey = PUB(v.id);
     const degree = v.degree;
     const score = v.score;
     const itemNpub = Key.toNostrBech32Address(itemKey as string, 'npub') as string;

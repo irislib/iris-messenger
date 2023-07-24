@@ -5,6 +5,7 @@ import Events from "../../nostr/Events";
 import { EntityType } from "../model/Graph";
 import Key from "../../nostr/Key";
 import SocialNetwork from "../../nostr/SocialNetwork";
+import { ID } from "../../nostr/UserIds";
 
 
 export type OnEvent = (
@@ -95,17 +96,17 @@ const WOTPubSub = {
     loadProfiles(
         addresses: string[],
       ): Unsubscribe {
-        let missingAddresses = addresses.filter((a) => !SocialNetwork.profiles.has(a));
+        let missingAddresses = addresses.filter((a) => !SocialNetwork.profiles.has(ID(a)));
 
         let callback = (event: Event) => { 
                 
             if (!event.content) return; // no content
-            let existing = SocialNetwork.profiles.get(event.pubkey);
+            let existing = SocialNetwork.profiles.get(ID(event.pubkey));
             if (existing) return; // already have it
 
             let profile = JSON.parse(event.content) as any;
 
-            SocialNetwork.profiles.set(event.pubkey, profile); 
+            SocialNetwork.profiles.set(ID(event.pubkey), profile); 
         }
 
         return PubSub.subscribe({ kinds: [0], authors: missingAddresses }, callback, false);

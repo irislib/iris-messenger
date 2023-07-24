@@ -10,6 +10,8 @@ import { Link } from 'preact-router';
 import { RenderTrust1Color, renderEntityKeyName } from '../components/RenderGraph';
 import { renderScoreLine } from './WotView';
 import SocialNetwork from '../../nostr/SocialNetwork';
+import profileManager from '../ProfileManager';
+import { PUB } from '../../nostr/UserIds';
 
 type VisGraphProps = {
   id?: string;
@@ -137,8 +139,8 @@ const VisGraph = (props: VisGraphProps) => {
 
     list = graphNetwork.g.inOutTrustById(vId, EntityType.Key, undefined);
 
-    let addresses = list.filter((v) => !v.profile).map((v) => v.key);
-    let unsub = await SocialNetwork.getProfiles(addresses, (profiles) => {
+    let addresses = list.filter((v) => !v.profile).map((v) => PUB(v.id));
+    let unsub = await profileManager.getProfiles(addresses, (profiles) => {
       
       for (let profile of profiles) {
         let id = graphNetwork.g.getVerticeId(profile.key);
@@ -156,16 +158,17 @@ const VisGraph = (props: VisGraphProps) => {
     for (let item of list) {
       nodes.get(item.id as number) || nodes.add({ id: item.id, label: item['profile']?.name, image: item['profile']?.picture });
 
-      let outEdge = graphNetwork.g.edges[v.out[item.id as number]] as Edge;
+      let outEdge = v.out[item.id as number] as Edge;
       if (outEdge) {
         let color = RenderTrust1Color(outEdge.val);
-        edges.get(outEdge.id as number) || edges.add({ id: outEdge.id, from: vId, to: item.id, color });
+
+        edges.get(outEdge.key) || edges.add({ id: outEdge.key, from: vId, to: item.id, color });
       }
 
-      let inEdge = graphNetwork.g.edges[v.in[item.id as number]] as Edge;
+      let inEdge = v.in[item.id as number] as Edge;
       if (inEdge) {
         let color = RenderTrust1Color(inEdge.val);
-        edges.get(inEdge.id as number) || edges.add({ id: inEdge.id, from: item.id, to: vId, color });
+        edges.get(outEdge.key) || edges.add({ id: outEdge.key, from: item.id, to: vId, color });
       }
     }
   }

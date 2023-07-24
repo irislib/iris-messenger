@@ -1,14 +1,12 @@
 import { Event } from 'nostr-tools';
-import Graph, { Edge, EntityType, Vertice } from './model/Graph';
+import Graph, { Edge, EdgeRecord, EntityType, Vertice } from './model/Graph';
 import WOTPubSub from './network/WOTPubSub';
 import Key from '../nostr/Key';
 import { MAX_DEGREE } from './model/TrustScore';
-import wotDB from './network/WoTDB';
+import dwotrDB from './network/DWoTRDB';
 import { debounce } from 'lodash';
 import { MonitorItem } from './model/MonitorItem';
-import IndexedDB from '../nostr/IndexedDB';
-import Events from '../nostr/Events';
-import SocialNetwork from '../nostr/SocialNetwork';
+import { BECH32, ID, PUB } from '../nostr/UserIds';
 
 export type ResolveTrustCallback = (result: any) => any;
 
@@ -25,7 +23,7 @@ export class TrustScoreEvent extends CustomEvent<MonitorItem> {
 export const TRUST1 = 'trust1';
 
 class GraphNetwork {
-  db: typeof wotDB;
+  db: typeof dwotrDB;
 
   localDataLoaded = false;
 
@@ -49,7 +47,7 @@ class GraphNetwork {
   submitTrustIndex = {};
   profilesLoaded = false;
 
-  constructor(wotPubSub: typeof WOTPubSub, db: typeof wotDB) {
+  constructor(wotPubSub: typeof WOTPubSub, db: typeof dwotrDB) {
     this.wotPubSub = wotPubSub;
     this.db = db;
   }
@@ -58,24 +56,20 @@ class GraphNetwork {
     this.sourceKey = source;
     if (this.localDataLoaded) return;
 
-    let v = await this.db.vertices.where({ key: source }).first();
-    if (!v) {
-      // Create source vertice
-      v = await this.loadVertice(source, { degree: 0, entityType: EntityType.Key, timestamp: 0 });
-    }
+    // let v = await this.db.vertices.where({ key: source }).first();
+    // if (!v) {
+    //   // Create source vertice
+    //   v = await this.loadVertice(source, { degree: 0, entityType: EntityType.Key, timestamp: 0 });
+    // }
 
-    this.sourceId = v.id as number;
+    this.sourceId = ID(this.sourceKey);
+    this.g.addVertice(this.sourceId); // Add the source vertice to the graph
 
-    // Load vertices and edges from DB
-    let vertices = await this.db.vertices.toArray();
-    let edges = await this.db.edges.toArray();
-    this.g.load(vertices, edges);
-    console.info(
-      'Loaded vertices and edges from DB - vertices: ' +
-        vertices.length +
-        '  Edges: ' +
-        edges.length,
-    );
+    // Load edges from DB
+    await this.db.edges.each((record) => { // Load one record at a time, to avoid memory issues (check that this is indeed the case with each())
+      this.g.addEdge(record, false); // Load all edges from the DB into the graph with partial data
+    });
+
     console.info(
       'Graph: ' +
         Object.entries(this.g.vertices).length +
@@ -87,12 +81,12 @@ class GraphNetwork {
     this.processGraph = true; // Process the whole graph
     this.processScore(); // Process score for all vertices within degree of maxDegree and subscribe to trust events
 
-    //await this.initProfiles(); // Load profiles from IndexedDB
-
     this.localDataLoaded = true;
+
     for (let callback of this.readyCallbacks) {
       callback();
     }
+
     this.readyCallbacks = [];
   }
 
@@ -238,7 +232,7 @@ class GraphNetwork {
   }
 
   updateVerticeMonitor(v: Vertice) {
-    let monitorItem = this.verticeMonitor[v.key] as MonitorItem;
+    let monitorItem = this.verticeMonitor[v.id] as MonitorItem;
     if (!monitorItem) return; // Dont update if a vertice is already set
     monitorItem.vertice = v;
   }
@@ -259,59 +253,65 @@ class GraphNetwork {
   }
 
   async setTrust(props: any, isExternal: boolean): Promise<any> {
-    let { from, to } = props;
-    let outV = await this.loadVertice(from, { ...props, entityType: EntityType.Key }); // Create the vertice if it doesn't exist and always entity type is Key
-    let inV = await this.loadVertice(to, { degree: (outV?.degree || 98) + 1, ...props });
-    let { edge, preVal, change } = await this.loadEdge(outV, inV, props, isExternal);
+    //let outV = await this.loadVertice(from, { ...props, entityType: EntityType.Key }); // Create the vertice if it doesn't exist and always entity type is Key
+    //let inV = await this.loadVertice(to, { degree: (outV?.degree || 98) + 1, ...props });
+    let { edge, preVal, change } = await this.putEdge(props, isExternal);
+    let outV = edge.out;
+    let inV = edge.in;
 
     return { outV, inV, edge, preVal, change };
   }
 
-  async loadVertice(key: string, props: any): Promise<Vertice> {
-    let { degree, entityType, timestamp } = props;
-    let v = this.g.getVertice(key);
-    if (!v) {
-      v = new Vertice();
-      v.key = key;
-      v.entityType = entityType;
-      v.timestamp = timestamp;
-      v.degree = degree || 0;
-      v.id = (await this.db.vertices.add(v)) as number;
-      this.g.addVertice(v);
-    } else {
-      let updateObject = {};
-      if (v.timestamp < timestamp) v.timestamp = updateObject['timestamp'] = timestamp; // Update the timestamp to the latest event.
-      if (v.entityType != entityType) v.entityType = updateObject['entityType'] = entityType; // Update the entityType only if it is different.
-      if (degree && v.degree && v.degree > degree) v.degree = updateObject['degree'] = degree; // Update the degree only if it is lower than the current degree.
+  // async loadVertice(key: string, props: any): Promise<Vertice> {
+  //   let { degree, entityType, timestamp } = props;
+  //   let v = this.g.getVertice(key);
+  //   if (!v) {
+  //     v = new Vertice();
+  //     v.key = key;
+  //     v.entityType = entityType;
+  //     v.timestamp = timestamp;
+  //     v.degree = degree || 0;
+  //     v.id = (await this.db.vertices.add(v)) as number;
+  //     this.g.addVertice(v);
+  //   } else {
+  //     let updateObject = {};
+  //     if (v.timestamp < timestamp) v.timestamp = updateObject['timestamp'] = timestamp; // Update the timestamp to the latest event.
+  //     if (v.entityType != entityType) v.entityType = updateObject['entityType'] = entityType; // Update the entityType only if it is different.
+  //     if (degree && v.degree && v.degree > degree) v.degree = updateObject['degree'] = degree; // Update the degree only if it is lower than the current degree.
 
-      if (Object.keys(updateObject).length > 0)
-        await this.db.vertices.update(v.id as number, updateObject);
-    }
-    return v;
-  }
+  //     if (Object.keys(updateObject).length > 0)
+  //       await this.db.vertices.update(v.id as number, updateObject);
+  //   }
+  //   return v;
+  // }
 
-  async loadEdge(outV: Vertice, inV: Vertice, props: any, isExternal: boolean) {
-    let { val, context, note, timestamp } = props;
-    let edge: Edge | undefined;
+  async putEdge(props: any, isExternal: boolean) {
+    let { from, to, val, context, note, timestamp } = props;
+    let type = 1; // Trust1
     let preVal = undefined;
     let change = false;
-    let edgeId = outV.out[inV.id as number];
 
-    if (!edgeId) {
+    let key =  Edge.getKey(type, from, to, context); // Create the key for the edge
+    let edge = this.g.edges[key];
+
+    if (!edge) {
       if (val == 0 && isExternal) return { edge, preVal, change }; // No need to add an edge if the value is 0
 
-      edge = new Edge();
-      edge.out = outV.id as number;
-      edge.in = inV.id as number;
-      edge.val = val;
-      edge.context = context;
-      edge.note = note;
-      edge.timestamp = timestamp;
-      edge.id = (await this.db.edges.add(edge)) as number;
-      this.g.addEdge(edge);
+      let record = new EdgeRecord();
+      record.type = type;
+      record.key = key;
+      record.from = from;
+      record.to = to;
+      record.val = val;
+      record.context = context;
+      record.note = note;
+      record.timestamp = timestamp;
+      await this.db.edges.put(record);
+
+      edge = this.g.addEdge(record, false); // Add the record to the graph and return the graph edge
+
       change = true;
     } else {
-      edge = this.g.getEdge(edgeId) as Edge;
       preVal = edge.val;
 
       // If data is older or the same as the current data and value, then ignore it.
@@ -329,11 +329,11 @@ class GraphNetwork {
 
         if (edge.val == 0 && isExternal) {
           // Delete the edge if the value is 0 / neutral and it is an external event
-          await this.db.edges.delete(edgeId);
+          await this.db.edges.delete(key);
           this.g.removeEdge(edge);
           edge = undefined;
         } else {
-          await this.db.edges.update(edgeId, updateObject);
+          await this.db.edges.update(key, updateObject);
         }
 
         change = true;
@@ -365,7 +365,7 @@ class GraphNetwork {
 
     for (let v of vertices) {
       if (since < v.timestamp) since = v.timestamp;
-      authors.push(v.key);
+      authors.push(BECH32(v.id));
     }
 
     vertices.forEach((v) => (v.subscribed = id)); // Mark the vertices as subscribed with the current subscription counter
@@ -482,6 +482,6 @@ class GraphNetwork {
   }
 }
 
-const graphNetwork = new GraphNetwork(WOTPubSub, wotDB);
+const graphNetwork = new GraphNetwork(WOTPubSub, dwotrDB);
 
 export default graphNetwork;
