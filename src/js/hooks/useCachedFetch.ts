@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'preact/hooks';
 
 const useCachedFetch = (url, storageKey, dataProcessor = (data) => data) => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const cachedData = localStorage.getItem(storageKey);
+  const initialData = cachedData ? JSON.parse(cachedData).data : [];
+
+  const [data, setData] = useState(initialData);
 
   useEffect(() => {
-    const cachedData = localStorage.getItem(storageKey);
-
     const fetchData = () => {
-      setLoading(true);
       fetch(url)
         .then((res) => res.json())
         .then((fetchedData) => {
@@ -24,27 +23,20 @@ const useCachedFetch = (url, storageKey, dataProcessor = (data) => data) => {
             const { data } = JSON.parse(cachedData);
             setData(data);
           }
-        })
-        .finally(() => {
-          setLoading(false);
         });
     };
 
-    if (!loading) {
-      if (cachedData) {
-        const { data, timestamp } = JSON.parse(cachedData);
-        const age = (new Date().getTime() - timestamp) / 1000 / 60;
+    if (cachedData) {
+      const { timestamp } = JSON.parse(cachedData);
+      const age = (new Date().getTime() - timestamp) / 1000 / 60;
 
-        if (age < 15) {
-          setData(data);
-        } else {
-          fetchData();
-        }
-      } else {
+      if (age >= 15) {
         fetchData();
       }
+    } else {
+      fetchData();
     }
-  }, [url, storageKey, dataProcessor, loading]);
+  }, [url, storageKey, dataProcessor]);
 
   return data;
 };

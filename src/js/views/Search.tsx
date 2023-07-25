@@ -11,6 +11,28 @@ import useCachedFetch from '../hooks/useCachedFetch';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 
+const SuggestionProfile = memo(({ profile }: { profile: any }) => (
+  <Link
+    href={`/${nip19.npubEncode(profile.pubkey)}`}
+    key={profile.pubkey}
+    className="flex flex-row gap-2 w-full break-words"
+  >
+    <span className="flex-shrink-0">
+      <Avatar str={profile.pubkey} width={30} />
+    </span>
+    <span className="flex-1">
+      <b>
+        <Name pub={profile.pubkey} />
+      </b>
+      <br />
+      <span className="text-neutral-400">{profile.bio}</span>
+    </span>
+    <span className="flex-shrink-0">
+      <FollowButton className="btn btn-sm" id={profile.pubkey} />
+    </span>
+  </Link>
+));
+
 const FollowSuggestionsAPI = memo(() => {
   const url = `https://api.nostr.band/v0/suggested/profiles/${Key.getPubKey()}`;
   const suggestions = useCachedFetch(url, 'followSuggestions', (data) => data.profiles || []);
@@ -23,25 +45,7 @@ const FollowSuggestionsAPI = memo(() => {
       <hr className="opacity-10" />
       <div className="-ml-2 flex flex-wrap gap-4 items-center text-xs overflow-y-scroll overflow-x-hidden max-h-[50vh]">
         {suggestions.map((profile: any) => (
-          <Link
-            href={`/${nip19.npubEncode(profile.pubkey)}`}
-            key={profile.pubkey}
-            className="flex flex-row gap-2 w-full break-words"
-          >
-            <span className="flex-shrink-0">
-              <Avatar str={profile.pubkey} width={30} />
-            </span>
-            <span className="flex-1">
-              <b>
-                <Name pub={profile.pubkey} />
-              </b>
-              <br />
-              <span className="text-neutral-400">{profile.bio}</span>
-            </span>
-            <span className="flex-shrink-0">
-              <FollowButton className="btn btn-sm" id={profile.pubkey} />
-            </span>
-          </Link>
+          <SuggestionProfile key={profile.pubkey} profile={profile} />
         ))}
       </div>
     </div>
