@@ -259,6 +259,12 @@ const VisGraph = (props: VisGraphProps) => {
         >
           Graph
         </Link>
+        <Link
+          href={setSearch({ page: 'path', view: 'path' })}
+          className={state.view == 'path' ? selected : unselected}
+        >
+          Path
+        </Link>
       </div>
 
       <hr className="-mx-2 opacity-10 my-2" />

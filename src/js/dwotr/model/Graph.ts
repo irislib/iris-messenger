@@ -301,52 +301,39 @@ export default class Graph {
         return result;
     }
 
-    getPath(sourceId: number, targetId: number) : Array<Vertice> {
-        let maxDegree = MAX_DEGREE;
-        let result = [] as Array<Vertice>;
-        const sourceV = this.vertices[sourceId] as Vertice;
-        const targetV = this.vertices[targetId] as Vertice;
+    getPaths(targetId: number) : Array<Edge> {
 
-        if(!sourceV || !targetV) return result;
+        let result = [] as Array<Edge>;
+
+        const targetV = this.vertices[targetId] as Vertice;
+        if(!targetV) return result;
 
         let queue = [] as Array<Vertice>;
-        let nextQueue = Object.create(null) as {[key: string]: Vertice}; // Use null to avoid prototype pollution
-        let startV = this.vertices[sourceId] as Vertice;
-        let degree = startV.degree = 0;
+        let nextQueue =[] as Array<Vertice>;
 
-        queue.push(startV); // Add the source vertice id to the queue as starting point
+        queue.push(targetV); // Add the target vertice id to the queue as starting point
 
-        while (queue.length > 0 && degree <= maxDegree) {
+        while (queue.length > 0) {
 
-            for(let outV of queue) {
+            for(let inV of queue) {
+                
+                if(inV.degree == 0) continue; // Skip the source vertice, as we are done
 
-                if(degree > 0 && !outV.score.isTrusted(degree-1)) continue; // Skip if the vertice is distrusted or not trusted and is not the start vertice
-        
-                let nextDegree = degree + 1;
+                for(const inId in inV.in) {
 
-                for(const inId in outV.out) {
-
-                    const inV = this.vertices[inId] as Vertice;
-
-                    const edge = outV.out[inId]; // Get the edge object
+                    const edge = inV.in[inId] as Edge; // Get the edge object
                     if(!edge || edge.val === 0) continue; // Skip if the edge has no value / neutral
 
-                    inV.score.addValue(edge.val, degree); // Add the edge value to the score
+                    const outV = edge.out as Vertice;
+                    if(!outV || outV.degree >= inV.degree) continue; // Skip if degree is higher or equal to the current degree as we are looking for the shortest path
 
-                    if(degree >= inV.degree) continue; // Skip if degree is already set by a shorter path
-
-                    inV.degree = nextDegree; // Set the degree to next level
-
-                    if(degree < maxDegree 
-                        && inV.entityType === EntityType.Key 
-                        && !nextQueue[inId])  // Only add keys to the queue, setting values takes time
-                        nextQueue[inId] = inV; // Only add the in vertice to the queue once
+                    result.push(edge); // Add the edge to the result
+                    nextQueue.push(outV); // Add the out vertice to the next queue
                 }
             }
 
-            queue = Object.values(nextQueue) as Array<Vertice>;
-            nextQueue = Object.create(null); // Clear the next queue
-            degree++;
+            queue = nextQueue;
+            nextQueue = []; // Clear the next queue
         }
 
         return result;

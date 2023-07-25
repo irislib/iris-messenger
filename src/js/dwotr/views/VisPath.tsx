@@ -1,19 +1,18 @@
 import { Network } from 'vis-network';
 import { DataSet } from 'vis-data';
 import { useEffect, useState, useRef } from 'preact/hooks';
-import Header from '../../components/Header';
-import Name from '../../components/Name';
 import Key from '../../nostr/Key';
 import graphNetwork from '../GraphNetwork';
-import { Edge, EntityType, Vertice } from '../model/Graph';
+import { Vertice } from '../model/Graph';
 import { Link } from 'preact-router';
 import { RenderTrust1Color, renderEntityKeyName } from '../components/RenderGraph';
-import { renderScoreLine } from './WotView';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import profileManager from '../ProfileManager';
-import { PUB } from '../../nostr/UserIds';
+import { ID, PUB } from '../../nostr/UserIds';
 import Identicon from 'identicon.js';
-
+import { renderScoreLine } from './WotView';
+import Name from '../../components/Name';
+import Header from '../../components/Header';
 
 type VisGraphProps = {
   id?: string;
@@ -74,15 +73,13 @@ const defaultOptions = {
 //   { from: 3, to: 3 },
 // ];
 
-const VisHierarchical = (props: VisGraphProps) => {
+const VisPath = (props: VisGraphProps) => {
   // Create a ref to provide DOM access
   const visJsRef = useRef<HTMLDivElement>(null);
   const [network, setNetwork] = useState<Network | null>();
   const [state, setState] = useState<any>(null);
-  const [vertices, setVertices] = useState<Array<Vertice>>([]);
-  const [nodes, setNodes] = useState<DataSet<any>>(new DataSet());
-  const [edges, setEdges] = useState<DataSet<any>>(new DataSet());
-  //const [name, setName] = useState<string | undefined>('...');
+  const [nodes] = useState<DataSet<any>>(new DataSet());
+  const [edges] = useState<DataSet<any>>(new DataSet());
 
   useEffect(() => {
     if (!visJsRef.current) return;
@@ -105,42 +102,60 @@ const VisHierarchical = (props: VisGraphProps) => {
     graphNetwork.whenReady(() => {
       const npub = props.id || Key.getPubKey();
       const hexKey = Key.toNostrHexAddress(npub) as string;
-      const trust1 = props.trust1 == 'trust' ? 1 : props.trust1 == 'distrust' ? -1 : 0;
-      const dir = props.dir || 'both';
-      const entitytype = props?.entitytype == 'item' ? EntityType.Item : EntityType.Key;
-      const view = props.view || 'list';
-      const filter = props.filter || '';
-      const me = hexKey == Key.getPubKey();
+      // const trust1 = props.trust1 == 'trust' ? 1 : props.trust1 == 'distrust' ? -1 : 0;
+      // const dir = props.dir || 'both';
+      // const entitytype = props?.entitytype == 'item' ? EntityType.Item : EntityType.Key;
+      // const view = props.view || 'list';
+      // const filter = props.filter || '';
+      // const me = hexKey == Key.getPubKey();
 
-      let vId = graphNetwork.g.getVerticeId(hexKey);
-      if (!vId) return;
-      let v = graphNetwork.g.vertices[vId];
-      let score = v?.score;
+      let vId = ID(hexKey);
 
-      profileManager.getProfile(hexKey, (profile) => {
+      let paths = graphNetwork.g.getPaths(vId);
+      let verticeIndex = Object.create(null);
 
-        if(nodes.get(vId as number)) return; // already added
+      for (let edge of paths) {
+        if (edge?.in) verticeIndex[edge.in.id] = edge.in;
+        if (edge?.out) verticeIndex[edge.out.id] = edge.out;
+      }
 
-        let image = getImage(profile);
-        nodes.add({ id: vId, label: profile.name, image, shape: 'circularImage' });
+      let vertices = Object.values(verticeIndex) as Vertice[];
 
-        setState((prevState) => ({
-          ...prevState,
-          npub,
-          hexKey,
-          entitytype,
-          trust1,
-          dir,
-          view,
-          filter,
-          vId,
-          me,
-          v,
-          score,
-        }));
+      let addresses = vertices.map((v) => PUB(v.id));
 
-        loadNode(vId as number);
+      profileManager.getProfiles(addresses, (_) => {
+        for (let vertice of vertices) {
+          let profile = SocialNetwork.profiles.get(vertice.id);
+          if (!profile.picture) {
+            profile.picture = getImage(profile);
+          }
+
+          nodes.add({
+            id: vertice.id,
+            label: profile.name,
+            image: profile.picture,
+            shape: 'circularImage',
+          });
+        }
+
+        for (let edge of paths) {
+          let color = RenderTrust1Color(edge.val);
+          if (!edges.get(edge.key))
+            edges.add({
+              id: edge.key,
+              from: edge.out?.id,
+              to: edge.in?.id,
+              color,
+            });
+        }
       });
+
+      setState((prevState) => ({
+        ...prevState,
+        npub,
+        hexKey,
+        vId,
+      }));
     });
   }, [props.id]);
 
@@ -152,62 +167,7 @@ const VisHierarchical = (props: VisGraphProps) => {
       format: `svg`,
     });
     return `data:image/svg+xml;base64,${identicon.toString()}`;
-    
   }
-
-
-  async function loadNode(vId: number) {
-    let v = graphNetwork.g.vertices[vId] as Vertice;
-    if (!v) return;
-
-    let list: Vertice[] = [];
-
-    list = graphNetwork.g.inOutTrustById(vId, EntityType.Key, undefined);
-
-    let addresses = list.filter((v) => !v.profile).map((v) => PUB(v.id));
-    let unsub = await profileManager.getProfiles(addresses, (profiles) => {
-      // for (let profile of profiles) {
-      //   let id = graphNetwork.g.getVerticeId(profile.key);
-      //   if(!id) continue;
-      //   let v = graphNetwork.g.vertices[id];
-      //   if (v) {
-      //     v.profile = profile;
-      //   }
-      // }
-    });
-
-    //let filterResults = filterByName(list, ''); // make sure to add name and picture to the vertices.
-
-    for (let item of list) {
-      const profile = SocialNetwork.profiles.get(item.id);
-
-      let image = getImage(profile);
-
-      nodes.get(item.id as number) ||
-        nodes.add({ id: item.id, label: profile?.name, image, shape: 'circularImage' });
-
-      let outEdge = v.out[item.id as number] as Edge;
-      if (outEdge) {
-        let color = RenderTrust1Color(outEdge.val);
-
-        edges.get(outEdge.key) || edges.add({ id: outEdge.key, from: vId, to: item.id, color });
-      }
-
-      let inEdge = v.in[item.id as number] as Edge;
-      if (inEdge) {
-        let color = RenderTrust1Color(inEdge.val);
-        edges.get(inEdge.key) || edges.add({ id: inEdge.key, from: item.id, to: vId, color });
-      }
-    }
-  }
-
-  // useEffect(() => {
-  // 	const hexKey = Key.toNostrHexAddress(props.id || Key.getPubKey()) as string;
-  // 	return SocialNetwork.getProfile(hexKey, (profile) => {
-  // 	  //setProfile(profile);
-  // 	  setName(() => profile?.display_name || profile?.name || '...');
-  // 	});
-  //   }, [props.id]);
 
   function setSearch(params: any) {
     const p = {
@@ -259,6 +219,12 @@ const VisHierarchical = (props: VisGraphProps) => {
         >
           Graph
         </Link>
+        <Link
+          href={setSearch({ page: 'path', view: 'path' })}
+          className={state.view == 'path' ? selected : unselected}
+        >
+          Path
+        </Link>
       </div>
 
       <hr className="-mx-2 opacity-10 my-2" />
@@ -269,4 +235,4 @@ const VisHierarchical = (props: VisGraphProps) => {
   );
 };
 
-export default VisHierarchical;
+export default VisPath;
