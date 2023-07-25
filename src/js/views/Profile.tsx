@@ -1,23 +1,14 @@
 import { Helmet } from 'react-helmet';
-import { html } from 'htm/preact';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
-import Block from '../components/buttons/Block';
-import { Button } from '../components/buttons/Button';
 import Copy from '../components/buttons/Copy';
-import Follow from '../components/buttons/Follow';
-import Report from '../components/buttons/Report';
-import Dropdown from '../components/Dropdown';
 import Feed from '../components/feed/Feed';
-import QRModal from '../components/modal/QRModal';
+import Show from '../components/helpers/Show';
 import { isSafeOrigin } from '../components/SafeImg';
-import Avatar from '../components/user/Avatar';
-import Name from '../components/user/Name';
-import ProfilePicture from '../components/user/ProfilePicture';
+import ProfileCard from '../components/user/ProfileCard';
 import Helpers from '../Helpers';
 import localState from '../LocalState';
-import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import PubSub from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
@@ -45,207 +36,49 @@ class Profile extends View {
 
   getNotification() {
     if (this.state.noFollowers && this.followers.has(Key.getPubKey())) {
-      return html`
+      return (
         <div className="msg">
           <div className="msg-content">
-            <p>Share your profile link so ${this.state.name || 'this user'} can follow you:</p>
+            <p>Share your profile link so {this.state.name || 'this user'} can follow you:</p>
             <p>
-              <${Copy} text=${t('copy_link')} copyStr=${Helpers.getMyProfileLink()} />
+              <Copy text={t('copy_link')} copyStr={Helpers.getMyProfileLink()} />
             </p>
-            <small>${t('no_followers_yet_info')}</small>
+            <small>{t('no_followers_yet_info')}</small>
           </div>
         </div>
-      `;
+      );
     }
   }
 
   renderLinks() {
-    return html`
+    return (
       <div className="flex flex-1 flex-row align-center justify-center mt-2">
-        ${this.state.lightning
-          ? html`
-              <div className="flex-1">
-                <a
-                  className="btn btn-sm btn-neutral"
-                  href=${this.state.lightning}
-                  onClick=${(e) => Helpers.handleLightningLinkClick(e)}
-                >
-                  ⚡ ${t('tip_lightning')}
-                </a>
-              </div>
-            `
-          : ''}
-        ${this.state.website
-          ? html`
-              <div className="flex-1">
-                <a href=${this.state.website} target="_blank" className="link">
-                  ${this.state.website.replace(/^https?:\/\//, '')}
-                </a>
-              </div>
-            `
-          : ''}
+        <Show when={this.state.lightning}>
+          <div className="flex-1">
+            <a
+              className="btn btn-sm btn-neutral"
+              href={this.state.lightning}
+              onClick={(e) => Helpers.handleLightningLinkClick(e)}
+            >
+              ⚡ {t('tip_lightning')}
+            </a>
+          </div>
+        </Show>
+        <Show when={this.state.website}>
+          <div className="flex-1">
+            <a href={this.state.website} target="_blank" className="link">
+              {this.state.website.replace(/^https?:\/\//, '')}
+            </a>
+          </div>
+        </Show>
       </div>
-    `;
+    );
   }
 
   async viewAs(event) {
     event.preventDefault();
     route('/');
     Key.login({ rpub: this.state.hexPub });
-  }
-
-  renderDetails() {
-    if (!this.state.hexPub) {
-      return '';
-    }
-    let profilePicture;
-    if (this.state.picture && !this.state.blocked && !this.state.profilePictureError) {
-      profilePicture = html`<${ProfilePicture}
-        key="${this.state.hexPub}picture"
-        picture=${this.state.picture}
-        onError=${() => this.setState({ profilePictureError: true })}
-      />`;
-    } else {
-      profilePicture = html`<${Avatar}
-        key="${this.state.npub}avatar"
-        str=${this.state.npub}
-        hidePicture=${true}
-        width=${128}
-      />`;
-    }
-    let rawDataJson = [] as any;
-    const profileEvent = Events.db.findOne({
-      kind: 0,
-      pubkey: this.state.hexPub,
-    });
-    const followEvent = Events.db.findOne({
-      kind: 3,
-      pubkey: this.state.hexPub,
-    });
-    if (profileEvent) {
-      delete profileEvent.$loki;
-      rawDataJson.push(profileEvent);
-    }
-    if (followEvent) {
-      delete followEvent.$loki;
-      rawDataJson.push(followEvent);
-    }
-    rawDataJson = JSON.stringify(rawDataJson, null, 2);
-    const loggedIn = this.state.loggedIn;
-    // TODO: on Follow / Message btn click open login modal if not logged in
-    return html`
-      <div key="${this.state.hexPub}details">
-        <div className="mb-2 mx-2 md:px-2 md:mx-0 flex flex-col gap-2">
-          <div className="flex flex-row">
-            <div className=${this.state.banner ? '-mt-20' : ''}>${profilePicture}</div>
-            <div className="flex-1 justify-end flex">
-              <div onClick=${() => !loggedIn && localState.get('showLoginModal').put(true)}>
-                ${this.state.isMyProfile
-                  ? html`<button
-                      className="btn btn-sm btn-neutral"
-                      onClick=${() => loggedIn && route('/profile/edit')}
-                    >
-                      ${t('edit_profile')}
-                    <//>`
-                  : html`
-                      <${Follow} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
-                      ${this.state.npub !==
-                      'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8'
-                        ? html` <button
-                            className="btn btn-neutral btn-sm"
-                            onClick=${() => loggedIn && route(`/chat/${this.state.npub}`)}
-                          >
-                            ${t('send_message')}
-                          <//>`
-                        : ''}
-                    `}
-              </div>
-              <div className="profile-actions">
-                <${Dropdown}>
-                  <${Copy}
-                    className="btn btn-sm"
-                    key=${`${this.state.hexPub}copyLink`}
-                    text=${t('copy_link')}
-                    title=${this.state.name}
-                    copyStr=${window.location.href}
-                  />
-                  <${Copy}
-                    className="btn btn-sm"
-                    key=${`${this.state.hexPub}copyNpub`}
-                    text=${t('copy_user_ID')}
-                    title=${this.state.name}
-                    copyStr=${this.state.npub}
-                  />
-                  <${Button}
-                    className="btn btn-sm"
-                    onClick=${() => this.setState({ showQR: !this.state.showQR })}
-                    >${t('show_qr_code')}<//
-                  >
-                  <${Copy}
-                    className="btn btn-sm"
-                    key=${`${this.state.hexPub}copyData`}
-                    text=${t('copy_raw_data')}
-                    title=${this.state.name}
-                    copyStr=${rawDataJson}
-                  />
-                  ${!this.state.isMyProfile && !Key.getPrivKey()
-                    ? html`
-                        <${Button} className="btn btn-sm" onClick=${(e) => this.viewAs(e)}>
-                          ${t('view_as') + ' '}
-                          <${Name} pub=${this.state.hexPub} hideBadge=${true} />
-                        <//>
-                      `
-                    : ''}
-                  ${this.state.isMyProfile
-                    ? ''
-                    : html`
-                        <${Block} className="btn btn-sm" id=${this.state.hexPub} />
-                        <${Report} className="btn btn-sm" id=${this.state.hexPub} />
-                      `}
-                <//>
-              </div>
-            </div>
-          </div>
-          <div className="profile-header-stuff">
-            <div className="flex-1 profile-name">
-              <span className="text-xl">
-                <${Name} pub=${this.state.hexPub} />
-              </span>
-              ${this.state.nip05
-                ? html`<br /><small className="text-iris-green"
-                      >${this.state.nip05.replace(/^_@/, '')}</small
-                    >`
-                : ''}
-            </div>
-            <div>
-              <div className="text-sm flex gap-4">
-                <a href="/follows/${this.state.npub}">
-                  <b>${this.state.followedUserCount}</b> ${t('following')}
-                </a>
-                <a href="/followers/${this.state.npub}">
-                  <b>${this.state.followerCount}</b> ${t('followers')}
-                </a>
-              </div>
-              ${SocialNetwork.isFollowing(this.state.hexPub, Key.getPubKey())
-                ? html` <div><small>${t('follows_you')}</small></div> `
-                : ''}
-            </div>
-            <div className="py-2">
-              <p className="text-sm">${this.state.about}</p>
-              ${this.renderLinks()}
-            </div>
-          </div>
-        </div>
-        ${this.state.showQR
-          ? html`
-              <${QRModal}
-                pub=${this.state.hexPub}
-                onClose=${() => this.setState({ showQR: false })}
-              />
-            `
-          : ''}
-      </div>
-    `;
   }
 
   renderTabs() {
@@ -255,89 +88,98 @@ class Profile extends View {
     const linkClass = (href) =>
       path === href ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-neutral';
 
-    return html`
-      <div class="flex mx-2 md:mx-0 gap-2 mb-4 overflow-x-scroll">
-        <${Link} className="${linkClass('/' + currentProfileUrl)}" href="/${currentProfileUrl}"
-          >${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//
+    return (
+      <div className="flex mx-2 md:mx-0 gap-2 mb-4 overflow-x-scroll">
+        <Link className={linkClass('/' + currentProfileUrl)} href={'/' + currentProfileUrl}>
+          {t('posts')}
+          <Show when={this.state.noPosts}>{' (0)'}</Show>
+        </Link>
+        <Link
+          className={linkClass('/' + currentProfileUrl + '/replies')}
+          href={'/' + currentProfileUrl + '/replies'}
         >
-        <${Link}
-          className="${linkClass('/' + currentProfileUrl + '/replies')}"
-          href="/${currentProfileUrl}/replies"
-          >${t('posts')} & ${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
+          {t('posts')} & {t('replies')}
+          <Show when={this.state.noReplies}>{' (0)'}</Show>
+        </Link>
+        <Link
+          className={linkClass('/' + currentProfileUrl + '/likes')}
+          href={'/' + currentProfileUrl + '/likes'}
         >
-        <${Link}
-          className="${linkClass('/' + currentProfileUrl + '/likes')}"
-          href="/${currentProfileUrl}/likes"
-          >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
-        >
+          {t('likes')}
+          <Show when={this.state.noLikes}>{' (0)'}</Show>
+        </Link>
       </div>
-    `;
+    );
   }
 
   renderTab() {
     if (!this.state.hexPub) {
-      return html`<div></div>`;
-    }
-    if (this.props.tab === 'replies') {
-      return html`
-        <${Feed}
-          key="replies${this.state.hexPub}"
-          index="postsAndReplies"
-          nostrUser=${this.state.hexPub}
-        />
-      `;
-    } else if (this.props.tab === 'likes') {
-      return html`
-        <${Feed} key="likes${this.state.hexPub}" index="likes" nostrUser=${this.state.hexPub} />
-      `;
-    } else if (this.props.tab === 'media') {
-      return html`TODO media message feed`;
+      return <div></div>;
     }
 
-    return html`
+    if (this.props.tab === 'replies') {
+      return (
+        <Feed
+          key={`replies${this.state.hexPub}`}
+          index="postsAndReplies"
+          nostrUser={this.state.hexPub}
+        />
+      );
+    } else if (this.props.tab === 'likes') {
+      return <Feed key={`likes${this.state.hexPub}`} index="likes" nostrUser={this.state.hexPub} />;
+    } else if (this.props.tab === 'media') {
+      return <div>TODO media message feed</div>;
+    }
+
+    return (
       <div>
-        ${this.getNotification()}
-        <${Feed} key="posts${this.state.hexPub}" index="posts" nostrUser=${this.state.hexPub} />
+        {this.getNotification()}
+        <Feed key={`posts${this.state.hexPub}`} index="posts" nostrUser={this.state.hexPub} />
       </div>
-    `;
+    );
   }
 
   renderView() {
-    if (!this.state.hexPub) {
-      return html`<div></div>`;
+    const { hexPub, display_name, name, profile, banner, picture, blocked } = this.state;
+
+    if (!hexPub) {
+      return <div></div>;
     }
-    const title = this.state.display_name || this.state.name || 'Profile';
+
+    const title = display_name || name || 'Profile';
     const ogTitle = `${title} | Iris`;
-    const description = `Latest posts by ${this.state.display_name || this.state.name || 'user'}. ${
-      this.state.profile?.about || ''
+    const description = `Latest posts by ${display_name || name || 'user'}. ${
+      profile?.about || ''
     }`;
-    return html`
-      ${this.state.banner
-        ? html`
-            <div
-              className="mb-2 h-48 bg-cover bg-center"
-              style="background-image: url(${this.state.banner})"
-            ></div>
-          `
-        : ''}
-      <div>
-        <${Helmet}>
-          <title>${title}</title>
-          <meta name="description" content=${description} />
-          <meta property="og:type" content="profile" />
-          ${this.state.picture
-            ? html`
-                <meta property="og:image" content=${this.state.picture} />
-                <meta name="twitter:image" content=${this.state.picture} />
-              `
-            : ''}
-          <meta property="og:title" content=${ogTitle} />
-          <meta property="og:description" content=${description} />
-        <//>
-        ${this.renderDetails()} ${this.state.blocked ? '' : this.renderTabs()}
-        ${this.state.blocked ? '' : this.renderTab()}
-      </div>
-    `;
+
+    return (
+      <>
+        <Show when={banner}>
+          <div
+            className="mb-2 h-48 bg-cover bg-center"
+            style={{ backgroundImage: `url(${banner})` }}
+          ></div>
+        </Show>
+        <div>
+          <Helmet>
+            <title>{title}</title>
+            <meta name="description" content={description} />
+            <meta property="og:type" content="profile" />
+            <Show when={picture}>
+              <meta property="og:image" content={picture} />
+              <meta name="twitter:image" content={picture} />
+            </Show>
+            <meta property="og:title" content={ogTitle} />
+            <meta property="og:description" content={description} />
+          </Helmet>
+          <ProfileCard />
+          <Show when={!blocked}>
+            {this.renderTabs()}
+            {this.renderTab()}
+          </Show>
+        </div>
+      </>
+    );
   }
 
   getNostrProfile(address, nostrAddress) {
