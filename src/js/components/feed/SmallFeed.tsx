@@ -7,6 +7,27 @@ import Avatar from '../Avatar';
 import Name from '../Name';
 import RelativeTime from '../RelativeTime';
 
+const SmallEvent = memo(({ event }: { event: Event }) => (
+  <div key={event.id} className="flex gap-2 w-full break-words">
+    <div className="flex-shrink-0">
+      <Link href={`/${nip19.npubEncode(event.pubkey)}`}>
+        <Avatar str={event.pubkey} width={30} />
+      </Link>
+    </div>
+    <Link href={`/${nip19.noteEncode(event.id)}`} className="w-full">
+      <b>
+        <Name pub={event.pubkey} />
+      </b>
+      {' | '}
+      <span className="text-neutral-400">
+        <RelativeTime date={new Date(event.created_at * 1000)} />
+        <br />
+        {event.content?.length > 80 ? `${event.content?.slice(0, 80)}...` : event.content}
+      </span>
+    </Link>
+  </div>
+));
+
 const SmallFeed = ({ events }: { events: Event[] }) => {
   const mutedUsers = [];
   return (
@@ -22,24 +43,7 @@ const SmallFeed = ({ events }: { events: Event[] }) => {
         {events
           .filter((event) => !mutedUsers[event.pubkey])
           .map((event) => (
-            <div key={event.id} className="flex gap-2 w-full break-words">
-              <div className="flex-shrink-0">
-                <Link href={`/${nip19.npubEncode(event.pubkey)}`}>
-                  <Avatar str={event.pubkey} width={30} />
-                </Link>
-              </div>
-              <Link href={`/${nip19.noteEncode(event.id)}`} className="w-full">
-                <b>
-                  <Name pub={event.pubkey} />
-                </b>
-                {' | '}
-                <span className="text-neutral-400">
-                  <RelativeTime date={new Date(event.created_at * 1000)} />
-                  <br />
-                  {event.content?.length > 80 ? `${event.content?.slice(0, 80)}...` : event.content}
-                </span>
-              </Link>
-            </div>
+            <SmallEvent event={event} />
           ))}
       </div>
     </div>
