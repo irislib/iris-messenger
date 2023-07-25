@@ -20,17 +20,6 @@ class ProfileManager {
     const queue = this.saveQueue;
     this.saveQueue = [];
 
-    //   async saveProfile(profile: ProfileRecord): Promise<number | undefined> {
-    //     if (!profile) return undefined;
-    //     if (profile.id > 0) {
-    //       await dwotrDB.profiles.update(profile.id, profile);
-    //       return profile.id;
-    //     } else {
-    //       profile.id = (await dwotrDB.profiles.add(profile)) as number;
-    //     }
-    //     return profile.id;
-    //   }
-
     dwotrDB.profiles.bulkPut(queue).catch(() => {});
   }, 500);
 
