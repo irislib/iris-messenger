@@ -21,21 +21,18 @@ class ProfileManager {
     this.saveQueue = [];
 
     //   async saveProfile(profile: ProfileRecord): Promise<number | undefined> {
-//     if (!profile) return undefined;
-//     if (profile.id > 0) {
-//       await dwotrDB.profiles.update(profile.id, profile);
-//       return profile.id;
-//     } else {
-//       profile.id = (await dwotrDB.profiles.add(profile)) as number;
-//     }
-//     return profile.id;
-//   }
+    //     if (!profile) return undefined;
+    //     if (profile.id > 0) {
+    //       await dwotrDB.profiles.update(profile.id, profile);
+    //       return profile.id;
+    //     } else {
+    //       profile.id = (await dwotrDB.profiles.add(profile)) as number;
+    //     }
+    //     return profile.id;
+    //   }
 
-
-    dwotrDB.profiles.bulkPut(queue).catch(() => {
-
-    });
-  }, 500);  
+    dwotrDB.profiles.bulkPut(queue).catch(() => {});
+  }, 500);
 
   async init() {
     this.loaded = true;
@@ -49,6 +46,13 @@ class ProfileManager {
     return profile;
   }
 
+  quickProfile(address: string) {
+    const id = ID(address);
+    const profile = SocialNetwork.profiles.get(id);
+    if (profile) return profile;
+    else return this.sanitizeProfile({}, address);
+  }
+
   getProfile(
     address: string,
     cb?: (profile: any, address: string) => void,
@@ -60,8 +64,7 @@ class ProfileManager {
     };
 
     const profile = SocialNetwork.profiles.get(id);
-    
-    // TODO subscribe & callback
+
     if (profile) {
       callback();
       if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
@@ -73,14 +76,35 @@ class ProfileManager {
         //   callback();
         // });
       }
-    } else {
-      profileManager.fetchProfile(address).then((profile) => {
-        if (!profile) return;
-        // TODO verify sig
-        this.addProfileEvent(profile);
-        callback();
+    }
+
+    if (!profile) {
+      // Check if profile is in IndexedDB
+      this.loadProfile(address).then((profile) => {
+        if (profile) {
+          // exists in DB
+          if (this.profileIsNewer(profile))
+            // but is it newer?
+            this.addProfileToMemory(profile);
+
+          callback(); // callback with profile
+        } else {
+          // Check if profile is in API
+          profileManager.fetchProfile(address).then((profile) => {
+            if (!profile) return; // not in API
+            // TODO verify sig
+            if (this.profileIsNewer(profile))
+              // but is it newer?
+              this.addProfileEvent(profile);
+
+            callback();
+          });
+          return;
+        }
       });
     }
+
+    // Then subscribe to updates via nostr relays
     return PubSub.subscribe({ kinds: [0], authors: [address] }, callback, false);
   }
 
@@ -161,12 +185,10 @@ class ProfileManager {
     return this.addProfileToMemory(dbProfile);
   }
 
-
-saveProfile(profile: ProfileRecord) {
+  saveProfile(profile: ProfileRecord) {
     this.saveQueue.push(profile);
     this.save();
   }
-
 
   async loadAllProfiles() {
     console.time('Loading profiles from DWoTRDB');
@@ -181,7 +203,7 @@ saveProfile(profile: ProfileRecord) {
     console.log('Loaded profiles from DWoTRDB - ' + list.length + ' profiles');
   }
 
-  sanitizeProfile(p: any, npub: string) : ProfileRecord {
+  sanitizeProfile(p: any, npub: string): ProfileRecord {
     if (!p) p = { name: '', displayName: '', default: false };
 
     let name = p.name?.trim().slice(0, 100) || '';
@@ -194,7 +216,22 @@ saveProfile(profile: ProfileRecord) {
 
     let display_name = p.display_name?.trim().slice(0, 100) || name;
 
-    return { ...p, key: npub, name, displayName: display_name, picture, isDefault } as ProfileRecord;
+    return {
+      ...p,
+      key: npub,
+      name,
+      displayName: display_name,
+      picture,
+      isDefault,
+    } as ProfileRecord;
+  }
+
+  profileIsNewer(profile: ProfileRecord) {
+    const existingProfile = SocialNetwork.profiles.get(ID(profile.key));
+    if (existingProfile) {
+      if (existingProfile.created_at > profile.created_at) return false;
+    }
+    return true;
   }
 
   addProfileToMemory(profile: ProfileRecord) {
@@ -215,7 +252,7 @@ saveProfile(profile: ProfileRecord) {
     try {
       const rawProfile = JSON.parse(event.content);
       rawProfile.created_at = event.created_at;
-     
+
       let profile = this.sanitizeProfile(rawProfile, event.pubkey);
       this.save(profile); // Save to DWoTRDB
 

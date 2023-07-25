@@ -27,6 +27,7 @@ import View from './View';
 import TrustProfileButtons from '../dwotr/components/TrustProfileButtons';
 import ProfileFollowerLinks from '../components/ProfileFollowerLinks';
 import ProfileTrustLinks from '../dwotr/components/ProfileTrustLinks';
+import profileManager from '../dwotr/ProfileManager';
 
 class Profile extends View {
   followedUsers: Set<string>;
@@ -352,7 +353,7 @@ class Profile extends View {
       false,
       false,
     );
-    const unsub = SocialNetwork.getProfile(
+    const unsub = profileManager.getProfile(
       address,
       (profile) => {
         if (!profile) {

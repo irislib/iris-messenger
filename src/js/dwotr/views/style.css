@@ -1,3 +1,22 @@
+html {
+  overflow-y: scroll;
+}
+
+/* This will change the scrollbar track (background) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* This will change the scrollbar thumb (foreground or the actual scroll) */
+::-webkit-scrollbar-thumb {
+  background: #555;
+}
+
+/* This will change the scrollbar thumb when it's in hover state */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 .linkbutton {
     background: none!important;
     border: none;
