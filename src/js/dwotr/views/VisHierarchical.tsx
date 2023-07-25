@@ -74,7 +74,7 @@ const defaultOptions = {
 //   { from: 3, to: 3 },
 // ];
 
-const VisGraph = (props: VisGraphProps) => {
+const VisHierarchical = (props: VisGraphProps) => {
   // Create a ref to provide DOM access
   const visJsRef = useRef<HTMLDivElement>(null);
   const [network, setNetwork] = useState<Network | null>();
@@ -269,4 +269,4 @@ const VisGraph = (props: VisGraphProps) => {
   );
 };
 
-export default VisGraph;
+export default VisHierarchical;

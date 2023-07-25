@@ -25,12 +25,15 @@ const TrustProfileButtons = ({ props }: any) => {
     processing: false,
   });
 
-  const { hexPub, lightning, website } = props;
+  const { hexPub } = props;
   const wot = useVerticeMonitor(ID(hexPub)) as any;
 
   useEffect(() => {
-    const score = wot?.vertice?.score as TrustScore;
+    if(!wot) return;
+
+    const score = graphNetwork.g.vertices[wot?.id]?.score as TrustScore;
     if (!score) return;
+
     let trusted = score.isDirectTrusted();
     let distrusted = score.isDirectDistrusted();
 
