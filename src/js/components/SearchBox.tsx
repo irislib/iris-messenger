@@ -10,8 +10,8 @@ import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
-import Avatar from './Avatar';
-import Name from './Name';
+import Avatar from './user/Avatar';
+import Name from './user/Name';
 import SafeImg from './SafeImg';
 
 const RESULTS_MAX = 5;

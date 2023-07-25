@@ -4,7 +4,7 @@ import Key from '../../../nostr/Key';
 import { translate as t } from '../../../translations/Translation.mjs';
 import For from '../../helpers/For';
 import Show from '../../helpers/Show';
-import Name from '../../Name';
+import Name from '../../user/Name';
 
 const ReplyingToUsers = ({ event, isQuoting }) => {
   let replyingToUsers = [];

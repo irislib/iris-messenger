@@ -5,7 +5,7 @@ import { Event } from 'nostr-tools';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
-import Name from '../Name';
+import Name from '../user/Name';
 
 import EventComponent from './EventComponent';
 

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import $ from 'jquery';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
@@ -5,7 +6,7 @@ import { route } from 'preact-router';
 import Helpers from '../Helpers';
 import Key from '../nostr/Key';
 
-import Name from './Name';
+import Name from './user/Name';
 import Torrent from './Torrent';
 
 const PrivateMessage = (props) => {
@@ -60,4 +61,4 @@ const PrivateMessage = (props) => {
   );
 };
 
-export default PrivateMessage;
+export default memo(PrivateMessage);

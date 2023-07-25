@@ -2,7 +2,7 @@ import Component from '../../BaseComponent';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
-import Name from '../Name';
+import Name from '../user/Name';
 
 import { PrimaryButton as Button } from './Button';
 

@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import Helpers from '../../../Helpers';
 import Key from '../../../nostr/Key';
 import Show from '../../helpers/Show';
-import Name from '../../Name';
+import Name from '../../user/Name';
 import EventDropdown from '../EventDropdown';
 
 import Avatar from './Avatar';

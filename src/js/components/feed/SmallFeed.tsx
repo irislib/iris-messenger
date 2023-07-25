@@ -3,9 +3,9 @@ import { FireIcon } from '@heroicons/react/24/solid';
 import { Event, nip19 } from 'nostr-tools';
 import { Link } from 'preact-router';
 
-import Avatar from '../Avatar';
-import Name from '../Name';
 import RelativeTime from '../RelativeTime';
+import Avatar from '../user/Avatar';
+import Name from '../user/Name';
 
 const SmallEvent = memo(({ event }: { event: Event }) => (
   <div key={event.id} className="flex gap-2 w-full break-words">

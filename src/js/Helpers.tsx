@@ -8,9 +8,9 @@ import { ComponentChild } from 'preact';
 import { route } from 'preact-router';
 
 import EventComponent from './components/events/EventComponent';
-import Name from './components/Name';
 import SafeImg from './components/SafeImg';
 import Torrent from './components/Torrent';
+import Name from './components/user/Name';
 import Key from './nostr/Key';
 import { language, translate as t } from './translations/Translation.mjs';
 import localState from './LocalState';

@@ -1,6 +1,6 @@
 import Key from '../../../nostr/Key';
-import Avatar from '../../Avatar';
 import Show from '../../helpers/Show';
+import Avatar from '../../user/Avatar';
 
 const NoteAvatar = ({ event, isQuote, standalone }) => (
   <span className="flex flex-col items-center flex-shrink-0 mr-2">

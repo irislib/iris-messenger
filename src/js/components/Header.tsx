@@ -9,7 +9,7 @@ import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
 import { translate as t } from '../translations/Translation.mjs';
 
-import Name from './Name';
+import Name from './user/Name';
 import SearchBox from './SearchBox';
 
 export default class Header extends Component {

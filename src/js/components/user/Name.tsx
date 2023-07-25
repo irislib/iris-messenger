@@ -1,9 +1,9 @@
 import { memo, useEffect, useState } from 'react';
 
-import AnimalName from '../AnimalName';
-import Key from '../nostr/Key';
-import SocialNetwork from '../nostr/SocialNetwork';
-import { ID } from '../nostr/UserIds';
+import AnimalName from '../../AnimalName';
+import Key from '../../nostr/Key';
+import SocialNetwork from '../../nostr/SocialNetwork';
+import { ID } from '../../nostr/UserIds';
 
 import Badge from './Badge';
 

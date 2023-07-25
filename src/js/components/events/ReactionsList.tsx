@@ -4,9 +4,9 @@ import { Link } from 'preact-router';
 
 import { decodeInvoice, formatAmount } from '../../Lightning';
 import Events from '../../nostr/Events'; // Import Events module
-import Avatar from '../Avatar';
 import Modal from '../modal/Modal';
-import Name from '../Name';
+import Avatar from '../user/Avatar';
+import Name from '../user/Name';
 
 type ReactionData = {
   pubkey: string;

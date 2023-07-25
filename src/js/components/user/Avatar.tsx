@@ -1,13 +1,12 @@
 import { sha256 } from '@noble/hashes/sha256';
 import Identicon from 'identicon.js';
 
-import Component from '../BaseComponent';
-import Key from '../nostr/Key';
-import { Unsubscribe } from '../nostr/PubSub';
-import SocialNetwork from '../nostr/SocialNetwork';
-
-import Show from './helpers/Show';
-import SafeImg from './SafeImg';
+import Component from '../../BaseComponent';
+import Key from '../../nostr/Key';
+import { Unsubscribe } from '../../nostr/PubSub';
+import SocialNetwork from '../../nostr/SocialNetwork';
+import Show from '../helpers/Show';
+import SafeImg from '../SafeImg';
 
 type Props = {
   str: unknown;
