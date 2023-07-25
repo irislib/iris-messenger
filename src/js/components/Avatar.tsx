@@ -1,6 +1,5 @@
 import { sha256 } from '@noble/hashes/sha256';
 import Identicon from 'identicon.js';
-import styled from 'styled-components';
 
 import Component from '../BaseComponent';
 import Key from '../nostr/Key';
@@ -26,17 +25,6 @@ type State = {
   avatar: string | null;
   hasError: boolean;
 };
-
-const AvatarContainer = styled.div<Props>`
-  max-width: ${(props: Props) => props.width}px;
-  max-height: ${(props: Props) => props.width}px;
-  display: inline-block;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  position: relative;
-  user-select: none;
-`;
 
 class MyAvatar extends Component<Props, State> {
   activityTimeout?: ReturnType<typeof setTimeout>;
@@ -102,35 +90,33 @@ class MyAvatar extends Component<Props, State> {
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
 
     return (
-      <AvatarContainer
-        width={width}
+      <div
+        style={{
+          maxWidth: `${width}px`,
+          maxHeight: `${width}px`,
+          cursor: this.props.onClick ? 'pointer' : undefined,
+        }}
+        className={`inline-flex flex-col items-center justify-center relative select-none ${hasPictureStyle} ${showTooltip} ${activity}`}
         onClick={this.props.onClick}
-        style={{ cursor: this.props.onClick ? 'pointer' : undefined }}
-        className={`${hasPictureStyle} ${showTooltip} ${activity}`}
       >
         <div>
           <Show when={hasPicture}>
             <SafeImg
-              className="rounded-full"
+              className="object-cover rounded-full"
               src={this.state.picture as string}
               width={width}
               square={true}
-              style={{ objectFit: 'cover' }}
               onError={() => this.setState({ hasError: true })}
             />
           </Show>
           <Show when={!hasPicture}>
-            <img
-              width={width}
-              style="max-width:100%; border-radius: 50%"
-              src={this.state.avatar || ''}
-            />
+            <img width={width} className="max-w-full rounded-full" src={this.state.avatar || ''} />
           </Show>
         </div>
         <Show when={this.props.showTooltip && this.state.name}>
-          <span class="tooltiptext">{this.state.name}</span>
+          <span className="tooltiptext">{this.state.name}</span>
         </Show>
-      </AvatarContainer>
+      </div>
     );
   }
 }

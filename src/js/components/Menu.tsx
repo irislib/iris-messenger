@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Cog8ToothIcon,
   HomeIcon,
@@ -66,6 +66,11 @@ export default function Menu() {
       unsubscribeUnseenMsgsTotal();
       unsubscribeActiveRoute();
     };
+  }, []);
+
+  const isStPatricksDay = useMemo(() => {
+    const today = new Date();
+    return today.getMonth() === 2 && today.getDate() === 17;
   }, []);
 
   const menuLinkClicked = (e, a?, openFeed = false) => {
@@ -143,8 +148,12 @@ export default function Menu() {
         href="/"
         onClick={(e) => menuLinkClicked(e, undefined, true)}
       >
-        <img src="/img/icon128.png" width="30" height="30" />
-        <h1 className="hidden xl:flex text-3xl">iris</h1>
+        {isStPatricksDay ? (
+          <span className="text-3xl">🇮🇪</span>
+        ) : (
+          <img src="/img/icon128.png" width="30" height="30" />
+        )}
+        <h1 className="hidden xl:flex text-3xl">iris{isStPatricksDay ? 'h' : ''}</h1>
       </a>
       {MENU_ITEMS.map((a: any) => renderMenuItem(a))}
       <div class="py-2 flex-1">
