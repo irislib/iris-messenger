@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Cog8ToothIcon,
   HomeIcon,
@@ -66,6 +66,11 @@ export default function Menu() {
       unsubscribeUnseenMsgsTotal();
       unsubscribeActiveRoute();
     };
+  }, []);
+
+  const isStPatricksDay = useMemo(() => {
+    const today = new Date();
+    return today.getMonth() === 2 && today.getDate() === 17;
   }, []);
 
   const menuLinkClicked = (e, a?, openFeed = false) => {

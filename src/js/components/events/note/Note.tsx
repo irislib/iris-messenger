@@ -158,7 +158,7 @@ const Note = ({
         </div>
       </div>
       <Show when={!(isQuote || asInlineQuote)}>
-        <hr className="-mx-2 opacity-10 mb-2" />
+        <hr className="opacity-10 mb-2" />
       </Show>
       <For each={replies}>
         {(r) => (
