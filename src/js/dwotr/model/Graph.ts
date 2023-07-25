@@ -86,14 +86,6 @@ export default class Graph {
     vertices = {};
     edges = {};
 
-    //verticeMap: Map<string, number> = new Map<string, number>(); // Map of key to vertice id
-
-
-    //loadEdges(edges: Edge[]) {
-        //vertices.forEach(v => this.addVertice(v));
-        //edges.forEach(e => this.addEdge(e));
-    //}
-
     addVertice(id: number) : void {
         if(this.vertices[id] == undefined) {
             this.vertices[id] = new Vertice(id);
@@ -128,26 +120,6 @@ export default class Graph {
 
         return edge;
     }
-
-    // addVertice(v: Vertice) : void {
-
-    //     if(!v.id) return;
-    //     const id = v.id;
-        
-    //     if(this.vertices[id] == undefined) {
-    //         this.vertices[id] = v;
-    //         this.verticeMap.set(v.key, id);
-    //     }
-    // }
-
-    // addEdge(e: Edge) : void {
-        
-    //     const outV = this.vertices[e.out];
-    //     const inV = this.vertices[e.in];
-    //     if(outV) outV.out[inV.id] = e.id;
-    //     if(inV) inV.in[outV.id] = e.id;
-    //     this.edges[e.id as number] = e;
-    // }
 
     removeEdge(e: Edge) : void {
 

@@ -14,6 +14,7 @@ import Avatar from './Avatar';
 import Content from './Content';
 
 import useVerticeMonitor from '../../../dwotr/components/useVerticeMonitor';
+import { ID } from '../../../nostr/UserIds';
 
 
 const Note = ({
@@ -45,7 +46,7 @@ const Note = ({
     fullWidth = !isReply && !isQuoting && !isQuote && !asInlineQuote;
   }
 
-  const wot = useVerticeMonitor(event.id, ["badMessage", "neutralMessage", "goodMessage"], "" ) as any;
+  const wot = useVerticeMonitor(ID(event.id), ["badMessage", "neutralMessage", "goodMessage"], "" ) as any;
 
   const className = useMemo(() => {
     const classNames = ['msg'];

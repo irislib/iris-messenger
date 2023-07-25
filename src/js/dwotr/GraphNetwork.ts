@@ -6,7 +6,7 @@ import { MAX_DEGREE } from './model/TrustScore';
 import dwotrDB from './network/DWoTRDB';
 import { debounce } from 'lodash';
 import { MonitorItem } from './model/MonitorItem';
-import { BECH32, ID, PUB } from '../nostr/UserIds';
+import { BECH32, ID } from '../nostr/UserIds';
 
 export type ResolveTrustCallback = (result: any) => any;
 
@@ -15,8 +15,12 @@ export type ReadyCallback = () => void;
 export const TrustScoreEventName = 'trustScoreEvent';
 
 export class TrustScoreEvent extends CustomEvent<MonitorItem> {
-  constructor(key: string, item: MonitorItem) {
-    super(TrustScoreEventName + key, { detail: item });
+  constructor(id: number, item: MonitorItem) {
+    super(TrustScoreEvent.getEventId(id), { detail: item });
+  }
+
+  static getEventId(id: number): string {
+    return TrustScoreEventName + id;
   }
 }
 
@@ -114,8 +118,8 @@ class GraphNetwork {
     const { outV, inV, preVal } = await this.setTrust(props, false);
 
     // Update the vertice monitors
-    graphNetwork.updateVerticeMonitor(outV); // Update the monitor for the source vertice before recalculating the score
-    graphNetwork.updateVerticeMonitor(inV);
+    // graphNetwork.updateVerticeMonitor(outV); // Update the monitor for the source vertice before recalculating the score
+    // graphNetwork.updateVerticeMonitor(inV);
 
     // Update the Graph score
     this.addToProcessScoreQueue(outV, inV);
@@ -187,8 +191,9 @@ class GraphNetwork {
     // If processGraph was false and there was no items to process, then return
     if (!processItems) return; // No need to process the monitors
 
-    for (const key in graphNetwork.verticeMonitor) {
-      graphNetwork.callMonitor(key);
+    for (const id in graphNetwork.verticeMonitor) {
+
+      graphNetwork.callMonitor(parseInt(id));
     }
 
     if (this.processGraph) {
@@ -200,56 +205,44 @@ class GraphNetwork {
     this.processItems = {};
   }
 
-  callMonitor(key: string) {
-    let monitorItem = graphNetwork.verticeMonitor[key] as MonitorItem;
+  callMonitor(id: number) {
+    let monitorItem = graphNetwork.verticeMonitor[id] as MonitorItem;
+    if(!monitorItem) return; // No monitorItem found
 
-    if (!monitorItem.vertice) return; // No vertice found, no need to process Elements that are subscribed to this vertice
-    if (!monitorItem.hasChanged()) {
-      return;
-    }
+    let vertice = this.g.vertices[id] as Vertice;
+    if (!vertice) return; // No vertice found, no need to process Elements that are subscribed to this vertice
+    if (!monitorItem.hasChanged(vertice)) return; // No change in the vertice
 
     let clone = monitorItem.clone();
-    monitorItem.syncScore(); // Reset the old score to the current score
+    monitorItem.setScore(vertice); // Reset the old score to the current score
 
-    document.dispatchEvent(new TrustScoreEvent(key, clone)); // Dispatch event with an clone of the monitorItem so oldScore is not changed when the syncScore() is called
+    document.dispatchEvent(new TrustScoreEvent(id, clone)); // Dispatch event with an clone of the monitorItem so oldScore is not changed when the syncScore() is called
   }
 
-  getTrustScoreEvent(key: string): TrustScoreEvent | undefined {
-    let vertice = this.g.getVertice(key);
-    if (!vertice) return; // No vertice found
-
-    return new TrustScoreEvent(key, new MonitorItem(vertice));
-  }
-
-  addVerticeMonitor(key: string) {
-    let vertice = this.g.getVertice(key);
-    let monitorItem = this.verticeMonitor[key];
+  addVerticeMonitor(id: number) {
+    let monitorItem = this.verticeMonitor[id];
     if (!monitorItem) {
-      monitorItem = new MonitorItem(vertice);
-      this.verticeMonitor[key] = monitorItem;
+      monitorItem = new MonitorItem(id);
+      this.verticeMonitor[id] = monitorItem;
     }
-    monitorItem.counter++;
+    monitorItem.counter++; // Increment the counter of elements that are subscribed to this monitor item
   }
 
-  updateVerticeMonitor(v: Vertice) {
-    let monitorItem = this.verticeMonitor[v.id] as MonitorItem;
-    if (!monitorItem) return; // Dont update if a vertice is already set
-    monitorItem.vertice = v;
-  }
 
-  removeVerticeMonitor(key: string) {
-    let monitorItem = this.verticeMonitor[key];
+  removeVerticeMonitor(id: number) {
+    let monitorItem = this.verticeMonitor[id];
     if (!monitorItem) return;
-    monitorItem.counter--;
-    if (monitorItem.counter <= 0) {
-      delete this.verticeMonitor[key];
+    
+    monitorItem.counter--; // Decrement the counter of elements that are subscribed to this monitor item
+
+    if (monitorItem.counter <= 0) { // If no more elements are subscribed to this monitor item, then delete it
+      delete this.verticeMonitor[id];
     }
   }
 
   updateSubscriptions() {
     let vertices = this.g.getUnsubscribedVertices(this.maxDegree);
     this.subscribeToTrustEvents(vertices);
-    //console.info("Subscribed to trust events for " + vertices.length + " vertices");
   }
 
   async setTrust(props: any, isExternal: boolean): Promise<any> {
@@ -343,18 +336,6 @@ class GraphNetwork {
     return { edge, preVal, change };
   }
 
-  // subscribe(author: string) {
-  //     if(this.unsubs[author]) return; // Already subscribed
-
-  //     const unsubFn = this.wotPubSub?.subscribeTrust([author], this.trustEvent); // Subscribe to trust events
-  //     this.unsubs[author] = unsubFn; // Store the unsubscribe function
-  // }
-
-  // unsubscribe(author: string) {
-  //     if(this.unsubs[author])
-  //         this.unsubs[author]();
-  // }
-
   subscribeToTrustEvents(vertices: Array<Vertice>) {
     if (vertices.length == 0) return; // Nothing to subscribe to
 
@@ -427,8 +408,8 @@ class GraphNetwork {
         true,
       );
 
-      graphNetwork.updateVerticeMonitor(outV); // Update the monitor if has no vertice, but an Element subscribes to it.
-      graphNetwork.updateVerticeMonitor(inV); // Update the monitor if has no vertice, but an Element subscribes to it.
+      // graphNetwork.updateVerticeMonitor(outV); // Update the monitor if has no vertice, but an Element subscribes to it.
+      // graphNetwork.updateVerticeMonitor(inV); // Update the monitor if has no vertice, but an Element subscribes to it.
 
       if (change) {
         graphNetwork.addToProcessScoreQueue(outV, inV);

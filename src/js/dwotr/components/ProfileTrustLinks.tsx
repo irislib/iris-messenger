@@ -3,17 +3,18 @@ import Key from '../../nostr/Key';
 import TrustScore from '../model/TrustScore';
 import useVerticeMonitor from './useVerticeMonitor';
 import { RenderScoreDistrustLink, RenderScoreTrustLink } from './RenderGraph';
+import { ID } from '../../nostr/UserIds';
 
 type ProfileTrustLinkProps = {
   id?: string;
 };
 
 const ProfileTrustLinks = (props: ProfileTrustLinkProps) => {
-  const [hexKey] = useState(Key.toNostrHexAddress(props.id || Key.getPubKey()));
+  const [hexKey] = useState(Key.toNostrHexAddress(props.id || Key.getPubKey())as string);
   const [npub] = useState(Key.toNostrBech32Address(hexKey as string, 'npub') as string);
   const [state, setState] = useState<any>();
   const wot = useVerticeMonitor(
-    hexKey as string,
+    ID(hexKey),
     undefined,
     '',
   ) as any;

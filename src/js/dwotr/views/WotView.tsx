@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
 import Header from '../../components/Header';
-import Name, { sanitizeProfile } from '../../components/Name';
 import ScrollView from '../../components/ScrollView';
 import Key from '../../nostr/Key';
 import graphNetwork from '../GraphNetwork';
@@ -13,6 +12,7 @@ import TrustScore from '../model/TrustScore';
 import { RenderScoreDistrustLink, RenderScoreTrustLink, RenderTrust1Value, renderEntityKeyName } from '../components/RenderGraph';
 import MyAvatar from '../../components/Avatar';
 import { PUB } from '../../nostr/UserIds';
+import Name from '../../components/Name';
 
 
 type TrustListViewProps = {
@@ -28,12 +28,12 @@ type TrustListViewProps = {
 export function filterByName(list: Vertice[], filter: string) {
   
   let result = list.filter((v) => {
-    if (!v['profile'] || v['profile'].dummy) {
-      if (v.entityType == EntityType.Key) {
-        let rawP = SocialNetwork.profiles.get(v.id as number);
-        v['profile'] = sanitizeProfile(rawP, PUB(v.id));
-      }
-    }
+    // if (!v['profile'] || v['profile'].dummy) {
+    //   if (v.entityType == EntityType.Key) {
+    //     let rawP = SocialNetwork.profiles.get(v.id as number);
+    //     v['profile'] = sanitizeProfile(rawP, PUB(v.id));
+    //   }
+    // }
 
     if (!filter) return true;
 

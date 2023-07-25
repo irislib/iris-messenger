@@ -11,6 +11,7 @@ import useVerticeMonitor from './useVerticeMonitor';
 // import { route } from 'preact-router';
 // import Key from '../nostr/Key';
 import TrustScore from '../model/TrustScore';
+import { ID } from '../../nostr/UserIds';
 
 const TrustProfileButtons = ({ props }: any) => {
   const [state, setState] = useState({
@@ -25,7 +26,7 @@ const TrustProfileButtons = ({ props }: any) => {
   });
 
   const { hexPub, lightning, website } = props;
-  const wot = useVerticeMonitor(hexPub) as any;
+  const wot = useVerticeMonitor(ID(hexPub)) as any;
 
   useEffect(() => {
     const score = wot?.vertice?.score as TrustScore;

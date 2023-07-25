@@ -1,19 +1,20 @@
 import { useEffect, useState } from "preact/hooks";
-import graphNetwork, { TrustScoreEventName } from "../GraphNetwork";
+import graphNetwork, { TrustScoreEvent } from "../GraphNetwork";
 import { MonitorItem } from "../model/MonitorItem";
 import { Vertice } from "../model/Graph";
 
 
-const useVerticeMonitor = (key: string, options?: any, option?: any) => {
+const useVerticeMonitor = (id: number, options?: any, option?: any) => {
     
-    const [state, setState] = useState({key, options, option});
+    const [state, setState] = useState({id, options, option});
 
     useEffect(() => {
-        if (!key) return;
-        let eventID = TrustScoreEventName+key;
+        if (!id) return;
+        let eventID = TrustScoreEvent.getEventId(id);
 
         function findOption(item: MonitorItem) {
-            let vertice = item.vertice as Vertice;
+            let vertice = graphNetwork.g.vertices[item.id] as Vertice;
+            if(!vertice) return;
             let option = graphNetwork.findOption(vertice, options);
             setState((prevState) => ({ ...prevState, ...item, option }));
             
@@ -21,25 +22,25 @@ const useVerticeMonitor = (key: string, options?: any, option?: any) => {
 
         const cb = (e: any) => {
             let item = e.detail as MonitorItem;
-            if (item.vertice?.key != key)
+            if (item.id != id)
                 return;
 
             findOption(item);
         }
 
-        graphNetwork.addVerticeMonitor(key);
+        graphNetwork.addVerticeMonitor(id);
         document.addEventListener(eventID, cb);
 
         // Call manually the graphNetwork.resolveTrust the first time
-        let eventItem = graphNetwork.getTrustScoreEvent(key);
+        let eventItem = new TrustScoreEvent(id, new MonitorItem(id));
         if (eventItem?.detail) 
             findOption(eventItem.detail);   
 
         return () => {
-            graphNetwork.removeVerticeMonitor(key);
+            graphNetwork.removeVerticeMonitor(id);
             document.removeEventListener(eventID, cb);
         }
-    }, [key]);
+    }, [id]);
 
     return state;
 }
