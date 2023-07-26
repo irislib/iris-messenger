@@ -5,10 +5,9 @@ import Show from './helpers/Show';
 
 type Props = {
   children: JSX.Element | JSX.Element[];
-  small?: boolean;
 };
 
-const Dropdown = ({ children, small }: Props) => {
+const Dropdown = ({ children }: Props) => {
   const [open, setOpen] = useState(false);
 
   const toggle = (e: MouseEvent, newOpenState: boolean) => {
@@ -45,9 +44,7 @@ const Dropdown = ({ children, small }: Props) => {
       onMouseEnter={(e) => toggle(e, true)}
       onMouseLeave={(e) => toggle(e, false)}
     >
-      <button className={`dropbtn btn btn-circle ${small && 'btn-sm'} btn-ghost text-neutral-500`}>
-        …
-      </button>
+      <button className="dropbtn btn btn-circle btn-sm btn-ghost text-neutral-500">…</button>
       <Show when={open}>
         <div className="absolute z-10 p-2 flex flex-col gap-2 right-0 w-56 rounded-md shadow-lg bg-black border-neutral-500 border-2">
           {children}

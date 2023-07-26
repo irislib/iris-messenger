@@ -29,25 +29,23 @@ export default function Repost(props: Props) {
   }, [props.notification, repostedEventId]);
 
   return (
-    <div className="msg">
-      <div className="msg-content" style={{ padding: '12px 0 0 0' }}>
-        <div className="flex gap-1 items-center text-sm text-neutral-500">
-          <i>
-            <ArrowPathIcon width={18} />
-          </i>
-          <a href={`/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`}>
-            <Name pub={props.event?.pubkey} hideBadge={true} />
-          </a>
-          <span>
-            {allReposts.length > 1 && `and ${allReposts.length - 1} others`} {t('reposted')}
-          </span>
-        </div>
-        <EventComponent
-          key={repostedEventId + props.event.id}
-          id={repostedEventId}
-          fullWidth={props.fullWidth}
-        />
+    <div>
+      <div className="flex gap-1 items-center text-sm text-neutral-500 px-2 pt-2">
+        <i>
+          <ArrowPathIcon width={18} />
+        </i>
+        <a href={`/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`}>
+          <Name pub={props.event?.pubkey} hideBadge={true} />
+        </a>
+        <span>
+          {allReposts.length > 1 && `and ${allReposts.length - 1} others`} {t('reposted')}
+        </span>
       </div>
+      <EventComponent
+        key={repostedEventId + props.event.id}
+        id={repostedEventId}
+        fullWidth={props.fullWidth}
+      />
     </div>
   );
 }

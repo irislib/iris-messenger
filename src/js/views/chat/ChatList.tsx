@@ -72,7 +72,7 @@ class ChatList extends BaseComponent<ChatListProps, ChatListState> {
 
     return (
       <section
-        className={`h-screen overflow-x-hidden overflow-y-scroll px-2 md:px-0 w-full md:w-64 ${
+        className={`h-screen overflow-x-hidden overflow-y-scroll px-4 md:px-0 w-full md:w-64 ${
           this.props.className || ''
         }`}
       >
@@ -86,7 +86,7 @@ class ChatList extends BaseComponent<ChatListProps, ChatListState> {
             <a>{t('turn_on_desktop_notifications')}</a>
           </div>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           {this.state.sortedChats.map((pubkey) => (
             <ChatListItem
               active={pubkey === activeChat}

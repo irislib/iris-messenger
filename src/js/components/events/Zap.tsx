@@ -55,9 +55,9 @@ export default function Zap(props: Props) {
   const userLink = `/${zappingUser}`;
 
   return (
-    <div className="msg">
-      <div className="msg-content" onClick={(e) => messageClicked(e, zappedId || '')}>
-        <div className="flex gap-1 items-center text-sm text-neutral-500">
+    <div>
+      <div onClick={(e) => messageClicked(e, zappedId || '')}>
+        <div className="flex gap-1 items-center text-sm text-neutral-500 px-2 pt-2">
           <i className="zap-btn text-iris-orange">{Icons.lightning}</i>
           <div>
             <a href={userLink}>
