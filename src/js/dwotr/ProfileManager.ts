@@ -108,10 +108,11 @@ class ProfileManager {
 
     // First load from memory
     for (const address of addresses) {
-      const id = ID(address);
+      const pub = Key.toNostrHexAddress(address) as string;
+      const id = ID(pub);
       const item = SocialNetwork.profiles.get(id);
       if (item) list.push(item);
-      else dbLookups.push(address);
+      else dbLookups.push(pub);
     }
 
     // Then load from DB

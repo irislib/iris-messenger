@@ -26,11 +26,6 @@ type VisGraphProps = {
 };
 
 const defaultOptions = {
-  layout: {
-    hierarchical: {
-      direction: 'LR',
-    },
-  },
   physics: {
     stabilization: false,
   },
@@ -58,31 +53,15 @@ const defaultOptions = {
   },
 };
 
-// const nodes = [
-//   { id: 1, label: 'Node 1' },
-//   { id: 2, label: 'Node 2' },
-//   { id: 3, label: 'Node 3' },
-//   { id: 4, label: 'Node 4' },
-//   { id: 5, label: 'Node 5' },
-// ];
-
-// const edges = [
-//   { from: 1, to: 3 },
-//   { from: 1, to: 2 },
-//   { from: 2, to: 4 },
-//   { from: 2, to: 5 },
-//   { from: 3, to: 3 },
-// ];
 
 const VisGraph = (props: VisGraphProps) => {
   // Create a ref to provide DOM access
   const visJsRef = useRef<HTMLDivElement>(null);
   const [network, setNetwork] = useState<Network | null>();
   const [state, setState] = useState<any>(null);
-  const [vertices, setVertices] = useState<Array<Vertice>>([]);
-  const [nodes, setNodes] = useState<DataSet<any>>(new DataSet());
-  const [edges, setEdges] = useState<DataSet<any>>(new DataSet());
-  //const [name, setName] = useState<string | undefined>('...');
+  const [nodes] = useState<DataSet<any>>(new DataSet());
+  const [edges] = useState<DataSet<any>>(new DataSet());
+  const [unsubscribe] = useState<Array<() => void>>([]);
 
   useEffect(() => {
     if (!visJsRef.current) return;
@@ -117,7 +96,7 @@ const VisGraph = (props: VisGraphProps) => {
       let v = graphNetwork.g.vertices[vId];
       let score = v?.score;
 
-      profileManager.getProfile(hexKey, (profile) => {
+      let unsub = profileManager.getProfile(hexKey, (profile) => {
 
         if(nodes.get(vId as number)) return; // already added
 
@@ -141,7 +120,12 @@ const VisGraph = (props: VisGraphProps) => {
 
         loadNode(vId as number);
       });
+      unsubscribe.push(unsub);
+
     });
+    return () => {
+      unsubscribe.forEach((u) => u?.());
+    } 
   }, [props.id]);
 
   function getImage(profile: any) {
@@ -165,16 +149,8 @@ const VisGraph = (props: VisGraphProps) => {
     list = graphNetwork.g.inOutTrustById(vId, EntityType.Key, undefined);
 
     let addresses = list.filter((v) => !v.profile).map((v) => PUB(v.id));
-    let unsub = await profileManager.getProfiles(addresses, (profiles) => {
-      // for (let profile of profiles) {
-      //   let id = graphNetwork.g.getVerticeId(profile.key);
-      //   if(!id) continue;
-      //   let v = graphNetwork.g.vertices[id];
-      //   if (v) {
-      //     v.profile = profile;
-      //   }
-      // }
-    });
+    let unsub = await profileManager.getProfiles(addresses, (_) => {});
+    unsubscribe.push(unsub);
 
     //let filterResults = filterByName(list, ''); // make sure to add name and picture to the vertices.
 
@@ -200,14 +176,6 @@ const VisGraph = (props: VisGraphProps) => {
       }
     }
   }
-
-  // useEffect(() => {
-  // 	const hexKey = Key.toNostrHexAddress(props.id || Key.getPubKey()) as string;
-  // 	return SocialNetwork.getProfile(hexKey, (profile) => {
-  // 	  //setProfile(profile);
-  // 	  setName(() => profile?.display_name || profile?.name || '...');
-  // 	});
-  //   }, [props.id]);
 
   function setSearch(params: any) {
     const p = {

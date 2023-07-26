@@ -13,6 +13,7 @@ import Identicon from 'identicon.js';
 import { renderScoreLine } from './WotView';
 import Name from '../../components/Name';
 import Header from '../../components/Header';
+import { Unsubscribe } from '../../nostr/PubSub';
 
 type VisGraphProps = {
   id?: string;
@@ -26,9 +27,21 @@ type VisGraphProps = {
 
 const defaultOptions = {
   layout: {
+    randomSeed: undefined,
+    improvedLayout:true,
+    //clusterThreshold: 150,
     hierarchical: {
-      direction: 'LR',
-    },
+      enabled:true,
+      //levelSeparation: 150,
+      //nodeSpacing: 100,
+      //treeSpacing: 200,
+      blockShifting: true,
+      edgeMinimization: true,
+      parentCentralization: true,
+      direction: 'LR',        // UD, DU, LR, RL
+      sortMethod: 'directed',  // hubsize, directed
+      shakeTowards: 'roots'  // roots, leaves
+    }
   },
   physics: {
     stabilization: false,
@@ -57,22 +70,6 @@ const defaultOptions = {
   },
 };
 
-// const nodes = [
-//   { id: 1, label: 'Node 1' },
-//   { id: 2, label: 'Node 2' },
-//   { id: 3, label: 'Node 3' },
-//   { id: 4, label: 'Node 4' },
-//   { id: 5, label: 'Node 5' },
-// ];
-
-// const edges = [
-//   { from: 1, to: 3 },
-//   { from: 1, to: 2 },
-//   { from: 2, to: 4 },
-//   { from: 2, to: 5 },
-//   { from: 3, to: 3 },
-// ];
-
 const VisPath = (props: VisGraphProps) => {
   // Create a ref to provide DOM access
   const visJsRef = useRef<HTMLDivElement>(null);
@@ -80,6 +77,7 @@ const VisPath = (props: VisGraphProps) => {
   const [state, setState] = useState<any>(null);
   const [nodes] = useState<DataSet<any>>(new DataSet());
   const [edges] = useState<DataSet<any>>(new DataSet());
+  const [unsubscribe] = useState<Array<() => void>>([]);
 
   useEffect(() => {
     if (!visJsRef.current) return;
@@ -105,7 +103,7 @@ const VisPath = (props: VisGraphProps) => {
       // const trust1 = props.trust1 == 'trust' ? 1 : props.trust1 == 'distrust' ? -1 : 0;
       // const dir = props.dir || 'both';
       // const entitytype = props?.entitytype == 'item' ? EntityType.Item : EntityType.Key;
-      // const view = props.view || 'list';
+      const view = props.view || 'list';
       // const filter = props.filter || '';
       // const me = hexKey == Key.getPubKey();
 
@@ -132,11 +130,12 @@ const VisPath = (props: VisGraphProps) => {
 
           nodes.add({
             id: vertice.id,
-            label: profile.name,
+            label: profile.name+ ` (ID: ${vertice.id})`,
             image: profile.picture,
             shape: 'circularImage',
           });
         }
+
 
         for (let edge of paths) {
           let color = RenderTrust1Color(edge.val);
@@ -148,15 +147,20 @@ const VisPath = (props: VisGraphProps) => {
               color,
             });
         }
-      });
+      }).then((unsub: Unsubscribe) => unsubscribe.push(unsub));
 
       setState((prevState) => ({
         ...prevState,
         npub,
         hexKey,
         vId,
+        view,
       }));
+    
     });
+    return () => {
+      unsubscribe.forEach((u) => u?.());
+    } 
   }, [props.id]);
 
   function getImage(profile: any) {

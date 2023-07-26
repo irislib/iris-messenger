@@ -38,6 +38,7 @@ import DWoTRSetup from './dwotr/components/DWoTRSetup';
 import WotView from './dwotr/views/WotView';
 import VisGraph from './dwotr/views/VisGraph';
 import VisPath from './dwotr/views/VisPath';
+import TestData from './dwotr/views/TestData';
 
 type Props = Record<string, unknown>;
 
@@ -158,6 +159,7 @@ class Main extends Component<Props, ReactState> {
               <WotView path="/wot/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?"  />
               <VisGraph path="/vis/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
               <VisPath path="/path/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
+              <TestData path="/test/:id?" />
               {/* <WotView path="/wot/events/:id"  entitytype={EntityType.Item} /> */}
               {/* <Score path="/trustedby/:id" trust1={1} dir="in" title="Trusted by" />
               <Score path="/distrustedby/:id" trust1={-1} dir="in" title="Distrusted by" />

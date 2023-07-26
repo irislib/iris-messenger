@@ -246,8 +246,6 @@ class GraphNetwork {
   }
 
   async setTrust(props: any, isExternal: boolean): Promise<any> {
-    //let outV = await this.loadVertice(from, { ...props, entityType: EntityType.Key }); // Create the vertice if it doesn't exist and always entity type is Key
-    //let inV = await this.loadVertice(to, { degree: (outV?.degree || 98) + 1, ...props });
     let { edge, preVal, change } = await this.putEdge(props, isExternal);
     let outV = edge.out;
     let inV = edge.in;
@@ -255,36 +253,14 @@ class GraphNetwork {
     return { outV, inV, edge, preVal, change };
   }
 
-  // async loadVertice(key: string, props: any): Promise<Vertice> {
-  //   let { degree, entityType, timestamp } = props;
-  //   let v = this.g.getVertice(key);
-  //   if (!v) {
-  //     v = new Vertice();
-  //     v.key = key;
-  //     v.entityType = entityType;
-  //     v.timestamp = timestamp;
-  //     v.degree = degree || 0;
-  //     v.id = (await this.db.vertices.add(v)) as number;
-  //     this.g.addVertice(v);
-  //   } else {
-  //     let updateObject = {};
-  //     if (v.timestamp < timestamp) v.timestamp = updateObject['timestamp'] = timestamp; // Update the timestamp to the latest event.
-  //     if (v.entityType != entityType) v.entityType = updateObject['entityType'] = entityType; // Update the entityType only if it is different.
-  //     if (degree && v.degree && v.degree > degree) v.degree = updateObject['degree'] = degree; // Update the degree only if it is lower than the current degree.
-
-  //     if (Object.keys(updateObject).length > 0)
-  //       await this.db.vertices.update(v.id as number, updateObject);
-  //   }
-  //   return v;
-  // }
 
   async putEdge(props: any, isExternal: boolean) {
-    let { from, to, val, context, note, timestamp } = props;
+    let { from, to, val, entityType, context, note, timestamp } = props;
     let type = 1; // Trust1
     let preVal = undefined;
     let change = false;
 
-    let key =  Edge.getKey(type, from, to, context); // Create the key for the edge
+    let key =  Edge.key(type, from, to, context); // Create the key for the edge
     let edge = this.g.edges[key];
 
     if (!edge) {
@@ -296,6 +272,7 @@ class GraphNetwork {
       record.from = from;
       record.to = to;
       record.val = val;
+      record.entityType = entityType;
       record.context = context;
       record.note = note;
       record.timestamp = timestamp;
@@ -404,7 +381,7 @@ class GraphNetwork {
 
       // Add the Trust Event to the memory Graph and IndexedDB
       let { outV, inV, change } = await graphNetwork.setTrust(
-        { from, to, val, content: note, context, entityType, timestamp: event.created_at },
+        { from, to, val, note, context, entityType, timestamp: event.created_at },
         true,
       );
 

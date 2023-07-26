@@ -8,3 +8,7 @@ export function sha256(data: string): string {
     let eventHash = hash(utf8Encoder.encode(data));
     return bytesToHex(eventHash);
   }
+
+export function toTimestamp(date: number = Date.now()) : number {
+    return Math.floor(date / 1000);
+}

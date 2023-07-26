@@ -34,9 +34,11 @@ export class EdgeBase  {
     key: string = ""; // The public key of the edge
     type: number = 1; // The type of the edge, 1 is trust, 2 is distrust, 3 is neutral
     val: any = undefined; // The value of the edge
+    entityType: EntityType = 1; // Type 1 is Key and 2 is item. Items cannot issue Trust claims.
     context: string = ""; // The context of the edge
     note: string = ""; // A note about the edge
     timestamp = 0; // Timestamp of latest update, used to update the edge with only the latest values.
+
 }
 
 
@@ -57,14 +59,10 @@ export class Edge extends EdgeBase {
         return edge;
     }
     
-    static getKey(type: number, outKey: string, inKey: string, context: string) : string {
+    static key(type: number, outKey: string, inKey: string, context: string) : string {
         let key = `${type}|${outKey}|${inKey}|${context}`;
         return sha256(key);
     }
-
-    // setKey() {
-    //     this.key = Edge.getKey(this.type, this.out?.key || "", this.in?.key || "", this.context || "");
-    // }
 
     fill(record: EdgeRecord) : void {
         this.val = record.val;
@@ -181,6 +179,10 @@ export default class Graph {
                     if(degree >= inV.degree) continue; // Skip if degree is already set by a shorter path
 
                     inV.degree = nextDegree; // Set the degree to next level
+
+                    // TODO: This should be set by majority of edges with best trust
+                    inV.entityType = edge.entityType; 
+                    // --------------------------------
 
                     if(degree < maxDegree 
                         && inV.entityType === EntityType.Key 
