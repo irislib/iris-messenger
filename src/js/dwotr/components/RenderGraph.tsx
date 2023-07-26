@@ -47,12 +47,12 @@ export const RenderScoreTrustLink = (
 ) => {
   if (!score || (!forceRender && !score.hasTrustScore())) return null;
   return (
-    <div className="flex-shrink-0">
+    // <div className="flex-shrink-0">
       <a href={`/wot/${npub}/key/in/trust/list`} className="cursor-pointer hover:underline" title="Trusts at degree 0/1/2">
         {renderTrustCount(score, forceRender)}&nbsp;
         <span className="text-neutral-500">Trusts</span>
       </a>
-    </div>
+    // </div>
   );
 };
 

@@ -16,7 +16,7 @@ const useVerticeMonitor = (id: number, options?: any, option?: any) => {
             let vertice = graphNetwork.g.vertices[item.id] as Vertice;
             if(!vertice) return;
             let option = graphNetwork.findOption(vertice, options);
-            setState((prevState) => ({ ...prevState, ...item, option }));
+            setState((prevState) => ({ ...prevState, ...item, option, vertice }));
             
         }
 

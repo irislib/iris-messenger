@@ -46,32 +46,6 @@ class Profile extends View {
     }
   }
 
-  renderLinks() {
-    return (
-      <div className="flex flex-1 flex-row align-center justify-center mt-2">
-        <TrustProfileButtons props={this.state} />
-        <Show when={this.state.lightning}>
-          <div className="flex-1">
-            <a
-              className="btn btn-sm btn-neutral"
-              href={this.state.lightning}
-              onClick={(e) => Helpers.handleLightningLinkClick(e)}
-            >
-              ⚡ {t('tip_lightning')}
-            </a>
-          </div>
-        </Show>
-        <Show when={this.state.website}>
-          <div className="flex-1">
-            <a href={this.state.website} target="_blank" className="link">
-              {this.state.website.replace(/^https?:\/\//, '')}
-            </a>
-          </div>
-        </Show>
-      </div>
-    );
-  }
-
   async viewAs(event) {
     event.preventDefault();
     route('/');

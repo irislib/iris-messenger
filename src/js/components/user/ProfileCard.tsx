@@ -15,6 +15,8 @@ import Avatar from './Avatar';
 import ProfileDropdown from './Dropdown';
 import Name from './Name';
 import ProfilePicture from './ProfilePicture';
+import TrustProfileButtons from '../../dwotr/components/TrustProfileButtons';
+import ProfileScoreLinks from '../../dwotr/components/ProfileScoreLinks';
 
 const ProfileCard = (props: { hexPub: string; npub: string }) => {
   const { hexPub, npub } = props;
@@ -172,11 +174,13 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
           <div className={profile.banner ? '-mt-24' : ''}>{profilePicture}</div>
           <div className="flex-1 justify-end flex gap-2">
             <div onClick={onClickHandler}>
+              <a href={"/wot/"+ npub} className="link px-2" >Web of Trust</a>
               <Show when={isMyProfile}>
                 <a className="btn btn-sm btn-neutral" href="/profile/edit">
                   {t('edit_profile')}
                 </a>
               </Show>
+
               <Show when={!isMyProfile}>
                 <Follow key={`${hexPub}follow`} id={hexPub} />
                 <button
@@ -210,11 +214,12 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
           <div>
             <div className="text-sm flex gap-4">
               <a href={`/follows/${npub}`}>
-                <b>{Math.max(followedUserCount, followedUserCountFromApi)}</b> {t('following')}
+                <b>{Math.max(followedUserCount, followedUserCountFromApi)}</b><span className="text-neutral-500">&nbsp;{t('following')}</span>  
               </a>
               <a href={`/followers/${npub}`}>
-                <b>{Math.max(followerCount, followerCountFromApi)}</b> {t('followers')}
+                <b>{Math.max(followerCount, followerCountFromApi)}</b><span className="text-neutral-500">&nbsp;{t('followers')}</span> 
               </a>
+              <ProfileScoreLinks hexPub={hexPub} />
             </div>
             <Show when={SocialNetwork.isFollowing(hexPub, Key.getPubKey())}>
               <div>
@@ -225,6 +230,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
           <div className="py-2">
             <p className="text-sm">{profile.about}</p>
             <div className="flex flex-1 flex-row align-center justify-center mt-4">
+              <TrustProfileButtons hexPub={hexPub} />
               <Show when={lightning}>
                 <div className="flex-1">
                   <a

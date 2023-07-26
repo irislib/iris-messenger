@@ -385,9 +385,6 @@ class GraphNetwork {
         true,
       );
 
-      // graphNetwork.updateVerticeMonitor(outV); // Update the monitor if has no vertice, but an Element subscribes to it.
-      // graphNetwork.updateVerticeMonitor(inV); // Update the monitor if has no vertice, but an Element subscribes to it.
-
       if (change) {
         graphNetwork.addToProcessScoreQueue(outV, inV);
         graphNetwork.processScoreDebounce(); // Wait a little before processing the score, to allow for multiple updates to be made at once

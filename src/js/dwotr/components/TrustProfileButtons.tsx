@@ -1,19 +1,12 @@
 import { useEffect, useState } from 'react';
-import { ReactionButtons } from './TrustButtons';
-
 import graphNetwork from '../GraphNetwork';
 import { CheckCorrect, FlagMarkSolid } from './Icons';
 import { EntityType } from '../model/Graph';
 import useVerticeMonitor from './useVerticeMonitor';
-// import Helpers from '../Helpers';
-// import { translate as t } from '../translations/Translation.mjs';
-// import Identicon from '../components/Identicon';
-// import { route } from 'preact-router';
-// import Key from '../nostr/Key';
 import TrustScore from '../model/TrustScore';
 import { ID } from '../../nostr/UserIds';
 
-const TrustProfileButtons = ({ props }: any) => {
+const TrustProfileButtons = ({hexPub}: any) => {
   const [state, setState] = useState({
     showTrustsList: false,
     trusted: false,
@@ -25,13 +18,12 @@ const TrustProfileButtons = ({ props }: any) => {
     processing: false,
   });
 
-  const { hexPub } = props;
   const wot = useVerticeMonitor(ID(hexPub)) as any;
 
   useEffect(() => {
     if (!wot) return;
 
-    const score = graphNetwork.g.vertices[wot?.id]?.score as TrustScore;
+    const score = wot.vertice?.score as TrustScore;
     if (!score) return;
 
     let trusted = score.isDirectTrusted();
@@ -47,16 +39,6 @@ const TrustProfileButtons = ({ props }: any) => {
       processing: false,
     }));
   }, [wot]);
-
-  // const trustList = useMemo(() => {
-  //   if (!wot?.vertice || !state.showTrustsList) return [];
-  //   return graphNetwork.getTrustList(wot.vertice, 1);
-  // }, [wot, state.showTrustsList]);
-
-  // const ditrustList = useMemo(() => {
-  //   if (!wot?.vertice || !state.showDistrustsList) return [];
-  //   return graphNetwork.getTrustList(wot.vertice, -1);
-  // }, [wot, state.showDistrustsList]);
 
   function trustBtnClicked(e) {
     e.preventDefault();
@@ -94,9 +76,9 @@ const TrustProfileButtons = ({ props }: any) => {
 
   return (
     <>
-      <div className="flex-1">
+      <div className="flex-1 flex gap-4">
         <a
-          className={`msg-btn trust-btn ${state.trusted ? 'trusted' : ''}`}
+          className={`msg-btn trust-btn ${state.trusted ? 'trusted' : ''} cursor-pointer`}
           onClick={(e) => trustBtnClicked(e)}
           title={state.trusted ? 'Trusted' : 'Trust'}
         >
@@ -106,15 +88,13 @@ const TrustProfileButtons = ({ props }: any) => {
             <CheckCorrect size={24} fill="none" stroke="currentColor" />
           )}
         </a>
-      </div>
-      <div className="flex-1">
         {/* <ReactionCount active={state.trusted} onClick={(e) => toggleTrusts(e)}>
             {state.renderTrustScore || ''}
             {state.processing && state.trusted ? <span id="loading"></span> : null}
           </ReactionCount> */}
 
         <a
-          className={`msg-btn trust-btn ${state.distrusted ? 'distrusted' : ''}`}
+          className={`msg-btn trust-btn ${state.distrusted ? 'distrusted' : ''} cursor-pointer`}
           onClick={(e) => distrustBtnClicked(e)}
           title={state.distrusted ? 'Distrusted' : 'Distrust'}
         >
