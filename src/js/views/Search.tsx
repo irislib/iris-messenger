@@ -15,7 +15,7 @@ const SuggestionProfile = memo(({ profile }: { profile: any }) => (
   <Link
     href={`/${nip19.npubEncode(profile.pubkey)}`}
     key={profile.pubkey}
-    className="flex flex-row gap-2 w-full break-words"
+    className="flex flex-row gap-4 w-full break-words"
   >
     <span className="flex-shrink-0">
       <Avatar str={profile.pubkey} width={30} />

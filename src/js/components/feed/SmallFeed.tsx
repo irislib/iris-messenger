@@ -8,7 +8,7 @@ import Avatar from '../user/Avatar';
 import Name from '../user/Name';
 
 const SmallEvent = memo(({ event }: { event: Event }) => (
-  <div key={event.id} className="flex gap-2 w-full break-words">
+  <div key={event.id} className="flex gap-4 w-full break-words">
     <div className="flex-shrink-0">
       <Link href={`/${nip19.npubEncode(event.pubkey)}`}>
         <Avatar str={event.pubkey} width={30} />

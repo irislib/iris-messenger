@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { route } from 'preact-router';
 
-import Block from '../../components/buttons/Block';
-import Report from '../../components/buttons/Report';
 import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
@@ -10,13 +8,11 @@ import Key from '../../nostr/Key';
 import PubSub from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
-import Copy from '../buttons/Copy';
 import Follow from '../buttons/Follow';
-import Dropdown from '../Dropdown';
 import Show from '../helpers/Show';
-import QRModal from '../modal/QRModal';
 
 import Avatar from './Avatar';
+import ProfileDropdown from './Dropdown';
 import Name from './Name';
 import ProfilePicture from './ProfilePicture';
 
@@ -27,19 +23,12 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [nostrAddress, setNostrAddress] = useState<string>('');
   const [rawDataJson, setRawDataJson] = useState<string>('');
-  const [showQrCode, setShowQrCode] = useState<boolean>(false);
   const [isMyProfile, setIsMyProfile] = useState<boolean>(false);
   const [blocked, setBlocked] = useState<boolean>(false);
   const [followedUserCount, setFollowedUserCount] = useState<number>(0);
   const [followerCount, setFollowerCount] = useState<number>(0);
   const [followerCountFromApi, setFollowerCountFromApi] = useState<number>(0);
   const [followedUserCountFromApi, setFollowedUserCountFromApi] = useState<number>(0);
-
-  async function viewAs(event) {
-    event.preventDefault();
-    route('/');
-    Key.login({ rpub: hexPub });
-  }
 
   const getNostrProfile = useCallback((address, nostrAddress) => {
     const subscriptions = [] as any[];
@@ -181,7 +170,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
       <div className="mb-2 mx-4 md:px-4 md:mx-0 flex flex-col gap-2">
         <div className="flex flex-row">
           <div className={profile.banner ? '-mt-24' : ''}>{profilePicture}</div>
-          <div className="flex-1 justify-end flex">
+          <div className="flex-1 justify-end flex gap-2">
             <div onClick={onClickHandler}>
               <Show when={isMyProfile}>
                 <a className="btn btn-sm btn-neutral" href="/profile/edit">
@@ -198,42 +187,13 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
                 </button>
               </Show>
             </div>
-            <div className="profile-actions">
-              <Dropdown>
-                <Copy
-                  className="btn btn-sm"
-                  key={`${hexPub}copyLink`}
-                  text={t('copy_link')}
-                  copyStr={window.location.href}
-                />
-                <Copy
-                  className="btn btn-sm"
-                  key={`${hexPub}copyNpub`}
-                  text={t('copy_user_ID')}
-                  copyStr={npub}
-                />
-                <button className="btn btn-sm" onClick={() => setShowQrCode(true)}>
-                  {t('show_qr_code')}
-                </button>
-                <Copy
-                  className="btn btn-sm"
-                  key={`${hexPub}copyData`}
-                  text={t('copy_raw_data')}
-                  copyStr={rawDataJson}
-                />
-                <Show when={!isMyProfile && !Key.getPrivKey()}>
-                  <button className="btn btn-sm" onClick={viewAs}>
-                    {t('view_as') + ' '}
-                    <Name pub={hexPub} hideBadge={true} />
-                  </button>
-                </Show>
-                <Show when={!isMyProfile}>
-                  <>
-                    <Block className="btn btn-sm" id={hexPub} />
-                    <Report className="btn btn-sm" id={hexPub} />
-                  </>
-                </Show>
-              </Dropdown>
+            <div>
+              <ProfileDropdown
+                hexPub={hexPub}
+                npub={npub}
+                rawDataJson={rawDataJson}
+                isMyProfile={isMyProfile}
+              />
             </div>
           </div>
         </div>
@@ -292,9 +252,6 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
           </div>
         </div>
       </div>
-      <Show when={showQrCode}>
-        <QRModal pub={hexPub} onClose={() => setShowQrCode(false)} />
-      </Show>
     </div>
   );
 };
