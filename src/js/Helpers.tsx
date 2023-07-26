@@ -665,7 +665,8 @@ export default {
       );
     });
 
-    s = s.map((x) => (typeof x === 'string' ? x.trim() : x));
+    // remove leading and trailing newlines
+    s = s.map((x) => (typeof x === 'string' ? x.replace(/^\n+|\n+$/g, '') : x));
 
     return s;
   },

@@ -311,7 +311,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           <FeedSettings settings={settings} onChange={(settings) => this.setState({ settings })} />
         </Show>
         <Show when={['global', 'follows'].includes(index || '')}>
-          <div className="flex items-center mx-2 md:mx-0 my-2">
+          <div className="flex items-center mx-4 my-4">
             <div
               className={`btn btn-sm  mr-2 ${
                 this.state.settings.showReplies ? 'btn-neutral' : 'btn-primary'

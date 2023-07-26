@@ -29,7 +29,7 @@ class Feed extends View {
           ) : (
             <>
               <OnboardingNotification />
-              <div className="hidden md:block">
+              <div className="hidden md:block px-4">
                 <PublicMessageForm autofocus={false} placeholder={t('whats_on_your_mind')} />
               </div>
             </>

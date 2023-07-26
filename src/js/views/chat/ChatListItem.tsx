@@ -88,7 +88,7 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
         onKeyUp={(e: KeyboardEvent) => this.onKeyUp(e)}
         role="button"
         tabIndex={0}
-        className={`flex flex-row gap-2 ${hasUnseen} ${active}`}
+        className={`flex flex-row gap-4 ${hasUnseen} ${active}`}
         onClick={() => route(`/chat/${npub}`)}
       >
         <Avatar str={npub} width={49} />

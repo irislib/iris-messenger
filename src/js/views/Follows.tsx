@@ -1,14 +1,38 @@
+import { memo } from 'react';
 import throttle from 'lodash/throttle';
 
 import Follow from '../components/buttons/Follow';
+import Show from '../components/helpers/Show';
 import Avatar from '../components/user/Avatar';
 import Name from '../components/user/Name';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
+import { ID } from '../nostr/UserIds';
 import { translate as t } from '../translations/Translation.mjs';
 
 import View from './View';
+
+const FollowedUser = memo(({ hexKey }: { hexKey: string }) => {
+  const npub = Key.toNostrBech32Address(hexKey, 'npub') || '';
+  return (
+    <div key={npub} className="flex w-full">
+      <a href={`/${npub}`} className="flex flex-1 gap-4">
+        <Avatar str={npub} width={49} />
+        <div>
+          <Name pub={npub} />
+          <br />
+          <span className="text-neutral-500 text-sm">
+            {SocialNetwork.followersByUser.get(ID(hexKey))?.size || 0}
+            <i> </i>
+            followers
+          </span>
+        </div>
+      </a>
+      {hexKey !== Key.getPubKey() && <Follow id={npub} />}
+    </div>
+  );
+});
 
 class Follows extends View {
   follows: Set<string>;
@@ -99,35 +123,16 @@ class Follows extends View {
   }
 
   renderFollows() {
-    return this.state.follows.map((hexKey) => {
-      const npub = Key.toNostrBech32Address(hexKey, 'npub') || '';
-      return (
-        <div key={npub} className="flex w-full">
-          <a href={`/${npub}`} className="flex flex-1 gap-2">
-            <Avatar str={npub} width={49} />
-            <div>
-              <Name pub={npub} />
-              <br />
-              <span className="text-neutral-500 text-sm">
-                {SocialNetwork.followersByUser.get(hexKey)?.size || 0}
-                <i> </i>
-                followers
-              </span>
-            </div>
-          </a>
-          {hexKey !== Key.getPubKey() && <Follow id={npub} />}
-        </div>
-      );
-    });
+    return this.state.follows.map((hexKey) => <FollowedUser hexKey={hexKey} />);
   }
 
   renderView() {
     const showFollowAll =
       this.state.follows.length > 1 && !(this.props.id === this.myPub && !this.props.followers);
     return (
-      <>
+      <div className="px-4 mb-4">
         <div className="flex justify-between mb-4">
-          <span className="text-2xl font-bold">
+          <span className="text-xl font-bold">
             <a className="link" href={`/${this.props.id}`}>
               <Name pub={this.props.id} />
             </a>
@@ -136,30 +141,26 @@ class Follows extends View {
               {this.props.followers ? t('followers') : t('following')}
             </span>
           </span>
-          {showFollowAll ? (
+          <Show when={showFollowAll}>
             <span style="text-align: right" className="hidden md:inline">
               <button className="btn btn-sm btn-neutral" onClick={() => this.followAll()}>
                 {t('follow_all')} ({this.state.follows.length})
               </button>
             </span>
-          ) : (
-            ''
-          )}
+          </Show>
         </div>
-        {showFollowAll ? (
+        <Show when={showFollowAll}>
           <p style="text-align: right" className="inline md:hidden">
             <button className="btn btn-sm btn-neutral" onClick={() => this.followAll()}>
               {t('follow_all')} ({this.state.follows.length})
             </button>
           </p>
-        ) : (
-          ''
-        )}
+        </Show>
         <div className="flex flex-col w-full gap-4">
           {this.renderFollows() /* TODO limit if lots of follows */}
           {this.state.follows.length === 0 ? '—' : ''}
         </div>
-      </>
+      </div>
     );
   }
 }

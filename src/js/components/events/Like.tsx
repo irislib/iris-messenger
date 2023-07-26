@@ -51,9 +51,9 @@ export default function Like(props: Props) {
 
   const userLink = `/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`;
   return (
-    <div className="msg" key={props.event.id}>
-      <div className="msg-content" onClick={(e) => messageClicked(e, likedId)}>
-        <div className="flex gap-1 items-center text-sm text-neutral-500">
+    <div key={props.event.id}>
+      <div onClick={(e) => messageClicked(e, likedId)}>
+        <div className="flex gap-1 items-center text-sm text-neutral-500 px-2 pt-2">
           <i className="like-btn text-iris-red">
             <HeartIconFull width={18} />
           </i>
