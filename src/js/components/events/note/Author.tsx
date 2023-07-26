@@ -7,9 +7,8 @@ import Name from '../../user/Name';
 import EventDropdown from '../EventDropdown';
 
 import Avatar from './Avatar';
-import ReplyingToUsers from './ReplyingToUsers';
 
-const Author = ({ event, fullWidth, isQuote, standalone, setTranslatedText, isQuoting }) => {
+const Author = ({ event, fullWidth, isQuote, standalone, setTranslatedText }) => {
   const { time, dateStr, timeStr } = useMemo(() => {
     const t = new Date(event.created_at * 1000);
     const dStr = t.toLocaleString(window.navigator.language, {
@@ -46,8 +45,6 @@ const Author = ({ event, fullWidth, isQuote, standalone, setTranslatedText, isQu
             </a>
           </small>
         </div>
-
-        <ReplyingToUsers event={event} isQuoting={isQuoting} />
       </div>
       <Show when={!isQuote}>
         <div className="flex-1 flex items-center justify-end">

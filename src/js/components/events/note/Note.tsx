@@ -144,7 +144,6 @@ const Note = ({
             meta={meta}
             standalone={standalone}
             isQuote={isQuote}
-            isQuoting={isQuoting}
             asInlineQuote={asInlineQuote}
             fullWidth={fullWidth}
           />

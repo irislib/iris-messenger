@@ -28,7 +28,7 @@ localState.get('settings').on((s) => {
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
 
-const Content = ({ standalone, isQuote, fullWidth, isQuoting, asInlineQuote, event, meta }) => {
+const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta }) => {
   const [translatedText, setTranslatedText] = useState('');
   const [showMore, setShowMore] = useState(false);
   const [name, setName] = useState('');
@@ -98,7 +98,6 @@ const Content = ({ standalone, isQuote, fullWidth, isQuoting, asInlineQuote, eve
         standalone={standalone}
         event={event}
         isQuote={isQuote}
-        isQuoting={isQuoting}
         fullWidth={fullWidth}
         setTranslatedText={setTranslatedText}
       />
