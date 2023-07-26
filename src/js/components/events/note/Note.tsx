@@ -54,7 +54,7 @@ const Note = ({
     }
     if (isQuote) classNames.push('quote pb-2');
     if (isQuoting) classNames.push('quoting pt-0');
-    if (asInlineQuote) classNames.push('inline-quote border-2 border-neutral-900 rounded-lg my-2');
+    if (asInlineQuote) classNames.push('inline-quote border-2 border-neutral-900 rounded-lg');
     if (fullWidth) classNames.push('full-width');
 
     return classNames.join(' ');

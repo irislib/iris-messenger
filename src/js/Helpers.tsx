@@ -171,7 +171,7 @@ export default {
       replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
         return (
           <video
-            className="my-2 rounded max-h-[70vh] md:max-h-96 max-w-full"
+            className="rounded max-h-[70vh] md:max-h-96 max-w-full"
             key={match + i}
             src={match}
             poster={`https://imgproxy.iris.to/thumbnail/428/${match}`}
@@ -509,7 +509,7 @@ export default {
       replacedText = reactStringReplace(replacedText, imgRegex, (match, i) => {
         return (
           <SafeImg
-            className="my-2 md:rounded max-h-[70vh] md:max-h-96 max-w-full cursor-pointer"
+            className="md:rounded max-h-[70vh] md:max-h-96 max-w-full cursor-pointer"
             onClick={opts.onImageClick}
             src={match}
             key={match + i}
