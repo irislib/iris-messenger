@@ -135,6 +135,7 @@ class Login extends Component<Props, State> {
     return (
       <>
         <input
+          className="rounded-full input input-bordered centered-placeholder"
           id="paste-privkey"
           autoFocus
           onInput={(e) => this.onPasteKey(e)}
@@ -185,13 +186,13 @@ class Login extends Component<Props, State> {
                 </button>
               </p>
               {window.nostr ? (
-                <p className="text-center text-blue-500 hover:text-blue-800">
+                <p className="text-center link">
                   <a href="" onClick={(e) => this.nostrExtensionLogin(e)}>
                     {t('nostr_extension_login')}
                   </a>
                 </p>
               ) : null}
-              <p className="text-center text-blue-500 hover:text-blue-800">
+              <p className="text-center link">
                 <a
                   href=""
                   id="show-existing-account-login"
@@ -206,8 +207,8 @@ class Login extends Component<Props, State> {
               <LanguageSelector />
             </form>
           ) : (
-            <div className="shadow-md rounded px-8 pt-6 pb-8 mb-4">
-              <p className="text-center text-blue-500 hover:text-blue-800">
+            <div className="text-center shadow-md rounded px-8 pt-6 pb-8 mb-4 flex gap-2 flex-col">
+              <p className="link">
                 <a href="" id="show-create-account" onClick={(e) => this.showCreateAccount(e)}>
                   {t('back')}
                 </a>

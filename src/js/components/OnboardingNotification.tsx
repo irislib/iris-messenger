@@ -96,10 +96,7 @@ export default class OnboardingNotification extends Component {
         <p className="text-base">
           {t('alternatively')}
           <i> </i>
-          <a
-            href={`/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}`}
-            className="text-blue-500 hover:underline"
-          >
+          <a href={`/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}`} className="link">
             {t('give_your_profile_link_to_someone')}
           </a>
           .
