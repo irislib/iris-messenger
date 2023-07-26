@@ -3,6 +3,7 @@ import { route } from 'preact-router';
 
 import Block from '../../components/buttons/Block';
 import Report from '../../components/buttons/Report';
+import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -237,7 +238,60 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
             </div>
           </div>
         </div>
-        {/* More code here */}
+        <div className="profile-header-stuff">
+          <div className="flex-1 profile-name">
+            <span className="text-xl">
+              <Name pub={hexPub} />
+            </span>
+            <Show when={profile.nip05 && profile.nip05valid}>
+              <br />
+              <small className="text-iris-green">{profile.nip05?.replace(/^_@/, '')}</small>
+            </Show>
+          </div>
+          <div>
+            <div className="text-sm flex gap-4">
+              <a href={`/follows/${npub}`}>
+                <b>{followedUserCount}</b> {t('following')}
+              </a>
+              <a href={`/followers/${npub}`}>
+                <b>{followerCount}</b> {t('followers')}
+              </a>
+            </div>
+            <Show when={SocialNetwork.isFollowing(hexPub, Key.getPubKey())}>
+              <div>
+                <small>{t('follows_you')}</small>
+              </div>
+            </Show>
+          </div>
+          <div className="py-2">
+            <p className="text-sm">{profile.about}</p>
+            <div className="flex flex-1 flex-row align-center justify-center mt-2">
+              <Show when={profile.lightning}>
+                <div className="flex-1">
+                  <a
+                    className="btn btn-sm btn-neutral"
+                    href={profile.lightning}
+                    onClick={(e) => Helpers.handleLightningLinkClick(e)}
+                  >
+                    ⚡ {t('tip_lightning')}
+                  </a>
+                </div>
+              </Show>
+              <Show when={profile.website}>
+                <div className="flex-1">
+                  <a
+                    href={profile.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link"
+                  >
+                    {profile.website?.replace(/^https?:\/\//, '')}
+                  </a>
+                </div>
+              </Show>
+            </div>
+          </div>
+        </div>
       </div>
       <Show when={showQrCode}>
         <QRModal pub={hexPub} onClose={() => setShowQrCode(false)} />

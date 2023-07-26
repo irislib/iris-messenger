@@ -24,14 +24,14 @@ abstract class View extends Component {
 
   render() {
     return (
-      <div className="flex flex-row">
+      <div className="flex flex-row w-full">
         <div className="flex flex-col w-full lg:w-2/3">
           <Header />
           <div class={this.class} id={this.id}>
             <ErrorBoundary>{this.renderView()}</ErrorBoundary>
           </div>
         </div>
-        <div className="sticky flex-col hidden lg:flex lg:w-1/3">
+        <div className="flex-col hidden lg:flex lg:w-1/3">
           <Search focus={false} />
         </div>
       </div>

@@ -39,12 +39,14 @@ const FollowSuggestionsAPI = memo(() => {
 
   if (!suggestions.length) return null;
 
+  const randomSuggestions = suggestions.sort(() => 0.5 - Math.random()).slice(0, 8);
+
   return (
-    <div className="card-body p-4">
+    <div className="card-body p-2">
       <h2 className="card-title">Follow suggestions</h2>
       <hr className="opacity-10" />
-      <div className="-ml-2 flex flex-wrap gap-4 items-center text-xs overflow-y-scroll overflow-x-hidden max-h-[50vh]">
-        {suggestions.map((profile: any) => (
+      <div className="flex flex-wrap gap-4 items-center text-xs overflow-x-hidden">
+        {randomSuggestions.map((profile: any) => (
           <SuggestionProfile key={profile.pubkey} profile={profile} />
         ))}
       </div>
@@ -64,15 +66,19 @@ const Search = (props: any) => {
   const trendingPosts = useCachedFetch(url, 'trendingNotes', dataProcessor);
 
   return (
-    <div class="mt-2 p-2 mx-2 md:mx-0 flex flex-col gap-4">
+    <div class="sticky top-0 right-0 p-2 mx-2 md:mx-0 flex flex-col gap-4 h-screen">
       <SearchBox
         focus={props.focus}
         onSelect={({ key }) => {
           route('/' + key);
         }}
       />
-      <SmallFeed events={trendingPosts} />
-      <FollowSuggestionsAPI />
+      <div className="max-h-[50vh] overflow-y-scroll">
+        <SmallFeed events={trendingPosts} />
+      </div>
+      <div className="max-h-[50vh] overflow-y-scroll">
+        <FollowSuggestionsAPI />
+      </div>
     </div>
   );
 };

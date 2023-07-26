@@ -31,7 +31,7 @@ const SmallEvent = memo(({ event }: { event: Event }) => (
 const SmallFeed = ({ events }: { events: Event[] }) => {
   const mutedUsers = [];
   return (
-    <div className="card-body p-4">
+    <div className="card-body p-2">
       <h2 className="card-title">
         <FireIcon width={20} className="text-iris-orange" />
         Trending 24h
@@ -39,7 +39,7 @@ const SmallFeed = ({ events }: { events: Event[] }) => {
 
       <hr className="opacity-10" />
 
-      <div className="-ml-2 flex flex-wrap gap-6 text-xs overflow-y-scroll overflow-x-hidden max-h-[50vh]">
+      <div className="flex flex-wrap gap-6 text-xs overflow-x-hidden">
         {events
           .filter((event) => !mutedUsers[event.pubkey])
           .map((event) => (
