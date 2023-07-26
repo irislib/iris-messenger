@@ -100,7 +100,7 @@ export default class Account extends Component {
             <Copy className="btn btn-neutral btn-sm" copyStr={myPub} text="Copy hex" />
           </div>
           <h3>{t('private_key')}</h3>
-          <p>
+          <div className="flex gap-2 my-2">
             {myPrivHex ? (
               <>
                 <Copy className="btn btn-neutral btn-sm" copyStr={myPriv32} text="Copy nsec" />
@@ -109,7 +109,7 @@ export default class Account extends Component {
             ) : (
               <p>{t('private_key_not_present_good')}</p>
             )}
-          </p>
+          </div>
           {myPrivHex ? <p>{t('private_key_warning')}</p> : ''}
 
           {Helpers.isStandalone() ? (
