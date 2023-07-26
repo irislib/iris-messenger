@@ -1,4 +1,4 @@
-import { useEffect,  useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ReactionButtons } from './TrustButtons';
 
 import graphNetwork from '../GraphNetwork';
@@ -29,7 +29,7 @@ const TrustProfileButtons = ({ props }: any) => {
   const wot = useVerticeMonitor(ID(hexPub)) as any;
 
   useEffect(() => {
-    if(!wot) return;
+    if (!wot) return;
 
     const score = graphNetwork.g.vertices[wot?.id]?.score as TrustScore;
     if (!score) return;
@@ -94,34 +94,38 @@ const TrustProfileButtons = ({ props }: any) => {
 
   return (
     <>
-          <a
-            className={`msg-btn trust-btn ${state.trusted ? 'trusted' : ''}`}
-            onClick={(e) => trustBtnClicked(e)}
-            title={state.trusted ? 'Trusted' : 'Trust'}
-          >
-            {state.trusted ? (
-              <CheckCorrect size={24} fill="green" stroke="currentColor" />
-            ) : (
-              <CheckCorrect size={24} fill="none" stroke="currentColor" />
-            )}
-          </a>
-          {/* <ReactionCount active={state.trusted} onClick={(e) => toggleTrusts(e)}>
+      <div className="flex-1">
+        <a
+          className={`msg-btn trust-btn ${state.trusted ? 'trusted' : ''}`}
+          onClick={(e) => trustBtnClicked(e)}
+          title={state.trusted ? 'Trusted' : 'Trust'}
+        >
+          {state.trusted ? (
+            <CheckCorrect size={24} fill="green" stroke="currentColor" />
+          ) : (
+            <CheckCorrect size={24} fill="none" stroke="currentColor" />
+          )}
+        </a>
+      </div>
+      <div className="flex-1">
+        {/* <ReactionCount active={state.trusted} onClick={(e) => toggleTrusts(e)}>
             {state.renderTrustScore || ''}
             {state.processing && state.trusted ? <span id="loading"></span> : null}
           </ReactionCount> */}
 
-          <a
-            className={`msg-btn trust-btn ${state.distrusted ? 'distrusted' : ''}`}
-            onClick={(e) => distrustBtnClicked(e)}
-            title={state.distrusted ? 'Distrusted' : 'Distrust'}
-          >
-            {state.distrusted ? (
-              <FlagMarkSolid size={24} fill="red" stroke="currentColor" />
-            ) : (
-              <FlagMarkSolid size={24} fill="none" stroke="currentColor" />
-            )}
-          </a>
-          {/* <ReactionCount active={state.distrusted} onClick={(e) => toggleDistrusts(e)}>
+        <a
+          className={`msg-btn trust-btn ${state.distrusted ? 'distrusted' : ''}`}
+          onClick={(e) => distrustBtnClicked(e)}
+          title={state.distrusted ? 'Distrusted' : 'Distrust'}
+        >
+          {state.distrusted ? (
+            <FlagMarkSolid size={24} fill="red" stroke="currentColor" />
+          ) : (
+            <FlagMarkSolid size={24} fill="none" stroke="currentColor" />
+          )}
+        </a>
+      </div>
+      {/* <ReactionCount active={state.distrusted} onClick={(e) => toggleDistrusts(e)}>
             {state.renderDistrustScore || ''}
             {state.processing && state.distrusted ? <span id="loading"></span> : null}
           </ReactionCount> */}
