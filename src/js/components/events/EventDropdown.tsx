@@ -104,7 +104,7 @@ const EventDropdown = (props: EventDropdownProps) => {
 
   return (
     <div>
-      <Dropdown>
+      <Dropdown small>
         <Copy className="btn btn-sm" key={`${id!}copy_link`} text={t('copy_link')} copyStr={url} />
         <Copy
           className="btn btn-sm"

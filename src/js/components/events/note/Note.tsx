@@ -43,7 +43,7 @@ const Note = ({
   }
 
   const className = useMemo(() => {
-    const classNames = ['msg'];
+    const classNames = [] as string[];
 
     if (standalone) {
       classNames.push('standalone');

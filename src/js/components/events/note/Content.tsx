@@ -13,7 +13,6 @@ import Reactions from '../buttons/ReactionButtons';
 
 import Author from './Author';
 import Helmet from './Helmet';
-import ReplyingToUsers from './ReplyingToUsers';
 
 let loadReactions = true;
 let showLikes = true;
@@ -99,10 +98,10 @@ const Content = ({ standalone, isQuote, fullWidth, isQuoting, asInlineQuote, eve
         standalone={standalone}
         event={event}
         isQuote={isQuote}
+        isQuoting={isQuoting}
         fullWidth={fullWidth}
         setTranslatedText={setTranslatedText}
       />
-      <ReplyingToUsers event={event} isQuoting={isQuoting} />
       <Show when={standalone}>
         <Helmet name={name} text={text} attachments={attachments} />
       </Show>
@@ -110,7 +109,7 @@ const Content = ({ standalone, isQuote, fullWidth, isQuoting, asInlineQuote, eve
         <Torrent torrentId={meta.torrentId} autopause={!standalone} />
       </Show>
       <Show when={text?.length > 0}>
-        <div className={`preformatted-wrap py-2 ${emojiOnly && 'text-2xl'}`}>
+        <div className={`preformatted-wrap pb-1 ${emojiOnly && 'text-2xl'}`}>
           {text}
           <Show when={translatedText}>
             <p>
