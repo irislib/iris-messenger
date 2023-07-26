@@ -84,7 +84,7 @@ class Profile extends View {
       path === href ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-neutral';
 
     return (
-      <div className="flex mx-2 md:mx-0 gap-2 mb-4 overflow-x-scroll">
+      <div className="flex mx-4 gap-2 mb-4 overflow-x-scroll">
         <Link className={linkClass('/' + currentProfileUrl)} href={'/' + currentProfileUrl}>
           {t('posts')}
           <Show when={this.state.noPosts}>{' (0)'}</Show>
@@ -151,7 +151,7 @@ class Profile extends View {
       <>
         <Show when={banner}>
           <div
-            className="mb-2 h-48 bg-cover bg-center"
+            className="mb-4 h-48 bg-cover bg-center"
             style={{ backgroundImage: `url(${banner})` }}
           ></div>
         </Show>

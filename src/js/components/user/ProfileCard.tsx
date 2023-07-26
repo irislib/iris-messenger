@@ -23,6 +23,7 @@ import ProfilePicture from './ProfilePicture';
 const ProfileCard = (props: { hexPub: string; npub: string }) => {
   const { hexPub, npub } = props;
   const [profile, setProfile] = useState<any>({});
+  const [lightning, setLightning] = useState<string>('');
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [nostrAddress, setNostrAddress] = useState<string>('');
   const [rawDataJson, setRawDataJson] = useState<string>('');
@@ -31,6 +32,8 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
   const [blocked, setBlocked] = useState<boolean>(false);
   const [followedUserCount, setFollowedUserCount] = useState<number>(0);
   const [followerCount, setFollowerCount] = useState<number>(0);
+  const [followerCountFromApi, setFollowerCountFromApi] = useState<number>(0);
+  const [followedUserCountFromApi, setFollowedUserCountFromApi] = useState<number>(0);
 
   async function viewAs(event) {
     event.preventDefault();
@@ -57,24 +60,19 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
       }
       res.json().then((json) => {
         if (json) {
-          setFollowedUserCount(json.following?.length || followedUserCount);
-          setFollowerCount(json.followerCount || followerCount);
+          setFollowedUserCountFromApi(json.following?.length);
+          setFollowerCountFromApi(json.followerCount);
         }
       });
     });
-    const setFollowCounts = () => {
-      if (address) {
-        setFollowedUserCount(
-          Math.max(SocialNetwork.followedByUser.get(address)?.size ?? 0, followedUserCount),
-        );
-        setFollowerCount(
-          Math.max(SocialNetwork.followersByUser.get(address)?.size ?? 0, followerCount),
-        );
-      }
-    };
+
     setTimeout(() => {
-      subscriptions.push(SocialNetwork.getFollowersByUser(address, setFollowCounts));
-      subscriptions.push(SocialNetwork.getFollowedByUser(address, setFollowCounts));
+      subscriptions.push(
+        SocialNetwork.getFollowersByUser(address, (followers) => setFollowerCount(followers.size)),
+      );
+      subscriptions.push(
+        SocialNetwork.getFollowedByUser(address, (followed) => setFollowedUserCount(followed.size)),
+      );
     }, 1000); // this causes social graph recursive loading, so let some other stuff like feed load first
     subscriptions.push(
       SocialNetwork.getProfile(
@@ -116,6 +114,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
           if (lightning && !lightning.startsWith('lightning:')) {
             lightning = 'lightning:' + lightning;
           }
+          setLightning(lightning);
 
           let website =
             profile.website &&
@@ -179,9 +178,9 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
 
   return (
     <div key={`${hexPub}details`}>
-      <div className="mb-2 mx-2 md:px-2 md:mx-0 flex flex-col gap-2">
+      <div className="mb-2 mx-4 md:px-4 md:mx-0 flex flex-col gap-2">
         <div className="flex flex-row">
-          <div className={profile.banner ? '-mt-20' : ''}>{profilePicture}</div>
+          <div className={profile.banner ? '-mt-24' : ''}>{profilePicture}</div>
           <div className="flex-1 justify-end flex">
             <div onClick={onClickHandler}>
               <Show when={isMyProfile}>
@@ -251,10 +250,10 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
           <div>
             <div className="text-sm flex gap-4">
               <a href={`/follows/${npub}`}>
-                <b>{followedUserCount}</b> {t('following')}
+                <b>{Math.max(followedUserCount, followedUserCountFromApi)}</b> {t('following')}
               </a>
               <a href={`/followers/${npub}`}>
-                <b>{followerCount}</b> {t('followers')}
+                <b>{Math.max(followerCount, followerCountFromApi)}</b> {t('followers')}
               </a>
             </div>
             <Show when={SocialNetwork.isFollowing(hexPub, Key.getPubKey())}>
@@ -265,12 +264,12 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
           </div>
           <div className="py-2">
             <p className="text-sm">{profile.about}</p>
-            <div className="flex flex-1 flex-row align-center justify-center mt-2">
-              <Show when={profile.lightning}>
+            <div className="flex flex-1 flex-row align-center justify-center mt-4">
+              <Show when={lightning}>
                 <div className="flex-1">
                   <a
                     className="btn btn-sm btn-neutral"
-                    href={profile.lightning}
+                    href={lightning}
                     onClick={(e) => Helpers.handleLightningLinkClick(e)}
                   >
                     ⚡ {t('tip_lightning')}

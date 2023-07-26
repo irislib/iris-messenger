@@ -46,14 +46,18 @@ const Note = ({
     const classNames = [] as string[];
 
     if (standalone) {
-      classNames.push('standalone');
+      classNames.push('');
     } else {
       classNames.push(
         'cursor-pointer transition-all ease-in-out duration-200 hover:bg-neutral-999',
       );
     }
     if (isQuote) classNames.push('quote pb-2');
-    if (isQuoting) classNames.push('quoting pt-0');
+    if (isQuoting) {
+      classNames.push('quoting pt-0');
+    } else {
+      classNames.push('pt-4');
+    }
     if (asInlineQuote) classNames.push('inline-quote border-2 border-neutral-900 rounded-lg my-2');
     if (fullWidth) classNames.push('full-width');
 
@@ -131,7 +135,7 @@ const Note = ({
       {repliedMsg}
       <div
         key={event.id + 'note'}
-        className={`p-2 ${className}`}
+        className={`px-4 pb-2 ${className}`}
         onClick={(e) => messageClicked(e)}
       >
         {showThreadBtn}
@@ -150,7 +154,7 @@ const Note = ({
         </div>
       </div>
       <Show when={!(isQuote || asInlineQuote)}>
-        <hr className="opacity-10 mb-2" />
+        <hr className="opacity-10" />
       </Show>
       <For each={replies}>
         {(r) => (
