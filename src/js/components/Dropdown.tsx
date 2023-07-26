@@ -5,6 +5,7 @@ import Show from './helpers/Show';
 
 type Props = {
   children: JSX.Element | JSX.Element[];
+  small?: boolean;
 };
 
 const Dropdown = ({ children, small }: Props) => {

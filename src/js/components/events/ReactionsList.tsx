@@ -85,7 +85,7 @@ const ReactionsList = ({ event }) => {
 
   return (
     <>
-      <hr className="-mx-2 opacity-10 mt-4" />
+      <hr className="-mx-2 opacity-10 mt-2" />
       {modalReactions.length > 0 && (
         <Modal showContainer={true} onClose={() => setModalReactions([])}>
           <div className="flex items-center justify-between mb-4">
