@@ -208,7 +208,7 @@ export default function Menu() {
   // };
 
   return (
-    <div className="sticky top-0 z-20 h-screen max-h-screen hidden md:w-16 xl:w-56 flex-col px-2 py-4 md:flex flex-shrink-0">
+    <div className="sticky top-0 z-20 h-screen max-h-screen hidden md:flex xl:w-56 flex-col px-2 py-4 flex-shrink-0">
       <a
         className="flex items-center gap-3 px-2 mb-4"
         tabIndex={3}
@@ -219,7 +219,7 @@ export default function Menu() {
         <h1 className="hidden xl:flex text-3xl">Dpeep</h1>
       </a>
       <a href="https://github.com/DigitalTrustProtocol/DWoTR-Documentation/blob/main/Trust.md" target="_blank"><small className="pl-3">Iris clone with DWoTR</small></a>
-      {MENU_ITEMS.map((a: any) => renderMenuItem(a))}
+      <div className="flex flex-col gap-2">{MENU_ITEMS.map((a: any) => renderMenuItem(a))}</div>
       <div class="py-2 flex-1">
         <button
           className="btn btn-primary md:max-xl:btn-circle"

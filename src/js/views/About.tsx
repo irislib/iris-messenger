@@ -37,7 +37,7 @@ class About extends Component {
                 <p>
                   <ul>
                     <li>
-                      <a className="link" target="_blank" href="https://iris.to">
+                      <a target="_blank" href="https://iris.to">
                         iris.to
                       </a>{' '}
                       (web)
