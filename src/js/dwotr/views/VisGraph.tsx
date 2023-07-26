@@ -2,7 +2,7 @@ import { Network } from 'vis-network';
 import { DataSet } from 'vis-data';
 import { useEffect, useState, useRef } from 'preact/hooks';
 import Header from '../../components/Header';
-import Name from '../../components/Name';
+import Name from '../../components/user/Name';
 import Key from '../../nostr/Key';
 import graphNetwork from '../GraphNetwork';
 import { Edge, EntityType, Vertice } from '../model/Graph';

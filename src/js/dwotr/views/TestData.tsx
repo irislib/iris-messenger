@@ -2,13 +2,13 @@ import { JSX } from 'react';
 import { useEffect, useState } from 'preact/hooks';
 import Key from '../../nostr/Key';
 import graphNetwork from '../GraphNetwork';
-import Name from '../../components/Name';
 import Header from '../../components/Header';
 import { Button } from '../../components/buttons/Button';
 import profileManager from '../ProfileManager';
 import { Unsubscribe } from '../../nostr/PubSub';
 import { ID } from '../../nostr/UserIds';
 import { toTimestamp } from '../Utils';
+import Name from '../../components/user/Name';
 
 type TestDataProps = {
   id?: string;
@@ -55,7 +55,7 @@ const TestData = (props: TestDataProps) => {
             profileIndex[ID(p.key)] = p;
           });
 
-          
+
 
           setState((prevState) => ({
             ...prevState,

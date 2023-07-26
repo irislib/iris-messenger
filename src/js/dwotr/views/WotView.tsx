@@ -10,9 +10,9 @@ import { Link } from 'preact-router';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import TrustScore from '../model/TrustScore';
 import { RenderScoreDistrustLink, RenderScoreTrustLink, RenderTrust1Value, renderEntityKeyName } from '../components/RenderGraph';
-import MyAvatar from '../../components/Avatar';
+import MyAvatar from '../../components/user/Avatar';
 import { PUB } from '../../nostr/UserIds';
-import Name from '../../components/Name';
+import Name from '../../components/user/Name';
 
 
 type TrustListViewProps = {

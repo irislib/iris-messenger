@@ -11,7 +11,7 @@ import profileManager from '../ProfileManager';
 import { ID, PUB } from '../../nostr/UserIds';
 import Identicon from 'identicon.js';
 import { renderScoreLine } from './WotView';
-import Name from '../../components/Name';
+import Name from '../../components/user/Name';
 import Header from '../../components/Header';
 import { Unsubscribe } from '../../nostr/PubSub';
 
