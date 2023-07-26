@@ -9,6 +9,7 @@ class Chat extends View {
   constructor() {
     super();
     this.id = 'chat-view';
+    this.hideSideBar = true;
   }
 
   renderView() {

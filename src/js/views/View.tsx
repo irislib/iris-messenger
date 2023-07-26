@@ -4,6 +4,7 @@ import { JSX } from 'preact';
 import Component from '../BaseComponent';
 import ErrorBoundary from '../components/ErrorBoundary';
 import Header from '../components/Header';
+import Show from '../components/helpers/Show';
 
 import Search from './Search';
 
@@ -19,21 +20,24 @@ abstract class View extends Component {
   id = '';
   observer: ResizeObserver | null = null;
   scrollPosition = 0;
+  hideSideBar = false;
 
   abstract renderView(): JSX.Element;
 
   render() {
     return (
       <div className="flex flex-row w-full">
-        <div className="flex flex-col w-full lg:w-2/3">
+        <div className={`flex flex-col w-full ${this.hideSideBar ? '' : 'lg:w-2/3'}`}>
           <Header />
           <div class={this.class} id={this.id}>
             <ErrorBoundary>{this.renderView()}</ErrorBoundary>
           </div>
         </div>
-        <div className="flex-col hidden lg:flex lg:w-1/3">
-          <Search focus={false} />
-        </div>
+        <Show when={!this.hideSideBar}>
+          <div className="flex-col hidden lg:flex lg:w-1/3">
+            <Search focus={false} />
+          </div>
+        </Show>
       </div>
     );
   }
