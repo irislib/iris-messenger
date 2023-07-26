@@ -10,8 +10,8 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Relays from '../../nostr/Relays';
 import CopyButton from '../buttons/Copy';
-import Name from '../Name';
 import QrCode from '../QrCode';
+import Name from '../user/Name';
 
 import Modal from './Modal';
 

@@ -1,7 +1,7 @@
 import { ChangeEvent } from 'react';
 
 import Component from '../../BaseComponent';
-import Name from '../../components/Name';
+import Name from '../../components/user/Name';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';

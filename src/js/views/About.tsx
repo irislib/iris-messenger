@@ -1,8 +1,8 @@
 import Component from '../BaseComponent';
-import Avatar from '../components/Avatar';
 import Follow from '../components/buttons/Follow';
 import Header from '../components/Header';
-import Name from '../components/Name';
+import Avatar from '../components/user/Avatar';
+import Name from '../components/user/Name';
 import Helpers from '../Helpers';
 import { translate as t } from '../translations/Translation.mjs';
 

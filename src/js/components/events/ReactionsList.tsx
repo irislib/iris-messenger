@@ -4,9 +4,9 @@ import { Link } from 'preact-router';
 
 import { decodeInvoice, formatAmount } from '../../Lightning';
 import Events from '../../nostr/Events'; // Import Events module
-import Avatar from '../Avatar';
 import Modal from '../modal/Modal';
-import Name from '../Name';
+import Avatar from '../user/Avatar';
+import Name from '../user/Name';
 
 type ReactionData = {
   pubkey: string;
@@ -85,7 +85,7 @@ const ReactionsList = ({ event }) => {
 
   return (
     <>
-      <hr className="-mx-2 opacity-10" />
+      <hr className="-mx-2 opacity-10 mt-2" />
       {modalReactions.length > 0 && (
         <Modal showContainer={true} onClose={() => setModalReactions([])}>
           <div className="flex items-center justify-between mb-4">

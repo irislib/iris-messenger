@@ -1,8 +1,8 @@
 import { route } from 'preact-router';
 
 import BaseComponent from '../../BaseComponent';
-import Avatar from '../../components/Avatar';
-import Name from '../../components/Name';
+import Avatar from '../../components/user/Avatar';
+import Name from '../../components/user/Name';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';

@@ -5,7 +5,7 @@ import { route } from 'preact-router';
 
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import Name from '../Name';
+import Name from '../user/Name';
 
 import EventComponent from './EventComponent';
 

@@ -43,7 +43,7 @@ const Note = ({
   }
 
   const className = useMemo(() => {
-    const classNames = ['msg'];
+    const classNames = [] as string[];
 
     if (standalone) {
       classNames.push('standalone');
@@ -144,7 +144,6 @@ const Note = ({
             meta={meta}
             standalone={standalone}
             isQuote={isQuote}
-            isQuoting={isQuoting}
             asInlineQuote={asInlineQuote}
             fullWidth={fullWidth}
           />

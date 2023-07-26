@@ -13,7 +13,6 @@ import Reactions from '../buttons/ReactionButtons';
 
 import Author from './Author';
 import Helmet from './Helmet';
-import ReplyingToUsers from './ReplyingToUsers';
 
 let loadReactions = true;
 let showLikes = true;
@@ -29,7 +28,7 @@ localState.get('settings').on((s) => {
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
 
-const Content = ({ standalone, isQuote, fullWidth, isQuoting, asInlineQuote, event, meta }) => {
+const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta }) => {
   const [translatedText, setTranslatedText] = useState('');
   const [showMore, setShowMore] = useState(false);
   const [name, setName] = useState('');
@@ -102,7 +101,6 @@ const Content = ({ standalone, isQuote, fullWidth, isQuoting, asInlineQuote, eve
         fullWidth={fullWidth}
         setTranslatedText={setTranslatedText}
       />
-      <ReplyingToUsers event={event} isQuoting={isQuoting} />
       <Show when={standalone}>
         <Helmet name={name} text={text} attachments={attachments} />
       </Show>
@@ -110,7 +108,7 @@ const Content = ({ standalone, isQuote, fullWidth, isQuoting, asInlineQuote, eve
         <Torrent torrentId={meta.torrentId} autopause={!standalone} />
       </Show>
       <Show when={text?.length > 0}>
-        <div className={`preformatted-wrap py-2 ${emojiOnly && 'text-2xl'}`}>
+        <div className={`preformatted-wrap pb-1 ${emojiOnly && 'text-2xl'}`}>
           {text}
           <Show when={translatedText}>
             <p>
