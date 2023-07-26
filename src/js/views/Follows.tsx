@@ -1,8 +1,8 @@
 import throttle from 'lodash/throttle';
 
-import Avatar from '../components/Avatar';
 import Follow from '../components/buttons/Follow';
-import Name from '../components/Name';
+import Avatar from '../components/user/Avatar';
+import Name from '../components/user/Name';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';

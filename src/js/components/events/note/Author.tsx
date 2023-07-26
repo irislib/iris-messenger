@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import Helpers from '../../../Helpers';
 import Key from '../../../nostr/Key';
 import Show from '../../helpers/Show';
-import Name from '../../Name';
+import Name from '../../user/Name';
 import EventDropdown from '../EventDropdown';
 
 import Avatar from './Avatar';
@@ -29,19 +29,23 @@ const Author = ({ event, fullWidth, isQuote, standalone, setTranslatedText }) =>
       <Show when={fullWidth}>
         <Avatar event={event} isQuote={isQuote} standalone={standalone} />
       </Show>
-      <a href={`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`} className="font-bold">
-        <Name pub={event.pubkey} />
-      </a>
-      <small>
-        {'· '}
-        <a
-          href={`/${Key.toNostrBech32Address(event.id, 'note')}`}
-          className="tooltip text-neutral-500"
-          data-tip={`${dateStr} ${timeStr}`}
-        >
-          {time && Helpers.getRelativeTimeText(time)}
-        </a>
-      </small>
+      <div className="flex flex-col">
+        <div>
+          <a href={`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`} className="font-bold">
+            <Name pub={event.pubkey} />
+          </a>
+          <small>
+            {'· '}
+            <a
+              href={`/${Key.toNostrBech32Address(event.id, 'note')}`}
+              className="tooltip text-neutral-500"
+              data-tip={`${dateStr} ${timeStr}`}
+            >
+              {time && Helpers.getRelativeTimeText(time)}
+            </a>
+          </small>
+        </div>
+      </div>
       <Show when={!isQuote}>
         <div className="flex-1 flex items-center justify-end">
           <EventDropdown id={event.id} event={event} onTranslate={setTranslatedText} />

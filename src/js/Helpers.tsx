@@ -8,9 +8,9 @@ import { ComponentChild } from 'preact';
 import { route } from 'preact-router';
 
 import EventComponent from './components/events/EventComponent';
-import Name from './components/Name';
 import SafeImg from './components/SafeImg';
 import Torrent from './components/Torrent';
+import Name from './components/user/Name';
 import Key from './nostr/Key';
 import { language, translate as t } from './translations/Translation.mjs';
 import localState from './LocalState';
@@ -171,7 +171,7 @@ export default {
       replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
         return (
           <video
-            className="my-2 rounded max-h-[70vh] md:max-h-96 max-w-full"
+            className="py-2 rounded max-h-[70vh] md:max-h-96 max-w-full"
             key={match + i}
             src={match}
             poster={`https://imgproxy.iris.to/thumbnail/428/${match}`}
@@ -509,7 +509,7 @@ export default {
       replacedText = reactStringReplace(replacedText, imgRegex, (match, i) => {
         return (
           <SafeImg
-            className="my-2 md:rounded max-h-[70vh] md:max-h-96 max-w-full cursor-pointer"
+            className="py-2 md:rounded max-h-[70vh] md:max-h-96 max-w-full cursor-pointer"
             onClick={opts.onImageClick}
             src={match}
             key={match + i}
@@ -664,6 +664,8 @@ export default {
         </a>
       );
     });
+
+    s = s.map((x) => (typeof x === 'string' ? x.trim() : x));
 
     return s;
   },

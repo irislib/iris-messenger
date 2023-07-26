@@ -1,6 +1,6 @@
 import Key from '../../nostr/Key';
-import Name from '../Name';
 import QrCode from '../QrCode';
+import Name from '../user/Name';
 
 import Modal from './Modal';
 

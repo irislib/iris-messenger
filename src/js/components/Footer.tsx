@@ -13,7 +13,7 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 
 import Show from './helpers/Show';
-import Avatar from './Avatar';
+import Avatar from './user/Avatar';
 
 const MENU_ITEMS = [
   { url: '/', icon: HomeIcon, activeIcon: HomeIconFull },

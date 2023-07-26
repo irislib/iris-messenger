@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks';
 
-import Modal from './modal/Modal';
-import SafeImg from './SafeImg';
+import Modal from '../modal/Modal';
+import SafeImg from '../SafeImg';
 
 type Props = { picture?: string; onError?: () => void };
 

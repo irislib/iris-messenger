@@ -22,8 +22,8 @@ import { translate as t } from '../translations/Translation.mjs';
 
 import Show from './helpers/Show';
 import Modal from './modal/Modal';
-import Avatar from './Avatar';
-import Name from './Name';
+import Avatar from './user/Avatar';
+import Name from './user/Name';
 import PublicMessageForm from './PublicMessageForm';
 
 const MENU_ITEMS = [

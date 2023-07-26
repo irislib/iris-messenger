@@ -2,11 +2,11 @@ import { memo } from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link, route } from 'preact-router';
 
-import Avatar from '../components/Avatar';
 import FollowButton from '../components/buttons/Follow';
 import SmallFeed from '../components/feed/SmallFeed';
-import Name from '../components/Name';
 import SearchBox from '../components/SearchBox';
+import Avatar from '../components/user/Avatar';
+import Name from '../components/user/Name';
 import useCachedFetch from '../hooks/useCachedFetch';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';

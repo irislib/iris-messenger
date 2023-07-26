@@ -11,8 +11,8 @@ import { translate as t } from '../translations/Translation.mjs';
 import Copy from './buttons/Copy';
 import Follow from './buttons/Follow';
 import QRModal from './modal/QRModal';
-import Avatar from './Avatar';
-import Name from './Name';
+import Avatar from './user/Avatar';
+import Name from './user/Name';
 
 const SUGGESTED_FOLLOWS = [
   [

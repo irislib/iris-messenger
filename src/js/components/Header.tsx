@@ -9,7 +9,8 @@ import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
 import { translate as t } from '../translations/Translation.mjs';
 
-import Name from './Name';
+import Show from './helpers/Show';
+import Name from './user/Name';
 import SearchBox from './SearchBox';
 
 export default class Header extends Component {
@@ -135,11 +136,11 @@ export default class Header extends Component {
   renderNotifications() {
     return (
       <>
-        {this.state.isMyProfile ? (
+        <Show when={this.state.isMyProfile}>
           <a href="/settings" className="md:hidden">
             <Cog8ToothIcon width={28} />
           </a>
-        ) : null}
+        </Show>
         <a
           href="/notifications"
           className={`relative inline-block ${this.state.isMyProfile ? 'hidden md:flex' : ''}`}
@@ -149,13 +150,11 @@ export default class Header extends Component {
           ) : (
             <HeartIcon width={28} />
           )}
-          {this.state.unseenNotificationCount ? (
+          <Show when={this.state.unseenNotificationCount}>
             <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-iris-purple text-white text-sm rounded-full h-5 w-5 flex items-center justify-center">
               {this.state.unseenNotificationCount > 99 ? '' : this.state.unseenNotificationCount}
             </span>
-          ) : (
-            ''
-          )}
+          </Show>
         </a>
       </>
     );
@@ -200,13 +199,15 @@ export default class Header extends Component {
     const loggedIn = !!pub;
     return (
       <div className="sticky top-0 z-10 cursor-pointer">
-        <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2">
+        <div className="w-full overflow-x-hidden bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2">
           <div className="flex items-center justify-between h-12">
             {this.renderBackBtnOrLogo()}
-            {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
+            <Show when={loggedIn && this.state.showConnectedRelays}>
+              {this.renderConnectedRelays()}
+            </Show>
             {this.renderTitle()}
-            {loggedIn && this.renderNotifications()}
-            {!loggedIn && this.renderLoginBtns()}
+            <Show when={loggedIn}>{this.renderNotifications()}</Show>
+            <Show when={!loggedIn}>{this.renderLoginBtns()}</Show>
           </div>
         </div>
       </div>
