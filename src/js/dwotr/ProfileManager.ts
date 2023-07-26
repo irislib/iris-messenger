@@ -108,6 +108,7 @@ class ProfileManager {
 
     // First load from memory
     for (const address of addresses) {
+      if(!address) continue; 
       const pub = Key.toNostrHexAddress(address) as string;
       const id = ID(pub);
       const item = SocialNetwork.profiles.get(id);
@@ -129,7 +130,7 @@ class ProfileManager {
     // Then load from API
     if (lookupSet.size > 0 && lookupSet.size <= 100) {
       const apiProfiles = await Promise.all(
-        Array.from(lookupSet).map((address) => this.fetchProfile(address)),
+        Array.from(lookupSet).map((address) =>this.fetchProfile(Key.toNostrBech32Address(address, 'npub') as string)),
       );
       if (apiProfiles && apiProfiles.length > 0) {
         for (const profile of apiProfiles) {

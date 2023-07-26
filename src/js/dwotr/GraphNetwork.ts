@@ -69,6 +69,7 @@ class GraphNetwork {
     this.sourceId = ID(this.sourceKey);
     this.g.addVertice(this.sourceId); // Add the source vertice to the graph
 
+    //let list = await this.db.edges.toArray();
     // Load edges from DB
     await this.db.edges.each((record) => { // Load one record at a time, to avoid memory issues (check that this is indeed the case with each())
       this.g.addEdge(record, false); // Load all edges from the DB into the graph with partial data
@@ -79,7 +80,8 @@ class GraphNetwork {
         Object.entries(this.g.vertices).length +
         ' vertices and ' +
         Object.entries(this.g.edges).length +
-        ' edges',
+        ' edges', 
+      //'List: ' + list.length + ' edges'
     );
 
     this.processGraph = true; // Process the whole graph
