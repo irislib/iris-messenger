@@ -10,15 +10,12 @@ import ProfileCard from '../components/user/ProfileCard';
 import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
-import PubSub from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation.mjs';
 
 import View from './View';
 
 class Profile extends View {
-  followedUsers: Set<string>;
-  followers: Set<string>;
   subscriptions: any[];
   unsub: any;
 
@@ -28,14 +25,12 @@ class Profile extends View {
       followedUserCount: 0,
       followerCount: 0,
     };
-    this.followedUsers = new Set();
-    this.followers = new Set();
     this.id = 'profile';
     this.subscriptions = [];
   }
 
   getNotification() {
-    if (this.state.noFollowers && this.followers.has(Key.getPubKey())) {
+    if (this.state.noFollowers /* && this.followers.has(Key.getPubKey()) */) {
       return (
         <div className="msg">
           <div className="msg-content">
@@ -172,145 +167,13 @@ class Profile extends View {
             <meta property="og:title" content={ogTitle} />
             <meta property="og:description" content={description} />
           </Helmet>
-          <ProfileCard />
+          <ProfileCard npub={this.state.npub} hexPub={this.state.hexPub} />
           <Show when={!blocked}>
             {this.renderTabs()}
             {this.renderTab()}
           </Show>
         </div>
       </>
-    );
-  }
-
-  getNostrProfile(address, nostrAddress) {
-    this.unsub = PubSub.subscribe(
-      {
-        authors: [address],
-        kinds: [0, 3],
-      },
-      undefined,
-      false,
-      false,
-    );
-    fetch(`https://eu.rbr.bio/${address}/info.json`).then((res) => {
-      if (!res.ok) {
-        return;
-      }
-      res.json().then((json) => {
-        if (json) {
-          this.setState({
-            followerCount: json.followerCount || this.state.followerCount,
-            followedUserCount: json.following?.length || this.state.followedUserCount,
-          });
-        }
-      });
-    });
-    const setFollowCounts = () => {
-      address &&
-        this.setState({
-          followedUserCount: Math.max(
-            SocialNetwork.followedByUser.get(address)?.size ?? 0,
-            this.state.followedUserCount,
-          ),
-          followerCount: Math.max(
-            SocialNetwork.followersByUser.get(address)?.size ?? 0,
-            this.state.followerCount,
-          ),
-        });
-    };
-    setTimeout(() => {
-      this.subscriptions.push(SocialNetwork.getFollowersByUser(address, setFollowCounts));
-      this.subscriptions.push(SocialNetwork.getFollowedByUser(address, setFollowCounts));
-    }, 1000); // this causes social graph recursive loading, so let some other stuff like feed load first
-    const unsub = SocialNetwork.getProfile(
-      address,
-      (profile) => {
-        if (!profile) {
-          return;
-        }
-        const isIrisAddress = nostrAddress && nostrAddress.endsWith('@iris.to');
-        if (!isIrisAddress && profile.nip05 && profile.nip05valid) {
-          // replace url and history entry with iris.to/${profile.nip05} or if nip is user@iris.to, just iris.to/${user}
-          // TODO don't replace if at /likes or /replies
-          const nip05 = profile.nip05;
-          const nip05Parts = nip05.split('@');
-          const nip05User = nip05Parts[0];
-          const nip05Domain = nip05Parts[1];
-          let newUrl;
-          if (nip05Domain === 'iris.to') {
-            if (nip05User === '_') {
-              newUrl = 'iris';
-            } else {
-              newUrl = nip05User;
-            }
-          } else {
-            if (nip05User === '_') {
-              newUrl = nip05Domain;
-            } else {
-              newUrl = nip05;
-            }
-          }
-          this.setState({ nostrAddress: newUrl });
-          // replace part before first slash with new url
-          newUrl = window.location.pathname.replace(/[^/]+/, newUrl);
-          const previousState = window.history.state;
-          window.history.replaceState(previousState, '', newUrl);
-        }
-
-        let lightning = profile.lud16 || profile.lud06;
-        if (lightning && !lightning.startsWith('lightning:')) {
-          lightning = 'lightning:' + lightning;
-        }
-
-        let website =
-          profile.website &&
-          (profile.website.match(/^https?:\/\//) ? profile.website : 'http://' + profile.website);
-        // remove trailing slash
-        if (website && website.endsWith('/')) {
-          website = website.slice(0, -1);
-        }
-
-        let banner;
-
-        try {
-          banner = profile.banner && new URL(profile.banner).toString();
-          banner = isSafeOrigin(banner)
-            ? banner
-            : `https://imgproxy.iris.to/insecure/plain/${banner}`;
-        } catch (e) {
-          console.log('Invalid banner URL', profile.banner);
-        }
-
-        // profile may contain arbitrary fields, so be careful what you pass to setState
-        this.setState({
-          name: profile.name,
-          display_name: profile.display_name,
-          about: Helpers.highlightText(profile.about),
-          picture: profile.picture,
-          nip05: profile.nip05valid && profile.nip05,
-          lightning,
-          website: website,
-          banner,
-          profile,
-        });
-      },
-      true,
-    );
-    this.subscriptions.push(unsub);
-  }
-
-  loadProfile(hexPub: string, nostrAddress?: string) {
-    const isMyProfile = hexPub === Key.getPubKey();
-    localState.get('isMyProfile').put(isMyProfile);
-    this.setState({ isMyProfile });
-    this.followedUsers = new Set();
-    this.followers = new Set();
-    localState.get('noFollowers').on(this.inject());
-    this.getNostrProfile(hexPub, nostrAddress);
-    this.subscriptions.push(
-      SocialNetwork.getBlockedUsers((blockedUsers) => {
-        this.setState({ blocked: blockedUsers.has(hexPub) });
-      }),
     );
   }
 
@@ -328,6 +191,30 @@ class Profile extends View {
         window.prerenderReady = true;
       }, 1000); // give feed a sec to load
     }
+  }
+
+  loadProfile(hexPub: string) {
+    const isMyProfile = hexPub === Key.getPubKey();
+    localState.get('isMyProfile').put(isMyProfile);
+    localState.get('noFollowers').on(this.inject());
+    this.subscriptions.push(
+      SocialNetwork.getProfile(hexPub, (profile) => {
+        let banner;
+
+        try {
+          banner = profile.banner && new URL(profile.banner).toString();
+          if (!banner) {
+            return;
+          }
+          banner = isSafeOrigin(banner)
+            ? banner
+            : `https://imgproxy.iris.to/insecure/plain/${banner}`;
+          this.setState({ banner });
+        } catch (e) {
+          console.log('Invalid banner URL', profile.banner);
+        }
+      }),
+    );
   }
 
   componentDidMount() {
@@ -356,7 +243,7 @@ class Profile extends View {
           const npub = Key.toNostrBech32Address(pubKey, 'npub');
           if (npub && npub !== pubKey) {
             this.setState({ npub, hexPub: pubKey });
-            this.loadProfile(pubKey, nostrAddress);
+            this.loadProfile(pubKey);
           }
         } else {
           this.setState({ notFound: true });
