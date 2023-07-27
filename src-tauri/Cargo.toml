@@ -5,7 +5,7 @@ description = "Iris"
 authors = ["you"]
 license = ""
 repository = ""
-default-run = "app"
+default-run = "iris"
 edition = "2021"
 rust-version = "1.59"
 
