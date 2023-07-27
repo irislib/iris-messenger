@@ -1,6 +1,7 @@
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
 
 import Show from '../../components/helpers/Show';
+import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
 import View from '../View';
 
@@ -17,16 +18,14 @@ class Chat extends View {
   }
 
   renderView() {
+    const hexId = Key.toNostrHexAddress(this.props.id) || undefined;
     return (
       <div className="flex flex-row">
-        <ChatList
-          activeChat={this.props.id}
-          className={this.props.id ? 'hidden md:flex' : 'flex'}
-        />
-        <Show when={this.props.id}>
-          <PrivateChat id={this.props.id} key={this.props.id} />
+        <ChatList activeChat={hexId} className={hexId ? 'hidden md:flex' : 'flex'} />
+        <Show when={hexId}>
+          <PrivateChat id={hexId || ''} key={hexId} />
         </Show>
-        <Show when={!this.props.id}>
+        <Show when={!hexId}>
           <div className="hidden md:flex flex-col items-center justify-center flex-1">
             <div className="my-4">
               <PaperAirplaneIcon className="w-24 h-24 text-neutral-400" />

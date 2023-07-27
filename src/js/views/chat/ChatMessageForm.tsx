@@ -82,7 +82,7 @@ class ChatMessageForm extends BaseComponent<ChatMessageFormProps> {
     return (
       <form
         autocomplete="off"
-        class={`flex flex-row gap-2 p-2 message-form fixed bottom-0 w-96 max-w-screen bg-black ${
+        class={`flex flex-1 flex-row gap-2 p-2 message-form sticky w-full bottom-0 w-96 max-w-screen bg-black ${
           this.props.class || ''
         }`}
         onSubmit={(e: Event) => this.onSubmit(e)}

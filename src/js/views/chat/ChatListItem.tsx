@@ -75,7 +75,7 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
 
   render() {
     const chat = this.props.chat;
-    const active = this.props.active ? 'active-item' : '';
+    const active = this.props.active ? 'bg-neutral-800' : 'hover:bg-neutral-900';
     const hasUnseen = this.hasUnseen() ? 'has-unseen' : '';
     const unseenEl = this.hasUnseen() ? <span className="unseen"></span> : null;
     const time =
@@ -90,7 +90,7 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
         onKeyUp={(e: KeyboardEvent) => this.onKeyUp(e)}
         role="button"
         tabIndex={0}
-        className={`flex flex-row gap-4 ${hasUnseen} ${active}`}
+        className={`flex p-2 flex-row gap-4 ${hasUnseen} ${active}`}
         onClick={() => route(`/chat/${npub}`)}
       >
         <Avatar str={npub} width={49} />
@@ -98,7 +98,7 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
           <div className="flex flex-col">
             <span className="name">
               <Show when={this.props.chat === Key.getPubKey()}>
-                <span className="font-bold italic">{t('note_to_self')}</span>
+                <span className="font-bold italic">📝 {t('note_to_self')}</span>
               </Show>
               <Show when={this.props.chat !== Key.getPubKey()}>
                 <Name pub={this.props.chat} />

@@ -86,7 +86,7 @@ class ChatList extends BaseComponent<ChatListProps, ChatListState> {
             <a>{t('turn_on_desktop_notifications')}</a>
           </div>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-1 flex-col">
           {this.state.sortedChats.map((pubkey) => (
             <ChatListItem
               active={pubkey === activeChat}
