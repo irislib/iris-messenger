@@ -65,7 +65,7 @@ const Note = ({
   }, [standalone, isQuote, isQuoting, asInlineQuote, fullWidth]);
 
   useEffect(() => {
-    if (standalone) {
+    if (showReplies) {
       return Events.getReplies(
         event.id,
         debounce(
@@ -83,7 +83,7 @@ const Note = ({
         ),
       );
     }
-  }, [event.id, standalone, showReplies]);
+  }, [event.id, showReplies]);
 
   let rootMsg = Events.getEventRoot(event);
   if (!rootMsg) {
