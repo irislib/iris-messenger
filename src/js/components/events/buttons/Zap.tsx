@@ -67,7 +67,7 @@ const Zap = ({ event }) => {
           e.stopPropagation();
           setState((prevState) => ({ ...prevState, showZapModal: true }));
         }}
-        className={`btn-ghost btn-sm flex-1 hover:bg-transparent btn content-center gap-2 rounded-none
+        className={`btn-ghost btn-sm hover:bg-transparent btn content-center gap-2 rounded-none
           ${state.zapped ? 'text-iris-orange' : 'text-neutral-500 hover:text-iris-orange'}`}
       >
         <BoltIcon width={18} />
