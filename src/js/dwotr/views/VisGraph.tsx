@@ -6,13 +6,14 @@ import Name from '../../components/user/Name';
 import Key from '../../nostr/Key';
 import graphNetwork from '../GraphNetwork';
 import { Edge, EntityType, Vertice } from '../model/Graph';
-import { Link } from 'preact-router';
 import { RenderTrust1Color, renderEntityKeyName } from '../components/RenderGraph';
 import { renderScoreLine } from './WotView';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import profileManager from '../ProfileManager';
 import { PUB } from '../../nostr/UserIds';
-import Identicon from 'identicon.js';
+import { MAX_DEGREE } from '../model/TrustScore';
+import GraphViewSelect from '../components/GraphViewSelect';
+import { translate as t } from '../../translations/Translation.mjs';
 
 
 type VisGraphProps = {
@@ -39,11 +40,13 @@ const defaultOptions = {
       background: '#666666',
     },
     font: { color: '#eeeeee' },
+    shadow: true,
   },
   edges: {
     smooth: false,
     color: 'lightgray',
     width: 1,
+    shadow: true,
     arrows: {
       to: {
         enabled: true,
@@ -52,7 +55,6 @@ const defaultOptions = {
     },
   },
 };
-
 
 const VisGraph = (props: VisGraphProps) => {
   // Create a ref to provide DOM access
@@ -96,86 +98,81 @@ const VisGraph = (props: VisGraphProps) => {
       let v = graphNetwork.g.vertices[vId];
       let score = v?.score;
 
-      let unsub = profileManager.getProfile(hexKey, (profile) => {
+      //let unsub = profileManager.getProfile(hexKey, (profile) => {
 
-        if(nodes.get(vId as number)) return; // already added
+      //if(nodes.get(vId as number)) return; // already added
 
-        let image = getImage(profile);
-        nodes.add({ id: vId, label: profile.name, image, shape: 'circularImage' });
+      //let image = getImage(profile);
+      //nodes.add({ id: vId, label: profile.name, image, shape: 'circularImage' });
 
-        setState((prevState) => ({
-          ...prevState,
-          npub,
-          hexKey,
-          entitytype,
-          trust1,
-          dir,
-          view,
-          filter,
-          vId,
-          me,
-          v,
-          score,
-        }));
+      setState((prevState) => ({
+        ...prevState,
+        npub,
+        hexKey,
+        entitytype,
+        trust1,
+        dir,
+        view,
+        filter,
+        vId,
+        me,
+        v,
+        score,
+      }));
 
-        loadNode(vId as number);
-      });
-      unsubscribe.push(unsub);
-
+      loadNode(vId as number);
+      //});
+      //unsubscribe.push(unsub);
     });
     return () => {
       unsubscribe.forEach((u) => u?.());
-    } 
+    };
   }, [props.id]);
 
-  function getImage(profile: any) {
-    if (profile && profile.picture) return profile.picture;
-
-    const identicon = new Identicon(profile.key, {
-      width: 30,
-      format: `svg`,
-    });
-    return `data:image/svg+xml;base64,${identicon.toString()}`;
-    
-  }
-
-
   async function loadNode(vId: number) {
-    let v = graphNetwork.g.vertices[vId] as Vertice;
-    if (!v) return;
+    let sourceV = graphNetwork.g.vertices[vId] as Vertice;
+    if (!sourceV) return;
 
-    let list: Vertice[] = [];
+    let distinctV = {} as { [key: number]: Vertice };
+    distinctV[vId] = sourceV; // add the source vertice
 
-    list = graphNetwork.g.inOutTrustById(vId, EntityType.Key, undefined);
+    for (const id in sourceV.in) {
+      const edge = sourceV.in[id] as Edge;
+      if (!edge || edge.val == 0) continue; // Skip if the edge has no value / neutral
+      if (!edge.out || edge.out.degree > MAX_DEGREE) continue; // Skip if the in vertice has no degree or above max degree
 
-    let addresses = list.filter((v) => !v.profile).map((v) => PUB(v.id));
+      distinctV[edge.out.id] = edge.out;
+
+      let color = RenderTrust1Color(edge.val);
+      edges.get(edge.key) || edges.add({ id: edge.key, from: edge.out.id, to: vId, color });
+    }
+
+    for (const id in sourceV.out) {
+      const edge = sourceV.out[id] as Edge;
+      if (!edge || edge.val == 0 || !edge.in) continue; // Skip if the edge has no value / neutral
+
+      distinctV[edge.in.id] = edge.in;
+
+      let color = RenderTrust1Color(edge.val);
+      edges.get(edge.key) || edges.add({ id: edge.key, from: vId, to: edge.in.id, color });
+    }
+
+    let vertices = Object.values(distinctV);
+    let addresses = vertices.map((v) => PUB(v.id)); // convert to pub hex format
     let unsub = await profileManager.getProfiles(addresses, (_) => {});
     unsubscribe.push(unsub);
 
-    //let filterResults = filterByName(list, ''); // make sure to add name and picture to the vertices.
+    // Create nodes in vis
+    for (const v of vertices) {
+      if (nodes.get(v.id as number)) continue; // already added
 
-    for (let item of list) {
-      const profile = SocialNetwork.profiles.get(item.id);
+      const profile = SocialNetwork.profiles.get(v.id);
+      let image = profileManager.ensurePicture(profile);
 
-      let image = getImage(profile);
-
-      nodes.get(item.id as number) ||
-        nodes.add({ id: item.id, label: profile?.name, image, shape: 'circularImage' });
-
-      let outEdge = v.out[item.id as number] as Edge;
-      if (outEdge) {
-        let color = RenderTrust1Color(outEdge.val);
-
-        edges.get(outEdge.key) || edges.add({ id: outEdge.key, from: vId, to: item.id, color });
-      }
-
-      let inEdge = v.in[item.id as number] as Edge;
-      if (inEdge) {
-        let color = RenderTrust1Color(inEdge.val);
-        edges.get(inEdge.key) || edges.add({ id: inEdge.key, from: item.id, to: vId, color });
-      }
+      nodes.add({ id: v.id, label: profile.name + ' (' + v.id + ')', image, shape: 'circularImage' });
     }
   }
+
 
   function setSearch(params: any) {
     const p = {
@@ -212,28 +209,24 @@ const VisGraph = (props: VisGraphProps) => {
           </span>
         </span>
       </div>
-      {renderScoreLine(state?.score, state.npub)}
+      {renderScoreLine(state?.score, state?.npub)}
+      <hr className="-mx-2 opacity-10 my-2" />
+      <GraphViewSelect view={state?.view} setSearch={setSearch} />
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-wrap gap-4">
-        <Link
-          href={setSearch({ page: 'wot', view: 'list' })}
-          className={state.view == 'list' ? selected : unselected}
-        >
-          List
-        </Link>
-        <Link
-          href={setSearch({ page: 'vis', view: 'graph' })}
-          className={state.view == 'graph' ? selected : unselected}
-        >
-          Graph
-        </Link>
-        <Link
-          href={setSearch({ page: 'path', view: 'path' })}
-          className={state.view == 'path' ? selected : unselected}
-        >
-          Path
-        </Link>
+        <form>
+          <label>
+            <input
+              type="text"
+              placeholder={t('Filter')}
+              tabIndex={1}
+              //onInput={(e) => onInput((e?.target as any)?.value)}
+              className="input-bordered border-neutral-500 input input-sm w-full"
+            />
+          </label>
+        </form>
       </div>
+      <hr className="-mx-2 opacity-10 my-2" />
 
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="h-full w-full flex items-stretch justify-center">

@@ -13,6 +13,7 @@ import { RenderScoreDistrustLink, RenderScoreTrustLink, RenderTrust1Value, rende
 import MyAvatar from '../../components/user/Avatar';
 import { PUB } from '../../nostr/UserIds';
 import Name from '../../components/user/Name';
+import GraphViewSelect from '../components/GraphViewSelect';
 
 
 type TrustListViewProps = {
@@ -201,6 +202,8 @@ const WotView = (props: TrustListViewProps) => {
       </div>
       {renderScoreLine(state?.score, state.npub)}
       <hr className="-mx-2 opacity-10 my-2" />
+      <GraphViewSelect view={state?.view} setSearch={setSearch} />
+      <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-wrap gap-4">
         <form>
           <label>
@@ -251,25 +254,6 @@ const WotView = (props: TrustListViewProps) => {
           className={state.trust1 == -1 ? selected : unselected}
         >
           Distrust
-        </Link>
-        -
-        <Link
-          href={setSearch({ page:'wot', view: 'list' })}
-          className={state.view == 'list' ? selected : unselected}
-        >
-          List
-        </Link>
-        <Link
-          href={setSearch({ page:'vis', view: 'graph' })}
-          className={state.view == 'graph' ? selected : unselected}
-        >
-          Graph
-        </Link>
-        <Link
-          href={setSearch({ page: 'path', view: 'path' })}
-          className={state.view == 'path' ? selected : unselected}
-        >
-          Path
         </Link>
       </div>
       <hr className="-mx-2 opacity-10 my-2" />

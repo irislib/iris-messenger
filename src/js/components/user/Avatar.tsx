@@ -7,6 +7,7 @@ import { Unsubscribe } from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import Show from '../helpers/Show';
 import SafeImg from '../SafeImg';
+import profileManager from '../../dwotr/ProfileManager';
 
 type Props = {
   str: unknown;
@@ -30,19 +31,24 @@ class MyAvatar extends Component<Props, State> {
   unsub: Unsubscribe | undefined;
 
   updateAvatar() {
-    const hash = sha256(this.props.str as string);
-    // convert to hex
-    const hex = Array.from(new Uint8Array(hash))
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
 
-    const identicon = new Identicon(hex, {
-      width: this.props.width,
-      format: `svg`,
-    });
+    // const hash = sha256(this.props.str as string);
+    // // convert to hex
+    // const hex = Array.from(new Uint8Array(hash))
+    //   .map((b) => b.toString(16).padStart(2, '0'))
+    //   .join('');
+
+    // const identicon = new Identicon(hex, {
+    //   width: this.props.width,
+    //   format: `svg`,
+    // });
+    // this.setState({
+    //   avatar: `data:image/svg+xml;base64,${identicon.toString()}`,
+    // });
+
     this.setState({
-      avatar: `data:image/svg+xml;base64,${identicon.toString()}`,
-    });
+        avatar: profileManager.createImageUrl(this.props.str as string, this.props.width),
+      });
   }
 
   componentDidMount() {

@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from 'preact/hooks';
 import Key from '../../nostr/Key';
 import graphNetwork from '../GraphNetwork';
 import { Vertice } from '../model/Graph';
-import { Link } from 'preact-router';
 import { RenderTrust1Color, renderEntityKeyName } from '../components/RenderGraph';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import profileManager from '../ProfileManager';
@@ -14,6 +13,9 @@ import { renderScoreLine } from './WotView';
 import Name from '../../components/user/Name';
 import Header from '../../components/Header';
 import { Unsubscribe } from '../../nostr/PubSub';
+import GraphViewSelect from '../components/GraphViewSelect';
+import { translate as t } from '../../translations/Translation.mjs';
+
 
 type VisGraphProps = {
   id?: string;
@@ -108,6 +110,8 @@ const VisPath = (props: VisGraphProps) => {
       // const me = hexKey == Key.getPubKey();
 
       let vId = ID(hexKey);
+      let v = graphNetwork.g.vertices[vId];
+      let score = v?.score;
 
       let paths = graphNetwork.g.getPaths(vId);
       let verticeIndex = Object.create(null);
@@ -155,6 +159,7 @@ const VisPath = (props: VisGraphProps) => {
         hexKey,
         vId,
         view,
+        score,
       }));
     
     });
@@ -189,49 +194,39 @@ const VisPath = (props: VisGraphProps) => {
     }/${p.view}${p.filter ? '/' + p.filter : ''}`;
   }
 
-  const selected = 'link link-active'; // linkSelected
-  const unselected = 'text-neutral-500';
-
-  //return { network, visJsRef };
-  //return <div ref={visJsRef} />;
   if (!state) return null;
   return (
     <>
       <Header />
       <div className="flex justify-between mb-4">
         <span className="text-2xl font-bold">
-          <a className="link" href={`/${state.npub}`}>
-            <Name pub={state.npub as string} />
+          <a className="link" href={`/${state?.npub}`}>
+            <Name pub={state?.npub as string} />
           </a>
           <span style={{ flex: 1 }} className="ml-1">
             Web of Trust Graph
           </span>
         </span>
       </div>
-      {renderScoreLine(state?.score, state.npub)}
+      {renderScoreLine(state?.score, state?.npub)}
+      <hr className="-mx-2 opacity-10 my-2" />
+      <GraphViewSelect view={state?.view} setSearch={setSearch} />
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-wrap gap-4">
-        <Link
-          href={setSearch({ page: 'wot', view: 'list' })}
-          className={state.view == 'list' ? selected : unselected}
-        >
-          List
-        </Link>
-        <Link
-          href={setSearch({ page: 'vis', view: 'graph' })}
-          className={state.view == 'graph' ? selected : unselected}
-        >
-          Graph
-        </Link>
-        <Link
-          href={setSearch({ page: 'path', view: 'path' })}
-          className={state.view == 'path' ? selected : unselected}
-        >
-          Path
-        </Link>
+        <form>
+          <label>
+            <input
+              type="text"
+              placeholder={t('Filter')}
+              tabIndex={1}
+              //onInput={(e) => onInput((e?.target as any)?.value)}
+              className="input-bordered border-neutral-500 input input-sm w-full"
+            />
+          </label>
+        </form>
       </div>
-
       <hr className="-mx-2 opacity-10 my-2" />
+
       <div className="h-full w-full flex items-stretch justify-center">
         <div className="flex-grow" ref={visJsRef} />
       </div>

@@ -10,6 +10,8 @@ import FuzzySearch from '../FuzzySearch';
 import dwotrDB from './network/DWoTRDB';
 import ProfileRecord from './model/ProfileRecord';
 import { throttle } from 'lodash';
+import Identicon from 'identicon.js';
+
 
 class ProfileManager {
   loaded: boolean = false;
@@ -105,15 +107,21 @@ class ProfileManager {
 
     let list: Array<any> = [];
     let dbLookups: Array<string> = [];
+    let npubs: Array<string> = [];
 
     // First load from memory
     for (const address of addresses) {
-      if(!address) continue; 
+      if (!address) continue;
       const pub = Key.toNostrHexAddress(address) as string;
       const id = ID(pub);
       const item = SocialNetwork.profiles.get(id);
-      if (item) list.push(item);
-      else dbLookups.push(pub);
+      if (item) {
+        list.push(item);
+      } else {
+        dbLookups.push(pub);
+      }
+
+      npubs.push(Key.toNostrBech32Address(address, 'npub') as string);
     }
 
     // Then load from DB
@@ -130,7 +138,9 @@ class ProfileManager {
     // Then load from API
     if (lookupSet.size > 0 && lookupSet.size <= 100) {
       const apiProfiles = await Promise.all(
-        Array.from(lookupSet).map((address) =>this.fetchProfile(Key.toNostrBech32Address(address, 'npub') as string)),
+        Array.from(lookupSet).map((address) =>
+          this.fetchProfile(Key.toNostrBech32Address(address, 'npub') as string),
+        ),
       );
       if (apiProfiles && apiProfiles.length > 0) {
         for (const profile of apiProfiles) {
@@ -145,7 +155,9 @@ class ProfileManager {
 
     // Fill in default profile for missing profiles
     for (const address of lookupSet) {
-      list.push(this.sanitizeProfile({}, address)); // Fill in default profile with animal names
+      let profile = this.sanitizeProfile({}, address);
+      SocialNetwork.profiles.set(ID(profile.key), profile);
+      list.push(profile); // Fill in default profile with animal names
     }
 
     // Then callback
@@ -160,7 +172,7 @@ class ProfileManager {
       cb?.([profile]);
     };
 
-    return PubSub.subscribe({ kinds: [0], authors: addresses }, callback, false);
+    return PubSub.subscribe({ kinds: [0], authors: npubs }, callback, false);
   }
 
   async loadProfiles(addresses: Set<string>) {
@@ -207,7 +219,7 @@ class ProfileManager {
 
     let display_name = p.display_name?.trim().slice(0, 100) || name;
 
-    return {
+    let profile = {
       ...p,
       key: npub,
       name,
@@ -215,6 +227,8 @@ class ProfileManager {
       picture,
       isDefault,
     } as ProfileRecord;
+
+    return profile;
   }
 
   profileIsNewer(profile: ProfileRecord) {
@@ -257,6 +271,28 @@ class ProfileManager {
       return undefined;
     }
   }
+
+  createImageUrl(str: string, width: number = 30, height: number = 30) {
+    //if (profile && profile.picture) return profile.picture;
+
+    const identicon = new Identicon(str, {
+      width,
+      height,
+      format: `svg`,
+    });
+    return `data:image/svg+xml;base64,${identicon.toString()}`;
+  }
+
+  ensurePicture(profile: ProfileRecord) : string {
+    if (!profile.picture) {
+      profile.picture = this.createImageUrl(profile.key);
+    }
+    return profile.picture;
+  } 
+
+
+
+
 }
 
 const profileManager = new ProfileManager();

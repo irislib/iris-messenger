@@ -246,6 +246,7 @@ export default class Graph {
     }
 
 
+  
     inOutTrustById(sourceId: number, entityType?:EntityType, trust1?:number) : Array<Vertice> {
         let obj = Object.create(null) as {[key: string]: Vertice};
         const sourceV = this.vertices[sourceId] as Vertice;
@@ -268,6 +269,27 @@ export default class Graph {
         }
         return Object.values(obj);
     }
+
+    // getEdges(sourceId: number, entityType?:EntityType, trust1?:number) : any {
+    //     let edges = Object.create(null) as {[key: string]: Edge};
+    //     const sourceV = this.vertices[sourceId] as Vertice;
+    //     for(const id in sourceV.in) {
+    //         const edge = sourceV.in[id] as Edge;
+    //         if(!edge || edge.val == 0 || (trust1 && edge.val != trust1)) continue; // Skip if the edge has no value / neutral
+    //         if(!edge.out || edge.out.degree > MAX_DEGREE) continue; // Skip if the in vertice has no degree or above max degree
+            
+    //         edges[edge.key] = edge;
+    //     }
+    //     for(const id in sourceV.out) {
+    //         const edge = sourceV.out[id] as Edge;
+    //         if(!edge || edge.val == 0 || (trust1 && edge.val != trust1)) continue; // Skip if the edge has no value / neutral
+
+    //         if(!entityType || edge.in?.entityType === entityType)
+    //             edges[edge.key] = edge;
+    //     }
+    //     return edges;
+    // }
+
 
 
 

@@ -96,6 +96,7 @@ const TestData = (props: TestDataProps) => {
     addEdge(trust(snowden, jack, 1));
     addEdge(trust(pub, lyn, 1));
     addEdge(trust(lyn, jack, 1));
+    addEdge(trust(lyn, pub, -1));
   };
 
   // Visualize a list of users from the state.profiles object

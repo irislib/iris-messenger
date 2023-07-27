@@ -6,6 +6,7 @@ class ProfileRecord {
     display_name: string | undefined;
     description: string | undefined;
     avatar: string | undefined;
+    picture: string | undefined;
     cover: string | undefined;
     location: string | undefined;
     website: string | undefined;
