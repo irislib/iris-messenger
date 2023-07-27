@@ -20,6 +20,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
   const { hexPub, npub } = props;
   const [profile, setProfile] = useState<any>({});
   const [lightning, setLightning] = useState<string>('');
+  const [website, setWebsite] = useState<string>('');
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [nostrAddress, setNostrAddress] = useState<string>('');
   const [rawDataJson, setRawDataJson] = useState<string>('');
@@ -105,13 +106,23 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
           }
           setLightning(lightning);
 
-          let website =
-            profile.website &&
-            (profile.website.match(/^https?:\/\//) ? profile.website : 'http://' + profile.website);
-          // remove trailing slash
-          if (website && website.endsWith('/')) {
-            website = website.slice(0, -1);
+          let website = '';
+
+          try {
+            const tempWebsite =
+              profile.website &&
+              (profile.website.match(/^https?:\/\//)
+                ? profile.website
+                : 'http://' + profile.website);
+
+            const url = new URL(tempWebsite);
+
+            website = url.href.endsWith('/') ? url.href.slice(0, -1) : url.href;
+          } catch (e) {
+            website = '';
           }
+
+          setWebsite(website);
 
           setProfile(profile);
         },
@@ -236,15 +247,10 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
                   </a>
                 </div>
               </Show>
-              <Show when={profile.website}>
+              <Show when={website}>
                 <div className="flex-1">
-                  <a
-                    href={profile.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="link"
-                  >
-                    {profile.website?.replace(/^https?:\/\//, '')}
+                  <a href={website} target="_blank" rel="noopener noreferrer" className="link">
+                    {website?.replace(/^https?:\/\//, '')}
                   </a>
                 </div>
               </Show>
