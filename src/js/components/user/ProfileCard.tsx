@@ -15,6 +15,7 @@ import Avatar from './Avatar';
 import ProfileDropdown from './Dropdown';
 import Name from './Name';
 import ProfilePicture from './ProfilePicture';
+import Stats from './Stats';
 
 const ProfileCard = (props: { hexPub: string; npub: string }) => {
   const { hexPub, npub } = props;
@@ -26,10 +27,6 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
   const [rawDataJson, setRawDataJson] = useState<string>('');
   const [isMyProfile, setIsMyProfile] = useState<boolean>(false);
   const [blocked, setBlocked] = useState<boolean>(false);
-  const [followedUserCount, setFollowedUserCount] = useState<number>(0);
-  const [followerCount, setFollowerCount] = useState<number>(0);
-  const [followerCountFromApi, setFollowerCountFromApi] = useState<number>(0);
-  const [followedUserCountFromApi, setFollowedUserCountFromApi] = useState<number>(0);
 
   const getNostrProfile = useCallback((address, nostrAddress) => {
     const subscriptions = [] as any[];
@@ -44,26 +41,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
         false,
       ),
     );
-    fetch(`https://eu.rbr.bio/${address}/info.json`).then((res) => {
-      if (!res.ok) {
-        return;
-      }
-      res.json().then((json) => {
-        if (json) {
-          setFollowedUserCountFromApi(json.following?.length);
-          setFollowerCountFromApi(json.followerCount);
-        }
-      });
-    });
 
-    setTimeout(() => {
-      subscriptions.push(
-        SocialNetwork.getFollowersByUser(address, (followers) => setFollowerCount(followers.size)),
-      );
-      subscriptions.push(
-        SocialNetwork.getFollowedByUser(address, (followed) => setFollowedUserCount(followed.size)),
-      );
-    }, 1000); // this causes social graph recursive loading, so let some other stuff like feed load first
     subscriptions.push(
       SocialNetwork.getProfile(
         address,
@@ -218,21 +196,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
               <small className="text-iris-green">{profile.nip05?.replace(/^_@/, '')}</small>
             </Show>
           </div>
-          <div>
-            <div className="text-sm flex gap-4">
-              <a href={`/follows/${npub}`}>
-                <b>{Math.max(followedUserCount, followedUserCountFromApi)}</b> {t('following')}
-              </a>
-              <a href={`/followers/${npub}`}>
-                <b>{Math.max(followerCount, followerCountFromApi)}</b> {t('followers')}
-              </a>
-            </div>
-            <Show when={SocialNetwork.isFollowing(hexPub, Key.getPubKey())}>
-              <div>
-                <small>{t('follows_you')}</small>
-              </div>
-            </Show>
-          </div>
+          <Stats address={hexPub} />
           <div className="py-2">
             <p className="text-sm">{profile.about}</p>
             <div className="flex flex-1 flex-row align-center justify-center mt-4">
