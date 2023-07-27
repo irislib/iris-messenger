@@ -21,7 +21,7 @@ export default {
   "copy_user_ID": "Copy User ID",
   "dark": "Dark",
   "delete": "Delete",
-  "dm_privacy_warning": "Nostr private messages are encrypted, but everyone can see who you're chatting with",
+  "dm_privacy_warning": "Nostr private messages are encrypted, but everyone can see who and when you're chatting with",
   "done": "Done",
   "download": "Download",
   "edit_profile": "Edit Profile",

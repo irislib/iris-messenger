@@ -1,3 +1,7 @@
+import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
+
+import Show from '../../components/helpers/Show';
+import { translate as t } from '../../translations/Translation.mjs';
 import View from '../View';
 
 import ChatList from './ChatList';
@@ -19,7 +23,17 @@ class Chat extends View {
           activeChat={this.props.id}
           className={this.props.id ? 'hidden md:flex' : 'flex'}
         />
-        <PrivateChat id={this.props.id} key={this.props.id} />
+        <Show when={this.props.id}>
+          <PrivateChat id={this.props.id} key={this.props.id} />
+        </Show>
+        <Show when={!this.props.id}>
+          <div className="hidden md:flex flex-col items-center justify-center flex-1">
+            <div className="my-4">
+              <PaperAirplaneIcon className="w-24 h-24 text-neutral-400" />
+            </div>
+            <div className="text-neutral-400">{t('dm_privacy_warning')}</div>
+          </div>
+        </Show>
       </div>
     );
   }

@@ -72,7 +72,7 @@ class ChatList extends BaseComponent<ChatListProps, ChatListState> {
 
     return (
       <section
-        className={`h-screen overflow-x-hidden overflow-y-scroll px-4 md:px-0 w-full md:w-64 ${
+        className={`h-screen border-r border-neutral-800 overflow-x-hidden overflow-y-scroll px-4 md:px-0 w-full md:w-64 ${
           this.props.className || ''
         }`}
       >
