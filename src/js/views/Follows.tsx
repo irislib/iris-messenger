@@ -47,8 +47,8 @@ class Follows extends View {
   }
 
   sortByName(aK, bK) {
-    const aName = SocialNetwork.profiles.get(aK)?.name;
-    const bName = SocialNetwork.profiles.get(bK)?.name;
+    const aName = SocialNetwork.profiles.get(ID(aK))?.name;
+    const bName = SocialNetwork.profiles.get(ID(bK))?.name;
     if (!aName && !bName) {
       return aK.localeCompare(bK);
     }
@@ -62,8 +62,8 @@ class Follows extends View {
   }
 
   sortByFollowDistance(aK, bK) {
-    const aDistance = SocialNetwork.followDistanceByUser.get(aK);
-    const bDistance = SocialNetwork.followDistanceByUser.get(bK);
+    const aDistance = SocialNetwork.followDistanceByUser.get(ID(aK));
+    const bDistance = SocialNetwork.followDistanceByUser.get(ID(bK));
     if (aDistance === bDistance) {
       return this.sortByName(aK, bK);
     }

@@ -819,7 +819,6 @@ const Events = {
         // Add "note to self" chat so the list is not empty
         map.set(Key.getPubKey(), new SortedLimitedEventSet(500));
       }
-      console.log('direct messages', map);
       cb?.(map);
     };
     callback();
