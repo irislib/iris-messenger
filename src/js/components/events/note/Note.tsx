@@ -135,7 +135,7 @@ const Note = ({
       {repliedMsg}
       <div
         key={event.id + 'note'}
-        className={`px-4 pb-2 ${className}`}
+        className={`px-2 md:px-4 pb-2 ${className}`}
         onClick={(e) => messageClicked(e)}
       >
         {showThreadBtn}
