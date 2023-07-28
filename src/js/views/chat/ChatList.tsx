@@ -88,6 +88,30 @@ class ChatList extends BaseComponent<ChatListProps, ChatListState> {
     ) {
       // setTimeout logic here, currently commented out.
     }
+
+    localState.get('groups').map((group: any, localKey) => {
+      if (!(group && localKey)) {
+        return;
+      }
+      console.log('group', group);
+      // add localKey to chat list
+      const chats = this.state.chats;
+      chats.set(localKey, { eventIds: [] });
+      console.log('chats', chats);
+      const sortedChats: string[] = Array.from(chats.keys()).sort((a: string, b: string) => {
+        const aEventIds: any[] = chats.get(a).eventIds;
+        const bEventIds: any[] = chats.get(b).eventIds;
+        const aLatestEvent: any = aEventIds.length ? Events.db.by('id', aEventIds[0]) : null;
+        const bLatestEvent: any = bEventIds.length ? Events.db.by('id', bEventIds[0]) : null;
+        if (bLatestEvent?.created_at > aLatestEvent?.created_at) {
+          return 1;
+        } else if (bLatestEvent?.created_at < aLatestEvent?.created_at) {
+          return -1;
+        }
+        return 0;
+      });
+      this.setState({ chats, sortedChats });
+    });
   }
 
   render() {

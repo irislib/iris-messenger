@@ -7,7 +7,6 @@ import Name from '../../components/user/Name';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation.mjs';
 
 interface ChatListItemProps {
@@ -53,11 +52,8 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
   }
 
   componentDidMount() {
+    console.log('list item', this.props.chat);
     this.getLatestMsg();
-    const path = 'chats/' + this.props.chat + '/lastOpened';
-    Session.public?.get(path, (lastOpened: number) => {
-      this.setState({ lastOpened });
-    });
   }
 
   componentDidUpdate(prevProps: ChatListItemProps) {
@@ -66,18 +62,9 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
     }
   }
 
-  hasUnseen() {
-    if (this.state.latest.pubkey === Key.getPubKey()) {
-      return false;
-    }
-    return !this.props.active && !(this.state.latest.created_at <= this.state.lastOpened);
-  }
-
   render() {
     const chat = this.props.chat;
     const active = this.props.active ? 'bg-neutral-800' : 'hover:bg-neutral-900';
-    const hasUnseen = this.hasUnseen() ? 'has-unseen' : '';
-    const unseenEl = this.hasUnseen() ? <span className="unseen"></span> : null;
     const time =
       (this.state.latest.created_at &&
         Helpers.getRelativeTimeText(new Date(this.state.latest.created_at * 1000))) ||
@@ -90,8 +77,8 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
         onKeyUp={(e: KeyboardEvent) => this.onKeyUp(e)}
         role="button"
         tabIndex={0}
-        className={`flex p-2 flex-row gap-4 ${hasUnseen} ${active}`}
-        onClick={() => route(`/chat/${npub}`)}
+        className={`flex p-2 flex-row gap-4 ${active}`}
+        onClick={() => route(`/chat/${npub || chat}`)}
       >
         <Avatar str={npub} width={49} />
         <div className="flex flex-row">
@@ -107,7 +94,6 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
             </span>
             <small className="text-neutral-500 truncate">{this.state.latestText}</small>
           </div>
-          {unseenEl}
         </div>
       </div>
     );

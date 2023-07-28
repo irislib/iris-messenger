@@ -1,15 +1,35 @@
 import { generatePrivateKey } from 'nostr-tools';
+import { useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
 import localState from '../../LocalState';
+import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
 
 export default function NewChat() {
-  const startNewGroup = () => {
+  const [inputKey, setInputKey] = useState('');
+
+  const createNewGroup = (key) => {
     const randomChatID = Math.floor(Math.random() * 1000000000);
-    const newNostrKey = generatePrivateKey();
-    localState.get(`groups/${randomChatID}/key`).put(newNostrKey);
+    localState.get('groups').get(randomChatID).put({ key });
     route(`/chat/${randomChatID}`);
+  };
+
+  const startNewGroup = () => {
+    const newNostrKey = generatePrivateKey();
+    createNewGroup(newNostrKey);
+  };
+
+  const handleInput = (e) => {
+    setInputKey(e.target.value);
+    addChatWithInputKey();
+  };
+
+  const addChatWithInputKey = () => {
+    if (inputKey.startsWith('nsec')) {
+      const hexPriv = Key.toNostrHexAddress(inputKey);
+      hexPriv && createNewGroup(hexPriv);
+    }
   };
 
   return (
@@ -20,14 +40,16 @@ export default function NewChat() {
       <div className="my-4">{t('or')}</div>
       <div className="my-4 flex gap-2 justify-center items-center">
         <input
-          placeholder="Paste a chat link"
-          type="text"
+          placeholder="Paste nsec or chat link"
+          type="password"
           id="pasteLink"
           className="text-center input border border-gray-400 rounded p-2"
+          onInput={handleInput}
+          value={inputKey}
         />
-        <button id="scanQR" className="btn btn-neutral">
+        {/*<button id="scanQR" className="btn btn-neutral" onClick={}>
           {t('Scan QR Code')}
-        </button>
+        </button>*/}
       </div>
     </div>
   );
