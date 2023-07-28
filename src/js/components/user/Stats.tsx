@@ -74,8 +74,13 @@ const ProfileStats = ({ address }) => {
             Followed by{' '}
             {knownFollowers.slice(0, 3).map((follower, index) => (
               <span key={follower}>
-                {index > 0 && ', '}
-                <Name pub={follower} hideBadge={true} />
+                <Show when={index > 0}>{', '}</Show>
+                <a
+                  className="hover:underline"
+                  href={`/profile/${Key.toNostrBech32Address(follower, 'npub')}`}
+                >
+                  <Name pub={follower} hideBadge={true} />
+                </a>{' '}
               </span>
             ))}
             <Show when={knownFollowers.length > 3}>
