@@ -67,13 +67,13 @@ class Follows extends View {
     if (aDistance === bDistance) {
       return this.sortByName(aK, bK);
     }
-    if (!aDistance) {
+    if (aDistance === undefined) {
       return 1;
     }
-    if (!bDistance) {
+    if (bDistance === undefined) {
       return -1;
     }
-    return aDistance - bDistance;
+    return aDistance < bDistance ? -1 : 1;
   }
 
   updateSortedFollows = throttle(

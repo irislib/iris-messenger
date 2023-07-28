@@ -1,15 +1,20 @@
 import { memo, useEffect, useState } from 'react';
+import throttle from 'lodash/throttle';
 
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
 import Show from '../helpers/Show';
 
+import Name from './Name';
+
 const ProfileStats = ({ address }) => {
   const [followedUserCount, setFollowedUserCount] = useState<number>(0);
   const [followerCount, setFollowerCount] = useState<number>(0);
   const [followerCountFromApi, setFollowerCountFromApi] = useState<number>(0);
   const [followedUserCountFromApi, setFollowedUserCountFromApi] = useState<number>(0);
+  const [knownFollowers, setKnownFollowers] = useState<string[]>([]);
+  const isMyProfile = Key.getPubKey() === address;
 
   useEffect(() => {
     const subscriptions = [] as any[];
@@ -26,9 +31,22 @@ const ProfileStats = ({ address }) => {
       });
     });
 
+    const throttledSetKnownFollowers = throttle((followers) => {
+      const knownFollowers = new Set<string>();
+      for (const follower of followers) {
+        if (SocialNetwork.getFollowDistance(follower) === 1) {
+          knownFollowers.add(follower);
+        }
+      }
+      setKnownFollowers(Array.from(knownFollowers));
+    }, 1000);
+
     setTimeout(() => {
       subscriptions.push(
-        SocialNetwork.getFollowersByUser(address, (followers) => setFollowerCount(followers.size)),
+        SocialNetwork.getFollowersByUser(address, (followers) => {
+          setFollowerCount(followers.size);
+          throttledSetKnownFollowers(followers);
+        }),
       );
       subscriptions.push(
         SocialNetwork.getFollowedByUser(address, (followed) => setFollowedUserCount(followed.size)),
@@ -50,8 +68,27 @@ const ProfileStats = ({ address }) => {
           <b>{Math.max(followerCount, followerCountFromApi)}</b> {t('followers')}
         </a>
       </div>
+      <Show when={!isMyProfile && knownFollowers.length > 0}>
+        <div className="text-neutral-500">
+          <small>
+            Followed by{' '}
+            {knownFollowers.slice(0, 3).map((follower, index) => (
+              <span key={follower}>
+                {index > 0 && ', '}
+                <Name pub={follower} hideBadge={true} />
+              </span>
+            ))}
+            <Show when={knownFollowers.length > 3}>
+              <span>
+                {' '}
+                and <b>{knownFollowers.length - 3}</b> other users you follow
+              </span>
+            </Show>
+          </small>
+        </div>
+      </Show>
       <Show when={SocialNetwork.isFollowing(address, Key.getPubKey())}>
-        <div>
+        <div className="text-neutral-500">
           <small>{t('follows_you')}</small>
         </div>
       </Show>
