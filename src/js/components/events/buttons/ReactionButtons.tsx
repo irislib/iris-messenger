@@ -128,9 +128,9 @@ const ReactionButtons = (props) => {
   return (
     <>
       {props.standalone && <ReactionsList event={props.event} wot={wot} />}
-      <div className="flex">
+      <div className="flex gap-4">
         <a
-          className="btn-ghost btn-sm flex-1 hover:bg-transparent hover:text-iris-blue btn content-center gap-2 rounded-none text-neutral-500"
+          className="btn-ghost btn-sm hover:bg-transparent hover:text-iris-blue btn content-center gap-2 rounded-none text-neutral-500"
           onClick={() => replyBtnClicked()}
         >
           <ChatBubbleOvalLeftIcon width={18} />

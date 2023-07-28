@@ -10,7 +10,7 @@ import Name from './user/Name';
 import Torrent from './Torrent';
 
 const PrivateMessage = (props) => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState(props.text || '');
 
   useEffect(() => {
     $('a').click((e) => {
@@ -20,9 +20,11 @@ const PrivateMessage = (props) => {
         route(href.replace('https://iris.to/', ''));
       }
     });
-    Key.decryptMessage(props.id, (decryptedText) => {
-      setText(decryptedText);
-    });
+    if (!text) {
+      Key.decryptMessage(props.id, (decryptedText) => {
+        setText(decryptedText);
+      });
+    }
   }, [props.id]);
 
   const onNameClick = () => {
