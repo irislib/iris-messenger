@@ -46,7 +46,7 @@ export function filterByName(list: Vertice[], filter: string) {
   return result;
 }
 
-const WotView = (props: TrustListViewProps) => {
+const TrustList = (props: TrustListViewProps) => {
   const [state, setState] = useState<any>(null);
   const [vertices, setVertices] = useState<Array<Vertice>>([]);
   const [name, setName] = useState<string | undefined>('...');
@@ -202,7 +202,7 @@ const WotView = (props: TrustListViewProps) => {
       </div>
       {renderScoreLine(state?.score, state.npub)}
       <hr className="-mx-2 opacity-10 my-2" />
-      <GraphViewSelect view={state?.view} setSearch={setSearch} />
+      <GraphViewSelect view={state?.view} setSearch={setSearch} me={state?.me} />
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-wrap gap-4">
         <form>
@@ -272,7 +272,7 @@ const WotView = (props: TrustListViewProps) => {
   );
 };
 
-export default WotView;
+export default TrustList;
 
 function compareDegree(a: Vertice, b: Vertice) {
   if (a.degree < b.degree) {

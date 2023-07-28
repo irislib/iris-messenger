@@ -7,7 +7,7 @@ import Key from '../../nostr/Key';
 import graphNetwork from '../GraphNetwork';
 import { Edge, EntityType, Vertice } from '../model/Graph';
 import { RenderTrust1Color, renderEntityKeyName } from '../components/RenderGraph';
-import { renderScoreLine } from './WotView';
+import { renderScoreLine } from './TrustList';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import profileManager from '../ProfileManager';
 import { PUB } from '../../nostr/UserIds';
@@ -190,9 +190,6 @@ const VisGraph = (props: VisGraphProps) => {
     }/${p.view}${p.filter ? '/' + p.filter : ''}`;
   }
 
-  const selected = 'link link-active'; // linkSelected
-  const unselected = 'text-neutral-500';
-
   //return { network, visJsRef };
   //return <div ref={visJsRef} />;
   if (!state) return null;
@@ -211,7 +208,7 @@ const VisGraph = (props: VisGraphProps) => {
       </div>
       {renderScoreLine(state?.score, state?.npub)}
       <hr className="-mx-2 opacity-10 my-2" />
-      <GraphViewSelect view={state?.view} setSearch={setSearch} />
+      <GraphViewSelect view={state?.view} setSearch={setSearch} me={state?.me} />
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-wrap gap-4">
         <form>

@@ -1,11 +1,13 @@
 import { Link } from 'preact-router';
+import Show from '../../components/helpers/Show';
 
 type GraphViewSelectProps = {
   view: string;
+  me: boolean;
   setSearch: any;
 };
 
-const GraphViewSelect = ({ view, setSearch }: GraphViewSelectProps) => {
+const GraphViewSelect = ({ view, me, setSearch }: GraphViewSelectProps) => {
   const selected = 'link link-active'; // linkSelected
   const unselected = 'text-neutral-500';
 
@@ -22,13 +24,21 @@ const GraphViewSelect = ({ view, setSearch }: GraphViewSelectProps) => {
         href={setSearch({ page: 'vis', view: 'graph' })}
         className={view == 'graph' ? selected : unselected}
       >
-        Graph
+        My Graph
       </Link>
+      <Show when={!me}>
+        <Link
+          href={setSearch({ page: 'path', view: 'path' })}
+          className={view == 'path' ? selected : unselected}
+        >
+          Path
+        </Link>
+      </Show>
       <Link
-        href={setSearch({ page: 'path', view: 'path' })}
-        className={view == 'path' ? selected : unselected}
+        href={setSearch({ page: 'globalgraph', view: 'globalgraph' })}
+        className={view == 'globalgraph' ? selected : unselected}
       >
-        Path
+        Global Graph
       </Link>
     </div>
   );

@@ -9,7 +9,7 @@ import SocialNetwork from '../../nostr/SocialNetwork';
 import profileManager from '../ProfileManager';
 import { ID, PUB } from '../../nostr/UserIds';
 import Identicon from 'identicon.js';
-import { renderScoreLine } from './WotView';
+import { renderScoreLine } from './TrustList';
 import Name from '../../components/user/Name';
 import Header from '../../components/Header';
 import { Unsubscribe } from '../../nostr/PubSub';
@@ -107,7 +107,7 @@ const VisPath = (props: VisGraphProps) => {
       // const entitytype = props?.entitytype == 'item' ? EntityType.Item : EntityType.Key;
       const view = props.view || 'list';
       // const filter = props.filter || '';
-      // const me = hexKey == Key.getPubKey();
+      const me = hexKey == Key.getPubKey();
 
       let vId = ID(hexKey);
       let v = graphNetwork.g.vertices[vId];
@@ -160,6 +160,7 @@ const VisPath = (props: VisGraphProps) => {
         vId,
         view,
         score,
+        me,
       }));
     
     });
@@ -210,7 +211,7 @@ const VisPath = (props: VisGraphProps) => {
       </div>
       {renderScoreLine(state?.score, state?.npub)}
       <hr className="-mx-2 opacity-10 my-2" />
-      <GraphViewSelect view={state?.view} setSearch={setSearch} />
+      <GraphViewSelect view={state?.view} setSearch={setSearch} me={state?.me} />
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-wrap gap-4">
         <form>
