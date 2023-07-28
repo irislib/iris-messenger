@@ -60,7 +60,7 @@ const Repost = ({ event }) => {
 
   return (
     <a
-      className={`btn-ghost btn-sm flex-1 hover:bg-transparent btn content-center gap-2 rounded-none ${
+      className={`btn-ghost btn-sm hover:bg-transparent btn content-center gap-2 rounded-none ${
         state.reposted ? 'text-iris-green' : 'hover:text-iris-green text-neutral-500'
       }`}
       onClick={(e) => repostBtnClicked(e)}

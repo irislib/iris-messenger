@@ -688,7 +688,7 @@ const Events = {
     PubSub.publish(event as Event);
 
     console.log('publishing event', event);
-    this.handle(event as Event);
+    this.handle(event as Event, true);
 
     // also publish at most 10 events referred to in tags
     const referredEvents = event.tags
@@ -814,8 +814,14 @@ const Events = {
   },
   getDirectMessages(cb?: (chats: Map<string, SortedLimitedEventSet>) => void): Unsubscribe {
     const callback = () => {
-      cb?.(this.directMessagesByUser ?? new Map());
+      const map = this.directMessagesByUser ?? new Map();
+      if (map.size === 0) {
+        // Add "note to self" chat so the list is not empty
+        map.set(Key.getPubKey(), new SortedLimitedEventSet(500));
+      }
+      cb?.(map);
     };
+    callback();
     const unsub1 = PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()] }, callback);
     const unsub2 = PubSub.subscribe({ kinds: [4], authors: [Key.getPubKey()] }, callback);
     return () => {

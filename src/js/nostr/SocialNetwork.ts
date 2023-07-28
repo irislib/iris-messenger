@@ -110,23 +110,21 @@ export default {
     }
     const myId = ID(Key.getPubKey());
 
-    let newFollowDistance;
-    if (follower === myId) {
-      // basically same as the next "else" block, but faster
-      if (followedUser === myId) {
-        newFollowDistance = 0; // self-follow
-      } else {
+    if (followedUser !== myId) {
+      let newFollowDistance;
+      if (follower === myId) {
+        // basically same as the next "else" block, but faster
         newFollowDistance = 1;
         this.addUserByFollowDistance(newFollowDistance, followedUser);
-      }
-      this.followDistanceByUser.set(followedUser, newFollowDistance);
-    } else {
-      const existingFollowDistance = this.followDistanceByUser.get(followedUser);
-      const followerDistance = this.followDistanceByUser.get(follower);
-      newFollowDistance = followerDistance && followerDistance + 1;
-      if (!existingFollowDistance || newFollowDistance < existingFollowDistance) {
         this.followDistanceByUser.set(followedUser, newFollowDistance);
-        this.addUserByFollowDistance(newFollowDistance, followedUser);
+      } else {
+        const existingFollowDistance = this.followDistanceByUser.get(followedUser);
+        const followerDistance = this.followDistanceByUser.get(follower);
+        newFollowDistance = followerDistance && followerDistance + 1;
+        if (existingFollowDistance === undefined || newFollowDistance < existingFollowDistance) {
+          this.followDistanceByUser.set(followedUser, newFollowDistance);
+          this.addUserByFollowDistance(newFollowDistance, followedUser);
+        }
       }
     }
 
@@ -148,16 +146,20 @@ export default {
     this.followersByUser.get(unfollowedUser)?.delete(follower);
     this.followedByUser.get(follower)?.delete(unfollowedUser);
 
+    if (unfollowedUser === ID(Key.getPubKey())) {
+      return;
+    }
+
     // iterate over remaining followers and set the smallest follow distance
-    let smallest = 1000;
+    let smallest = Infinity;
     for (const follower of this.followersByUser.get(unfollowedUser) || []) {
-      const distance = (this.followDistanceByUser.get(follower) || Infinity) + 1;
-      if (distance && distance < smallest) {
-        smallest = distance;
+      const followerDistance = this.followDistanceByUser.get(follower);
+      if (followerDistance !== undefined && followerDistance + 1 < smallest) {
+        smallest = followerDistance + 1;
       }
     }
 
-    if (smallest === 1000) {
+    if (smallest === Infinity) {
       this.followDistanceByUser.delete(unfollowedUser);
     } else {
       this.followDistanceByUser.set(unfollowedUser, smallest);

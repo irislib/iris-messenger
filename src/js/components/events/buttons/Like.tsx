@@ -61,7 +61,7 @@ const Like = ({ event }) => {
 
   return (
     <a
-      className={`btn-ghost btn-sm flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none ${
+      className={`btn-ghost btn-sm justify-center hover:bg-transparent btn content-center gap-2 rounded-none ${
         state.liked ? 'text-iris-red' : 'hover:text-iris-red text-neutral-500'
       }`}
       onClick={(e) => likeBtnClicked(e)}
