@@ -688,7 +688,7 @@ const Events = {
     PubSub.publish(event as Event);
 
     console.log('publishing event', event);
-    this.handle(event as Event);
+    this.handle(event as Event, true);
 
     // also publish at most 10 events referred to in tags
     const referredEvents = event.tags
