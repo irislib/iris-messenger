@@ -7,6 +7,7 @@ import { translate as t } from '../../translations/Translation.mjs';
 import Show from '../helpers/Show';
 
 import Name from './Name';
+import ProfileScoreLinks from '../../dwotr/components/ProfileScoreLinks';
 
 const ProfileStats = ({ address }) => {
   const [followedUserCount, setFollowedUserCount] = useState<number>(0);
@@ -62,11 +63,12 @@ const ProfileStats = ({ address }) => {
     <div>
       <div className="text-sm flex gap-4">
         <a href={`/follows/${address}`}>
-          <b>{Math.max(followedUserCount, followedUserCountFromApi)}</b> {t('following')}
+          <b>{Math.max(followedUserCount, followedUserCountFromApi)}</b><span className="text-neutral-500"> {t('following')}</span>
         </a>
         <a href={`/followers/${address}`}>
-          <b>{Math.max(followerCount, followerCountFromApi)}</b> {t('followers')}
+          <b>{Math.max(followerCount, followerCountFromApi)}</b><span className="text-neutral-500"> {t('followers')}</span>
         </a>
+        <ProfileScoreLinks hexPub={address} />
       </div>
       <Show when={!isMyProfile && knownFollowers.length > 0}>
         <div className="text-neutral-500">
