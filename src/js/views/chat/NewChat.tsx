@@ -43,7 +43,7 @@ export default function NewChat() {
           placeholder="Paste nsec or chat link"
           type="password"
           id="pasteLink"
-          className="text-center input border border-gray-400 rounded p-2"
+          className="text-center input border border-gray-400 rounded-full p-2"
           onInput={handleInput}
           value={inputKey}
         />
