@@ -18,6 +18,9 @@ export const addGroup = (key) => {
 };
 
 export const addChatWithInputKey = (inputKey) => {
+  if (inputKey.indexOf('#') > -1) {
+    inputKey = inputKey.split('#')[1];
+  }
   if (inputKey.startsWith('nsec')) {
     const hexPriv = Key.toNostrHexAddress(inputKey);
     hexPriv && addGroup(hexPriv);
