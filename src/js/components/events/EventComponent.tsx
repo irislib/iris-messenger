@@ -38,6 +38,8 @@ interface EventComponentProps {
 const EventComponent = (props: EventComponentProps) => {
   const [state, setState] = useState<{ [key: string]: any }>({
     sortedReplies: [],
+    meta: {},
+    event: Events.db.by('id', props.id),
   });
   const subscriptions: (() => void)[] = [];
   const retrievingTimeout = useRef<any>();
@@ -73,7 +75,6 @@ const EventComponent = (props: EventComponentProps) => {
       return;
     }
     unmounted.current = false;
-    setState((prevState) => ({ prevState, meta: { id: props.id } }));
     const hexId = Key.toNostrHexAddress(props.id);
 
     /*
