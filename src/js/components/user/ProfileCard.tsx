@@ -20,7 +20,7 @@ import Stats from './Stats';
 
 const ProfileCard = (props: { hexPub: string; npub: string }) => {
   const { hexPub, npub } = props;
-  const [profile, setProfile] = useState<any>(SocialNetwork.profiles.get(ID(hexPub)));
+  const [profile, setProfile] = useState<any>(SocialNetwork.profiles.get(ID(hexPub)) || {});
   const [lightning, setLightning] = useState<string>('');
   const [website, setWebsite] = useState<string>('');
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
