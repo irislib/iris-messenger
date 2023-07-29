@@ -21,7 +21,7 @@ export default function Badge(props): JSX.Element | null {
   const following = SocialNetwork.isFollowing(myPub, hexAddress);
   if (following) {
     return (
-      <span class="mx-2 text-iris-blue tooltip" data-tip={t('following')}>
+      <span class="ml-2 text-iris-blue tooltip" data-tip={t('following')}>
         {Icons.checkmark}
       </span>
     );
@@ -30,7 +30,7 @@ export default function Badge(props): JSX.Element | null {
     if (count > 0) {
       const className = count > 10 ? 'text-iris-orange' : '';
       return (
-        <span class={`${className} tooltip mx-2`} data-tip={`${count} ${t('friends_following')}`}>
+        <span class={`${className} tooltip ml-2`} data-tip={`${count} ${t('friends_following')}`}>
           {Icons.checkmark}
         </span>
       );

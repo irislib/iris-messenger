@@ -27,18 +27,18 @@ const Author = ({ event, fullWidth, isQuote, standalone, setTranslatedText }) =>
   return (
     <div className="flex items-center gap-2 justify-between">
       <Show when={fullWidth}>
-        <Avatar event={event} isQuote={isQuote} standalone={standalone} />
+        <Avatar event={event} isQuote={isQuote} standalone={standalone} fullWidth={fullWidth} />
       </Show>
       <div className="flex flex-col">
         <div>
           <a href={`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`} className="font-bold">
             <Name pub={event.pubkey} />
           </a>
-          <small>
-            {'· '}
+          <small className="text-neutral-500">
+            <span className="mx-2">·</span>
             <a
               href={`/${Key.toNostrBech32Address(event.id, 'note')}`}
-              className="tooltip text-neutral-500"
+              className="tooltip"
               data-tip={`${dateStr} ${timeStr}`}
             >
               {time && Helpers.getRelativeTimeText(time)}

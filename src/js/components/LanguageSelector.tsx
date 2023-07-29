@@ -1,6 +1,6 @@
+import { LanguageIcon } from '@heroicons/react/24/solid';
 import $ from 'jquery';
 
-import Icons from '../Icons';
 import {
   AVAILABLE_LANGUAGE_KEYS,
   AVAILABLE_LANGUAGES,
@@ -18,7 +18,7 @@ function onLanguageChange(e: Event): void {
 
 const LanguageSelector = () => (
   <div className="flex flex-row w-full justify-center items-center">
-    {Icons.language}
+    <LanguageIcon width={24} />
     <select className="input rounded-full" onChange={(e) => onLanguageChange(e)} value={language}>
       {Object.keys(AVAILABLE_LANGUAGES).map((l) => (
         <option value={l}>{AVAILABLE_LANGUAGES[l]}</option>
