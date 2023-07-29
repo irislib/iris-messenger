@@ -107,7 +107,7 @@ export default function Menu() {
     const hex = Key.getPubKey();
     const npub = Key.toNostrBech32Address(hex, 'npub');
     return (
-      <div>
+      <div className="flex justify-center xl:justify-start">
         <Link href={`/${npub}`} className="btn btn-ghost md:max-xl:btn-circle">
           <Avatar str={hex} width={34} />
           <div className="hidden xl:block ml-2">
@@ -133,7 +133,7 @@ export default function Menu() {
           <Show when={a.text === 'messages' && unseenMsgsTotal}>
             <span class="unseen unseen-total">{unseenMsgsTotal}</span>
           </Show>
-          <Icon width={24} />
+          <Icon width={26} />
           <span className="hidden xl:flex">{t(a.text)}</span>
         </a>
       </div>
@@ -151,7 +151,7 @@ export default function Menu() {
         {isStPatricksDay ? (
           <span className="text-3xl">☘️</span>
         ) : (
-          <img src="/img/icon128.png" width="30" height="30" />
+          <img src="/img/icon128.png" width="34" height="34" />
         )}
         <h1 className="hidden xl:flex text-3xl">iris{isStPatricksDay ? 'h' : ''}</h1>
       </a>
@@ -161,7 +161,7 @@ export default function Menu() {
           className="btn btn-primary md:max-xl:btn-circle"
           onClick={() => setShowNewPostModal(!showNewPostModal)}
         >
-          <PlusIcon width={24} />
+          <PlusIcon width={26} />
           <span className="hidden xl:flex">{t('new_post')}</span>
         </button>
         <Show when={showNewPostModal}>{renderNewPostModal()}</Show>
