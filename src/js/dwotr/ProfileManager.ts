@@ -30,7 +30,8 @@ class ProfileManager {
   }
 
   async fetchProfile(address: string) {
-    const profile = await fetch(`https://api.iris.to/profile/${address}`).then((res) => {
+    const npub = Key.toNostrBech32Address(address, 'npub') as string;
+    const profile = await fetch(`https://api.iris.to/profile/${npub}`).then((res) => {
       if (res.status === 200) return res.json();
       else return undefined;
     });

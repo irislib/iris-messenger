@@ -40,6 +40,12 @@ const GraphViewSelect = ({ view, me, setSearch }: GraphViewSelectProps) => {
       >
         Global Graph
       </Link>
+      <Link
+        href={setSearch({ page: 'diagnostics', view: 'diagnostics' })}
+        className={view == 'diagnostics' ? selected : unselected}
+      >
+        Diagnostics
+      </Link>
     </div>
   );
 };

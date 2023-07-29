@@ -9,6 +9,9 @@ import { Unsubscribe } from '../../nostr/PubSub';
 import { ID } from '../../nostr/UserIds';
 import { toTimestamp } from '../Utils';
 import Name from '../../components/user/Name';
+import InfoList from '../components/Display/InfoList';
+import ProfileRecord from '../model/ProfileRecord';
+import { Edge } from '../model/Graph';
 
 type TestDataProps = {
   id?: string;
@@ -38,11 +41,11 @@ const nvk = 'npub1az9xj85cmxv8e9j9y80lvqp97crsqdu2fpu3srwthd99qfu9qsgstam8y8';
 const fiatjaf = 'npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6';
 const carla = 'npub1hu3hdctm5nkzd8gslnyedfr5ddz3z547jqcl5j88g4fame2jd08qh6h8nh';
 
-const TestData = (props: TestDataProps) => {
+const Diagnostics = (props: TestDataProps) => {
   const [state, setState] = useState<any>(null);
   const [unsubscribe] = useState<Array<() => void>>([]);
 
-  const pub = (props.id) ? Key.toNostrHexAddress(props.id) as string : Key.getPubKey();
+  const pub = props.id ? (Key.toNostrHexAddress(props.id) as string) : Key.getPubKey();
   const npub = Key.toNostrBech32Address(pub as string, 'npub') as string;
 
   useEffect(() => {
@@ -55,12 +58,15 @@ const TestData = (props: TestDataProps) => {
             profileIndex[ID(p.key)] = p;
           });
 
-
+          let edgesCount = Object.values(graphNetwork.g.edges).length;
+          let nodesCount = Object.values(graphNetwork.g.vertices).length;
 
           setState((prevState) => ({
             ...prevState,
             profiles,
             profileIndex,
+            edgesCount,
+            nodesCount,
           }));
         })
         .then((unsub: Unsubscribe) => unsubscribe.push(unsub));
@@ -79,7 +85,7 @@ const TestData = (props: TestDataProps) => {
     // const e = graphNetwork.g.edges[key];
     // if (e) return e;
 
-    return graphNetwork.setTrust({ ...props, from, to}, true);
+    return graphNetwork.setTrust({ ...props, from, to }, true);
   }
 
   function trust(from: string, to: string, val: number) {
@@ -103,42 +109,36 @@ const TestData = (props: TestDataProps) => {
   const listUsers = () => {
     if (!state?.profiles) return;
 
-    return state.profiles.map((p: any) => {
-        //const npub = Key.toNostrBech32Address(p.key as string, 'npub') as string;
-    
-        return (
-            <div className="flex">
-            <span className="">
-                <span style={{ flex: 1 }} className="">
-                    {p.name}
-                </span>
-            </span>
-            </div>
-        );
+    // Convert into a list of InfoList objects
+    let list = state.profiles.map((p: ProfileRecord) => {
+      return { name: p.name, value: p.email };
     });
-  }
+
+    return <InfoList data={list} title={'Profiles'} />;
+  };
 
   // visualize a list of Edges from the state.edges object
-    const listEdges = () => {
-        if (!state?.edges) return;
+  const listEdges = () => {
+    if (!state?.edges) return;
 
-        return state.edges.map((e: any) => {
-            //const npub = Key.toNostrBech32Address(p.key as string, 'npub') as string;
-        
-            return (
-                <div className="flex">
-                <span className="">
-                    <span style={{ flex: 1 }} className="">
-                        {e.name}
-                    </span>
-                </span>
-                </div>
-            );
-        });
-    }
+    // Convert into a list of InfoList objects
+    let list = state.edges.map((e: Edge) => {
+      return { name: e.key, value: `${e.out?.id} -- ${e.val} --> ${e.in?.id}` };
+    });
 
+    return <InfoList data={list} title={'Edges'} />;
+  };
 
+  const Overview = () => {
+    // Make a list of teknical data from profiles and edges
+    let list = [
+      { name: 'Profiles', value: state?.profiles.length },
+      { name: 'Vertices', value: state?.nodesCount },
+      { name: 'Edges', value: state?.edgesCount },
+    ];
 
+    return <InfoList data={list} title={'Overview'} />;
+  };
 
   return (
     <>
@@ -161,17 +161,14 @@ const TestData = (props: TestDataProps) => {
       </div>
 
       <hr className="-mx-2 opacity-10 my-2" />
-      <div className="h-full w-full flex items-stretch justify-center">
-        <div className="flex flex-col gap-4">
-            {listUsers()}
-        </div>
-        <div className="flex flex-col gap-4">
-            {listEdges()}
-        </div>
+      <div className="flex">
+        <div className="flex flex-1 gap-4">{Overview()}</div>
+        <div className="flex flex-1 gap-4">{listUsers()}</div>
+        <div className="flex flex-1 gap-4">{listEdges()}</div>
         {/* <div className="flex-grow" ref={visJsRef} /> */}
       </div>
     </>
   );
 };
 
-export default TestData;
+export default Diagnostics;
