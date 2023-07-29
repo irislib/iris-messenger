@@ -1,3 +1,4 @@
+import { sha256 } from '@noble/hashes/sha256';
 import { generatePrivateKey } from 'nostr-tools';
 import { useState } from 'preact/hooks';
 import { route } from 'preact-router';
@@ -6,17 +7,20 @@ import localState from '../../LocalState';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
 
-export const createNewGroup = (key) => {
-  const randomChatID = Math.floor(Math.random() * 1000000000);
-  localState.get('groups').get(randomChatID).put({ key });
-  console.log('create new group', key);
-  route(`/chat/${randomChatID}`);
+export const addGroup = (key) => {
+  const keyHash = sha256(key);
+  const groupId = Array.from(keyHash, (byte) => byte.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 12);
+
+  localState.get('groups').get(groupId).put({ key });
+  route(`/chat/${groupId}`);
 };
 
 export const addChatWithInputKey = (inputKey) => {
   if (inputKey.startsWith('nsec')) {
     const hexPriv = Key.toNostrHexAddress(inputKey);
-    hexPriv && createNewGroup(hexPriv);
+    hexPriv && addGroup(hexPriv);
   }
 };
 
@@ -25,10 +29,11 @@ export default function NewChat() {
 
   const startNewGroup = () => {
     const newNostrKey = generatePrivateKey();
-    createNewGroup(newNostrKey);
+    addGroup(newNostrKey);
   };
 
   const handleInput = (e) => {
+    console.log(111, e.target.value);
     setInputKey(e.target.value);
     addChatWithInputKey(e.target.value);
   };

@@ -13,6 +13,7 @@ import Torrent from './Torrent';
 const PrivateMessage = (props) => {
   const [text, setText] = useState(props.text || '');
   const [innerEvent, setInnerEvent] = useState<any>(null as any);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     $('a').click((e) => {
@@ -51,11 +52,16 @@ const PrivateMessage = (props) => {
     } catch (e) {
       // ignore
     }
+    setChecked(true);
     setText(textContent);
   };
 
   if (innerEvent) {
     return <PrivateMessage {...innerEvent} showName={true} />;
+  }
+
+  if (!checked) {
+    return null;
   }
 
   const onNameClick = () => {
