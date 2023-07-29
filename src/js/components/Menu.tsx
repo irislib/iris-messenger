@@ -158,7 +158,7 @@ export default function Menu() {
       <div className="flex flex-col gap-2">{MENU_ITEMS.map((a: any) => renderMenuItem(a))}</div>
       <div class="py-2 flex-1">
         <button
-          className="btn btn-primary md:max-xl:btn-circle"
+          className="btn btn-primary md:max-xl:btn-circle mt-2"
           onClick={() => setShowNewPostModal(!showNewPostModal)}
         >
           <PlusIcon width={26} />
