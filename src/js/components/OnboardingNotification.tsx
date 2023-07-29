@@ -69,7 +69,7 @@ export default class OnboardingNotification extends Component {
 
   renderFollowSuggestions() {
     return (
-      <div className="flex flex-col flex-grow  gap-2">
+      <div className="flex flex-col flex-grow px-2 py-4 md:px-4 gap-2">
         <p className="text-base">{t('follow_someone_info')}</p>
         {SUGGESTED_FOLLOWS.map(([pub, description]) => (
           <div className="flex items-center space-x-4">

@@ -141,7 +141,7 @@ export default function Menu() {
   };
 
   return (
-    <div className="sticky top-0 z-20 h-screen max-h-screen hidden md:flex xl:w-56 flex-col px-2 py-4 flex-shrink-0">
+    <div className="sticky border-r border-neutral-900 top-0 z-20 h-screen max-h-screen hidden md:flex xl:w-56 flex-col px-2 py-4 flex-shrink-0">
       <a
         className="flex items-center gap-3 px-2 mb-4"
         tabIndex={3}
