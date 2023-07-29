@@ -134,7 +134,7 @@ export default function Menu() {
             <span class="unseen unseen-total">{unseenMsgsTotal}</span>
           </Show>
           <Icon width={26} />
-          <span className="hidden xl:flex">{t(a.text)}</span>
+          <span className="hidden xl:flex pr-2">{t(a.text)}</span>
         </a>
       </div>
     );
