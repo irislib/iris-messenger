@@ -14,7 +14,7 @@ class About extends Component {
       <>
         <Header />
         <div className="main-view prose" id="settings">
-          <div className="p-2">
+          <div className="px-2 md:px-4 py-2">
             <h2 className="mt-0">{t('about')}</h2>
             <p>Iris is like the social networking apps we're used to, but better:</p>
             <ul>
