@@ -49,10 +49,18 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
       return;
     }
 
-    const event = { kind: 4, created_at: Math.floor(Date.now() / 1000) } as any;
+    const kind = 4;
+    const created_at = Math.floor(Date.now() / 1000);
+    const event = { kind, created_at } as any;
     if (keyPair) {
       // group message
-      event.content = await nip04.encrypt(keyPair.privKey, keyPair.pubKey, message);
+      let innerEvent = { kind, created_at, content: message, tags: [['p', keyPair.pubKey]] };
+      innerEvent = await Events.sign(innerEvent);
+      event.content = await nip04.encrypt(
+        keyPair.privKey,
+        keyPair.pubKey,
+        JSON.stringify(innerEvent),
+      );
       event.pubkey = keyPair.pubKey;
       event.tags = [['p', keyPair.pubKey]];
       console.log('event', event);
