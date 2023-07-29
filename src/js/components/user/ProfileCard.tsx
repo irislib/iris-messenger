@@ -159,7 +159,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
       <div className="mb-2 mx-4 md:px-4 md:mx-0 flex flex-col gap-2">
         <div className="flex flex-row">
           <div className={profile.banner ? '-mt-24' : ''}>{profilePicture}</div>
-          <div className="flex-1 justify-end flex gap-2">
+          <div className="flex-1 justify-end items-center flex gap-2">
             <div onClick={onClickHandler}>
               <Show when={isMyProfile}>
                 <a className="btn btn-sm btn-neutral" href="/profile/edit">
@@ -176,14 +176,12 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
                 </button>
               </Show>
             </div>
-            <div>
-              <ProfileDropdown
-                hexPub={hexPub}
-                npub={npub}
-                rawDataJson={rawDataJson}
-                isMyProfile={isMyProfile}
-              />
-            </div>
+            <ProfileDropdown
+              hexPub={hexPub}
+              npub={npub}
+              rawDataJson={rawDataJson}
+              isMyProfile={isMyProfile}
+            />
           </div>
         </div>
         <div className="profile-header-stuff">
