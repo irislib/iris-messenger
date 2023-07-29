@@ -167,7 +167,7 @@ function ChatMessages({ id }) {
                   />
                 </div>
                 <Show when={showQr}>
-                  <QrCode data={formatPrivateKey()} />
+                  <QrCode data={'nostr:' + formatPrivateKey()} />
                 </Show>
               </Show>
               <Show when={!isGroup}>{t('dm_privacy_warning')}</Show>
