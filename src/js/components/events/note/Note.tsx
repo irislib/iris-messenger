@@ -147,7 +147,7 @@ const Note = ({
         {showThreadBtn}
         <div className="flex flex-row" onClick={(e) => messageClicked(e)}>
           <Show when={!fullWidth}>
-            <Avatar event={event} isQuote={isQuote} standalone={standalone} />
+            <Avatar event={event} isQuote={isQuote} standalone={standalone} fullWidth={fullWidth} />
           </Show>
           <Content
             event={event}

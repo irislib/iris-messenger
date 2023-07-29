@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
+import { BoltIcon } from '@heroicons/react/24/solid';
 import { Event } from 'nostr-tools';
 import { route } from 'preact-router';
 
-import Icons from '../../Icons';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Name from '../user/Name';
@@ -58,7 +58,9 @@ export default function Zap(props: Props) {
     <div>
       <div onClick={(e) => messageClicked(e, zappedId || '')}>
         <div className="flex gap-1 items-center text-sm text-neutral-500 px-2 pt-2">
-          <i className="zap-btn text-iris-orange">{Icons.lightning}</i>
+          <i className="zap-btn text-iris-orange">
+            <BoltIcon width={18} height={18} />
+          </i>
           <div>
             <a href={userLink}>
               <Name pub={zappingUser || ''} />
