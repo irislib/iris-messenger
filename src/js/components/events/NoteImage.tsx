@@ -97,6 +97,9 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
 
   if (props.event.kind !== 1) {
     const id = Events.getEventReplyingTo(props.event);
+    if (!id) {
+      return null;
+    }
     return <EventComponent id={id} renderAs="NoteImage" />;
   }
   const attachments = [] as { type: string; url: string }[];
