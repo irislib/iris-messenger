@@ -6,14 +6,22 @@ import localState from '../../LocalState';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
 
+export const createNewGroup = (key) => {
+  const randomChatID = Math.floor(Math.random() * 1000000000);
+  localState.get('groups').get(randomChatID).put({ key });
+  console.log('create new group', key);
+  route(`/chat/${randomChatID}`);
+};
+
+export const addChatWithInputKey = (inputKey) => {
+  if (inputKey.startsWith('nsec')) {
+    const hexPriv = Key.toNostrHexAddress(inputKey);
+    hexPriv && createNewGroup(hexPriv);
+  }
+};
+
 export default function NewChat() {
   const [inputKey, setInputKey] = useState('');
-
-  const createNewGroup = (key) => {
-    const randomChatID = Math.floor(Math.random() * 1000000000);
-    localState.get('groups').get(randomChatID).put({ key });
-    route(`/chat/${randomChatID}`);
-  };
 
   const startNewGroup = () => {
     const newNostrKey = generatePrivateKey();
@@ -22,14 +30,7 @@ export default function NewChat() {
 
   const handleInput = (e) => {
     setInputKey(e.target.value);
-    addChatWithInputKey();
-  };
-
-  const addChatWithInputKey = () => {
-    if (inputKey.startsWith('nsec')) {
-      const hexPriv = Key.toNostrHexAddress(inputKey);
-      hexPriv && createNewGroup(hexPriv);
-    }
+    addChatWithInputKey(e.target.value);
   };
 
   return (
@@ -44,7 +45,7 @@ export default function NewChat() {
           type="password"
           id="pasteLink"
           className="text-center input border border-gray-400 rounded-full p-2"
-          onInput={handleInput}
+          onChange={handleInput}
           value={inputKey}
         />
         {/*<button id="scanQR" className="btn btn-neutral" onClick={}>

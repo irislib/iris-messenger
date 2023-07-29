@@ -165,6 +165,11 @@ function ChatMessages({ id }) {
                     copyStr={formatPrivateKey()}
                     text="Copy nsec"
                   />
+                  <Copy
+                    className="btn btn-neutral btn-sm"
+                    copyStr={`https://beta.iris.to/chat/#${formatPrivateKey()}`}
+                    text="Copy link"
+                  />
                 </div>
                 <Show when={showQr}>
                   <QrCode data={'nostr:' + formatPrivateKey()} />
