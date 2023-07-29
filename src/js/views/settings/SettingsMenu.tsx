@@ -1,7 +1,8 @@
+import { LanguageIcon } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
-import Icons from '../../Icons';
+import Show from '../../components/helpers/Show';
 import localState from '../../LocalState';
 import { translate as t } from '../../translations/Translation.mjs';
 
@@ -42,16 +43,16 @@ export default class SettingsMenu extends Component {
           return (
             <a
               href="#"
-              className={`btn inline-flex w-auto flex items-center space-x-4 p-3 rounded-full transition-colors duration-200 hover:bg-neutral-900 ${
+              className={`btn inline-flex w-auto flex items-center p-3 rounded-full transition-colors duration-200 hover:bg-neutral-900 ${
                 activePage === page && window.innerWidth > 624 ? 'active' : ''
               }`}
               onClick={(e) => this.menuLinkClicked(page, e)}
               key={page}
             >
-              <span class="text">
-                {t(SETTINGS[page])}
-                {page === 'language' && <small className="mar-left5">{Icons.language}</small>}
-              </span>
+              <span class="text">{t(SETTINGS[page])}</span>
+              <Show when={page === 'language'}>
+                <LanguageIcon width={16} />
+              </Show>
             </a>
           );
         })}

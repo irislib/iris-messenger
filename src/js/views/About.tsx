@@ -102,10 +102,6 @@ class About extends Component {
               <a href="https://t.me/irismessenger">Telegram</a> channel.
             </p>
 
-            <a href="https://opencollective.com/iris-social/donate" target="_blank">
-              <img src="/img/opencollective.png" width={200} />
-            </a>
-
             <p>
               Released under MIT license. Code:{' '}
               <a href="https://github.com/irislib/iris-messenger">Github</a>.
