@@ -66,7 +66,7 @@ const Search = (props: any) => {
   const trendingPosts = useCachedFetch(url, 'trendingNotes', dataProcessor);
 
   return (
-    <div class="sticky top-0 right-0 px-4 py-2 mx-2 md:mx-0 flex flex-col gap-4 h-screen">
+    <div class="sticky border-l border-neutral-900 top-0 right-0 px-4 py-2 mx-2 md:mx-0 flex flex-col gap-4 h-screen">
       <SearchBox
         focus={props.focus}
         onSelect={({ key }) => {
