@@ -1,11 +1,12 @@
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
 
+import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
 import View from '../View';
 
 import ChatList from './ChatList';
 import ChatMessages from './ChatMessages';
-import NewChat from './NewChat';
+import NewChat, { addChatWithInputKey } from './NewChat';
 
 class Chat extends View {
   id: string;
@@ -14,6 +15,18 @@ class Chat extends View {
     super();
     this.id = 'chat-view';
     this.hideSideBar = true;
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    const id = window.location.hash.substr(1);
+    if (id && id.startsWith('nsec')) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      if (!Key.getPubKey()) {
+        Key.loginAsNewUser();
+      }
+      addChatWithInputKey(id);
+    }
   }
 
   renderContent = (id) => {

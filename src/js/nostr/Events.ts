@@ -1,10 +1,18 @@
 import { debounce } from 'lodash';
 import Loki from 'lokijs';
-import { Event, Filter, getEventHash, matchFilter } from 'nostr-tools';
+import {
+  Event,
+  Filter,
+  getEventHash,
+  matchFilter,
+  validateEvent,
+  verifySignature,
+} from 'nostr-tools';
 import { EventTemplate } from 'nostr-tools';
 
 import FuzzySearch from '../FuzzySearch';
 import localState from '../LocalState';
+import { addGroup } from '../views/chat/NewChat';
 
 import EventMetaStore from './EventsMeta';
 import IndexedDB from './IndexedDB';
@@ -341,7 +349,7 @@ const Events = {
     }
     this.zapsByNote.get(zappedNote)?.add(event);
   },
-  handleDirectMessage(event: Event) {
+  async handleDirectMessage(event: Event) {
     const myPub = Key.getPubKey();
     let user = event.pubkey;
     if (event.pubkey === myPub) {
@@ -352,6 +360,33 @@ const Events = {
         return;
       }
     }
+    try {
+      // TODO trying to json parse all dms might be slow, how to avoid?
+      const decrypted = await Key.decrypt(event.content, event.pubkey);
+      const innerEvent = JSON.parse(decrypted.slice(decrypted.indexOf('{')));
+      if (validateEvent(innerEvent) && verifySignature(innerEvent)) {
+        // parse nsec from message by regex. nsec is bech32 encoded in the message
+        // no follow distance check here for now
+        const nsec = innerEvent.content.match(/nsec1[023456789acdefghjklmnpqrstuvwxyz]{6,}/gi)?.[0];
+        if (nsec) {
+          const hexPriv = Key.toNostrHexAddress(nsec);
+          if (hexPriv) {
+            // TODO browser notification?
+            addGroup(hexPriv, false, innerEvent.pubkey);
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    const distance = SocialNetwork.getFollowDistance(event.pubkey);
+    if (distance && distance > globalFilter.maxFollowDistance) {
+      // follow distance too high, reject
+      return false;
+    }
+
     this.insert(event);
     if (!this.directMessagesByUser.has(user)) {
       this.directMessagesByUser.set(user, new SortedLimitedEventSet(500));
@@ -385,6 +420,10 @@ const Events = {
   acceptEvent(event: Event) {
     // quick fix: disable follow distance filter when not logged in
     if (globalFilter.maxFollowDistance && !!Key.getPubKey()) {
+      // let dms through in case it's an anonymous chat invite. otherwise discard in handleDirectMessage.
+      if (event.kind === 4) {
+        return true;
+      }
       if (!PubSub.subscribedAuthors.has(event.pubkey) && !PubSub.subscribedEventIds.has(event.id)) {
         // unless we specifically subscribed to the user or post, ignore long follow distance users
         if (!event.pubkey) {

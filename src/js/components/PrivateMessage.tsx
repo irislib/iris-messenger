@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import $ from 'jquery';
+import { validateEvent, verifySignature } from 'nostr-tools';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
@@ -11,6 +12,8 @@ import Torrent from './Torrent';
 
 const PrivateMessage = (props) => {
   const [text, setText] = useState(props.text || '');
+  const [innerEvent, setInnerEvent] = useState<any>(null as any);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     $('a').click((e) => {
@@ -20,12 +23,47 @@ const PrivateMessage = (props) => {
         route(href.replace('https://iris.to/', ''));
       }
     });
-    if (!text) {
+
+    let initialText = text;
+    if (!initialText) {
       Key.decryptMessage(props.id, (decryptedText) => {
-        setText(decryptedText);
+        initialText = decryptedText;
+        checkTextForJson(initialText);
       });
+    } else {
+      checkTextForJson(initialText);
     }
-  }, [props.id]);
+  }, [props.id, text]);
+
+  const checkTextForJson = (textContent) => {
+    try {
+      const maybeJson = textContent.slice(textContent.indexOf('{'));
+      const event = JSON.parse(maybeJson);
+      if (validateEvent(event) && verifySignature(event)) {
+        if (
+          event.tags.length === 1 &&
+          event.tags[0][0] === 'p' &&
+          event.tags[0][1] === props.pubkey
+        ) {
+          event.text = event.content;
+          setInnerEvent(event);
+          return;
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    setChecked(true);
+    setText(textContent);
+  };
+
+  if (innerEvent) {
+    return <PrivateMessage {...innerEvent} showName={true} />;
+  }
+
+  if (!checked) {
+    return null;
+  }
 
   const onNameClick = () => {
     route(`/${Key.toNostrBech32Address(props.pubkey, 'npub')}`);
@@ -54,7 +92,9 @@ const PrivateMessage = (props) => {
           )}
         </div>
         {props.torrentId && <Torrent torrentId={props.torrentId} />}
-        <div className={`text-base ${emojiOnly ? 'text-4xl' : ''}`}>{formattedText}</div>
+        <div className={`preformatted-wrap text-base ${emojiOnly ? 'text-4xl' : ''}`}>
+          {formattedText}
+        </div>
         <div className="text-right text-xs text-gray-400">
           {props.id ? Helpers.getRelativeTimeText(time) : Helpers.formatTime(time)}
         </div>

@@ -26,10 +26,10 @@ abstract class View extends Component {
 
   render() {
     return (
-      <div className="flex flex-row w-full">
-        <div className={`flex flex-col w-full ${this.hideSideBar ? '' : 'lg:w-2/3'}`}>
+      <div className="flex flex-row h-full w-full">
+        <div className={`flex flex-col w-full h-full ${this.hideSideBar ? '' : 'lg:w-2/3'}`}>
           <Header />
-          <div class={this.class} id={this.id}>
+          <div class={this.class} id={this.id} className="h-full">
             <ErrorBoundary>{this.renderView()}</ErrorBoundary>
           </div>
         </div>
