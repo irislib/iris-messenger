@@ -50,7 +50,8 @@ export class Edge extends EdgeBase {
 
     partial: boolean = true; // True if the edge is partial, has not loaded all data
 
-    static partial(record: EdgeRecord) : Edge {
+    // Minimize memory usage by only storing minimal data in memory
+    static partialFrom(record: EdgeRecord) : Edge {
         let edge = new Edge();
         edge.key = record.key;
         edge.type = record.type;
@@ -84,28 +85,22 @@ export default class Graph {
     vertices = {};
     edges = {};
 
-    addVertice(id: number) : void {
-        if(this.vertices[id] == undefined) {
-            this.vertices[id] = new Vertice(id);
-        }
+    addVertice(id: number) : Vertice {
+        return this.vertices[id] as Vertice || (this.vertices[id] = new Vertice(id));
     }
 
     addEdge(record: EdgeRecord, fill: boolean = false) : Edge {
         let edge = this.edges[record.key] as Edge;
-        if(!edge) {
-            this.addVertice(ID(record.from));
-            this.addVertice(ID(record.to));
+        if(!edge) { // Create new edge
 
-            edge = Edge.partial(record);
+            edge = Edge.partialFrom(record);
+            this.edges[record.key] = edge;
 
-            let outV = this.vertices[ID(record.from)] as Vertice;
-            let inV = this.vertices[ID(record.to)] as Vertice;
+            edge.out = this.addVertice(ID(record.from));
+            edge.in = this.addVertice(ID(record.to));
 
-            if(outV) outV.out[inV.id] = edge;
-            if(inV) inV.in[outV.id] = edge;
-
-            edge.out = outV;
-            edge.in = inV;
+            edge.out.out[edge.in.id] = edge;
+            edge.in.in[edge.out.id] = edge;
         } 
 
         // Memory saving feature, only fill all data if requested
@@ -152,9 +147,11 @@ export default class Graph {
         let queue = [] as Array<Vertice>;
         let nextQueue = Object.create(null); // Use null to avoid prototype pollution
 
+        let startV = this.vertices[sourceId] as Vertice;
+        if(!startV) return; // Source vertice not found
+
         this.resetScore(); // Reset all scores in the graph
 
-        let startV = this.vertices[sourceId] as Vertice;
         let degree = startV.degree = 0;
 
         queue.push(startV); // Add the source vertice id to the queue as starting point
@@ -248,8 +245,11 @@ export default class Graph {
 
   
     inOutTrustById(sourceId: number, entityType?:EntityType, trust1?:number) : Array<Vertice> {
-        let obj = Object.create(null) as {[key: string]: Vertice};
         const sourceV = this.vertices[sourceId] as Vertice;
+        if(!sourceV) return [];
+
+        let obj = Object.create(null) as {[key: string]: Vertice};
+
         for(const key in sourceV.in) {
             const outV = this.vertices[key] as Vertice;
             if(!outV || outV.degree > MAX_DEGREE) continue; // Skip if the in vertice has no degree or above max degree

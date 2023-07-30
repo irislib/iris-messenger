@@ -266,6 +266,7 @@ const TrustList = (props: TrustListViewProps) => {
       </p>
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-col w-full gap-4">
+        
         <ScrollView>{renderVertices()}</ScrollView>
       </div>
     </>

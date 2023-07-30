@@ -54,6 +54,8 @@ html {
   }
 
   .neutralName {
+    text-decoration-line: underline;
+    text-decoration-color: yellow;
   }
 
   .badName {

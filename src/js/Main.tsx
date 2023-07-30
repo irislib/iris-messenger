@@ -158,7 +158,7 @@ class Main extends Component<Props, ReactState> {
               <TrustList path="/wot/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?"  />
               <VisGraph path="/vis/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
               <VisPath path="/path/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
-              <Diagnostics path="/diagnostics/:id?" />
+              <Diagnostics path="/diagnostics/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
               <VisGraph path="/globalgraph/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
               {/* <WotView path="/wot/events/:id"  entitytype={EntityType.Item} /> */}
               {/* <Score path="/trustedby/:id" trust1={1} dir="in" title="Trusted by" />

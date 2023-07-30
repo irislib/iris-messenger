@@ -29,13 +29,16 @@ class ProfileManager {
     this.loaded = true;
   }
 
-  async fetchProfile(address: string) {
-    const npub = Key.toNostrBech32Address(address, 'npub') as string;
-    const profile = await fetch(`https://api.iris.to/profile/${npub}`).then((res) => {
-      if (res.status === 200) return res.json();
-      else return undefined;
-    });
-    return profile;
+    // TODO: Disable for now as it's not working because of CORS
+    async fetchProfile(address: string) {
+    // const npub = Key.toNostrBech32Address(address, 'npub') as string;
+    // const profile = await fetch(`https://api.iris.to/profile/${npub}`).then((res) => {
+    //   if (res.status === 200) return res.json();
+    //   else return undefined;
+    // });
+    // return profile;
+    console.log('fetchProfile disabled. CORS issue. Requested address:', address);
+    return undefined;
   }
 
   quickProfile(address: string) {
@@ -55,7 +58,7 @@ class ProfileManager {
       cb?.(SocialNetwork.profiles.get(id), address);
     };
 
-    const profile = SocialNetwork.profiles.get(id);
+    let profile = SocialNetwork.profiles.get(id);
 
     if (profile) {
       callback();
@@ -68,15 +71,12 @@ class ProfileManager {
         //   callback();
         // });
       }
-    }
-
-    if (!profile) {
+    } else  {
       // Check if profile is in IndexedDB
       this.loadProfile(address).then((profile) => {
         if (profile) {
           // exists in DB
           if (this.profileIsNewer(profile))
-            // but is it newer?
             this.addProfileToMemory(profile);
 
           callback(); // callback with profile
@@ -96,6 +96,12 @@ class ProfileManager {
       });
     }
 
+    if(!profile) {
+      profile = this.createDefaultProfile(address);
+      SocialNetwork.profiles.set(id, profile);
+      callback();
+    }
+
     // Then subscribe to updates via nostr relays
     return PubSub.subscribe({ kinds: [0], authors: [address] }, callback, false);
   }
@@ -106,20 +112,19 @@ class ProfileManager {
   ): Promise<Unsubscribe> {
     if (!addresses || addresses.length === 0) return () => {};
 
-    let list: Array<any> = [];
+    let result: Array<any> = [];
     let dbLookups: Array<string> = [];
     let npubs: Array<string> = [];
 
     // First load from memory
     for (const address of addresses) {
       if (!address) continue;
-      const pub = Key.toNostrHexAddress(address) as string;
-      const id = ID(pub);
-      const item = SocialNetwork.profiles.get(id);
-      if (item) {
-        list.push(item);
+      const hexPub = Key.toNostrHexAddress(address) as string;
+      const profile = SocialNetwork.profiles.get(ID(hexPub));
+      if (profile) {
+        result.push(profile);
       } else {
-        dbLookups.push(pub);
+        dbLookups.push(hexPub);
       }
 
       npubs.push(Key.toNostrBech32Address(address, 'npub') as string);
@@ -130,7 +135,7 @@ class ProfileManager {
     const dbProfiles = await this.loadProfiles(lookupSet);
 
     if (dbProfiles && dbProfiles.length > 0) {
-      list = list.concat(dbProfiles);
+      result = result.concat(dbProfiles);
       for (const profile of dbProfiles) {
         if (profile) lookupSet.delete(profile.key);
       }
@@ -144,10 +149,10 @@ class ProfileManager {
         ),
       );
       if (apiProfiles && apiProfiles.length > 0) {
-        for (const profile of apiProfiles) {
+        for (const profile of apiProfiles as Array<any>) {
           if (profile) {
             Events.handle(profile);
-            list.push(profile);
+            result.push(profile);
             lookupSet.delete(profile.key);
           }
         }
@@ -155,16 +160,16 @@ class ProfileManager {
     }
 
     // Fill in default profile for missing profiles
-    for (const address of lookupSet) {
-      let profile = this.sanitizeProfile({}, address);
+    for (const hexPub of lookupSet) {
+      let profile = this.createDefaultProfile(hexPub);
       SocialNetwork.profiles.set(ID(profile.key), profile);
-      list.push(profile); // Fill in default profile with animal names
+      result.push(profile); // Fill in default profile with animal names
     }
 
     // Then callback
-    if (list.length > 0)
+    if (result.length > 0)
       // The list should contain a profile for each address
-      cb?.(list);
+      cb?.(result);
 
     // Then subscribe to updates via nostr relays
     const callback = (event: Event) => {
@@ -229,6 +234,12 @@ class ProfileManager {
       isDefault,
     } as ProfileRecord;
 
+    return profile;
+  }
+
+  createDefaultProfile(npub: string): ProfileRecord {
+    let profile = this.sanitizeProfile({}, npub);
+    profile.isDefault = true;
     return profile;
   }
 
