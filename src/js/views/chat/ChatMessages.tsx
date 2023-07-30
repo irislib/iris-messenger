@@ -193,7 +193,7 @@ function ChatMessages({ id }) {
                       Go to secret chat
                     </button>
                   </Show>
-                  <Show when={!sortedMessages.length && !invitedToPriv}>
+                  <Show when={!invitedToPriv}>
                     <button className="btn btn-neutral btn-sm" onClick={onClickSecretInvite}>
                       Invite to secret chat
                     </button>
@@ -239,7 +239,7 @@ function ChatMessages({ id }) {
     };
 
     localState
-      .get('sentInvites')
+      .get('chatInvites')
       .get(hexId)
       .once((invite) => {
         if (invite?.priv) {

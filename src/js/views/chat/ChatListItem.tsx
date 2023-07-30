@@ -5,6 +5,7 @@ import Show from '../../components/helpers/Show';
 import Avatar from '../../components/user/Avatar';
 import Name from '../../components/user/Name';
 import Helpers from '../../Helpers';
+import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
@@ -16,6 +17,7 @@ interface ChatListItemProps {
 }
 
 interface ChatListItemState {
+  name: string | null;
   latest: any;
   latestText: string;
   lastOpened: number;
@@ -25,6 +27,7 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
   constructor() {
     super();
     this.state = {
+      name: null,
       latest: {},
       latestText: '',
       lastOpened: -Infinity,
@@ -52,6 +55,17 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
   }
 
   componentDidMount() {
+    const isGroup = this.props.chat.length < 20;
+    if (isGroup) {
+      localState
+        .get('groups')
+        .get(this.props.chat)
+        .on((group) => {
+          if (group.name) {
+            this.setState({ name: group.name });
+          }
+        });
+    }
     this.getLatestMsg();
   }
 
@@ -83,13 +97,16 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
         <div className="flex flex-row">
           <div className="flex flex-col">
             <span className="name">
-              <Show when={this.props.chat === Key.getPubKey()}>
-                <span className="font-bold italic">📝 {t('note_to_self')}</span>
+              <Show when={this.state.name}>{this.state.name}</Show>
+              <Show when={!this.state.name}>
+                <Show when={this.props.chat === Key.getPubKey()}>
+                  <span className="font-bold italic">📝 {t('note_to_self')}</span>
+                </Show>
+                <Show when={this.props.chat !== Key.getPubKey()}>
+                  <Name pub={this.props.chat} />
+                </Show>
+                <small className="ml-2 latest-time text-neutral-500">{time}</small>
               </Show>
-              <Show when={this.props.chat !== Key.getPubKey()}>
-                <Name pub={this.props.chat} />
-              </Show>
-              <small className="ml-2 latest-time text-neutral-500">{time}</small>
             </span>
             <small className="text-neutral-500 truncate">{this.state.latestText}</small>
           </div>

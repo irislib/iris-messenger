@@ -96,7 +96,7 @@ class ChatList extends BaseComponent<ChatListProps, ChatListState> {
       console.log('group', group);
       // add localKey to chat list
       const chats = this.state.chats;
-      chats.set(localKey, { eventIds: [] });
+      chats.set(localKey, { eventIds: [], group });
       console.log('chats', chats);
       const sortedChats: string[] = Array.from(chats.keys()).sort((a: string, b: string) => {
         const aEventIds: any[] = chats.get(a).eventIds;
