@@ -1,7 +1,7 @@
+import React, { useEffect, useRef, useState } from 'react';
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
-import $ from 'jquery';
+import { getEventHash, getSignature, nip04 } from 'nostr-tools';
 
-import BaseComponent from '../../BaseComponent';
 import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
@@ -12,24 +12,28 @@ interface ChatMessageFormProps {
   class?: string;
   autofocus?: boolean;
   onSubmit?: () => void;
+  keyPair?: { pubKey: string; privKey: string };
 }
 
-class ChatMessageForm extends BaseComponent<ChatMessageFormProps> {
-  componentDidMount() {
-    if (!Helpers.isMobile && this.props.autofocus !== false) {
-      $(this.base).find('.new-msg').focus();
-    }
-  }
+const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
+  activeChat,
+  class: classProp,
+  autofocus,
+  onSubmit,
+  keyPair,
+}) => {
+  const [message, setMessage] = useState<string>('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  componentDidUpdate() {
-    if (!Helpers.isMobile && this.props.autofocus !== false) {
-      $(this.base).find('.new-msg').focus();
+  useEffect(() => {
+    if (!Helpers.isMobile && autofocus !== false) {
+      inputRef.current?.focus();
     }
-  }
+  }, [autofocus]);
 
-  encrypt(text: string) {
+  const privateEncrypt = (text: string) => {
     try {
-      const theirPub = Key.toNostrHexAddress(this.props.activeChat);
+      const theirPub = Key.toNostrHexAddress(activeChat);
       if (!theirPub) {
         throw new Error('invalid public key ' + theirPub);
       }
@@ -37,73 +41,85 @@ class ChatMessageForm extends BaseComponent<ChatMessageFormProps> {
     } catch (e) {
       console.error(e);
     }
-  }
+  };
 
-  async onSubmit(e: Event) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    e.stopPropagation();
-    const textEl = $(this.base).find('.new-msg');
-    const text = textEl.val() as string;
-    if (!text.length) {
+    if (!message.length) {
       return;
     }
 
-    const content = await this.encrypt(text);
-
-    const recipient = Key.toNostrHexAddress(this.props.activeChat);
-    if (!recipient) {
-      throw new Error('invalid public key ' + recipient);
+    const kind = 4;
+    const created_at = Math.floor(Date.now() / 1000);
+    const event = { kind, created_at } as any;
+    if (keyPair) {
+      // group message
+      let innerEvent = { kind, created_at, content: message, tags: [['p', keyPair.pubKey]] };
+      innerEvent = await Events.sign(innerEvent);
+      event.content = await nip04.encrypt(
+        keyPair.privKey,
+        keyPair.pubKey,
+        `${message}\n\n${JSON.stringify(innerEvent)}`,
+      );
+      event.pubkey = keyPair.pubKey;
+      event.tags = [['p', keyPair.pubKey]];
+      console.log('event', event);
+      event.id = getEventHash(event);
+      event.sig = getSignature(event, keyPair.privKey);
+    } else {
+      const recipient = Key.toNostrHexAddress(activeChat);
+      event.content = await privateEncrypt(message);
+      event.tags = [['p', recipient]];
+      if (!recipient) {
+        throw new Error('invalid public key ' + recipient);
+      }
     }
-    Events.publish({
-      kind: 4,
-      content,
-      tags: [['p', recipient]],
-    });
-    textEl.val('');
 
-    this.props.onSubmit?.();
-  }
+    Events.publish(event);
 
-  onMsgTextInput(event: Event) {
-    localState
-      .get('channels')
-      .get(this.props.activeChat)
-      .get('msgDraft')
-      .put($(event.target).val() as string);
-  }
+    setMessage('');
 
-  onKeyDown(e: KeyboardEvent) {
+    onSubmit?.();
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setMessage(value);
+    localState.get('channels').get(activeChat).get('msgDraft').put(value);
+  };
+
+  const handleKeyDown = (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-      this.onSubmit(e as Event);
+      handleSubmit(e as any);
     }
-  }
+  };
 
-  render() {
-    return (
-      <form
-        autocomplete="off"
-        class={`flex flex-1 flex-row gap-2 p-2 message-form sticky w-full bottom-0 w-96 max-w-screen bg-black ${
-          this.props.class || ''
-        }`}
-        onSubmit={(e: Event) => this.onSubmit(e)}
-      >
-        <input
-          className="input input-sm flex-1 new-msg"
-          onInput={(e: Event) => this.onMsgTextInput(e)}
-          onKeyDown={(e: KeyboardEvent) => this.onKeyDown(e)}
-          type="text"
-          placeholder="Type a message"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="sentences"
-          spellCheck={true}
-        />
-        <button className="btn btn-neutral btn-sm" style={{ marginRight: '0' }}>
-          <PaperAirplaneIcon onClick={(e: MouseEvent) => this.onSubmit(e as Event)} width="24" />
-        </button>
-      </form>
-    );
-  }
-}
+  return (
+    <form
+      autoComplete="off"
+      className={`flex flex-none flex-row gap-2 p-2 message-form sticky w-full bottom-0 w-96 max-w-screen bg-black ${
+        classProp || ''
+      }`}
+      onSubmit={handleSubmit}
+    >
+      <input
+        ref={inputRef}
+        className="input input-sm flex-1 new-msg"
+        onInput={handleInputChange}
+        onKeyDown={handleKeyDown}
+        type="text"
+        placeholder="Type a message"
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="sentences"
+        spellCheck={true}
+        value={message}
+      />
+      <button className="btn btn-neutral btn-sm" style={{ marginRight: '0' }}>
+        <PaperAirplaneIcon width="24" />
+      </button>
+    </form>
+  );
+};
 
 export default ChatMessageForm;

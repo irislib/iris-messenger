@@ -2,6 +2,7 @@
 import reactStringReplace from 'react-string-replace';
 import { bech32 } from 'bech32';
 import $ from 'jquery';
+import _ from 'lodash';
 import throttle from 'lodash/throttle';
 import { nip19 } from 'nostr-tools';
 import { ComponentChild } from 'preact';
@@ -853,7 +854,21 @@ export default {
 
   getMyProfileLink(): string {
     const user = existingIrisToAddress.name || Key.toNostrBech32Address(Key.getPubKey(), 'npub');
-    return `${window.location.origin}/${user}`;
+    return this.buildURL(user);
+  },
+
+  buildURL(path: string, queryParams: Record<string, string> = {}, hash: string = ''): string {
+    const url = new URL(window.location.origin);
+    url.pathname = path;
+
+    queryParams &&
+      _.forEach(queryParams, (value, key) => {
+        url.searchParams.append(key, value);
+      });
+
+    hash && (url.hash = hash);
+
+    return url.toString();
   },
 
   arrayToHex(array: any) {

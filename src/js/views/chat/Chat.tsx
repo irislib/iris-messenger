@@ -1,12 +1,12 @@
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
 
-import Show from '../../components/helpers/Show';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
 import View from '../View';
 
 import ChatList from './ChatList';
-import PrivateChat from './PrivateChat';
+import ChatMessages from './ChatMessages';
+import NewChat, { addChatWithInputKey } from './NewChat';
 
 class Chat extends View {
   id: string;
@@ -17,22 +17,42 @@ class Chat extends View {
     this.hideSideBar = true;
   }
 
-  renderView() {
-    const hexId = Key.toNostrHexAddress(this.props.id) || undefined;
-    return (
-      <div className="flex flex-row">
-        <ChatList activeChat={hexId} className={hexId ? 'hidden md:flex' : 'flex'} />
-        <Show when={hexId}>
-          <PrivateChat id={hexId || ''} key={hexId} />
-        </Show>
-        <Show when={!hexId}>
-          <div className="hidden md:flex flex-col items-center justify-center flex-1">
-            <div className="my-4">
-              <PaperAirplaneIcon className="w-24 h-24 text-neutral-400" />
-            </div>
-            <div className="text-neutral-400">{t('dm_privacy_warning')}</div>
+  componentDidMount() {
+    super.componentDidMount();
+    const id = window.location.hash.substr(1);
+    if (id && id.startsWith('nsec')) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      if (!Key.getPubKey()) {
+        Key.loginAsNewUser();
+      }
+      addChatWithInputKey(id);
+    }
+  }
+
+  renderContent = (id) => {
+    if (id === 'new') {
+      return <NewChat />;
+    } else if (id) {
+      return <ChatMessages id={id} key={id} />;
+    } else {
+      return (
+        <div className="hidden md:flex flex-col items-center justify-center flex-1">
+          <div className="my-4">
+            <PaperAirplaneIcon className="w-24 h-24 text-neutral-400" />
           </div>
-        </Show>
+          <div className="text-neutral-400">{t('dm_privacy_warning')}</div>
+        </div>
+      );
+    }
+  };
+
+  renderView() {
+    const { id } = this.props;
+
+    return (
+      <div className="flex flex-row h-full">
+        <ChatList activeChat={id} className={id ? 'hidden md:flex' : 'flex'} />
+        {this.renderContent(id)}
       </div>
     );
   }

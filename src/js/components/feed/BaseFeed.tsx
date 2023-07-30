@@ -345,11 +345,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           />
         </Show>
         <Show when={this.state.events.length === 0}>
-          <div className="msg">
-            <div className="msg-content notification-msg">
-              {this.props.emptyMessage || t('no_events_yet')}
-            </div>
-          </div>
+          <div className="px-2 md:px-4 py-2">{this.props.emptyMessage || t('no_events_yet')}</div>
         </Show>
         {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
         <Show when={displayCount < this.state.events.length}>

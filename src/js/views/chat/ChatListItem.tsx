@@ -5,9 +5,9 @@ import Show from '../../components/helpers/Show';
 import Avatar from '../../components/user/Avatar';
 import Name from '../../components/user/Name';
 import Helpers from '../../Helpers';
+import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation.mjs';
 
 interface ChatListItemProps {
@@ -17,6 +17,7 @@ interface ChatListItemProps {
 }
 
 interface ChatListItemState {
+  name: string | null;
   latest: any;
   latestText: string;
   lastOpened: number;
@@ -26,6 +27,7 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
   constructor() {
     super();
     this.state = {
+      name: null,
       latest: {},
       latestText: '',
       lastOpened: -Infinity,
@@ -53,11 +55,18 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
   }
 
   componentDidMount() {
+    const isGroup = this.props.chat.length < 20;
+    if (isGroup) {
+      localState
+        .get('groups')
+        .get(this.props.chat)
+        .on((group) => {
+          if (group.name) {
+            this.setState({ name: group.name });
+          }
+        });
+    }
     this.getLatestMsg();
-    const path = 'chats/' + this.props.chat + '/lastOpened';
-    Session.public?.get(path, (lastOpened: number) => {
-      this.setState({ lastOpened });
-    });
   }
 
   componentDidUpdate(prevProps: ChatListItemProps) {
@@ -66,18 +75,9 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
     }
   }
 
-  hasUnseen() {
-    if (this.state.latest.pubkey === Key.getPubKey()) {
-      return false;
-    }
-    return !this.props.active && !(this.state.latest.created_at <= this.state.lastOpened);
-  }
-
   render() {
     const chat = this.props.chat;
     const active = this.props.active ? 'bg-neutral-800' : 'hover:bg-neutral-900';
-    const hasUnseen = this.hasUnseen() ? 'has-unseen' : '';
-    const unseenEl = this.hasUnseen() ? <span className="unseen"></span> : null;
     const time =
       (this.state.latest.created_at &&
         Helpers.getRelativeTimeText(new Date(this.state.latest.created_at * 1000))) ||
@@ -90,24 +90,26 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
         onKeyUp={(e: KeyboardEvent) => this.onKeyUp(e)}
         role="button"
         tabIndex={0}
-        className={`flex p-2 flex-row gap-4 ${hasUnseen} ${active}`}
-        onClick={() => route(`/chat/${npub}`)}
+        className={`flex p-2 flex-row gap-4 ${active}`}
+        onClick={() => route(`/chat/${npub || chat}`)}
       >
-        <Avatar str={npub} width={49} />
+        <Avatar str={npub || chat} width={49} />
         <div className="flex flex-row">
           <div className="flex flex-col">
             <span className="name">
-              <Show when={this.props.chat === Key.getPubKey()}>
-                <span className="font-bold italic">📝 {t('note_to_self')}</span>
+              <Show when={this.state.name}>{this.state.name}</Show>
+              <Show when={!this.state.name}>
+                <Show when={this.props.chat === Key.getPubKey()}>
+                  <span className="font-bold italic">📝 {t('note_to_self')}</span>
+                </Show>
+                <Show when={this.props.chat !== Key.getPubKey()}>
+                  <Name pub={this.props.chat} />
+                </Show>
+                <small className="ml-2 latest-time text-neutral-500">{time}</small>
               </Show>
-              <Show when={this.props.chat !== Key.getPubKey()}>
-                <Name pub={this.props.chat} />
-              </Show>
-              <small className="ml-2 latest-time text-neutral-500">{time}</small>
             </span>
             <small className="text-neutral-500 truncate">{this.state.latestText}</small>
           </div>
-          {unseenEl}
         </div>
       </div>
     );

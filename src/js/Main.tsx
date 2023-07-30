@@ -50,10 +50,6 @@ Session.init({ autologin: false, autofollow: false });
 
 class Main extends Component<Props, ReactState> {
   componentDidMount() {
-    // if location contains a hash #, redirect to the same url without the hash. For example #/profile -> /profile
-    if (window.location.hash.length) {
-      window.location.href = window.location.origin + window.location.hash.replace('#', '');
-    }
     window.onload = () => {
       // this makes sure that window.nostr is there
       localState.get('loggedIn').on(this.inject());
@@ -134,7 +130,6 @@ class Main extends Component<Props, ReactState> {
               <Notifications path="/notifications" />
               <Chat path="/chat/hashtag/:hashtag?" />
               <Chat path="/chat/:id?" />
-              <Chat path="/chat/new/:id" />
               <Note path="/post/:id+" />
               <Torrent path="/torrent/:id+" />
               <About path="/about" />
