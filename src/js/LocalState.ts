@@ -76,22 +76,26 @@ class Node {
     return result;
   }, 500);
 
-  doCallbacks = _.debounce(() => {
-    for (const [id, callback] of this.on_subscriptions) {
-      const unsubscribe = () => this.on_subscriptions.delete(id);
-      this.once(callback, unsubscribe, false);
-    }
-    if (this.parent) {
-      for (const [id, callback] of this.parent.on_subscriptions) {
-        const unsubscribe = () => this.parent?.on_subscriptions.delete(id);
-        this.parent.once(callback, unsubscribe, false);
-      }
-      for (const [id, callback] of this.parent.map_subscriptions) {
-        const unsubscribe = () => this.parent?.map_subscriptions.delete(id);
+  doCallbacks = _.debounce(
+    () => {
+      for (const [id, callback] of this.on_subscriptions) {
+        const unsubscribe = () => this.on_subscriptions.delete(id);
         this.once(callback, unsubscribe, false);
       }
-    }
-  }, 20, {'maxWait': 40});
+      if (this.parent) {
+        for (const [id, callback] of this.parent.on_subscriptions) {
+          const unsubscribe = () => this.parent?.on_subscriptions.delete(id);
+          this.parent.once(callback, unsubscribe, false);
+        }
+        for (const [id, callback] of this.parent.map_subscriptions) {
+          const unsubscribe = () => this.parent?.map_subscriptions.delete(id);
+          this.once(callback, unsubscribe, false);
+        }
+      }
+    },
+    20,
+    { maxWait: 40 },
+  );
 
   /**
    *
@@ -122,9 +126,7 @@ class Node {
     }
     if (typeof value === 'object' && value !== null) {
       this.value = undefined;
-      await Promise.all(
-          _.map(value, (val, key) => this.get(key).put(val))
-      );
+      await Promise.all(_.map(value, (val, key) => this.get(key).put(val)));
     } else {
       this.children = new Map();
       this.value = value;

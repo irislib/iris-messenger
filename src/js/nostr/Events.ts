@@ -12,7 +12,7 @@ import { EventTemplate } from 'nostr-tools';
 
 import FuzzySearch from '../FuzzySearch';
 import localState from '../LocalState';
-import { addGroup } from '../views/chat/NewChat';
+import { addGroup, setGroupNameByInvite } from '../views/chat/NewChat';
 
 import EventMetaStore from './EventsMeta';
 import IndexedDB from './IndexedDB';
@@ -390,6 +390,8 @@ const Events = {
           if (hexPriv) {
             // TODO browser notification?
             addGroup(hexPriv, false, innerEvent.pubkey);
+            setGroupNameByInvite(hexPriv, innerEvent.pubkey);
+            localState.get('chatInvites').get(innerEvent.pubkey).put({ priv: hexPriv });
             return;
           }
         }
@@ -398,11 +400,15 @@ const Events = {
       // ignore
     }
 
-    const distance = SocialNetwork.getFollowDistance(event.pubkey);
-    if (distance && distance > globalFilter.maxFollowDistance) {
-      // follow distance too high, reject
-      return false;
+    /*
+    if (event.pubkey !== myPub && !this.directMessagesByUser.has(event.pubkey)) {
+      const distance = SocialNetwork.getFollowDistance(event.pubkey);
+      if (distance > globalFilter.maxFollowDistance) {
+        // follow distance too high, reject
+        return false;
+      }
     }
+     */
 
     this.insert(event);
     if (!this.directMessagesByUser.has(user)) {
