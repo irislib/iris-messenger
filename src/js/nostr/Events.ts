@@ -381,11 +381,15 @@ const Events = {
       // ignore
     }
 
-    const distance = SocialNetwork.getFollowDistance(event.pubkey);
-    if (distance && distance > globalFilter.maxFollowDistance) {
-      // follow distance too high, reject
-      return false;
+    /*
+    if (event.pubkey !== myPub && !this.directMessagesByUser.has(event.pubkey)) {
+      const distance = SocialNetwork.getFollowDistance(event.pubkey);
+      if (distance > globalFilter.maxFollowDistance) {
+        // follow distance too high, reject
+        return false;
+      }
     }
+     */
 
     this.insert(event);
     if (!this.directMessagesByUser.has(user)) {

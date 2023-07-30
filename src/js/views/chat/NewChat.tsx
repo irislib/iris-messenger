@@ -35,9 +35,9 @@ export const addChatWithInputKey = (inputKey, name = undefined as string | undef
   }
 };
 
-const startNewGroup = () => {
+const startNewGroup = (name = undefined as string | undefined) => {
   const newNostrKey = generatePrivateKey();
-  return [addGroup(newNostrKey), newNostrKey];
+  return [addGroup(newNostrKey, true, undefined, name), newNostrKey];
 };
 
 export const sendSecretInvite = async (recipient) => {
@@ -80,7 +80,6 @@ export default function NewChat() {
   const [newGroupName, setNewGroupName] = useState('');
 
   const handleKeyInput = (e) => {
-    console.log(111, e.target.value);
     setInputKey(e.target.value);
     addChatWithInputKey(e.target.value, newGroupName);
   };
@@ -98,7 +97,7 @@ export default function NewChat() {
           placeholder="Group name"
           onChange={handleGroupNameChange}
         />
-        <button className="btn btn-primary" onClick={startNewGroup}>
+        <button className="btn btn-primary" onClick={() => startNewGroup(newGroupName)}>
           {t('start_new_group')}
         </button>
       </div>

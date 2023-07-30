@@ -193,7 +193,7 @@ function ChatMessages({ id }) {
                       Go to secret chat
                     </button>
                   </Show>
-                  <Show when={!sortedMessages.length && !invitedToPriv}>
+                  <Show when={!invitedToPriv}>
                     <button className="btn btn-neutral btn-sm" onClick={onClickSecretInvite}>
                       Invite to secret chat
                     </button>
