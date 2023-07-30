@@ -52,7 +52,6 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
   }
 
   componentDidMount() {
-    console.log('list item', this.props.chat);
     this.getLatestMsg();
   }
 
@@ -80,7 +79,7 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
         className={`flex p-2 flex-row gap-4 ${active}`}
         onClick={() => route(`/chat/${npub || chat}`)}
       >
-        <Avatar str={npub} width={49} />
+        <Avatar str={npub || chat} width={49} />
         <div className="flex flex-row">
           <div className="flex flex-col">
             <span className="name">

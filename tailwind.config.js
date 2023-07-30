@@ -31,6 +31,7 @@ export default {
         iris: {
           'base-100': '#000000',
           'base-content': '#ffffff',
+          'color-scheme': 'dark',
           primary: '#603285',
           secondary: '#8A4EBC',
           accent: '#BB97D8',

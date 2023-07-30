@@ -45,6 +45,10 @@ export default function Zap(props: Props) {
       : () => null;
   }, [zappedId]);
 
+  if (!zappedId) {
+    return null;
+  }
+
   let zappingUser = null as string | null;
   try {
     zappingUser = Events.getZappingUser(props.event.id);

@@ -22,7 +22,7 @@ declare global {
 }
 
 interface EventComponentProps {
-  id?: string;
+  id: string;
   standalone?: boolean;
   asInlineQuote?: boolean;
   showReplies?: number;
@@ -38,8 +38,9 @@ interface EventComponentProps {
 const EventComponent = (props: EventComponentProps) => {
   const [state, setState] = useState<{ [key: string]: any }>({
     sortedReplies: [],
+    meta: {},
+    event: Events.db.by('id', Key.toNostrHexAddress(props.id)),
   });
-  const subscriptions: (() => void)[] = [];
   const retrievingTimeout = useRef<any>();
   const unmounted = useRef<boolean>(false);
 
@@ -73,7 +74,6 @@ const EventComponent = (props: EventComponentProps) => {
       return;
     }
     unmounted.current = false;
-    setState((prevState) => ({ prevState, meta: { id: props.id } }));
     const hexId = Key.toNostrHexAddress(props.id);
 
     /*
@@ -92,9 +92,6 @@ const EventComponent = (props: EventComponentProps) => {
     hexId && Events.getEventById(hexId, true, (event) => handleEvent(event));
 
     return () => {
-      subscriptions.forEach((unsub) => {
-        unsub();
-      });
       unmounted.current = true;
     };
   }, []);

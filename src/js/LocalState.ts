@@ -39,11 +39,11 @@ class Node {
     }
     if (this.children.size) {
       const children = Array.from(this.children.keys());
-      localForage.setItem(this.id, children);
+      await localForage.setItem(this.id, children);
     } else if (this.value === undefined) {
-      localForage.removeItem(this.id);
+      await localForage.removeItem(this.id);
     } else {
-      localForage.setItem(this.id, this.value === null ? LOCALFORAGE_NULL : this.value);
+      await localForage.setItem(this.id, this.value === null ? LOCALFORAGE_NULL : this.value);
     }
   }, 500);
 
@@ -76,7 +76,7 @@ class Node {
     return result;
   }, 500);
 
-  doCallbacks = _.throttle(() => {
+  doCallbacks = _.debounce(() => {
     for (const [id, callback] of this.on_subscriptions) {
       const unsubscribe = () => this.on_subscriptions.delete(id);
       this.once(callback, unsubscribe, false);
@@ -91,7 +91,7 @@ class Node {
         this.once(callback, unsubscribe, false);
       }
     }
-  }, 40);
+  }, 20, {'maxWait': 40});
 
   /**
    *
@@ -115,23 +115,22 @@ class Node {
    * @param value
    * @example node.get('users').get('alice').put({name: 'Alice'})
    */
-  put(value) {
+  async put(value) {
     // console.log('put', this.id, value);
     if (Array.isArray(value)) {
       throw new Error("Sorry, we don't deal with arrays");
     }
     if (typeof value === 'object' && value !== null) {
       this.value = undefined;
-      for (const key in value) {
-        this.get(key).put(value[key]);
-      }
-      _.defer(() => this.doCallbacks(), 100);
-      return;
+      await Promise.all(
+          _.map(value, (val, key) => this.get(key).put(val))
+      );
+    } else {
+      this.children = new Map();
+      this.value = value;
     }
-    this.children = new Map();
-    this.value = value;
     this.doCallbacks();
-    this.saveLocalForage();
+    return this.saveLocalForage();
   }
 
   // protip: the code would be a lot cleaner if you separated the Node API from storage adapters.

@@ -19,11 +19,13 @@ import PubSub from '../../nostr/PubSub';
 import { translate as t } from '../../translations/Translation.mjs';
 
 import ChatMessageForm from './ChatMessageForm.tsx';
+import { addGroup, sendSecretInvite } from './NewChat';
 
 function ChatMessages({ id }) {
   const ref = useRef(null);
   const [sortedMessages, setSortedMessages] = useState([] as any[]);
   const [stickToBottom, setStickToBottom] = useState(true);
+  const [invitedToPriv, setInvitedToPriv] = useState('');
   const [showQr, setShowQr] = useState(false);
   const [keyPair, setKeyPair] = useState(
     undefined as { pubKey: string; privKey: string } | undefined,
@@ -48,6 +50,11 @@ function ChatMessages({ id }) {
     $('#floating-day-separator').remove();
     setTimeout(() => s.fadeOut(), 2000);
     $('#message-view').prepend(center);
+  };
+
+  const onClickSecretInvite = () => {
+    const hexId = Key.toNostrHexAddress(id);
+    sendSecretInvite(hexId);
   };
 
   const toggleScrollDownBtn = () => {
@@ -142,15 +149,15 @@ function ChatMessages({ id }) {
 
       mainView = (
         <div
-          className="main-view p-2 h-screen overflow-y-scroll overflow-x-hidden"
+          className="main-view p-2 overflow-y-auto overflow-x-hidden flex-grow"
           id="message-view"
           onScroll={() => onMessageViewScroll()}
         >
-          <div id="message-list">
+          <div id="message-list" className="w-full">
             {msgListContent}
             <div className="italic my-2 text-neutral-500 w-full text-center">
               <Show when={isGroup && keyPair}>
-                <div>{t('anonymous_group_chat')}</div>
+                <div>{t('secret_group_chat')}</div>
                 <div className="flex gap-2 flex-1 items-center justify-center my-4">
                   <button
                     className="btn btn-neutral btn-sm"
@@ -165,12 +172,34 @@ function ChatMessages({ id }) {
                     copyStr={formatPrivateKey()}
                     text="Copy nsec"
                   />
+                  <Copy
+                    className="btn btn-neutral btn-sm"
+                    copyStr={Helpers.buildURL('chat', undefined, formatPrivateKey())}
+                    text={t('copy_link')}
+                  />
                 </div>
                 <Show when={showQr}>
-                  <QrCode data={formatPrivateKey()} />
+                  <QrCode data={'nostr:' + formatPrivateKey()} />
                 </Show>
               </Show>
-              <Show when={!isGroup}>{t('dm_privacy_warning')}</Show>
+              <Show when={!isGroup && Key.toNostrHexAddress(id) !== myPub}>
+                <div>{t('dm_privacy_warning')}</div>
+                <div className="mt-4 flex gap-2 justify-center">
+                  <Show when={invitedToPriv}>
+                    <button
+                      className="btn btn-neutral btn-sm"
+                      onClick={() => addGroup(invitedToPriv)}
+                    >
+                      Go to secret chat
+                    </button>
+                  </Show>
+                  <Show when={!sortedMessages.length && !invitedToPriv}>
+                    <button className="btn btn-neutral btn-sm" onClick={onClickSecretInvite}>
+                      Invite to secret chat
+                    </button>
+                  </Show>
+                </div>
+              </Show>
             </div>
           </div>
           <div
@@ -209,21 +238,26 @@ function ChatMessages({ id }) {
       });
     };
 
+    localState
+      .get('sentInvites')
+      .get(hexId)
+      .once((invite) => {
+        if (invite?.priv) {
+          setInvitedToPriv(invite.priv);
+        }
+      });
+
     const subscribeGroup = () => {
-      console.log('subscribe group', id);
       localState
         .get('groups')
         .get(id)
         .on((group) => {
           const privKey = group.key;
-          console.log('group private key', privKey);
           const pubKey = getPublicKey(privKey);
-          console.log('group public key', pubKey);
           setKeyPair({ privKey, pubKey });
           unsub = PubSub.subscribe(
             { kinds: [4], '#p': [pubKey], authors: [pubKey] },
             async (event) => {
-              console.log('got group message', event);
               const decrypted = await nip04.decrypt(privKey, pubKey, event.content);
               messagesById.set(event.id, { ...event, text: decrypted });
               setSortedMessages(Array.from(messagesById.values()));
@@ -274,7 +308,7 @@ function ChatMessages({ id }) {
       <Helmet>
         <title>{'Messages'}</title>
       </Helmet>
-      <div id="chat-main" ref={ref} className={`${id ? '' : 'hidden'} flex-1 pb-12`}>
+      <div id="chat-main" ref={ref} className={`${id ? '' : 'hidden'} flex flex-1 flex-col`}>
         {renderMainView()}
         <Show when={id && id.length > 4}>{renderMsgForm()}</Show>
       </div>

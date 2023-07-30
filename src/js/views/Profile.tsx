@@ -60,7 +60,7 @@ class Profile extends View {
       path === href ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-neutral';
 
     return (
-      <div className="flex mx-4 gap-2 mb-4 overflow-x-scroll">
+      <div className="flex mx-4 gap-2 mb-4 overflow-x-auto">
         <Link className={linkClass('/' + currentProfileUrl)} href={'/' + currentProfileUrl}>
           {t('posts')}
           <Show when={this.state.noPosts}>{' (0)'}</Show>

@@ -7,6 +7,7 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import PubSub from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
+import { ID } from '../../nostr/UserIds';
 import { translate as t } from '../../translations/Translation.mjs';
 import Follow from '../buttons/Follow';
 import Show from '../helpers/Show';
@@ -20,7 +21,7 @@ import Stats from './Stats';
 
 const ProfileCard = (props: { hexPub: string; npub: string }) => {
   const { hexPub, npub } = props;
-  const [profile, setProfile] = useState<any>({});
+  const [profile, setProfile] = useState<any>(SocialNetwork.profiles.get(ID(hexPub)) || {});
   const [lightning, setLightning] = useState<string>('');
   const [website, setWebsite] = useState<string>('');
   const [loggedIn, setLoggedIn] = useState<boolean>(false);

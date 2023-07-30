@@ -198,7 +198,7 @@ export default class Header extends Component {
     const pub = Key.getPubKey();
     const loggedIn = !!pub;
     return (
-      <div className="sticky top-0 z-10 cursor-pointer">
+      <div className="sticky top-0 z-10 cursor-pointer flex flex-wrap">
         <div className="w-full overflow-x-hidden bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2">
           <div className="flex items-center justify-between h-12">
             {this.renderBackBtnOrLogo()}
