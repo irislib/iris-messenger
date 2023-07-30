@@ -24,7 +24,7 @@ const GraphViewSelect = ({ view, me, setSearch }: GraphViewSelectProps) => {
         href={setSearch({ page: 'vis', view: 'graph' })}
         className={view == 'graph' ? selected : unselected}
       >
-        My Graph
+        Graph
       </Link>
       <Show when={!me}>
         <Link
@@ -35,16 +35,10 @@ const GraphViewSelect = ({ view, me, setSearch }: GraphViewSelectProps) => {
         </Link>
       </Show>
       <Link
-        href={setSearch({ page: 'globalgraph', view: 'globalgraph' })}
-        className={view == 'globalgraph' ? selected : unselected}
-      >
-        Global Graph
-      </Link>
-      <Link
         href={setSearch({ page: 'diagnostics', view: 'diagnostics' })}
         className={view == 'diagnostics' ? selected : unselected}
       >
-        Diagnostics
+        Demo
       </Link>
     </div>
   );

@@ -75,6 +75,15 @@ const VisGraph = (props: VisGraphProps) => {
 
     const instance = visJsRef.current && new Network(visJsRef.current, data, defaultOptions);
 
+    instance.on("click", function (params) {
+
+      if (params.nodes.length == 0) return;
+
+      const vId = params.nodes[0] as number;
+
+      loadNode(vId);
+    });
+
     setNetwork(instance);
     return () => {
       // Cleanup the network on component unmount
@@ -98,13 +107,6 @@ const VisGraph = (props: VisGraphProps) => {
       let v = graphNetwork.g.vertices[vId];
       let score = v?.score;
 
-      //let unsub = profileManager.getProfile(hexKey, (profile) => {
-
-      //if(nodes.get(vId as number)) return; // already added
-
-      //let image = getImage(profile);
-      //nodes.add({ id: vId, label: profile.name, image, shape: 'circularImage' });
-
       setState((prevState) => ({
         ...prevState,
         npub,
@@ -121,8 +123,6 @@ const VisGraph = (props: VisGraphProps) => {
       }));
 
       loadNode(vId as number);
-      //});
-      //unsubscribe.push(unsub);
     });
     return () => {
       unsubscribe.forEach((u) => u?.());
@@ -136,6 +136,7 @@ const VisGraph = (props: VisGraphProps) => {
     let distinctV = {} as { [key: number]: Vertice };
     distinctV[vId] = sourceV; // add the source vertice
 
+    // Add all the in and out edges
     for (const id in sourceV.in) {
       const edge = sourceV.in[id] as Edge;
       if (!edge || edge.val == 0) continue; // Skip if the edge has no value / neutral
