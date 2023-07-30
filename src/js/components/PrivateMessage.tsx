@@ -37,7 +37,8 @@ const PrivateMessage = (props) => {
 
   const checkTextForJson = (textContent) => {
     try {
-      const event = JSON.parse(textContent);
+      const maybeJson = textContent.slice(textContent.indexOf('{'));
+      const event = JSON.parse(maybeJson);
       if (validateEvent(event) && verifySignature(event)) {
         if (
           event.tags.length === 1 &&

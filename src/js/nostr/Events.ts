@@ -371,7 +371,8 @@ const Events = {
         if (nsec) {
           const hexPriv = Key.toNostrHexAddress(nsec);
           if (hexPriv) {
-            addGroup(hexPriv, true, innerEvent.pubkey);
+            // TODO browser notification?
+            addGroup(hexPriv, false, innerEvent.pubkey);
             return;
           }
         }

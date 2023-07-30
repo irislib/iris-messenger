@@ -59,7 +59,7 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
       event.content = await nip04.encrypt(
         keyPair.privKey,
         keyPair.pubKey,
-        JSON.stringify(innerEvent),
+        `${message}\n\n${JSON.stringify(innerEvent)}`,
       );
       event.pubkey = keyPair.pubKey;
       event.tags = [['p', keyPair.pubKey]];
