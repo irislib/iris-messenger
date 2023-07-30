@@ -1,20 +1,22 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { generatePrivateKey } from 'nostr-tools';
+import { generatePrivateKey, getEventHash, getPublicKey, nip04, signEvent } from 'nostr-tools';
 import { useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
 import localState from '../../LocalState';
+import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
 
-export const addGroup = (key) => {
+export const addGroup = (key, navigate = true, inviter = null) => {
   const keyHash = sha256(key);
   const groupId = Array.from(keyHash, (byte) => byte.toString(16).padStart(2, '0'))
     .join('')
     .slice(0, 12);
 
-  localState.get('groups').get(groupId).put({ key });
-  route(`/chat/${groupId}`);
+  localState.get('groups').get(groupId).put({ key, inviter });
+  navigate && route(`/chat/${groupId}`);
+  return groupId;
 };
 
 export const addChatWithInputKey = (inputKey) => {
@@ -27,13 +29,47 @@ export const addChatWithInputKey = (inputKey) => {
   }
 };
 
+const startNewGroup = () => {
+  const newNostrKey = generatePrivateKey();
+  return [addGroup(newNostrKey), newNostrKey];
+};
+
+export const sendSecretInvite = async (recipient) => {
+  const groupPrivateKey = startNewGroup()[1];
+  const nsec = Key.toNostrBech32Address(groupPrivateKey, 'nsec');
+  const anonymousInviterKey = generatePrivateKey();
+  const kind = 4;
+  const created_at = Math.floor(Date.now() / 1000);
+  const content = `This is an invitation to a secret chat. Use ${nsec} or go to https://iris.to/chat/#${nsec}`;
+
+  let innerEvent = {
+    kind,
+    created_at,
+    pubkey: Key.getPubKey(),
+    tags: [['p', recipient]],
+    content,
+  };
+  innerEvent = await Events.sign(innerEvent);
+
+  const encryptedContent = await nip04.encrypt(
+    anonymousInviterKey,
+    recipient,
+    `${content}\n\n${JSON.stringify(innerEvent)}`,
+  );
+  const event = {
+    kind,
+    created_at,
+    pubkey: getPublicKey(anonymousInviterKey),
+    tags: [['p', recipient]],
+    content: encryptedContent,
+  } as any;
+  event.id = getEventHash(event);
+  event.sig = signEvent(event, anonymousInviterKey);
+  Events.publish(event);
+};
+
 export default function NewChat() {
   const [inputKey, setInputKey] = useState('');
-
-  const startNewGroup = () => {
-    const newNostrKey = generatePrivateKey();
-    addGroup(newNostrKey);
-  };
 
   const handleInput = (e) => {
     console.log(111, e.target.value);
