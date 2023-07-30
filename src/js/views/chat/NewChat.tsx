@@ -8,24 +8,30 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
 
-export const addGroup = (key, navigate = true, inviter = null) => {
+export const addGroup = (
+  key,
+  navigate = true,
+  inviter = null,
+  name = undefined as string | undefined,
+) => {
   const keyHash = sha256(key);
   const groupId = Array.from(keyHash, (byte) => byte.toString(16).padStart(2, '0'))
     .join('')
     .slice(0, 12);
 
-  const saved = localState.get('groups').get(groupId).put({ key, inviter });
+  const saved = localState.get('groups').get(groupId).put({ key, inviter, name });
   navigate && saved.then(() => route(`/chat/${groupId}`));
+
   return groupId;
 };
 
-export const addChatWithInputKey = (inputKey) => {
+export const addChatWithInputKey = (inputKey, name = undefined as string | undefined) => {
   if (inputKey.indexOf('#') > -1) {
     inputKey = inputKey.split('#')[1];
   }
   if (inputKey.startsWith('nsec')) {
     const hexPriv = Key.toNostrHexAddress(inputKey);
-    hexPriv && addGroup(hexPriv);
+    hexPriv && addGroup(hexPriv, true, undefined, name);
   }
 };
 
@@ -71,26 +77,39 @@ export const sendSecretInvite = async (recipient) => {
 
 export default function NewChat() {
   const [inputKey, setInputKey] = useState('');
+  const [newGroupName, setNewGroupName] = useState('');
 
-  const handleInput = (e) => {
+  const handleKeyInput = (e) => {
     console.log(111, e.target.value);
     setInputKey(e.target.value);
-    addChatWithInputKey(e.target.value);
+    addChatWithInputKey(e.target.value, newGroupName);
+  };
+
+  const handleGroupNameChange = (e) => {
+    setNewGroupName(e.target.value);
   };
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center h-full">
-      <button className="btn btn-primary" onClick={startNewGroup}>
-        {t('start_new_group')}
-      </button>
+      <div className="flex flex-row gap-2">
+        <input
+          type="text"
+          className="input rounded-full input-bordered"
+          placeholder="Group name"
+          onChange={handleGroupNameChange}
+        />
+        <button className="btn btn-primary" onClick={startNewGroup}>
+          {t('start_new_group')}
+        </button>
+      </div>
       <div className="my-4">{t('or')}</div>
       <div className="my-4 flex gap-2 justify-center items-center">
         <input
           placeholder="Paste nsec or chat link"
           type="password"
           id="pasteLink"
-          className="text-center input border border-gray-400 rounded-full p-2"
-          onChange={handleInput}
+          className="text-center input input-bordered rounded-full p-2"
+          onChange={handleKeyInput}
           value={inputKey}
         />
         {/*<button id="scanQR" className="btn btn-neutral" onClick={}>
