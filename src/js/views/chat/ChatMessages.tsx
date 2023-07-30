@@ -239,7 +239,7 @@ function ChatMessages({ id }) {
     };
 
     localState
-      .get('sentInvites')
+      .get('chatInvites')
       .get(hexId)
       .once((invite) => {
         if (invite?.priv) {

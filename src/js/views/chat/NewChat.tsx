@@ -3,10 +3,31 @@ import { generatePrivateKey, getEventHash, getPublicKey, nip04, signEvent } from
 import { useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
+import AnimalName from '../../AnimalName';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
+import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
+
+export const setGroupNameByInvite = (hexPriv, otherGuy) => {
+  let name;
+  const unsub = SocialNetwork.getProfile(otherGuy, (profile) => {
+    name = profile.name;
+  });
+  setTimeout(() => {
+    name = name || AnimalName(Key.toNostrBech32Address(otherGuy, 'npub') || '');
+    localState.get('groups').get(getGroupId(hexPriv)).put({ name });
+    unsub();
+  }, 1000);
+};
+
+export const getGroupId = (key) => {
+  const keyHash = sha256(key);
+  return Array.from(keyHash, (byte) => byte.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 12);
+};
 
 export const addGroup = (
   key,
@@ -14,10 +35,7 @@ export const addGroup = (
   inviter = null,
   name = undefined as string | undefined,
 ) => {
-  const keyHash = sha256(key);
-  const groupId = Array.from(keyHash, (byte) => byte.toString(16).padStart(2, '0'))
-    .join('')
-    .slice(0, 12);
+  const groupId = getGroupId(key);
 
   const saved = localState.get('groups').get(groupId).put({ key, inviter, name });
   navigate && saved.then(() => route(`/chat/${groupId}`));
@@ -72,7 +90,8 @@ export const sendSecretInvite = async (recipient) => {
   event.id = getEventHash(event);
   event.sig = signEvent(event, anonymousInviterKey);
   Events.publish(event);
-  localState.get('sentInvites').get(recipient).put({ priv: groupPrivateKey });
+  localState.get('chatInvites').get(recipient).put({ priv: groupPrivateKey });
+  setGroupNameByInvite(groupPrivateKey, recipient);
 };
 
 export default function NewChat() {

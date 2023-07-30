@@ -2,11 +2,11 @@
 import reactStringReplace from 'react-string-replace';
 import { bech32 } from 'bech32';
 import $ from 'jquery';
+import _ from 'lodash';
 import throttle from 'lodash/throttle';
 import { nip19 } from 'nostr-tools';
 import { ComponentChild } from 'preact';
 import { route } from 'preact-router';
-import _ from 'lodash';
 
 import EventComponent from './components/events/EventComponent';
 import SafeImg from './components/SafeImg';
