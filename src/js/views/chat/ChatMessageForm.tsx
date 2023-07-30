@@ -97,7 +97,7 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
   return (
     <form
       autoComplete="off"
-      className={`flex flex-1 flex-row gap-2 p-2 message-form sticky w-full bottom-0 w-96 max-w-screen bg-black ${
+      className={`flex flex-none flex-row gap-2 p-2 message-form sticky w-full bottom-0 w-96 max-w-screen bg-black ${
         classProp || ''
       }`}
       onSubmit={handleSubmit}
