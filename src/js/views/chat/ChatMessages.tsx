@@ -174,8 +174,8 @@ function ChatMessages({ id }) {
                   />
                   <Copy
                     className="btn btn-neutral btn-sm"
-                    copyStr={`https://beta.iris.to/chat/#${formatPrivateKey()}`}
-                    text="Copy link"
+                    copyStr={Helpers.buildURL('chat', undefined, formatPrivateKey())}
+                    text={t('copy_link')}
                   />
                 </div>
                 <Show when={showQr}>
