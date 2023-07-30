@@ -365,21 +365,15 @@ const Events = {
       const decrypted = await Key.decrypt(event.content, event.pubkey);
       const innerEvent = JSON.parse(decrypted.slice(decrypted.indexOf('{')));
       if (validateEvent(innerEvent) && verifySignature(innerEvent)) {
-        const distance = SocialNetwork.getFollowDistance(innerEvent.pubkey);
-        if (
-          SocialNetwork.followedByUser.get(ID(myPub))?.size && // if not following anyone, accept all dms
-          distance &&
-          distance > globalFilter.maxFollowDistance
-        ) {
-          // follow distance too high, reject
-          return false;
-        }
         // parse nsec from message by regex. nsec is bech32 encoded in the message
+        // no follow distance check here for now
         const nsec = innerEvent.content.match(/nsec1[023456789acdefghjklmnpqrstuvwxyz]{6,}/gi)?.[0];
         if (nsec) {
           const hexPriv = Key.toNostrHexAddress(nsec);
-          addGroup(hexPriv, true, innerEvent.pubkey);
-          return;
+          if (hexPriv) {
+            addGroup(hexPriv, true, innerEvent.pubkey);
+            return;
+          }
         }
       }
     } catch (e) {

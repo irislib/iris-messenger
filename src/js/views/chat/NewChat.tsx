@@ -66,6 +66,7 @@ export const sendSecretInvite = async (recipient) => {
   event.id = getEventHash(event);
   event.sig = signEvent(event, anonymousInviterKey);
   Events.publish(event);
+  localState.get('sentInvites').get(recipient).put({ priv: groupPrivateKey });
 };
 
 export default function NewChat() {

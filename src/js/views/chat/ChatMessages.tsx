@@ -19,13 +19,13 @@ import PubSub from '../../nostr/PubSub';
 import { translate as t } from '../../translations/Translation.mjs';
 
 import ChatMessageForm from './ChatMessageForm.tsx';
-import { sendSecretInvite } from './NewChat';
+import { addGroup, sendSecretInvite } from './NewChat';
 
 function ChatMessages({ id }) {
   const ref = useRef(null);
   const [sortedMessages, setSortedMessages] = useState([] as any[]);
   const [stickToBottom, setStickToBottom] = useState(true);
-  const [inviteSent, setInviteSent] = useState(false);
+  const [invitedToPriv, setInvitedToPriv] = useState('');
   const [showQr, setShowQr] = useState(false);
   const [keyPair, setKeyPair] = useState(
     undefined as { pubKey: string; privKey: string } | undefined,
@@ -55,7 +55,6 @@ function ChatMessages({ id }) {
   const onClickSecretInvite = () => {
     const hexId = Key.toNostrHexAddress(id);
     sendSecretInvite(hexId);
-    setInviteSent(true);
   };
 
   const toggleScrollDownBtn = () => {
@@ -186,7 +185,15 @@ function ChatMessages({ id }) {
               <Show when={!isGroup && Key.toNostrHexAddress(id) !== myPub}>
                 <div>{t('dm_privacy_warning')}</div>
                 <div className="mt-4 flex gap-2 justify-center">
-                  <Show when={!sortedMessages.length && !inviteSent}>
+                  <Show when={invitedToPriv}>
+                    <button
+                      className="btn btn-neutral btn-sm"
+                      onClick={() => addGroup(invitedToPriv)}
+                    >
+                      Go to secret chat
+                    </button>
+                  </Show>
+                  <Show when={!sortedMessages.length && !invitedToPriv}>
                     <button className="btn btn-neutral btn-sm" onClick={onClickSecretInvite}>
                       Invite to secret chat
                     </button>
@@ -230,6 +237,15 @@ function ChatMessages({ id }) {
         }
       });
     };
+
+    localState
+      .get('sentInvites')
+      .get(hexId)
+      .once((invite) => {
+        if (invite?.priv) {
+          setInvitedToPriv(invite.priv);
+        }
+      });
 
     const subscribeGroup = () => {
       localState
