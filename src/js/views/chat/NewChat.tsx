@@ -14,8 +14,8 @@ export const addGroup = (key, navigate = true, inviter = null) => {
     .join('')
     .slice(0, 12);
 
-  localState.get('groups').get(groupId).put({ key, inviter });
-  navigate && route(`/chat/${groupId}`);
+  const saved = localState.get('groups').get(groupId).put({ key, inviter });
+  navigate && saved.then(() => route(`/chat/${groupId}`));
   return groupId;
 };
 
