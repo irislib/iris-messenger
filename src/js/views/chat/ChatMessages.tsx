@@ -149,11 +149,11 @@ function ChatMessages({ id }) {
 
       mainView = (
         <div
-          className="main-view p-2 h-screen overflow-y-scroll overflow-x-hidden"
+          className="main-view p-2 overflow-y-auto overflow-x-hidden"
           id="message-view"
           onScroll={() => onMessageViewScroll()}
         >
-          <div id="message-list">
+          <div id="message-list" className="w-full">
             {msgListContent}
             <div className="italic my-2 text-neutral-500 w-full text-center">
               <Show when={isGroup && keyPair}>
@@ -308,7 +308,7 @@ function ChatMessages({ id }) {
       <Helmet>
         <title>{'Messages'}</title>
       </Helmet>
-      <div id="chat-main" ref={ref} className={`${id ? '' : 'hidden'} flex-1 pb-12`}>
+      <div id="chat-main" ref={ref} className={`${id ? '' : 'hidden'} flex flex-1 flex-col`}>
         {renderMainView()}
         <Show when={id && id.length > 4}>{renderMsgForm()}</Show>
       </div>
