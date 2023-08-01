@@ -58,7 +58,13 @@ const PrivateMessage = (props) => {
   };
 
   if (innerEvent) {
-    return <PrivateMessage {...innerEvent} showName={true} />;
+    return (
+      <PrivateMessage
+        {...innerEvent}
+        showName={true}
+        selfAuthored={innerEvent.pubkey === Key.getPubKey()}
+      />
+    );
   }
 
   if (!checked) {
@@ -77,13 +83,17 @@ const PrivateMessage = (props) => {
     typeof props.created_at === 'object' ? props.created_at : new Date(props.created_at * 1000);
 
   const status: any = ''; // this.getSeenStatus();
-  const seen = status.seen ? 'text-green-500' : 'text-gray-500';
-  const delivered = status.delivered ? 'border-green-500' : 'border-gray-500';
-  const whose = props.selfAuthored ? 'bg-iris-blue text-white' : 'bg-neutral-900 text-white';
+  const seen = status.seen ? 'text-green-500' : 'text-neutral-500';
+  const delivered = status.delivered ? 'border-green-500' : 'border-neutral-500';
+  const whose = props.selfAuthored
+    ? 'self-end bg-iris-blue text-white'
+    : 'self-start bg-neutral-700 text-white';
 
   return (
-    <div className={`p-2 rounded-lg m-2 ${whose} ${seen} ${delivered}`}>
-      <div>
+    <div
+      className={`p-2 w-full md:w-2/3 rounded-xl m-2 ${whose} ${seen} ${delivered} flex flex-col items-start`}
+    >
+      <div className="w-full">
         <div className="mb-2">
           {props.showName && (
             <small onClick={onNameClick} className="cursor-pointer text-xs">
@@ -95,7 +105,7 @@ const PrivateMessage = (props) => {
         <div className={`preformatted-wrap text-base ${emojiOnly ? 'text-4xl' : ''}`}>
           {formattedText}
         </div>
-        <div className="text-right text-xs text-gray-400">
+        <div className={`${props.selfAuthored ? 'text-right' : 'text-left'} text-xs text-white`}>
           {props.id ? Helpers.getRelativeTimeText(time) : Helpers.formatTime(time)}
         </div>
       </div>

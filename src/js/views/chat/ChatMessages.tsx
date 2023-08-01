@@ -153,7 +153,7 @@ function ChatMessages({ id }) {
           id="message-view"
           onScroll={() => onMessageViewScroll()}
         >
-          <div id="message-list" className="w-full">
+          <div id="message-list" className="w-full flex flex-col items-center">
             {msgListContent}
             <div className="italic my-2 text-neutral-500 w-full text-center">
               <Show when={isGroup && keyPair}>
