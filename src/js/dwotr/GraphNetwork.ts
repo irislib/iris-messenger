@@ -398,14 +398,14 @@ class GraphNetwork {
     if (!options || options.length === 0 || vertice.degree == 0) return undefined;
 
     let score = vertice.score;
-    let degree = vertice.degree;
-    let val = score?.value(degree - 1);
-    let count = score?.count(degree - 1);
+    let { val, degree, count, hasScore } = score.resolve();
+    //let degree = vertice.degree; // The degree of the vertice should be the same as the score degree
 
-    if (count === 0)
+    if (!hasScore)
       // No trust yet
       return undefined;
 
+    
     // If the score is directly trust by degree 0, return the first or last option or undefined
     if (degree === 1) {
       if (val > 0) return options[options.length - 1];

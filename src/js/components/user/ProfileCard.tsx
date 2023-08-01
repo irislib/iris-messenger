@@ -163,7 +163,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
           <div className={profile.banner ? '-mt-24' : ''}>{profilePicture}</div>
           <div className="flex-1 justify-end items-center flex gap-2">
             <div onClick={onClickHandler}>
-              <a href={"/wot/"+ npub} className="link px-2" >Web of Trust</a>
+              <a href={"/graph/"+ npub} className="link px-2" >Web of Trust</a>
               <Show when={isMyProfile}>
                 <a className="btn btn-sm btn-neutral" href="/profile/edit">
                   {t('edit_profile')}

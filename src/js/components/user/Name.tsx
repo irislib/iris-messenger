@@ -1,7 +1,6 @@
 import { memo, useEffect, useState } from 'react';
 
 import Key from '../../nostr/Key';
-import SocialNetwork from '../../nostr/SocialNetwork';
 import { ID } from '../../nostr/UserIds';
 
 import Badge from './Badge';
@@ -24,7 +23,7 @@ const Name = (props: Props) => {
   const wot = useVerticeMonitor(ID(hexKey), ['badName', 'neutralName', 'goodName'], '');
 
   useEffect(() => {
-    return SocialNetwork.getProfile(hexKey, (p) => {
+    return profileManager.getProfile(hexKey, (p) => {
       setProfile(p);
     });
   }, [props.pub, props.hexKey]);

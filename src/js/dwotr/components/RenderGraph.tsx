@@ -48,7 +48,7 @@ export const RenderScoreTrustLink = (
   if (!score || (!forceRender && !score.hasTrustScore())) return null;
   return (
     // <div className="flex-shrink-0">
-      <a href={`/wot/${npub}/key/in/trust/list`} className="cursor-pointer hover:underline" title="Trusts at degree 0/1/2">
+      <a href={`/graph/${npub}/key/in/trust/path`} className="cursor-pointer hover:underline" title="Trusts at degree 0/1/2">
         {renderTrustCount(score, forceRender)}&nbsp;
         <span className="text-neutral-500">Trusts</span>
       </a>
@@ -63,14 +63,36 @@ export const RenderScoreDistrustLink = (
 ) => {
   if (!score || (!forceRender && !score.hasDistrustScore())) return null;
   return (
-    <div className="flex-shrink-0">
-      <a href={`/wot/${npub}/key/in/distrust/list`} className="cursor-pointer hover:underline" title="Distrusts at degree 0/1/2">
+    // <div className="flex-shrink-0">
+      <a href={`/graph/${npub}/key/in/distrust/path`} className="cursor-pointer hover:underline" title="Distrusts at degree 0/1/2">
         {renderDistrustCount(score, forceRender)}&nbsp;
         <span className="text-neutral-500">Distrusts</span>
       </a>
-    </div>
+    // </div>
   );
 };
+
+export const RenderScoreResultLink = (
+  score: TrustScore,
+  forceRender: boolean = false,
+) => {
+  let result = score?.values();
+      
+  const renderResult = (result: Array<number>) => {
+    let r = result.join("/");
+    return r;
+  }
+
+  if (!score || (!forceRender && !result)) return null;
+  return (
+    <span className="flex-shrink-0 ">
+        {renderResult(result)}&nbsp;
+        <span className="text-neutral-500">Result</span>
+    </span>
+  );
+};
+
+
 
 export function renderEntityKeyName(entityType: EntityType | undefined) {
     if (!entityType) return 'key';

@@ -1,0 +1,186 @@
+import { useCallback, useEffect, useState } from 'preact/hooks';
+import Key from '../../nostr/Key';
+import graphNetwork from '../GraphNetwork';
+import GraphViewSelect from '../components/GraphViewSelect';
+import { translate as t } from '../../translations/Translation.mjs';
+import Header from '../../components/Header';
+import Name from '../../components/user/Name';
+import TrustList, { renderScoreLine } from './TrustList';
+import VisPath from './VisPath';
+import VisGraph from './VisGraph';
+import { Vertice } from '../model/Graph';
+import { ID } from '../../nostr/UserIds';
+
+type GraphViewProps = {
+  id?: string;
+  entitytype?: string;
+  trusttype?: string;
+  dir?: string;
+  filter?: string;
+  view?: string;
+  path?: string; // full path
+};
+
+export type ViewComponentProps = {
+  props: {
+    npub: string;
+    hexKey: string;
+    entitytype: string;
+    trusttype: string;
+    dir: string;
+    filter: string;
+    view: string;
+    setNpub: (npub: string) => void;
+    route: (params: any) => void;
+    setSearch: (params: any) => string;
+  };
+};
+
+export function parseTrustType(trustType: string | undefined, defaultTrustType: number = 1) {
+  let t = trustType?.toLocaleLowerCase();
+  if (t == 'trust') return 1;
+  if (t == 'distrust') return -1;
+  return defaultTrustType;
+}
+
+export function parseEntityType(entityType: string | undefined, defaultEntityType: number = 1) {
+  let t = entityType?.toLocaleLowerCase();
+  if (t == 'key') return 1;
+  if (t == 'item') return 2;
+  return defaultEntityType;
+}
+
+const GraphView = (props: GraphViewProps) => {
+  // Create a ref to provide DOM access
+  const [state, setState] = useState<any>({ ready: false });
+
+  // State is preserved on route change, when props change
+  // Each time props change, we update the state
+  const [npub, setNpubPrivate] = useState<string>(
+    props.id || (Key.toNostrBech32Address(Key.getPubKey(), 'npub') as string),
+  );
+  const [entitytype, setEntityType] = useState<string>(props.entitytype || 'key');
+  const [trusttype, setTrustType] = useState<string>(props.trusttype || 'trust');
+  const [dir, setDirection] = useState<string>(props.dir || 'out');
+  const [view, setView] = useState<string>(props.view || 'graph');
+  const [filter, setFilter] = useState<string>(props.filter || '');
+  const [vertice, setVertice] = useState<Vertice | null>(null);
+
+  const [unsubscribe] = useState<Array<() => void>>([]);
+
+  const hexKey = Key.toNostrHexAddress(npub) as string;
+  const me = hexKey == Key.getPubKey();
+
+  useEffect(() => {
+    graphNetwork.whenReady(() => {
+      setVertice(graphNetwork.g.vertices[ID(npub)]);
+
+      setState((prevState) => ({
+        ...prevState,
+        ready: true,
+      }));
+    });
+    return () => {
+      unsubscribe.forEach((u) => u?.());
+    };
+  }, []); // Load once
+
+  const setNpub = useCallback((npub: string) => {
+    setVertice(graphNetwork.g.vertices[ID(npub)]);
+    setNpubPrivate(npub);
+  }, []);
+
+  // Update the state when the props change
+  // Check if the props have changed
+  useEffect(() => {
+    if (props.id != npub) setNpub(props.id || (Key.toNostrBech32Address(Key.getPubKey(), 'npub') as string));
+    if (props.entitytype != entitytype) setEntityType(props.entitytype || 'key');
+    if (props.trusttype != trusttype) setTrustType(props.trusttype || 'trust');
+    if (props.dir != dir) setDirection(props.dir || 'out');
+    if (props.view != view) setView(props.view || 'graph');
+    if (props.filter != filter) setFilter(props.filter || '');
+  }, [props.id, props.entitytype, props.trusttype, props.dir, props.view, props.filter]);
+
+  function setSearch(params: any) {
+    const p = {
+      npub,
+      entitytype,
+      trusttype,
+      dir,
+      view,
+      filter,
+      ...params,
+    };
+    return `/graph/${p.npub}/${p.entitytype}/${p.dir}/${p.trusttype}/${p.view}${
+      p.filter ? '/' + p.filter : ''
+    }`;
+  }
+
+  // Reload the graph when the view changes
+  const route = useCallback((params: any) => {
+    //console.log('route', params);
+    //setNpub
+    //window.history.pushState(null, '', setSearch(params));
+  }, []);
+
+  // Render the view from 3 different components, graph, path, and list
+  // selected by the name of the view useState property
+  const renderView = () => {
+    let props = {
+      npub,
+      hexKey,
+      entitytype,
+      trusttype,
+      dir,
+      view,
+      filter,
+      setNpub,
+      route,
+      setSearch,
+    };
+    if (view == 'path') return <VisPath props={props} />;
+    if (view == 'list') return <TrustList props={props} />;
+    //if (view == 'diagnostics') return renderDiagnostics();
+    return <VisGraph props={props} />;
+  };
+
+  const selected = 'link link-active'; // linkSelected
+  const unselected = 'text-neutral-500';
+
+  if (!state.ready) return null; // TODO: loading
+  return (
+    <>
+      <Header />
+      <div className="flex justify-between mb-4">
+        <span className="text-2xl font-bold">
+          <a className="link" href={`/${npub}`}>
+            <Name pub={npub} />
+          </a>
+          <span style={{ flex: 1 }} className="ml-1">
+            {view}
+          </span>
+        </span>
+      </div>
+      {renderScoreLine(vertice?.score, npub, true)}
+      <hr className="-mx-2 opacity-10 my-2" />
+      <div className="flex flex-wrap gap-8">
+        <GraphViewSelect view={view} setSearch={setSearch} me={me} />
+        <form>
+          <label>
+            <input
+              type="text"
+              placeholder={t('Filter')}
+              tabIndex={1}
+              onInput={(e) => setFilter((e?.target as any)?.value)}
+              className="input-bordered border-neutral-500 input input-sm w-full"
+            />
+          </label>
+        </form>
+      </div>
+      <hr className="-mx-2 opacity-10 my-2" />
+      {renderView()}
+    </>
+  );
+};
+
+export default GraphView;

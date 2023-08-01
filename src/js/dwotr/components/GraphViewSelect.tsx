@@ -1,10 +1,11 @@
 import { Link } from 'preact-router';
 import Show from '../../components/helpers/Show';
+import { translate as t } from '../../translations/Translation.mjs';
 
 type GraphViewSelectProps = {
   view: string;
   me: boolean;
-  setSearch: any;
+  setSearch: (params: any) => string;
 };
 
 const GraphViewSelect = ({ view, me, setSearch }: GraphViewSelectProps) => {
@@ -14,32 +15,27 @@ const GraphViewSelect = ({ view, me, setSearch }: GraphViewSelectProps) => {
   return (
     <div className="flex flex-wrap gap-4">
       <span className="">View:</span>
-      <Link
-        href={setSearch({ page: 'wot', view: 'list' })}
-        className={view == 'list' ? selected : unselected}
-      >
-        List
-      </Link>
-      <Link
-        href={setSearch({ page: 'vis', view: 'graph' })}
-        className={view == 'graph' ? selected : unselected}
-      >
-        Graph
-      </Link>
       <Show when={!me}>
         <Link
-          href={setSearch({ page: 'path', view: 'path' })}
+          href={setSearch({ view: 'path' })}
           className={view == 'path' ? selected : unselected}
         >
-          Path
+          {t('Path')}
         </Link>
       </Show>
       <Link
-        href={setSearch({ page: 'diagnostics', view: 'diagnostics' })}
-        className={view == 'diagnostics' ? selected : unselected}
+        href={setSearch({ view: 'graph' })}
+        className={view == 'graph' ? selected : unselected}
       >
-        Demo
+        {t('Graph')}
       </Link>
+      <Link
+        href={setSearch({ view: 'list' })}
+        className={view == 'list' ? selected : unselected}
+      >
+        {t('List')}
+      </Link>
+
     </div>
   );
 };

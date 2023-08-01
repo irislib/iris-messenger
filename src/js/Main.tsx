@@ -39,6 +39,7 @@ import TrustList from './dwotr/views/TrustList';
 import VisGraph from './dwotr/views/VisGraph';
 import VisPath from './dwotr/views/VisPath';
 import Diagnostics from './dwotr/views/Diagnostics';
+import GraphView from './dwotr/views/GraphView';
 
 type Props = Record<string, unknown>;
 
@@ -151,9 +152,10 @@ class Main extends Component<Props, ReactState> {
               <Follows path="/follows/:id" />
               <Follows followers={true} path="/followers/:id" />
 
-              <TrustList path="/wot/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?"  />
+              {/* <TrustList path="/wot/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?"  />
               <VisGraph path="/vis/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
-              <VisPath path="/path/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
+              <VisPath path="/path/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" /> */}
+              <GraphView path="/graph/:id/:entitytype?/:dir?/:trusttype?/:view?/:filter?" />
               <Diagnostics path="/diagnostics/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
               {/* <WotView path="/wot/events/:id"  entitytype={EntityType.Item} /> */}
               {/* <Score path="/trustedby/:id" trust1={1} dir="in" title="Trusted by" />

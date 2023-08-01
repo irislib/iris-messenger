@@ -1,34 +1,29 @@
 import { Network } from 'vis-network';
 import { DataSet } from 'vis-data';
 import { useEffect, useState, useRef } from 'preact/hooks';
-import Header from '../../components/Header';
-import Name from '../../components/user/Name';
-import Key from '../../nostr/Key';
 import graphNetwork from '../GraphNetwork';
-import { Edge, EntityType, Vertice } from '../model/Graph';
-import { RenderTrust1Color, renderEntityKeyName } from '../components/RenderGraph';
-import { renderScoreLine } from './TrustList';
+import { Edge, Vertice } from '../model/Graph';
+import { RenderTrust1Color } from '../components/RenderGraph';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import profileManager from '../ProfileManager';
-import { PUB } from '../../nostr/UserIds';
+import { BECH32, ID, PUB } from '../../nostr/UserIds';
 import { MAX_DEGREE } from '../model/TrustScore';
-import GraphViewSelect from '../components/GraphViewSelect';
 import { translate as t } from '../../translations/Translation.mjs';
-
-
-type VisGraphProps = {
-  id?: string;
-  entitytype?: string;
-  trust1?: string;
-  dir?: string;
-  filter?: string;
-  view?: string;
-  path?: string;
-};
+import { ViewComponentProps, parseEntityType } from './GraphView';
+import { memo } from 'preact/compat';
+import GraphDirectionSelect from '../components/GraphDirectionSelect';
+import { Link } from 'preact-router';
 
 const defaultOptions = {
+  layout: {
+    improvedLayout: true,
+  },
+
   physics: {
-    stabilization: false,
+    solver: 'barnesHut',
+    barnesHut: {
+      springLength: 200, // Increased from default 95
+    },
   },
   autoResize: false,
   nodes: {
@@ -56,14 +51,15 @@ const defaultOptions = {
   },
 };
 
-const VisGraph = (props: VisGraphProps) => {
-  // Create a ref to provide DOM access
+const VisGraph = ({ props }: ViewComponentProps) => {
   const visJsRef = useRef<HTMLDivElement>(null);
+  const [vId, setVid] = useState<number | null>(null);
   const [network, setNetwork] = useState<Network | null>();
-  const [state, setState] = useState<any>(null);
   const [nodes] = useState<DataSet<any>>(new DataSet());
   const [edges] = useState<DataSet<any>>(new DataSet());
   const [unsubscribe] = useState<Array<() => void>>([]);
+  const [dir, setDir] = useState<string>(props.dir || 'in');
+  const [entitytype, setEntityType] = useState<string>(props.entitytype);
 
   useEffect(() => {
     if (!visJsRef.current) return;
@@ -75,11 +71,13 @@ const VisGraph = (props: VisGraphProps) => {
 
     const instance = visJsRef.current && new Network(visJsRef.current, data, defaultOptions);
 
-    instance.on("click", function (params) {
-
+    instance.on('click', function (params) {
       if (params.nodes.length == 0) return;
 
       const vId = params.nodes[0] as number;
+      //const v = graphNetwork.g.vertices[vId];
+
+      props.setNpub(BECH32(vId));
 
       loadNode(vId);
     });
@@ -89,45 +87,28 @@ const VisGraph = (props: VisGraphProps) => {
       // Cleanup the network on component unmount
       network?.destroy();
     };
-  }, [visJsRef, state]);
+  }, [visJsRef]);
 
   useEffect(() => {
-    graphNetwork.whenReady(() => {
-      const npub = props.id || Key.getPubKey();
-      const hexKey = Key.toNostrHexAddress(npub) as string;
-      const trust1 = props.trust1 == 'trust' ? 1 : props.trust1 == 'distrust' ? -1 : 0;
-      const dir = props.dir || 'both';
-      const entitytype = props?.entitytype == 'item' ? EntityType.Item : EntityType.Key;
-      const view = props.view || 'list';
-      const filter = props.filter || '';
-      const me = hexKey == Key.getPubKey();
+    let id = ID(props.hexKey);
+    if (!id) return;
 
-      let vId = graphNetwork.g.getVerticeId(hexKey);
-      if (!vId) return;
-      let v = graphNetwork.g.vertices[vId];
-      let score = v?.score;
+    setVid(id as number);
 
-      setState((prevState) => ({
-        ...prevState,
-        npub,
-        hexKey,
-        entitytype,
-        trust1,
-        dir,
-        view,
-        filter,
-        vId,
-        me,
-        v,
-        score,
-      }));
+    // If the direction or entity type changed, reset the graph
+    if (props.dir != dir || props.entitytype != entitytype) {
+      edges.clear();
+      nodes.clear();
+      setDir(props.dir); 
+      setEntityType(props.entitytype);
+    }
 
-      loadNode(vId as number);
-    });
+    loadNode(id as number);
+
     return () => {
       unsubscribe.forEach((u) => u?.());
     };
-  }, [props.id]);
+  }, [props.npub, props.dir, props.entitytype]);
 
   async function loadNode(vId: number) {
     let sourceV = graphNetwork.g.vertices[vId] as Vertice;
@@ -137,30 +118,41 @@ const VisGraph = (props: VisGraphProps) => {
     distinctV[vId] = sourceV; // add the source vertice
 
     // Add all the in and out edges
-    for (const id in sourceV.in) {
-      const edge = sourceV.in[id] as Edge;
-      if (!edge || edge.val == 0) continue; // Skip if the edge has no value / neutral
-      if (!edge.out || edge.out.degree > MAX_DEGREE) continue; // Skip if the in vertice has no degree or above max degree
+    if (props.dir == 'in') {
+      for (const id in sourceV.in) {
+        const edge = sourceV.in[id] as Edge;
+        if (!edge || !edge.out || edge.val == 0) continue; // Skip if the edge has no value / neutral
 
-      distinctV[edge.out.id] = edge.out;
+        distinctV[edge.out.id] = edge.out;
 
-      let color = RenderTrust1Color(edge.val);
-      edges.get(edge.key) || edges.add({ id: edge.key, from: edge.out.id, to: vId, color });
+        let color = RenderTrust1Color(edge.val);
+        let dashes = edge.out.degree > MAX_DEGREE; // Dash the edge line if the out vertice has no degree or above max degree
+        edges.get(edge.key) ||
+          edges.add({ id: edge.key, from: edge.out.id, to: vId, color, dashes });
+      }
     }
 
-    for (const id in sourceV.out) {
-      const edge = sourceV.out[id] as Edge;
-      if (!edge || edge.val == 0 || !edge.in) continue; // Skip if the edge has no value / neutral
+    let entityType = parseEntityType(props.entitytype);
 
-      distinctV[edge.in.id] = edge.in;
+    if (props.dir == 'out') {
+      for (const id in sourceV.out) {
+        const edge = sourceV.out[id] as Edge;
+        if (!edge || edge.val == 0 || !edge.in) continue; // Skip if the edge has no value / neutral
 
-      let color = RenderTrust1Color(edge.val);
-      edges.get(edge.key) || edges.add({ id: edge.key, from: vId, to: edge.in.id, color });
+        if(edge.in.entityType != entityType) continue; // Skip if the distination node is not the selected entity type 
+
+        distinctV[edge.in.id] = edge.in;
+
+        let color = RenderTrust1Color(edge.val);
+        edges.get(edge.key) || edges.add({ id: edge.key, from: vId, to: edge.in.id, color });
+      }
     }
 
     let vertices = Object.values(distinctV);
     let addresses = vertices.map((v) => PUB(v.id)); // convert to pub hex format
-    let unsub = await profileManager.getProfiles(addresses, (_) => {});
+    let unsub = await profileManager.getProfiles(addresses, (profiles) => {
+      // Update the nodes with the new profile pictures and names
+    });
     unsubscribe.push(unsub);
 
     // Create nodes in vis
@@ -170,61 +162,53 @@ const VisGraph = (props: VisGraphProps) => {
       const profile = SocialNetwork.profiles.get(v.id);
       let image = profileManager.ensurePicture(profile);
 
-      nodes.add({ id: v.id, label: profile.name + ' (' + v.id + ')', image, shape: 'circularImage' });
+      //let border = v.degree > MAX_DEGREE ? '#808080' : '#222222';
+      nodes.add({
+        id: v.id,
+        label: profile.name + ' (D:' + v.degree + ')',
+        image,
+        shape: 'circularImage',
+      });
     }
   }
 
+  const reset = (selectedId?: number) => {
+    let id = selectedId || vId;
+    if (!id) return;
 
-  function setSearch(params: any) {
-    const p = {
-      npub: state.npub,
-      entitytype: state.entitytype,
-      trust1: state.trust1,
-      dir: state.dir,
-      view: state.view,
-      filter: '',
-      page: 'wot',
-      ...params,
-    };
-    return `/${p.page}/${p.npub}/${renderEntityKeyName(p.entitytype)}/${p.dir}/${
-      p.trust1 == 1 ? 'trust' : p.trust1 == -1 ? 'distrust' : 'both'
-    }/${p.view}${p.filter ? '/' + p.filter : ''}`;
-  }
+    nodes.clear();
+    edges.clear();
+    loadNode(id);
 
-  //return { network, visJsRef };
-  //return <div ref={visJsRef} />;
-  if (!state) return null;
+    const n = BECH32(id);
+    if (n != props.npub) {
+      props.setNpub(n);
+    }
+
+    network?.selectNodes([id], true);
+  };
+
+  if (!props.npub) return null;
   return (
     <>
-      <Header />
-      <div className="flex justify-between mb-4">
-        <span className="text-2xl font-bold">
-          <a className="link" href={`/${state.npub}`}>
-            <Name pub={state.npub as string} />
-          </a>
-          <span style={{ flex: 1 }} className="ml-1">
-            Web of Trust Graph
-          </span>
-        </span>
-      </div>
-      {renderScoreLine(state?.score, state?.npub)}
-      <hr className="-mx-2 opacity-10 my-2" />
-      <GraphViewSelect view={state?.view} setSearch={setSearch} me={state?.me} />
-      <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-wrap gap-4">
-        <form>
-          <label>
-            <input
-              type="text"
-              placeholder={t('Filter')}
-              tabIndex={1}
-              //onInput={(e) => onInput((e?.target as any)?.value)}
-              className="input-bordered border-neutral-500 input input-sm w-full"
-            />
-          </label>
-        </form>
+        <GraphDirectionSelect dir={props.dir} setSearch={props.setSearch} />
+        <div className="flex gap-4">&nbsp;</div>
+        <div className="flex gap-4">
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={() => reset(network?.getSelectedNodes()[0] as number)}
+          >
+            {t('Focus')}
+          </button>
+        </div>
+
+        <div className="flex gap-4">
+          <Link className="btn btn-primary btn-sm" href={props.setSearch({ view: 'path' })}>
+            {t('Path')}
+          </Link>
+        </div>
       </div>
-      <hr className="-mx-2 opacity-10 my-2" />
 
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="h-full w-full flex items-stretch justify-center">
@@ -234,4 +218,5 @@ const VisGraph = (props: VisGraphProps) => {
   );
 };
 
-export default VisGraph;
+// Use memo to prevent re-rendering when props change
+export default memo(VisGraph);

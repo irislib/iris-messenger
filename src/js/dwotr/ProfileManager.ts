@@ -4,7 +4,7 @@ import Events from '../nostr/Events';
 import IndexedDB from '../nostr/IndexedDB';
 import PubSub, { Unsubscribe } from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
-import { ID } from '../nostr/UserIds';
+import { BECH32, ID } from '../nostr/UserIds';
 import Key from '../nostr/Key';
 import FuzzySearch from '../FuzzySearch';
 import dwotrDB from './network/DWoTRDB';
@@ -120,7 +120,7 @@ class ProfileManager {
     for (const address of addresses) {
       if (!address) continue;
       const hexPub = Key.toNostrHexAddress(address) as string;
-      const profile = SocialNetwork.profiles.get(ID(hexPub));
+      const profile = SocialNetwork.profiles.get(ID(hexPub)); // ID() makes sure to register the address with an ID in the UserIds map if it's not already there
       if (profile) {
         result.push(profile);
       } else {
@@ -235,6 +235,13 @@ class ProfileManager {
     } as ProfileRecord;
 
     return profile;
+  }
+
+  getDefaultProfile(id: number | undefined) {
+    if (!id) return undefined;
+    const profile = SocialNetwork.profiles.get(id);
+    if (profile) return profile;
+    return this.createDefaultProfile(BECH32(id));
   }
 
   createDefaultProfile(npub: string): ProfileRecord {

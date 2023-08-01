@@ -3,8 +3,8 @@ export const MAX_DEGREE = 2;
 
 class TrustScore {
 
-    trusts = Array(MAX_DEGREE+1).fill(0);
-    distrusts = Array(MAX_DEGREE+1).fill(0);
+    trusts = Array(MAX_DEGREE+1).fill(0) as number[];
+    distrusts = Array(MAX_DEGREE+1).fill(0) as number[];
     
     addValue(value: number, degree: number) {
         if(value > 0) this.trusts[degree] ++;
@@ -17,6 +17,14 @@ class TrustScore {
 
     value(degree: number) {
         return this.trusts[degree] - this.distrusts[degree];
+    }
+
+    values() : Array<number> {
+        let result = Array(MAX_DEGREE+1).fill(0) as number[];
+        for(let i = 0; i <= MAX_DEGREE; i++) {
+            result[i] = this.value(i);
+        }
+        return result;
     }
 
     isDirectTrusted() {
@@ -42,6 +50,27 @@ class TrustScore {
         return false;
     }
 
+    //Resolve trust score to a single value
+    resolve() : { val:number, degree: number, count: number, hasScore: boolean } {
+        let result = { val: 0, degree: 0, count: 0, hasScore: false };
+        let i = 0;
+        for(; i <= MAX_DEGREE; i++) {
+            if(this.trusts[i] == 0 && this.distrusts[i] == 0)
+                continue; // no score at this degree
+
+            result.hasScore = true; // there is a score
+            if(this.value(i) != 0) {
+                result.val = this.value(i);
+                break; // found a score
+            }
+        }
+        result.count = this.count(i);
+        result.degree = i;
+        
+        return result;
+    }
+
+    
     clone() {
         const clone = Object.create(Object.getPrototypeOf(this)) as TrustScore;
         //Object.assign(clone, this);
