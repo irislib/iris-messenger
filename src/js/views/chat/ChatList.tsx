@@ -94,7 +94,7 @@ const ChatList = ({ activeChat, className }) => {
 
   return (
     <section
-      className={`border-r border-neutral-800 overflow-x-hidden overflow-y-auto h-full px-4 md:px-0 w-full md:w-64 ${className}`}
+      className={`border-r border-neutral-800 overflow-x-hidden overflow-y-auto h-full md:px-0 w-full md:w-64 ${className}`}
     >
       <div id="enable-notifications-prompt" className="hidden" onClick={enableDesktopNotifications}>
         <div className="title">{t('get_notified_new_messages')}</div>

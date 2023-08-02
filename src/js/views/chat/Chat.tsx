@@ -6,6 +6,7 @@ import View from '../View';
 
 import ChatList from './ChatList';
 import ChatMessages from './ChatMessages';
+import Header from './Header';
 import NewChat, { addChatWithInputKey } from './NewChat';
 
 class Chat extends View {
@@ -15,6 +16,7 @@ class Chat extends View {
     super();
     this.id = 'chat-view';
     this.hideSideBar = true;
+    this.hideHeader = true;
   }
 
   componentDidMount() {
@@ -50,9 +52,18 @@ class Chat extends View {
     const { id } = this.props;
 
     return (
-      <div className="flex flex-row h-full">
-        <ChatList activeChat={id} className={id ? 'hidden md:flex' : 'flex'} />
-        {this.renderContent(id)}
+      <div className="flex flex-col h-screen">
+        <Header />
+        <div className="flex flex-row flex-grow overflow-hidden">
+          <div
+            className={`flex-shrink-0 ${
+              id ? 'hidden md:flex overflow-y-auto h-screen' : 'flex overflow-y-auto h-screen'
+            }`}
+          >
+            <ChatList activeChat={id} className={id ? 'hidden md:flex' : 'flex'} />
+          </div>
+          <div className="flex-grow min-h-screen overflow-y-scroll">{this.renderContent(id)}</div>
+        </div>
       </div>
     );
   }

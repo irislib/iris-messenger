@@ -146,7 +146,7 @@ function ChatMessages({ id }) {
 
       mainView = (
         <div
-          className="main-view p-2 overflow-y-auto overflow-x-hidden flex-grow"
+          className="main-view p-2 overflow-y-auto overflow-x-hidden flex-grow min-h-screen"
           id="message-view"
           onScroll={() => onMessageViewScroll()}
         >
