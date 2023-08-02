@@ -46,7 +46,6 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   unsubLoadMore: (() => void) | undefined;
   twoSecondsPassed: boolean;
   sortedEventMap: SortedEventMap;
-  updated: boolean;
 
   constructor(props: FeedProps) {
     super(props);
@@ -67,7 +66,6 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       this.state.settings.sortBy,
       this.state.settings.sortDirection,
     );
-    this.updated = false;
   }
 
   getSettings(override = {} as any) {
@@ -236,11 +234,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     this.updateState(queuedEvents);
   }
 
-  debouncedUpdate = debounce(() => this.update(), 1000, { leading: true });
-
   updateState(queuedEvents) {
     if (this.twoSecondsPassed && !this.state.settings.realtime && this.state.events.length > 5) {
-      this.setState({ queuedEvents });
+      this.setState({ queuedEvents: [...this.state.queuedEvents, ...queuedEvents] });
     } else {
       this.setState({
         events: this.sortedEventMap.eventIds,
@@ -250,20 +246,13 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   }
 
   handleEvent(event) {
-    this.updated = false;
     if (this.shouldIgnoreEvent(event)) {
       return;
     }
 
     this.sortedEventMap.add(event);
 
-    if (this.sortedEventMap.size > 10 && !this.updated) {
-      // TODO should filter results (e.g. for images), only count what's shown
-      this.updated = true;
-      this.update();
-    } else {
-      this.debouncedUpdate();
-    }
+    this.update();
   }
 
   shouldIgnoreEvent(event) {
@@ -327,14 +316,10 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       prevState.settings?.showReplies !== this.state.settings?.showReplies ||
       prevState.settings?.display !== this.state.settings?.display
     ) {
-      this.setState({ displayCount: INITIAL_PAGE_SIZE });
       this.subscribe();
     }
     this.handleScroll();
     this.replaceState();
-    if (!this.state.queuedEvents.length && prevState.queuedEvents.length) {
-      window.scrollTo(0, 0);
-    }
     if (this.props.filter !== prevProps.filter || this.props.keyword !== prevProps.keyword) {
       this.sortedEventMap = new SortedEventMap(
         this.state.settings.sortBy,
@@ -356,6 +341,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       displayCount: INITIAL_PAGE_SIZE,
     });
     window.scrollTo(0, 0);
+    // TODO scroll up only if queued events are newer than newest shown
   }
 
   render() {
@@ -386,7 +372,10 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           <ShowNewEvents onClick={() => this.showQueuedEvents()} />
         </Show>
         <Show when={index !== 'notifications' && this.state.settingsOpen}>
-          <FeedSettings settings={settings} onChange={(settings) => this.setState({ settings })} />
+          <FeedSettings
+            settings={settings}
+            onChange={(settings) => this.setState({ displayCount: INITIAL_PAGE_SIZE, settings })}
+          />
         </Show>
         <Show when={['global', 'follows'].includes(index || '')}>
           <div className="flex items-center mx-4 my-4">
@@ -417,7 +406,10 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
             index={index}
             display={settings.display}
             setDisplay={(display) => {
-              this.setState({ settings: { ...settings, display } });
+              this.setState({
+                displayCount: INITIAL_PAGE_SIZE,
+                settings: { ...settings, display },
+              });
               localState.get('settings').get('feed').get('display').put(display);
             }}
           />

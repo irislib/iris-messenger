@@ -22,6 +22,8 @@ class Feed extends BaseFeed {
       filter.since = since;
     }
     if (until) {
+      // problem: there might be events newer than this that we don't have yet
+      // filters.not.ids = bloomFilter would be cool
       filter.until = until;
     }
     return filter;
