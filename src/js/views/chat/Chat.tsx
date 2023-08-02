@@ -62,7 +62,14 @@ class Chat extends View {
           >
             <ChatList activeChat={id} className={id ? 'hidden md:flex' : 'flex'} />
           </div>
-          <div className="flex-grow min-h-screen overflow-y-scroll">{this.renderContent(id)}</div>
+          <div
+            key={`chat-content-${id}`}
+            className={`flex-grow min-h-screen overflow-y-scroll ${
+              !id ? 'hidden md:flex' : 'flex'
+            }`}
+          >
+            {this.renderContent(id)}
+          </div>
         </div>
       </div>
     );
