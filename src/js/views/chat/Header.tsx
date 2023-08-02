@@ -54,9 +54,7 @@ const Header = ({ activeChat }) => {
             </div>
           </Show>
           <Show when={!activeChat}>
-            <div className="flex flex-row gap-2 items-center">
-              {t('chat')}
-            </div>
+            <div className="flex flex-row gap-2 items-center">{t('chat')}</div>
           </Show>
           <Show when={loggedIn}>
             <div></div>
