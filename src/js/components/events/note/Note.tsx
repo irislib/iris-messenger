@@ -13,7 +13,7 @@ import EventComponent from '../EventComponent';
 import Avatar from './Avatar';
 import Content from './Content';
 
-import useVerticeMonitor from '../../../dwotr/components/useVerticeMonitor';
+import useVerticeMonitor from '../../../dwotr/hooks/useVerticeMonitor';
 import { ID } from '../../../nostr/UserIds';
 
 

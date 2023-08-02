@@ -12,7 +12,6 @@ import ProfileRecord from './model/ProfileRecord';
 import { throttle } from 'lodash';
 import Identicon from 'identicon.js';
 
-
 class ProfileManager {
   loaded: boolean = false;
   saveQueue: ProfileRecord[] = [];
@@ -29,23 +28,16 @@ class ProfileManager {
     this.loaded = true;
   }
 
-    // TODO: Disable for now as it's not working because of CORS
-    async fetchProfile(address: string) {
+  // TODO: Disable for now as it's not working because of CORS
+  async fetchProfile(npub: string) {
     // const npub = Key.toNostrBech32Address(address, 'npub') as string;
     // const profile = await fetch(`https://api.iris.to/profile/${npub}`).then((res) => {
     //   if (res.status === 200) return res.json();
     //   else return undefined;
     // });
     // return profile;
-    console.log('fetchProfile disabled. CORS issue. Requested address:', address);
+    console.log('fetchProfile disabled. CORS issue. Requested address:', npub);
     return undefined;
-  }
-
-  quickProfile(address: string) {
-    const id = ID(address);
-    const profile = SocialNetwork.profiles.get(id);
-    if (profile) return profile;
-    else return this.sanitizeProfile({}, address);
   }
 
   getProfile(
@@ -53,9 +45,12 @@ class ProfileManager {
     cb?: (profile: any, address: string) => void,
     verifyNip05 = false,
   ): Unsubscribe {
-    const id = ID(address);
+    const hexPub = Key.toNostrHexAddress(address) as string;
+    const npub = Key.toNostrBech32Address(address, 'npub') as string;
+    const id = ID(hexPub);
+
     const callback = () => {
-      cb?.(SocialNetwork.profiles.get(id), address);
+      cb?.(SocialNetwork.profiles.get(id), hexPub);
     };
 
     let profile = SocialNetwork.profiles.get(id);
@@ -71,18 +66,17 @@ class ProfileManager {
         //   callback();
         // });
       }
-    } else  {
+    } else {
       // Check if profile is in IndexedDB
-      this.loadProfile(address).then((profile) => {
+      this.loadProfile(hexPub).then((profile) => {
         if (profile) {
           // exists in DB
-          if (this.profileIsNewer(profile))
-            this.addProfileToMemory(profile);
+          if (this.profileIsNewer(profile)) this.addProfileToMemory(profile);
 
           callback(); // callback with profile
         } else {
           // Check if profile is in API
-          profileManager.fetchProfile(address).then((profile) => {
+          profileManager.fetchProfile(npub).then((profile) => {
             if (!profile) return; // not in API
             // TODO verify sig
             if (this.profileIsNewer(profile))
@@ -96,14 +90,14 @@ class ProfileManager {
       });
     }
 
-    if(!profile) {
-      profile = this.createDefaultProfile(address);
+    if (!profile) {
+      profile = this.createDefaultProfile(npub);
       SocialNetwork.profiles.set(id, profile);
       callback();
     }
 
     // Then subscribe to updates via nostr relays
-    return PubSub.subscribe({ kinds: [0], authors: [address] }, callback, false);
+    return PubSub.subscribe({ kinds: [0], authors: [npub] }, callback, false);
   }
 
   async getProfiles(
@@ -237,6 +231,12 @@ class ProfileManager {
     return profile;
   }
 
+
+  createDefaultProfile(npub: string): ProfileRecord {
+    let profile = this.sanitizeProfile({}, npub);
+    return profile;
+  }
+
   getDefaultProfile(id: number | undefined) {
     if (!id) return undefined;
     const profile = SocialNetwork.profiles.get(id);
@@ -244,11 +244,13 @@ class ProfileManager {
     return this.createDefaultProfile(BECH32(id));
   }
 
-  createDefaultProfile(npub: string): ProfileRecord {
-    let profile = this.sanitizeProfile({}, npub);
-    profile.isDefault = true;
-    return profile;
+  quickProfile(address: string) {
+    const id = ID(address);
+    const profile = SocialNetwork.profiles.get(id);
+    if (profile) return profile;
+    return this.createDefaultProfile(BECH32(id));
   }
+
 
   profileIsNewer(profile: ProfileRecord) {
     const existingProfile = SocialNetwork.profiles.get(ID(profile.key));
@@ -302,16 +304,12 @@ class ProfileManager {
     return `data:image/svg+xml;base64,${identicon.toString()}`;
   }
 
-  ensurePicture(profile: ProfileRecord) : string {
+  ensurePicture(profile: ProfileRecord): string {
     if (!profile.picture) {
       profile.picture = this.createImageUrl(profile.key);
     }
     return profile.picture;
-  } 
-
-
-
-
+  }
 }
 
 const profileManager = new ProfileManager();

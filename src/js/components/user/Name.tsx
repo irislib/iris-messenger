@@ -4,7 +4,7 @@ import Key from '../../nostr/Key';
 import { ID } from '../../nostr/UserIds';
 
 import Badge from './Badge';
-import useVerticeMonitor from '../../dwotr/components/useVerticeMonitor';
+import useVerticeMonitor from '../../dwotr/hooks/useVerticeMonitor';
 import profileManager from '../../dwotr/ProfileManager';
 
 type Props = {

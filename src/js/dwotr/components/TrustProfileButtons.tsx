@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import graphNetwork from '../GraphNetwork';
 import { CheckCorrect, FlagMarkSolid } from './Icons';
 import { EntityType } from '../model/Graph';
-import useVerticeMonitor from './useVerticeMonitor';
+import useVerticeMonitor from '../hooks/useVerticeMonitor';
 import TrustScore from '../model/TrustScore';
 import { ID } from '../../nostr/UserIds';
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 import Key from '../../nostr/Key';
 import TrustScore from '../model/TrustScore';
-import useVerticeMonitor from './useVerticeMonitor';
+import useVerticeMonitor from '../hooks/useVerticeMonitor';
 import { RenderScoreDistrustLink, RenderScoreTrustLink } from './RenderGraph';
 import { ID } from '../../nostr/UserIds';
 
