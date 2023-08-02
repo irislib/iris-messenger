@@ -80,7 +80,7 @@ const ChatList = ({ activeChat, className }) => {
         }) as string[];
         setSortedChats(sorted);
       },
-      300,
+      1000,
       { leading: true },
     ),
     [],
