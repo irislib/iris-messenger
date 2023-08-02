@@ -1,6 +1,6 @@
 import { Cog8ToothIcon, HeartIcon } from '@heroicons/react/24/outline';
 import { ArrowLeftIcon, HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
-import { route } from 'preact-router';
+import { Link, route } from 'preact-router';
 
 import Component from '../BaseComponent';
 import Icons from '../Icons';
@@ -137,9 +137,9 @@ export default class Header extends Component {
     return (
       <>
         <Show when={this.state.isMyProfile}>
-          <a href="/settings" className="md:hidden">
+          <Link href="/settings" className="md:hidden">
             <Cog8ToothIcon width={28} />
-          </a>
+          </Link>
         </Show>
         <a
           href="/notifications"

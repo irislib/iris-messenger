@@ -1,3 +1,5 @@
+import { Link } from 'preact-router';
+
 import Component from '../BaseComponent';
 import Follow from '../components/buttons/Follow';
 import Header from '../components/Header';
@@ -91,10 +93,10 @@ class About extends Component {
 
             <h3>Follow</h3>
             <div className="flex flex-row items-center w-full justify-between">
-              <a href={`/${IRIS_INFO_ACCOUNT}`} className="flex flex-row items-center gap-2">
+              <Link href={`/${IRIS_INFO_ACCOUNT}`} className="flex flex-row items-center gap-2">
                 <Avatar str={IRIS_INFO_ACCOUNT} width={40} />
                 <Name pub={IRIS_INFO_ACCOUNT} placeholder="Iris" />
-              </a>
+              </Link>
               <Follow className="btn btn-neutral btn-sm" id={IRIS_INFO_ACCOUNT} />
             </div>
 

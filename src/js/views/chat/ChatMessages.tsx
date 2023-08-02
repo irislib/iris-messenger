@@ -119,7 +119,7 @@ function ChatMessages({ id }) {
             isDifferentDay = true;
             const separatorText = Helpers.getDaySeparatorText(date, dateStr, now, nowStr);
             msgListContent.push(
-              <div className="px-2 py-1 inline-block day-separator bg-black opacity-50 text-white rounded-full">
+              <div className="px-2 mt-3 mb-4 py-1 inline-block day-separator bg-black opacity-50 text-white rounded-full">
                 {t(separatorText.toLowerCase())}
               </div>,
             );
@@ -127,12 +127,9 @@ function ChatMessages({ id }) {
           previousDateStr = dateStr;
         }
 
-        let showName = false;
-        if (
-          msg.pubkey !== myPub &&
-          (isDifferentDay || (previousFrom && msg.pubkey !== previousFrom))
-        ) {
-          msgListContent.push(<div className="from-separator" />);
+        let showName = isDifferentDay;
+        if (!isDifferentDay && previousFrom && msg.pubkey !== previousFrom) {
+          msgListContent.push(<div className="m-2" />);
           showName = true;
         }
         previousFrom = msg.pubkey;
@@ -149,15 +146,15 @@ function ChatMessages({ id }) {
 
       mainView = (
         <div
-          className="main-view p-2 overflow-y-auto overflow-x-hidden flex-grow"
+          className="main-view p-2 overflow-y-auto overflow-x-hidden flex-grow min-h-screen"
           id="message-view"
           onScroll={() => onMessageViewScroll()}
         >
-          <div id="message-list" className="w-full">
+          <div id="message-list" className="w-full flex flex-col items-center">
             {msgListContent}
             <div className="italic my-2 text-neutral-500 w-full text-center">
               <Show when={isGroup && keyPair}>
-                <div>{t('secret_group_chat')}</div>
+                <div>{t('secret_chat')}</div>
                 <div className="flex gap-2 flex-1 items-center justify-center my-4">
                   <button
                     className="btn btn-neutral btn-sm"

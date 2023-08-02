@@ -149,13 +149,6 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           }),
         );
     }
-    let first = true;
-    localState.get('scrollUp').on(
-      this.sub(() => {
-        !first && window.scrollTo(0, 0);
-        first = false;
-      }),
-    );
   }
 
   componentWillMount() {

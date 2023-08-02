@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { Link } from 'preact-router';
 
 import Helpers from '../../../Helpers';
 import Key from '../../../nostr/Key';
@@ -31,18 +32,18 @@ const Author = ({ event, fullWidth, isQuote, standalone, setTranslatedText }) =>
       </Show>
       <div className="flex flex-col">
         <div>
-          <a href={`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`} className="font-bold">
+          <Link href={`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`} className="font-bold">
             <Name pub={event.pubkey} />
-          </a>
+          </Link>
           <small className="text-neutral-500">
             <span className="mx-2">·</span>
-            <a
+            <Link
               href={`/${Key.toNostrBech32Address(event.id, 'note')}`}
               className="tooltip"
               data-tip={`${dateStr} ${timeStr}`}
             >
               {time && Helpers.getRelativeTimeText(time)}
-            </a>
+            </Link>
           </small>
         </div>
       </div>

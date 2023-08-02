@@ -139,9 +139,12 @@ const EventDropdown = (props: EventDropdownProps) => {
                   {t('report_public')}
                 </a>
                 <FollowButton className="btn btn-sm" id={event?.pubkey} />
-                <span onClick={onBlock}>
-                  <Block className="btn btn-sm" id={event?.pubkey} showName={true} />
-                </span>
+                <Block
+                  className="btn btn-sm"
+                  onClick={onBlock}
+                  id={event?.pubkey}
+                  showName={true}
+                />
               </>
             )}
             <a

@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import throttle from 'lodash/throttle';
+import { Link } from 'preact-router';
 
 import Follow from '../components/buttons/Follow';
 import Show from '../components/helpers/Show';
@@ -17,7 +18,7 @@ const FollowedUser = memo(({ hexKey }: { hexKey: string }) => {
   const npub = Key.toNostrBech32Address(hexKey, 'npub') || '';
   return (
     <div key={npub} className="flex w-full">
-      <a href={`/${npub}`} className="flex flex-1 gap-4">
+      <Link href={`/${npub}`} className="flex flex-1 gap-4">
         <Avatar str={npub} width={49} />
         <div>
           <Name pub={npub} />
@@ -28,7 +29,7 @@ const FollowedUser = memo(({ hexKey }: { hexKey: string }) => {
             followers
           </span>
         </div>
-      </a>
+      </Link>
       {hexKey !== Key.getPubKey() && <Follow id={npub} />}
     </div>
   );

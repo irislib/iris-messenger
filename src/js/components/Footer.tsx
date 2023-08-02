@@ -6,7 +6,7 @@ import {
   PlusCircleIcon as PlusCircleIconFull,
 } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'preact/hooks';
-import { route } from 'preact-router';
+import { Link } from 'preact-router';
 
 import Icons from '../Icons';
 import localState from '../LocalState';
@@ -37,42 +37,18 @@ const Footer = () => {
     });
   }, []);
 
-  const handleFeedClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    localState.get('lastOpenedFeed').once((lastOpenedFeed) => {
-      if (lastOpenedFeed !== activeRoute.replace('/', '')) {
-        route('/' + (lastOpenedFeed || ''));
-      } else {
-        localState.get('lastOpenedFeed').put('');
-        route('/');
-      }
-    });
-  };
-
   const renderButton = (href, Icon, IconActive) => {
     const isActive = new RegExp(`^${href}(/|$)`).test(activeRoute);
 
-    const handleClick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (href === '/') {
-        handleFeedClick(e);
-      } else {
-        route(href);
-      }
-    };
-
     return (
-      <a onClick={handleClick} className={`btn flex-grow ${isActive ? 'active' : ''}`}>
+      <Link href={href} className={`btn flex-grow ${isActive ? 'active' : ''}`}>
         <Show when={isActive}>
           <IconActive width={24} />
         </Show>
         <Show when={!isActive}>
           <Icon width={24} />
         </Show>
-      </a>
+      </Link>
     );
   };
 
@@ -83,7 +59,7 @@ const Footer = () => {
       <footer className="fixed md:hidden bottom-0 z-10 w-full bg-base-200 pb-safe-area">
         <div className="flex">
           {MENU_ITEMS.map((item) => renderButton(item.url, item.icon, item.activeIcon))}
-          <a href={`/${key}`} className="rounded-full btn flex flex-grow">
+          <Link href={`/${key}`} className="rounded-full btn flex flex-grow">
             <span
               className={`${
                 isMyProfile ? 'border-white' : 'border-black'
@@ -91,7 +67,7 @@ const Footer = () => {
             >
               <Avatar str={key} width={28} />
             </span>
-          </a>
+          </Link>
         </div>
       </footer>
     </Show>

@@ -1,3 +1,5 @@
+import { Link } from 'preact-router';
+
 import Component from '../../BaseComponent';
 import Copy from '../../components/buttons/Copy';
 import Follow from '../../components/buttons/Follow';
@@ -104,10 +106,10 @@ export default class Backup extends Component {
               </p>
               {this.state.restoredFollows.map((hex) => (
                 <div className="profile-link-container">
-                  <a href={`/${Key.toNostrBech32Address(hex, 'npub')}`} className="profile-link">
+                  <Link href={`/${Key.toNostrBech32Address(hex, 'npub')}`} className="profile-link">
                     <Avatar str={hex} width={40} />
                     <Name pub={hex} />
-                  </a>
+                  </Link>
                   <Follow id={hex} />
                 </div>
               ))}

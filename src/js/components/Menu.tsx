@@ -13,7 +13,7 @@ import {
   PaperAirplaneIcon as PaperAirplaneIconFull,
   PlusIcon,
 } from '@heroicons/react/24/solid';
-import { Link, route } from 'preact-router';
+import { Link } from 'preact-router';
 
 import Icons from '../Icons';
 import localState from '../LocalState';
@@ -73,24 +73,9 @@ export default function Menu() {
     return today.getMonth() === 2 && today.getDate() === 17;
   }, []);
 
-  const menuLinkClicked = (e, a?, openFeed = false) => {
-    if (a?.text === 'home' || openFeed) {
-      openFeedClicked(e);
-    }
+  const menuLinkClicked = () => {
     localState.get('scrollUp').put(true);
-  };
-
-  const openFeedClicked = (e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    localState.get('lastOpenedFeed').once((lastOpenedFeed: string) => {
-      if (lastOpenedFeed !== activeRoute.replace('/', '')) {
-        route('/' + (lastOpenedFeed || ''));
-      } else {
-        localState.get('lastOpenedFeed').put('');
-        route('/');
-      }
-    });
+    window.scrollTo(0, 0);
   };
 
   const renderNewPostModal = () => (
@@ -119,12 +104,12 @@ export default function Menu() {
   };
 
   const renderMenuItem = (a) => {
-    const isActive = a.url === activeRoute;
+    const isActive = new RegExp(`^${a.url}(/|$)`).test(activeRoute);
     const Icon = isActive ? a.activeIcon : a.icon;
     return (
       <div>
         <a
-          onClick={(e) => menuLinkClicked(e, a)}
+          onClick={() => menuLinkClicked()}
           className={`${
             isActive ? 'active' : ''
           } inline-flex w-auto flex items-center space-x-4 p-3 rounded-full transition-colors duration-200 hover:bg-neutral-900`}
@@ -146,7 +131,7 @@ export default function Menu() {
         className="flex items-center gap-3 px-2 mb-4"
         tabIndex={3}
         href="/"
-        onClick={(e) => menuLinkClicked(e, undefined, true)}
+        onClick={() => menuLinkClicked()}
       >
         {isStPatricksDay ? (
           <span className="text-3xl">☘️</span>

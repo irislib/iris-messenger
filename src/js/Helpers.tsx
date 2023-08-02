@@ -6,7 +6,7 @@ import _ from 'lodash';
 import throttle from 'lodash/throttle';
 import { nip19 } from 'nostr-tools';
 import { ComponentChild } from 'preact';
-import { route } from 'preact-router';
+import { Link, route } from 'preact-router';
 
 import EventComponent from './components/events/EventComponent';
 import SafeImg from './components/SafeImg';
@@ -576,9 +576,9 @@ export default {
           return (
             <>
               {' '}
-              <a href={`/${data.pubkey}`} className="link">
+              <Link href={`/${data.pubkey}`} className="link">
                 @<Name key={match + i} pub={data.pubkey} hideBadge={true} />
-              </a>
+              </Link>
             </>
           );
         } else if (type === 'nevent') {
@@ -647,9 +647,9 @@ export default {
             return opts.showMentionedMessages ? (
               <EventComponent key={tagTarget + i} id={tagTarget} asInlineQuote={true} />
             ) : (
-              <a className="link" href={`/${Key.toNostrBech32Address(tagTarget, 'note')}`}>
+              <Link className="link" href={`/${Key.toNostrBech32Address(tagTarget, 'note')}`}>
                 {tag[1]}
-              </a>
+              </Link>
             );
           }
         }
@@ -660,9 +660,9 @@ export default {
     // highlight hashtags, link to /search/${encodeUriComponent(hashtag)}
     s = reactStringReplace(s, hashtagRegex, (match) => {
       return (
-        <a className="link" href={`/search/${encodeURIComponent(match)}`}>
+        <Link className="link" href={`/search/${encodeURIComponent(match)}`}>
           {match}
-        </a>
+        </Link>
       );
     });
 
