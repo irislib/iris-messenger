@@ -32,7 +32,8 @@ export default {
 
   getFollowDistance: function (user: string): number {
     const userId = ID(user);
-    return this.followDistanceByUser.get(userId) || Infinity;
+    const distance = this.followDistanceByUser.get(userId);
+    return distance === undefined ? 1000 : distance;
   },
 
   setFollowed: function (followedUsers: string | string[], follow = true) {

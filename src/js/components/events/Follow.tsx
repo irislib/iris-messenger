@@ -1,4 +1,5 @@
 import { Event } from 'nostr-tools';
+import { Link } from 'preact-router';
 
 import Icons from '../../Icons';
 import Key from '../../nostr/Key';
@@ -20,9 +21,9 @@ function Follow(props: Props) {
           <i className="repost-btn reposted" style={{ marginRight: 15 }}>
             {Icons.newFollower}
           </i>
-          <a href={`/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`}>
+          <Link href={`/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`}>
             <Name pub={props.event.pubkey} />
-          </a>
+          </Link>
           <span className="mar-left5"> {text}</span>
         </div>
       </div>

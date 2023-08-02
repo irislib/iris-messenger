@@ -41,7 +41,6 @@ export default {
       location.reload();
     }
     localState.get('loggedIn').put(true);
-    localState.get('lastOpenedFeed').put('following');
     if (redirect) {
       setTimeout(() => {
         route('/following');
@@ -186,7 +185,7 @@ export default {
       }
 
       let decrypted = (await this.decrypt(msg.content, theirPub)) as any;
-      if (decrypted.content) {
+      if (decrypted?.content) {
         decrypted = decrypted.content; // what? TODO debug
       }
       Events.decryptedMessages.set(id, decrypted);

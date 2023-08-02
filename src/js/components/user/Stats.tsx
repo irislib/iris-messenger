@@ -1,5 +1,6 @@
 import { memo, useEffect, useState } from 'react';
 import throttle from 'lodash/throttle';
+import { Link } from 'preact-router';
 
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
@@ -62,12 +63,12 @@ const ProfileStats = ({ address }) => {
   return (
     <div>
       <div className="text-sm flex gap-4">
-        <a href={`/follows/${address}`}>
+        <Link href={`/follows/${address}`}>
           <b>{Math.max(followedUserCount, followedUserCountFromApi)}</b><span className="text-neutral-500"> {t('following')}</span>
-        </a>
-        <a href={`/followers/${address}`}>
+        </Link>
+        <Link href={`/followers/${address}`}>
           <b>{Math.max(followerCount, followerCountFromApi)}</b><span className="text-neutral-500"> {t('followers')}</span>
-        </a>
+        </Link>
         <ProfileScoreLinks hexPub={address} />
       </div>
       <Show when={!isMyProfile && knownFollowers.length > 0}>
@@ -77,12 +78,12 @@ const ProfileStats = ({ address }) => {
             {knownFollowers.slice(0, 3).map((follower, index) => (
               <span key={follower}>
                 <Show when={index > 0}>{', '}</Show>
-                <a
+                <Link
                   className="hover:underline"
-                  href={`/profile/${Key.toNostrBech32Address(follower, 'npub')}`}
+                  href={`/${Key.toNostrBech32Address(follower, 'npub')}`}
                 >
                   <Name pub={follower} hideBadge={true} />
-                </a>{' '}
+                </Link>{' '}
               </span>
             ))}
             <Show when={knownFollowers.length > 3}>

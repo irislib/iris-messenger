@@ -21,6 +21,7 @@ abstract class View extends Component {
   observer: ResizeObserver | null = null;
   scrollPosition = 0;
   hideSideBar = false;
+  hideHeader = false;
 
   abstract renderView(): JSX.Element;
 
@@ -28,7 +29,9 @@ abstract class View extends Component {
     return (
       <div className="flex flex-row h-full w-full">
         <div className={`flex flex-col w-full h-full ${this.hideSideBar ? '' : 'lg:w-2/3'}`}>
-          <Header />
+          <Show when={!this.hideHeader}>
+            <Header />
+          </Show>
           <div class={this.class} id={this.id} className="h-full">
             <ErrorBoundary>{this.renderView()}</ErrorBoundary>
           </div>

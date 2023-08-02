@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { Event } from 'nostr-tools';
+import { Link } from 'preact-router';
 
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -34,9 +35,9 @@ export default function Repost(props: Props) {
         <i>
           <ArrowPathIcon width={18} />
         </i>
-        <a href={`/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`}>
+        <Link href={`/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`}>
           <Name pub={props.event?.pubkey} hideBadge={true} />
-        </a>
+        </Link>
         <span>
           {allReposts.length > 1 && `and ${allReposts.length - 1} others`} {t('reposted')}
         </span>

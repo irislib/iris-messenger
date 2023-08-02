@@ -4,12 +4,11 @@ import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
 import Name from '../user/Name';
 
-import { PrimaryButton as Button } from './Button';
-
 type Props = {
   id: string;
   showName?: boolean;
   className?: string;
+  onClick?: (e) => void;
 };
 
 class Block extends Component<Props> {
@@ -44,6 +43,7 @@ class Block extends Component<Props> {
     const newValue = !this.state[this.key];
     const hex = Key.toNostrHexAddress(this.props.id);
     hex && SocialNetwork.block(hex, newValue);
+    this.props.onClick?.(e);
   }
 
   componentDidMount() {
@@ -68,7 +68,7 @@ class Block extends Component<Props> {
     }
 
     return (
-      <Button
+      <button
         className={`${this.cls || this.key} ${isBlocked ? this.activeClass : ''} ${
           this.props.className || ''
         }`}
@@ -79,7 +79,7 @@ class Block extends Component<Props> {
         <span>
           {t(buttonText)} {this.props.showName ? <Name pub={this.props.id} hideBadge={true} /> : ''}
         </span>
-      </Button>
+      </button>
     );
   }
 }

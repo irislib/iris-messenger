@@ -12,6 +12,7 @@ import { EventTemplate } from 'nostr-tools';
 
 import FuzzySearch from '../FuzzySearch';
 import localState from '../LocalState';
+import SortedMap from '../utils/SortedMap';
 import { addGroup, setGroupNameByInvite } from '../views/chat/NewChat';
 
 import EventMetaStore from './EventsMeta';
@@ -65,6 +66,23 @@ localState.get('dev').on((d) => {
   dev = d;
 });
 
+const sortByEventCreatedAt = (aId, bId) => {
+  const aEvent = Events.db.by('id', aId);
+  const bEvent = Events.db.by('id', bId);
+  if (!aEvent) {
+    return 1;
+  }
+  if (!bEvent) {
+    return -1;
+  }
+  if (aEvent.created_at > bEvent.created_at) {
+    return -1;
+  } else if (aEvent.created_at < bEvent.created_at) {
+    return 1;
+  }
+  return 0;
+};
+
 // TODO separate files for different types of events
 const Events = {
   DEFAULT_GLOBAL_FILTER,
@@ -73,7 +91,17 @@ const Events = {
   eventsMetaDb: new EventMetaStore(),
   seen: new Set<string>(),
   deletedEvents: new Set<string>(),
-  directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
+  directMessagesByUser: new SortedMap<string, SortedLimitedEventSet>((a, b) => {
+    const aLatest = a.value.eventIds[0];
+    const bLatest = b.value.eventIds[0];
+    if (!aLatest) {
+      return 1;
+    }
+    if (!bLatest) {
+      return -1;
+    }
+    return sortByEventCreatedAt(aLatest, bLatest);
+  }),
   latestNotificationByTargetAndKind: new Map<string, string>(),
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   zapsByNote: new Map<string, SortedLimitedEventSet>(),
@@ -401,6 +429,7 @@ const Events = {
     }
 
     /*
+    // this would omit messages from groups
     if (event.pubkey !== myPub && !this.directMessagesByUser.has(event.pubkey)) {
       const distance = SocialNetwork.getFollowDistance(event.pubkey);
       if (distance > globalFilter.maxFollowDistance) {
@@ -411,10 +440,9 @@ const Events = {
      */
 
     this.insert(event);
-    if (!this.directMessagesByUser.has(user)) {
-      this.directMessagesByUser.set(user, new SortedLimitedEventSet(500));
-    }
-    this.directMessagesByUser.get(user)?.add(event);
+    const byUser = this.directMessagesByUser.get(user) ?? new SortedLimitedEventSet(500);
+    byUser.add(event);
+    this.directMessagesByUser.set(user, byUser);
   },
   handleKeyValue(event: Event) {
     if (event.pubkey !== Key.getPubKey()) {
@@ -874,7 +902,7 @@ const Events = {
       unsub2();
     };
   },
-  getDirectMessages(cb?: (chats: Map<string, SortedLimitedEventSet>) => void): Unsubscribe {
+  getDirectMessages(cb?: (chats: SortedMap<string, SortedLimitedEventSet>) => void): Unsubscribe {
     const callback = () => {
       const map = this.directMessagesByUser ?? new Map();
       if (map.size === 0) {

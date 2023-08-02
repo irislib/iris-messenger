@@ -163,11 +163,11 @@ export default class IrisAccount extends Component {
       });
       return;
     }
-    if (newUserName.length < 6 || newUserName.length > 15) {
+    if (newUserName.length < 8 || newUserName.length > 15) {
       this.setState({
         newUserName,
         newUserNameValid: false,
-        invalidUsernameMessage: 'Username must be between 6 and 15 characters',
+        invalidUsernameMessage: 'Username must be between 8 and 15 characters',
       });
       return;
     }

@@ -14,7 +14,6 @@ import Chat from './views/chat/Chat';
 import EditProfile from './views/EditProfile';
 import Explorer from './views/explorer/Explorer';
 import Feed from './views/Feed';
-import FeedList from './views/FeedList';
 import Follows from './views/Follows';
 import KeyConverter from './views/KeyConverter';
 import Login from './views/Login';
@@ -127,10 +126,9 @@ class Main extends Component<Props, ReactState> {
           <div className="overlay" onClick={() => this.onClickOverlay()}></div>
           <div className="pb-16 md:pb-0 relative flex h-full flex-grow flex-col w-1/2">
             <Router onChange={(e) => this.handleRoute(e)}>
-              <FeedList path="/" />
+              <Feed path="/" index="follows" />
               <Search path="/search" focus={true} />
               <KeyConverter path="/key" />
-              <Feed path="/following" index="follows" />
               <Feed path="/global" index="global" />
               <Feed path="/search/:keyword" />
               <Login path="/login" fullScreen={true} />

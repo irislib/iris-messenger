@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { debounce } from 'lodash';
 import { useEffect, useState } from 'preact/hooks';
-import { route } from 'preact-router';
+import { Link, route } from 'preact-router';
 
 import Events from '../../../nostr/Events';
 import Key from '../../../nostr/Key';
@@ -127,12 +127,12 @@ const Note = ({
 
   const showThreadBtn = (
     <Show when={!standalone && !isReply && !isQuoting && rootMsg}>
-      <a
+      <Link
         className="text-iris-blue text-sm block mb-2"
         href={`/${Key.toNostrBech32Address(rootMsg || '', 'note')}`}
       >
         {t('show_thread')}
-      </a>
+      </Link>
     </Show>
   );
 
