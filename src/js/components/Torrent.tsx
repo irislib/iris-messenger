@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet';
 import { createRef } from 'preact';
+import { Link } from 'preact-router';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
@@ -281,7 +282,9 @@ class Torrent extends Component {
             ) : null}
           </>
         ) : (
-          <a href={`/torrent/${encodeURIComponent(this.props.torrentId)}`}>{t('show_files')}</a>
+          <Link href={`/torrent/${encodeURIComponent(this.props.torrentId)}`}>
+            {t('show_files')}
+          </Link>
         )}
         {s.showFiles && to && to.files ? (
           <>

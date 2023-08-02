@@ -1,4 +1,5 @@
 import { ChangeEvent } from 'react';
+import { Link } from 'preact-router';
 
 import Component from '../../BaseComponent';
 import Name from '../../components/user/Name';
@@ -25,9 +26,9 @@ export default class SocialNetworkSettings extends Component {
         hasBlockedUsers = true;
         return (
           <div key={user}>
-            <a href={`/${bech32}`}>
+            <Link href={`/${bech32}`}>
               <Name pub={user} />
-            </a>
+            </Link>
           </div>
         );
       }

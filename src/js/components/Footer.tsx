@@ -59,7 +59,7 @@ const Footer = () => {
       <footer className="fixed md:hidden bottom-0 z-10 w-full bg-base-200 pb-safe-area">
         <div className="flex">
           {MENU_ITEMS.map((item) => renderButton(item.url, item.icon, item.activeIcon))}
-          <a href={`/${key}`} className="rounded-full btn flex flex-grow">
+          <Link href={`/${key}`} className="rounded-full btn flex flex-grow">
             <span
               className={`${
                 isMyProfile ? 'border-white' : 'border-black'
@@ -67,7 +67,7 @@ const Footer = () => {
             >
               <Avatar str={key} width={28} />
             </span>
-          </a>
+          </Link>
         </div>
       </footer>
     </Show>

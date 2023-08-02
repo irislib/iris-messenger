@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { Link } from 'preact-router';
 
 import Icons from '../Icons';
 import localState from '../LocalState';
@@ -114,7 +115,10 @@ class MediaPlayer extends Component<Record<string, never>, State> {
         <div className="media-player" style={{ display: s.isOpen ? '' : 'none' }}>
           <div className="player"></div>
           <div className="cover"></div>
-          <a href={`/torrent/${encodeURIComponent(this.state.torrentId ?? '')}`} className="info">
+          <Link
+            href={`/torrent/${encodeURIComponent(this.state.torrentId ?? '')}`}
+            className="info"
+          >
             {s.splitPath
               ? s.splitPath.map((str, i) => {
                   if (i === (s.splitPath?.length || 0) - 1) {
@@ -128,7 +132,7 @@ class MediaPlayer extends Component<Record<string, never>, State> {
                   return <p>{str}</p>;
                 })
               : ''}
-          </a>
+          </Link>
           <div className="close" onClick={() => this.closeClicked()}>
             {Icons.close}
           </div>

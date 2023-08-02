@@ -1,5 +1,5 @@
 import { XMarkIcon } from '@heroicons/react/24/solid';
-import { route } from 'preact-router';
+import { Link, route } from 'preact-router';
 import styled from 'styled-components';
 
 import Component from '../BaseComponent';
@@ -73,7 +73,7 @@ export default class OnboardingNotification extends Component {
         <p className="text-base">{t('follow_someone_info')}</p>
         {SUGGESTED_FOLLOWS.map(([pub, description]) => (
           <div className="flex items-center space-x-4">
-            <a href={`/${pub}`} className="flex flex-grow items-center space-x-2">
+            <Link href={`/${pub}`} className="flex flex-grow items-center space-x-2">
               <div className="w-10 h-10">
                 <Avatar str={pub} width={40} />
               </div>
@@ -81,7 +81,7 @@ export default class OnboardingNotification extends Component {
                 <Name pub={pub} placeholder="Suggested follow" />
                 <p className="text-sm text-gray-500">{description}</p>
               </div>
-            </a>
+            </Link>
             <Follow id={pub} />
           </div>
         ))}
@@ -96,9 +96,9 @@ export default class OnboardingNotification extends Component {
         <p className="text-base">
           {t('alternatively')}
           <i> </i>
-          <a href={`/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}`} className="link">
+          <Link href={`/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}`} className="link">
             {t('give_your_profile_link_to_someone')}
-          </a>
+          </Link>
           .
         </p>
       </div>
