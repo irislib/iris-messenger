@@ -29,7 +29,6 @@ const ChatList = ({ activeChat, className }) => {
 
   useEffect(() => {
     const unsubs = [] as any[];
-
     unsubs.push(
       Events.getDirectMessages(async (incomingChats) => {
         let keys = Array.from(incomingChats.keys());
