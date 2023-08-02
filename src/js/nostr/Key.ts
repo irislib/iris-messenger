@@ -41,7 +41,6 @@ export default {
       location.reload();
     }
     localState.get('loggedIn').put(true);
-    localState.get('lastOpenedFeed').put('following');
     if (redirect) {
       setTimeout(() => {
         route('/following');

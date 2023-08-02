@@ -6,7 +6,6 @@ import {
   PlusCircleIcon as PlusCircleIconFull,
 } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'preact/hooks';
-import { route } from 'preact-router';
 
 import Icons from '../Icons';
 import localState from '../LocalState';
@@ -37,35 +36,11 @@ const Footer = () => {
     });
   }, []);
 
-  const handleFeedClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    localState.get('lastOpenedFeed').once((lastOpenedFeed) => {
-      if (lastOpenedFeed !== activeRoute.replace('/', '')) {
-        route('/' + (lastOpenedFeed || ''));
-      } else {
-        localState.get('lastOpenedFeed').put('');
-        route('/');
-      }
-    });
-  };
-
   const renderButton = (href, Icon, IconActive) => {
     const isActive = new RegExp(`^${href}(/|$)`).test(activeRoute);
 
-    const handleClick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (href === '/') {
-        handleFeedClick(e);
-      } else {
-        route(href);
-      }
-    };
-
     return (
-      <a onClick={handleClick} className={`btn flex-grow ${isActive ? 'active' : ''}`}>
+      <a className={`btn flex-grow ${isActive ? 'active' : ''}`}>
         <Show when={isActive}>
           <IconActive width={24} />
         </Show>

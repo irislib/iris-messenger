@@ -131,18 +131,6 @@ const Session = {
         unsubFollowers();
       }
     });
-    if (window.location.pathname === '/') {
-      localState.get('lastOpenedFeed').once((lastOpenedFeed) => {
-        route('/' + (lastOpenedFeed || 'following'));
-        // dumb, but better than nothing
-        setTimeout(() => {
-          route('/' + (lastOpenedFeed || 'following'));
-        }, 100);
-        setTimeout(() => {
-          route('/' + (lastOpenedFeed || 'following'));
-        }, 500);
-      });
-    }
     setTimeout(() => {
       PubSub.subscribe({ authors: [myPub] }, undefined, true); // our stuff
       PubSub.subscribe({ '#p': [myPub], kinds: [1, 3, 6, 7, 9735] }, undefined, true); // notifications
