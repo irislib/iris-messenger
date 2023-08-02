@@ -14,7 +14,6 @@ import {
 import MyAvatar from '../../components/user/Avatar';
 import { ID, PUB } from '../../nostr/UserIds';
 import Name from '../../components/user/Name';
-import { memo } from 'preact/compat';
 import {
   ViewComponentProps,
   parseEntityType,
@@ -198,5 +197,4 @@ const TrustList = ({ props }: ViewComponentProps) => {
   );
 };
 
-// Use memo to prevent auto re-rendering when props change
-export default memo(TrustList);
+export default TrustList;

@@ -10,7 +10,6 @@ import { BECH32, ID, PUB } from '../../nostr/UserIds';
 import { MAX_DEGREE } from '../model/TrustScore';
 import { translate as t } from '../../translations/Translation.mjs';
 import { ViewComponentProps, parseEntityType } from './GraphView';
-import { memo } from 'preact/compat';
 import GraphDirectionSelect from '../components/GraphDirectionSelect';
 import { Link } from 'preact-router';
 
@@ -122,6 +121,7 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     setNetwork(instance);
     return () => {
       // Cleanup the network on component unmount
+      network?.off('click');
       network?.destroy();
     };
   }, [visJsRef]);
@@ -281,5 +281,4 @@ const VisGraph = ({ props }: ViewComponentProps) => {
   );
 };
 
-// Use memo to prevent re-rendering when props change
-export default memo(VisGraph);
+export default VisGraph;

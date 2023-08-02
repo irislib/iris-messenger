@@ -10,7 +10,6 @@ import { BECH32, ID, PUB } from '../../nostr/UserIds';
 import { Unsubscribe } from '../../nostr/PubSub';
 import { translate as t } from '../../translations/Translation.mjs';
 import TrustScore from '../model/TrustScore';
-import { memo } from 'preact/compat';
 import { ViewComponentProps } from './GraphView';
 import { Link } from 'preact-router';
 import { filterNodes } from './VisGraph';
@@ -90,6 +89,7 @@ const VisPath = ({ props }: ViewComponentProps) => {
     setNetwork(instance);
     return () => {
       // Cleanup the network on component unmount
+      network?.off('click');
       network?.destroy();
     };
   }, [visJsRef]);
@@ -249,5 +249,4 @@ const VisPath = ({ props }: ViewComponentProps) => {
   );
 };
 
-// Use memo to prevent re-rendering when props change
-export default memo(VisPath);
+export default VisPath;
