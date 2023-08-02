@@ -119,7 +119,7 @@ function ChatMessages({ id }) {
             isDifferentDay = true;
             const separatorText = Helpers.getDaySeparatorText(date, dateStr, now, nowStr);
             msgListContent.push(
-              <div className="px-2 py-1 inline-block day-separator bg-black opacity-50 text-white rounded-full">
+              <div className="px-2 mt-3 mb-4 py-1 inline-block day-separator bg-black opacity-50 text-white rounded-full">
                 {t(separatorText.toLowerCase())}
               </div>,
             );
@@ -127,12 +127,9 @@ function ChatMessages({ id }) {
           previousDateStr = dateStr;
         }
 
-        let showName = false;
-        if (
-          msg.pubkey !== myPub &&
-          (isDifferentDay || (previousFrom && msg.pubkey !== previousFrom))
-        ) {
-          msgListContent.push(<div className="from-separator" />);
+        let showName = isDifferentDay;
+        if (!isDifferentDay && previousFrom && msg.pubkey !== previousFrom) {
+          msgListContent.push(<div className="m-2" />);
           showName = true;
         }
         previousFrom = msg.pubkey;

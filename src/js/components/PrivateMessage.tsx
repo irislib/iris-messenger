@@ -91,7 +91,7 @@ const PrivateMessage = (props) => {
 
   return (
     <div
-      className={`p-2 w-full md:w-2/3 rounded-xl m-2 ${whose} ${seen} ${delivered} flex flex-col items-start`}
+      className={`p-2 w-full md:w-2/3 rounded-xl mb-1 ${whose} ${seen} ${delivered} flex flex-col items-start`}
     >
       <div className="w-full">
         <div className="mb-2">
