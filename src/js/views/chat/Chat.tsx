@@ -53,7 +53,7 @@ class Chat extends View {
 
     return (
       <div className="flex flex-col h-screen">
-        <Header />
+        <Header key={id} activeChat={id} />
         <div className="flex flex-row flex-grow overflow-hidden">
           <div
             className={`flex-shrink-0 ${
