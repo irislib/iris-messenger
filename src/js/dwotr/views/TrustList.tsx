@@ -9,18 +9,25 @@ import TrustScore from '../model/TrustScore';
 import {
   RenderScoreDistrustLink,
   RenderScoreTrustLink,
-  RenderTrust1Value,
+  RenderTrust1Color,
 } from '../components/RenderGraph';
 import MyAvatar from '../../components/user/Avatar';
 import { ID, PUB } from '../../nostr/UserIds';
 import Name from '../../components/user/Name';
 import { memo } from 'preact/compat';
-import { ViewComponentProps, parseEntityType, parseTrustType } from './GraphView';
+import {
+  ViewComponentProps,
+  parseEntityType,
+  parseTrust1Value as parseTrust1Value,
+} from './GraphView';
 import profileManager from '../ProfileManager';
 import GraphEntityTypeSelect from '../components/GraphEntityTypeSelect';
+import GraphDirectionSelect from '../components/GraphDirectionSelect';
+import GraphTrust1Select from '../components/GraphTrust1Select';
+import { translate as t } from '../../translations/Translation.mjs';
 
 export function filterByName(list: Vertice[], filter: string) {
-  if (!filter) return [...list]; // Return a copy of the list
+  if (!filter || list.length == 0) return [...list]; // Return a copy of the list
 
   let result = list.filter((v) => {
     let profile = profileManager.getDefaultProfile(v.id);
@@ -61,18 +68,15 @@ const TrustList = ({ props }: ViewComponentProps) => {
   const [rawList, setRawList] = useState<Array<Vertice>>([]);
   const [displayList, setDisplayList] = useState<Array<Vertice>>([]);
   const [unsubscribe] = useState<Array<() => void>>([]);
-  const [filter, setFilter] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     let id = ID(props.hexKey);
     if (!id) return;
 
     let entitytype = parseEntityType(props.entitytype, 1);
-    let claimtype = parseTrustType(props.trusttype, 1);
+    let trust1Value = parseTrust1Value(props.trusttype, undefined);
 
-    loadList(id, props.dir, entitytype, claimtype);
-
-    setFilter(props.filter); // Reset filter when changing the list force a refilter
+    loadList(id, props.dir, entitytype, trust1Value);
 
     return () => {
       unsubscribe.forEach((u) => u?.());
@@ -82,25 +86,19 @@ const TrustList = ({ props }: ViewComponentProps) => {
   // Implement filter on rawList using the filter property
   useEffect(() => {
     let filterResults = filterByName(rawList, props.filter);
+    if (filterResults.length == 0 && displayList.length == 0) return;
     setDisplayList(filterResults);
-  }, [filter]);
+  }, [props.filter, rawList]);
 
-  // Update the filter when the filter property changes
-  useEffect(() => {
-    if (props.filter != filter) {
-      setFilter(props.filter);
-    }
-  }, [props.filter]);
-
-  async function loadList(id: number, dir: string, entitytype: EntityType, claimtype: number) {
+  async function loadList(id: number, dir: string, entitytype: EntityType, trust1Value?: number) {
     let list: Vertice[] = [];
 
     if (dir == 'out') {
-      list = graphNetwork.g.outTrustById(id, entitytype, claimtype);
+      list = graphNetwork.g.outTrustById(id, entitytype, trust1Value);
     }
 
     if (props.dir == 'in') {
-      list = graphNetwork.g.trustedBy(id, EntityType.Key, claimtype);
+      list = graphNetwork.g.trustedBy(id, EntityType.Key, trust1Value);
     }
 
     let addresses = list.map((v) => PUB(v.id));
@@ -116,30 +114,55 @@ const TrustList = ({ props }: ViewComponentProps) => {
   }
 
   const renderVertices = () => {
-    return <>{displayList.map((v) => renderEntityKey(v, props.hexKey))}</>;
+    let id = ID(props.hexKey);
+
+    if (displayList.length == 0) return <div className="text-center">{t('No results')}</div>;
+
+    return <>{displayList.map((v) => renderEntityKey(v, id))}</>;
   };
 
-  const renderEntityKey = (v: Vertice, hexKey: string) => {
+  const renderEntityKey = (v: Vertice, id: number) => {
     const itemKey = PUB(v.id);
     const degree = v.degree;
     const score = v.score;
     const itemNpub = Key.toNostrBech32Address(itemKey as string, 'npub') as string;
-    const hexKeyId = graphNetwork.g.getVerticeId(hexKey) || 0; // No edge with index of 0
 
-    const outE = graphNetwork.g.edges[v.out[hexKeyId]] as Edge;
-    const inE = graphNetwork.g.edges[v.in[hexKeyId]] as Edge;
+    let arrowClass = '';
+    let arrow = '';
+
+    if (props.dir == 'in') {
+      const edge = v.out[id] as Edge;
+      if (edge) {
+        const color = RenderTrust1Color(edge.val);
+        arrowClass = `text-${color}-500 text-2xl`;
+        arrow = '\u2190';
+      }
+    } else {
+      const edge = v.in[id] as Edge;
+      if (edge) {
+        const color = RenderTrust1Color(edge.val);
+        arrowClass = `text-${color}-500 text-2xl`;
+        arrow = '\u2192';
+      }
+    }
+
+    // const outE = graphNetwork.g.edges[v.out[id]] as Edge;
+    // const inE = graphNetwork.g.edges[v.in[id]] as Edge;
 
     return (
       <div key={itemKey} className="flex w-full py-2">
-        <Link href="" className="flex flex-1 gap-2">
+        <div className="flex-0 self-center px-4">
+          <i className={arrowClass}>{arrow}</i>
+        </div>
+        <Link href={props.setSearch({ npub: itemNpub })} className="flex flex-1 gap-2">
           <MyAvatar str={itemNpub} width={49} />
           <div>
-            <Name pub={itemNpub} hexKey={itemKey} />
+            <Name pub={itemNpub} hexKey={itemKey} /> <span className="text-sm">ID {v.id}</span>
             <br />
             <span className="text-sm">Degree {degree}</span>
           </div>
         </Link>
-        <div className="flex flex-1 gap-2">
+        {/* <div className="flex flex-1 gap-2">
           <div className="flex flex-col flex-1 gap-2">
             <div title={outE && `${RenderTrust1Value(outE.val)} to ${name}`}>
               {outE && `-> ${RenderTrust1Value(outE.val)}`}
@@ -148,7 +171,7 @@ const TrustList = ({ props }: ViewComponentProps) => {
               {inE && `<- ${RenderTrust1Value(inE.val)}`}{' '}
             </div>
           </div>
-        </div>
+        </div> */}
 
         {renderScoreLine(score, itemNpub)}
       </div>
@@ -158,11 +181,15 @@ const TrustList = ({ props }: ViewComponentProps) => {
   if (!props.npub) return null;
   return (
     <>
-      <GraphEntityTypeSelect
+      <div className="flex flex-wrap gap-4">
+        <GraphDirectionSelect dir={props.dir} setSearch={props.setSearch} />
+        <GraphTrust1Select trusttype={props.trusttype} setSearch={props.setSearch} />
+        <GraphEntityTypeSelect
           entitytype={props.entitytype}
           dir={props.dir}
           setSearch={props.setSearch}
         />
+      </div>
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-col w-full gap-4">
         <ScrollView>{renderVertices()}</ScrollView>

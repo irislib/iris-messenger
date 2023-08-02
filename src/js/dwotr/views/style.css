@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html {
   overflow-y: scroll;
 }
@@ -106,6 +110,47 @@ html {
     animation: spin 1s ease-in-out infinite;
     -webkit-animation: spin 1s ease-in-out infinite;
   }
+
+  .arrow {
+    /* border: solid white; */
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+  }
+
+  .arrow.green {
+    border: solid green;
+  }
+  .arrow.red {
+    border: solid red;
+  }
+  
+  .right {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+  }
+  
+  .left {
+    transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+  }
+
+  .graphlink {
+    @apply hover:underline;
+    text-decoration: none;
+  }
+
+  .graphlink.active {
+    @apply text-iris-blue;
+    text-decoration: none;
+  }
+  
+
+  /* .graphlinkactive {
+    @apply text-iris-blue hover:none;
+    text-decoration: none;
+  }  */
+
   
   @keyframes spin {
     to { -webkit-transform: rotate(360deg); }

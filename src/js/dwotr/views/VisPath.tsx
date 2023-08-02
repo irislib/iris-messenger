@@ -225,8 +225,6 @@ const VisPath = ({ props }: ViewComponentProps) => {
         </Link>
       </div>
       <hr className="-mx-2 opacity-10 my-2" />
-
-      <hr className="-mx-2 opacity-10 my-2" />
       <div className="h-full w-full flex items-stretch justify-center">
         <div className="flex-grow" ref={visJsRef} />
       </div>

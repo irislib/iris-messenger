@@ -8,11 +8,11 @@ type GraphDirectionSelectProps = {
 };
 
 const GraphDirectionSelect = ({ dir, setSearch }: GraphDirectionSelectProps) => {
-  const selected = 'link link-active'; // linkSelected
-  const unselected = 'text-neutral-500';
+  const selected = 'graphlink active'; // linkSelected
+  const unselected = 'graphlink';
 
   return (        <div className="flex gap-4">
-  <span>Trust:</span>
+  <span className="text-neutral-500">{t('Direction')}:</span>
   <Link
     href={setSearch({ dir: 'out' })}
     className={dir == 'out' ? selected : unselected}

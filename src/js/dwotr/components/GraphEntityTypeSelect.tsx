@@ -9,13 +9,13 @@ type GraphEntityTypeSelectProps = {
 };
 
 const GraphEntityTypeSelect = ({ entitytype, dir, setSearch }: GraphEntityTypeSelectProps) => {
-  const selected = 'link link-active'; // linkSelected
-  const unselected = 'text-neutral-500';
+  const selected = 'graphlink active'; // linkSelected
+  const unselected = 'graphlink';
 
   return (
     <Show when={dir == 'out'}>
       <div className="flex gap-4">
-        <span>Type:</span>
+        <span className="text-neutral-500">Subject:</span>
         <Link
           href={setSearch({ entitytype: 'key' })}
           className={entitytype == 'key' ? selected : unselected}

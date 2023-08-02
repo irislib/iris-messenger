@@ -16,7 +16,7 @@ export const RenderTrust1Value = (
 
 export const RenderTrust1Color = (
     val: number,
-    texts: Array<string> = ['Red', 'grey', 'Green'],
+    texts: Array<string> = ['red', 'grey', 'green'],
   ) => {
     return texts[val + 1];
   };

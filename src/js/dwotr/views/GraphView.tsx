@@ -10,9 +10,11 @@ import VisPath from './VisPath';
 import VisGraph from './VisGraph';
 import { Vertice } from '../model/Graph';
 import { ID } from '../../nostr/UserIds';
+import { debounce } from 'lodash';
+import { number } from '@noble/hashes/_assert';
 
 type GraphViewProps = {
-  id?: string;
+  npub?: string;
   entitytype?: string;
   trusttype?: string;
   dir?: string;
@@ -36,11 +38,11 @@ export type ViewComponentProps = {
   };
 };
 
-export function parseTrustType(trustType: string | undefined, defaultTrustType: number = 1) {
-  let t = trustType?.toLocaleLowerCase();
+export function parseTrust1Value(value: string | undefined, defaultTrust1Value?: number | undefined) {
+  let t = value?.toLocaleLowerCase();
   if (t == 'trust') return 1;
   if (t == 'distrust') return -1;
-  return defaultTrustType;
+  return defaultTrust1Value;
 }
 
 export function parseEntityType(entityType: string | undefined, defaultEntityType: number = 1) {
@@ -57,7 +59,7 @@ const GraphView = (props: GraphViewProps) => {
   // State is preserved on route change, when props change
   // Each time props change, we update the state
   const [npub, setNpubPrivate] = useState<string>(
-    props.id || (Key.toNostrBech32Address(Key.getPubKey(), 'npub') as string),
+    props.npub || (Key.toNostrBech32Address(Key.getPubKey(), 'npub') as string),
   );
   const [entitytype, setEntityType] = useState<string>(props.entitytype || 'key');
   const [trusttype, setTrustType] = useState<string>(props.trusttype || 'trust');
@@ -70,6 +72,8 @@ const GraphView = (props: GraphViewProps) => {
 
   const hexKey = Key.toNostrHexAddress(npub) as string;
   const me = hexKey == Key.getPubKey();
+
+  const callFilter = debounce((filter: string) => setFilter(filter), 500, { trailing: true }); // 'maxWait':
 
   useEffect(() => {
     graphNetwork.whenReady(() => {
@@ -93,13 +97,13 @@ const GraphView = (props: GraphViewProps) => {
   // Update the state when the props change
   // Check if the props have changed
   useEffect(() => {
-    if (props.id != npub) setNpub(props.id || (Key.toNostrBech32Address(Key.getPubKey(), 'npub') as string));
+    if (props.npub != npub) setNpub(props.npub || (Key.toNostrBech32Address(Key.getPubKey(), 'npub') as string));
     if (props.entitytype != entitytype) setEntityType(props.entitytype || 'key');
     if (props.trusttype != trusttype) setTrustType(props.trusttype || 'trust');
     if (props.dir != dir) setDirection(props.dir || 'out');
     if (props.view != view) setView(props.view || 'graph');
     if (props.filter != filter) setFilter(props.filter || '');
-  }, [props.id, props.entitytype, props.trusttype, props.dir, props.view, props.filter]);
+  }, [props.npub, props.entitytype, props.trusttype, props.dir, props.view, props.filter]);
 
   function setSearch(params: any) {
     const p = {
@@ -144,9 +148,6 @@ const GraphView = (props: GraphViewProps) => {
     return <VisGraph props={props} />;
   };
 
-  const selected = 'link link-active'; // linkSelected
-  const unselected = 'text-neutral-500';
-
   if (!state.ready) return null; // TODO: loading
   return (
     <>
@@ -171,7 +172,7 @@ const GraphView = (props: GraphViewProps) => {
               type="text"
               placeholder={t('Filter')}
               tabIndex={1}
-              onInput={(e) => setFilter((e?.target as any)?.value)}
+              onInput={(e) => callFilter((e?.target as any)?.value)}
               className="input-bordered border-neutral-500 input input-sm w-full"
             />
           </label>

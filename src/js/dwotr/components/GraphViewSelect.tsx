@@ -9,12 +9,12 @@ type GraphViewSelectProps = {
 };
 
 const GraphViewSelect = ({ view, me, setSearch }: GraphViewSelectProps) => {
-  const selected = 'link link-active'; // linkSelected
-  const unselected = 'text-neutral-500';
+  const selected = 'graphlink active'; // linkSelected
+  const unselected = 'graphlink';
 
   return (
     <div className="flex flex-wrap gap-4">
-      <span className="">View:</span>
+      <span className="text-neutral-500">View:</span>
       <Show when={!me}>
         <Link
           href={setSearch({ view: 'path' })}
