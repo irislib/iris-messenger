@@ -73,6 +73,11 @@ export default function Menu() {
     return today.getMonth() === 2 && today.getDate() === 17;
   }, []);
 
+  const menuLinkClicked = () => {
+    localState.get('scrollUp').put(true);
+    window.scrollTo(0, 0);
+  };
+
   const renderNewPostModal = () => (
     <Modal centerVertically={true} showContainer={true} onClose={() => setShowNewPostModal(false)}>
       <PublicMessageForm
@@ -99,11 +104,12 @@ export default function Menu() {
   };
 
   const renderMenuItem = (a) => {
-    const isActive = a.url === activeRoute;
+    const isActive = new RegExp(`^${a.url}(/|$)`).test(activeRoute);
     const Icon = isActive ? a.activeIcon : a.icon;
     return (
       <div>
         <a
+          onClick={() => menuLinkClicked()}
           className={`${
             isActive ? 'active' : ''
           } inline-flex w-auto flex items-center space-x-4 p-3 rounded-full transition-colors duration-200 hover:bg-neutral-900`}
@@ -121,7 +127,12 @@ export default function Menu() {
 
   return (
     <div className="sticky border-r border-neutral-900 top-0 z-20 h-screen max-h-screen hidden md:flex xl:w-56 flex-col px-2 py-4 flex-shrink-0">
-      <a className="flex items-center gap-3 px-2 mb-4" tabIndex={3} href="/">
+      <a
+        className="flex items-center gap-3 px-2 mb-4"
+        tabIndex={3}
+        href="/"
+        onClick={() => menuLinkClicked()}
+      >
         {isStPatricksDay ? (
           <span className="text-3xl">☘️</span>
         ) : (

@@ -76,7 +76,9 @@ class Block extends Component<Props> {
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
       >
-        <span>{t(buttonText)} {this.props.showName ? <Name pub={this.props.id} hideBadge={true} /> : ''}</span>
+        <span>
+          {t(buttonText)} {this.props.showName ? <Name pub={this.props.id} hideBadge={true} /> : ''}
+        </span>
       </button>
     );
   }

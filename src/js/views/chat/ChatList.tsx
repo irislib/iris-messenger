@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import $ from 'jquery';
 
 import localState from '../../LocalState';
@@ -17,6 +17,7 @@ const ChatList = ({ activeChat, className }) => {
   const [groups, setGroups] = useState(new Map());
   const [sortedChats, setSortedChats] = useState([] as string[]);
   const [shouldWait] = useState(Date.now() - loadedTime < 1000);
+  const chatListRef = useRef(null as any);
 
   const enableDesktopNotifications = () => {
     if (Notification) {
@@ -57,7 +58,14 @@ const ChatList = ({ activeChat, className }) => {
       go();
     }
 
-    unsubs.push(localState.get('scrollUp').on(() => window.scrollTo(0, 0)));
+    unsubs.push(
+      localState.get('scrollUp').on(() => {
+        window.scrollTo(0, 0);
+        if (chatListRef.current) {
+          chatListRef.current.scrollTop = 0;
+        }
+      }),
+    );
 
     unsubs.push(
       localState.get('groups').map((group, localKey) => {
@@ -92,6 +100,7 @@ const ChatList = ({ activeChat, className }) => {
   return (
     <section
       className={`md:border-r border-neutral-800 overflow-x-hidden overflow-y-auto h-full md:px-0 w-full md:w-64 ${className}`}
+      ref={chatListRef}
     >
       <div id="enable-notifications-prompt" className="hidden" onClick={enableDesktopNotifications}>
         <div className="title">{t('get_notified_new_messages')}</div>
