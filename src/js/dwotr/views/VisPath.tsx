@@ -1,4 +1,4 @@
-import { Network } from 'vis-network';
+import { DataSetNodes, Network, Node as VisNode, Edge as VisEdge } from 'vis-network';
 import { DataSet } from 'vis-data';
 import { useEffect, useState, useRef } from 'preact/hooks';
 import graphNetwork from '../GraphNetwork';
@@ -13,6 +13,7 @@ import TrustScore from '../model/TrustScore';
 import { memo } from 'preact/compat';
 import { ViewComponentProps } from './GraphView';
 import { Link } from 'preact-router';
+import { filterNodes } from './VisGraph';
 
 const defaultOptions = {
   layout: {
@@ -63,7 +64,8 @@ const VisPath = ({ props }: ViewComponentProps) => {
   const visJsRef = useRef<HTMLDivElement>(null);
   const [network, setNetwork] = useState<Network | null>();
   const [state, setState] = useState<any>(null);
-  const [nodes] = useState<DataSet<any>>(new DataSet());
+  const [rawNodes] = useState<DataSetNodes>(new DataSet());
+  const [displayNodes] = useState<DataSetNodes>(new DataSet());
   const [edges] = useState<DataSet<any>>(new DataSet());
   const [unsubscribe] = useState<Array<() => void>>([]);
 
@@ -71,7 +73,7 @@ const VisPath = ({ props }: ViewComponentProps) => {
     if (!visJsRef.current) return;
 
     var data = {
-      nodes: nodes,
+      nodes: displayNodes,
       edges: edges,
     };
 
@@ -115,7 +117,7 @@ const VisPath = ({ props }: ViewComponentProps) => {
           let profile = SocialNetwork.profiles.get(vertice.id);
           let image = profileManager.ensurePicture(profile);
 
-          let node = nodes.get(vertice.id);
+          let node = rawNodes.get(vertice.id);
           if (node) {
             // Update the node if user name or image has changed
             if(node.label != profile.name + ` (ID: ${vertice.id})`) node.label = profile.name + ` (ID: ${vertice.id})`;
@@ -123,7 +125,7 @@ const VisPath = ({ props }: ViewComponentProps) => {
             continue;
           };
 
-          nodes.add({
+          rawNodes.add({
             id: vertice.id,
             label: profile.name + ` (ID: ${vertice.id})`,
             image,
@@ -143,6 +145,10 @@ const VisPath = ({ props }: ViewComponentProps) => {
             color,
           });
         }
+
+        let includes = new Set<number>([ID(props.hexKey)]);
+        filterNodes(rawNodes, displayNodes, props.filter, includes);
+
       })
       .then((unsub: Unsubscribe) => unsubscribe.push(unsub));
 
@@ -156,22 +162,33 @@ const VisPath = ({ props }: ViewComponentProps) => {
     };
   }, [props.npub]);
 
-  const reset = (selectedId?: number) => {
-    let id = selectedId || state?.vId;
-    if (!id) return;
+    // Implement filter on rawList using the filter property
+    useEffect(() => {
+      if (rawNodes.length == 0 && displayNodes.length == 0) return;
 
-    // nodes.clear();
-    // edges.clear();
-    // loadNode(id);
+      displayNodes.clear();
+      let includes = new Set<number>([ID(props.hexKey)]);
 
-    const n = BECH32(id);
-    if (n != props.npub) {
-      // Only set the npub if it's not equal to the current one
-      props.setNpub(n);
-    }
+      filterNodes(rawNodes, displayNodes, props.filter, includes);
+    }, [props.filter]);
 
-    // network?.selectNodes([id], true);
-  };
+
+  // const reset = (selectedId?: number) => {
+  //   let id = selectedId || state?.vId;
+  //   if (!id) return;
+
+  //   // nodes.clear();
+  //   // edges.clear();
+  //   // loadNode(id);
+
+  //   const n = BECH32(id);
+  //   if (n != props.npub) {
+  //     // Only set the npub if it's not equal to the current one
+  //     props.setNpub(n);
+  //   }
+
+  //   // network?.selectNodes([id], true);
+  // };
 
   const renderScoreResultNumbers = (score: TrustScore) => {
     let result = score?.values();

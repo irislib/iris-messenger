@@ -1,4 +1,4 @@
-import { Network } from 'vis-network';
+import { DataSetEdges, DataSetNodes, Network, Node as VisNode, Edge as VisEdge } from 'vis-network';
 import { DataSet } from 'vis-data';
 import { useEffect, useState, useRef } from 'preact/hooks';
 import graphNetwork from '../GraphNetwork';
@@ -51,21 +51,56 @@ const defaultOptions = {
   },
 };
 
+export function filterNodes(nodes: DataSetNodes, target:DataSetNodes, filter: string, includes: Set<number> | undefined) {
+  if (nodes.length == 0) return;
+
+  nodes.forEach(function(node) {
+    if(target.get(node.id as number))
+      return;
+
+    if(!filter) { 
+      target.add(node);
+      return;
+    }
+
+    if(includes?.has(node.id as number)) {
+      target.add(node);
+      return;
+    }
+
+    let profile = profileManager.getDefaultProfile(node.id as number);
+
+    if (profile?.name?.toLowerCase().includes(filter.toLowerCase())) {
+       target.add(node);
+        return;
+    }
+
+    if (profile?.display_name?.toLowerCase().includes(filter.toLowerCase())) {
+      target.add(node);
+      return;
+    }
+  });
+}
+
+
 const VisGraph = ({ props }: ViewComponentProps) => {
   const visJsRef = useRef<HTMLDivElement>(null);
   const [vId, setVid] = useState<number | null>(null);
   const [network, setNetwork] = useState<Network | null>();
-  const [nodes] = useState<DataSet<any>>(new DataSet());
-  const [edges] = useState<DataSet<any>>(new DataSet());
+  const [rawNodes] = useState<DataSetNodes>(new DataSet());
+  const [displayNodes] = useState<DataSetNodes>(new DataSet());
+  const [edges] = useState<DataSetEdges>(new DataSet());
   const [unsubscribe] = useState<Array<() => void>>([]);
   const [dir, setDir] = useState<string>(props.dir || 'in');
   const [entitytype, setEntityType] = useState<string>(props.entitytype);
+
+
 
   useEffect(() => {
     if (!visJsRef.current) return;
 
     var data = {
-      nodes: nodes,
+      nodes: displayNodes,
       edges: edges,
     };
 
@@ -75,11 +110,13 @@ const VisGraph = ({ props }: ViewComponentProps) => {
       if (params.nodes.length == 0) return;
 
       const vId = params.nodes[0] as number;
-      //const v = graphNetwork.g.vertices[vId];
 
       props.setNpub(BECH32(vId));
 
-      loadNode(vId);
+      loadNode(vId).then((nodes) => { 
+        let includes = new Set<number>([ID(props.hexKey), vId]);
+        if(nodes) filterNodes(nodes, displayNodes, props.filter, includes);
+      });
     });
 
     setNetwork(instance);
@@ -98,19 +135,35 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     // If the direction or entity type changed, reset the graph
     if (props.dir != dir || props.entitytype != entitytype) {
       edges.clear();
-      nodes.clear();
+      rawNodes.clear();
+      displayNodes.clear();
       setDir(props.dir); 
       setEntityType(props.entitytype);
     }
 
-    loadNode(id as number);
+    // Running asynchroniously, so other effects will run before nodes are added
+    loadNode(id as number).then((nodes) => { 
+      let includes = new Set<number>([ID(props.hexKey)]);
+      if(nodes) filterNodes(nodes, displayNodes, props.filter, includes);
+    });
 
     return () => {
       unsubscribe.forEach((u) => u?.());
     };
   }, [props.npub, props.dir, props.entitytype]);
 
-  async function loadNode(vId: number) {
+ 
+    // Implement filter on rawList using the filter property
+    useEffect(() => {
+      if (rawNodes.length == 0 && displayNodes.length == 0) return;
+
+      displayNodes.clear();
+      let includes = new Set<number>([ID(props.hexKey)]);
+
+      filterNodes(rawNodes, displayNodes, props.filter, includes);
+    }, [props.filter]);
+
+  async function loadNode(vId: number) : Promise<DataSetNodes | undefined> {
     let sourceV = graphNetwork.g.vertices[vId] as Vertice;
     if (!sourceV) return;
 
@@ -127,8 +180,10 @@ const VisGraph = ({ props }: ViewComponentProps) => {
 
         let color = RenderTrust1Color(edge.val);
         let dashes = edge.out.degree > MAX_DEGREE; // Dash the edge line if the out vertice has no degree or above max degree
+        
+
         edges.get(edge.key) ||
-          edges.add({ id: edge.key, from: edge.out.id, to: vId, color, dashes });
+          edges.add({ id: edge.key, from: edge.out.id, to: vId, color, dashes } as VisEdge);
       }
     }
 
@@ -144,7 +199,7 @@ const VisGraph = ({ props }: ViewComponentProps) => {
         distinctV[edge.in.id] = edge.in;
 
         let color = RenderTrust1Color(edge.val);
-        edges.get(edge.key) || edges.add({ id: edge.key, from: vId, to: edge.in.id, color });
+        edges.get(edge.key) || edges.add({ id: edge.key, from: vId, to: edge.in.id, color } as VisEdge);
       }
     }
 
@@ -154,29 +209,36 @@ const VisGraph = ({ props }: ViewComponentProps) => {
       // Update the nodes with the new profile pictures and names
     });
     unsubscribe.push(unsub);
+    
+    let delta = new DataSet() as DataSetNodes; // new nodes to added to the graph and returned to the caller, enables more efficient filtering
 
     // Create nodes in vis
     for (const v of vertices) {
-      if (nodes.get(v.id as number)) continue; // already added
+      if (rawNodes.get(v.id as number)) continue; // already added
 
       const profile = SocialNetwork.profiles.get(v.id);
       let image = profileManager.ensurePicture(profile);
 
       //let border = v.degree > MAX_DEGREE ? '#808080' : '#222222';
-      nodes.add({
+      let node = {
         id: v.id,
         label: profile.name + ' (D:' + v.degree + ')',
         image,
         shape: 'circularImage',
-      });
+      } as VisNode;
+
+      rawNodes.add(node);
+      delta.add(node);
     }
+
+    return delta;
   }
 
   const reset = (selectedId?: number) => {
     let id = selectedId || vId;
     if (!id) return;
 
-    nodes.clear();
+    rawNodes.clear();
     edges.clear();
     loadNode(id);
 
@@ -185,7 +247,8 @@ const VisGraph = ({ props }: ViewComponentProps) => {
       props.setNpub(n);
     }
 
-    network?.selectNodes([id], true);
+    // network may not be ready yet
+    //network?.selectNodes([id], true);
   };
 
   if (!props.npub) return null;
