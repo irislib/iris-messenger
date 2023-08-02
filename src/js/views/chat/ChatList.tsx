@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import $ from 'jquery';
-import { throttle } from 'lodash';
 
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
@@ -11,10 +10,13 @@ import { translate as t } from '../../translations/Translation.mjs';
 import ChatListItem from './ChatListItem';
 import NewChatButton from './NewChatButton';
 
+const loadedTime = Date.now();
+
 const ChatList = ({ activeChat, className }) => {
   const [directMessages, setDirectMessages] = useState(new Map());
   const [groups, setGroups] = useState(new Map());
   const [sortedChats, setSortedChats] = useState([] as string[]);
+  const [shouldWait] = useState(Date.now() - loadedTime < 1000);
 
   const enableDesktopNotifications = () => {
     if (Notification) {
@@ -29,24 +31,31 @@ const ChatList = ({ activeChat, className }) => {
 
   useEffect(() => {
     const unsubs = [] as any[];
-    unsubs.push(
-      Events.getDirectMessages(async (incomingChats) => {
-        let keys = Array.from(incomingChats.keys());
-        const maxFollowDistance = await localState
-          .get('globalFilter')
-          .get('maxFollowDistance')
-          .once();
-        const blockedUsers = Object.keys((await localState.get('blockedUsers').once()) || {});
-        keys = keys.filter(
-          (key) =>
-            !blockedUsers.includes(key) &&
-            SocialNetwork.getFollowDistance(key) <= maxFollowDistance,
-        );
+    const go = () => {
+      unsubs.push(
+        Events.getDirectMessages(async (incomingChats) => {
+          let keys = Array.from(incomingChats.keys()) as string[];
+          const maxFollowDistance = await localState
+            .get('globalFilter')
+            .get('maxFollowDistance')
+            .once();
+          const blockedUsers = Object.keys((await localState.get('blockedUsers').once()) || {});
+          keys = keys.filter(
+            (key: string) =>
+              !blockedUsers.includes(key) &&
+              SocialNetwork.getFollowDistance(key) <= maxFollowDistance,
+          );
 
-        const filteredChats = new Map(keys.map((k) => [k, incomingChats.get(k)]));
-        setDirectMessages(filteredChats);
-      }),
-    );
+          const filteredChats = new Map(keys.map((k) => [k, incomingChats.get(k)]));
+          setDirectMessages(filteredChats);
+        }),
+      );
+    };
+    if (shouldWait) {
+      setTimeout(go, 1000); // timeout always helps
+    } else {
+      go();
+    }
 
     unsubs.push(localState.get('scrollUp').on(() => window.scrollTo(0, 0)));
 
@@ -61,33 +70,21 @@ const ChatList = ({ activeChat, className }) => {
     return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
-  const throttledSortChats = useCallback(
-    // TODO use SortedMap instead
-    throttle(
-      (directMessages, groups) => {
-        const chats: Map<string, any> = new Map(directMessages);
-        groups.forEach((value, key) => {
-          chats.set(key, value);
-        });
-        const sorted = Array.from(chats.keys()).sort((a, b) => {
-          if (a.length < b.length) return -1; // show groups first until their last msg is implemented
-          const aEventIds = chats.get(a).eventIds;
-          const bEventIds = chats.get(b).eventIds;
-          const aLatestEvent = aEventIds.length ? Events.db.by('id', aEventIds[0]) : null;
-          const bLatestEvent = bEventIds.length ? Events.db.by('id', bEventIds[0]) : null;
-
-          return bLatestEvent?.created_at - aLatestEvent?.created_at;
-        }) as string[];
-        setSortedChats(sorted);
-      },
-      1000,
-      { leading: true },
-    ),
-    [],
-  );
-
   useEffect(() => {
-    throttledSortChats(directMessages, groups);
+    const chats: Map<string, any> = new Map(directMessages);
+    groups.forEach((value, key) => {
+      chats.set(key, value);
+    });
+    const sorted = Array.from(chats.keys()).sort((a, b) => {
+      if (a.length < b.length) return -1; // show groups first until their last msg is implemented
+      const aEventIds = chats.get(a).eventIds;
+      const bEventIds = chats.get(b).eventIds;
+      const aLatestEvent = aEventIds.length ? Events.db.by('id', aEventIds[0]) : null;
+      const bLatestEvent = bEventIds.length ? Events.db.by('id', bEventIds[0]) : null;
+
+      return bLatestEvent?.created_at - aLatestEvent?.created_at;
+    }) as string[];
+    setSortedChats(sorted);
   }, [directMessages, groups]);
 
   const activeChatHex = (activeChat && Key.toNostrHexAddress(activeChat)) || activeChat;

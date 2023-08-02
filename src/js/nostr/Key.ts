@@ -186,7 +186,7 @@ export default {
       }
 
       let decrypted = (await this.decrypt(msg.content, theirPub)) as any;
-      if (decrypted.content) {
+      if (decrypted?.content) {
         decrypted = decrypted.content; // what? TODO debug
       }
       Events.decryptedMessages.set(id, decrypted);
