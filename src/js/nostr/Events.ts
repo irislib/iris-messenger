@@ -384,6 +384,7 @@ const Events = {
     }
 
     /*
+    // this would omit messages from groups
     if (event.pubkey !== myPub && !this.directMessagesByUser.has(event.pubkey)) {
       const distance = SocialNetwork.getFollowDistance(event.pubkey);
       if (distance > globalFilter.maxFollowDistance) {

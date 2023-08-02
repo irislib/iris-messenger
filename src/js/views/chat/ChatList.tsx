@@ -1,154 +1,121 @@
-import { PlusIcon } from '@heroicons/react/24/solid';
+import { useCallback, useEffect, useState } from 'react';
 import $ from 'jquery';
-import { route } from 'preact-router';
+import { throttle } from 'lodash';
 
-import BaseComponent from '../../BaseComponent';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
+import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
 
 import ChatListItem from './ChatListItem';
+import NewChatButton from './NewChatButton';
 
-interface ChatListProps {
-  activeChat?: string;
-  className?: string;
-}
+const ChatList = ({ activeChat, className }) => {
+  const [directMessages, setDirectMessages] = useState(new Map());
+  const [groups, setGroups] = useState(new Map());
+  const [sortedChats, setSortedChats] = useState([] as string[]);
 
-interface ChatListState {
-  chats: Map<string, any>;
-  sortedChats: Array<string>;
-}
-
-const NewChatButton = ({ active }) => (
-  <div
-    role="button"
-    tabIndex={0}
-    className={`flex p-2 flex-row gap-4 h-16 items-center cursor-pointer hover:bg-neutral-900 ${
-      active ? 'bg-neutral-700' : ''
-    }`}
-    onClick={() => route(`/chat/new`)}
-  >
-    <div className="flex justify-center items-center w-12 h-12 rounded-full">
-      <PlusIcon className="w-6 h-6" />
-    </div>
-    <div className="flex flex-row">
-      <div className="flex flex-col">
-        <span className="name">{t('new_chat')}</span>
-      </div>
-    </div>
-  </div>
-);
-
-class ChatList extends BaseComponent<ChatListProps, ChatListState> {
-  constructor(props: ChatListProps) {
-    super(props);
-    this.state = {
-      chats: new Map(),
-      sortedChats: [],
-    };
-  }
-
-  enableDesktopNotifications() {
-    if (window.Notification) {
-      Notification.requestPermission(() => {
-        if (Notification.permission === 'granted' || Notification.permission === 'denied') {
+  const enableDesktopNotifications = () => {
+    if (Notification) {
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted' || permission === 'denied') {
           $('#enable-notifications-prompt').slideUp();
         }
-        if (Notification.permission === 'granted') {
-          // TODO subscribe to web push
-        }
+        // TODO: subscribe to web push if permission is granted.
       });
     }
-  }
+  };
 
-  componentDidMount() {
-    Events.getDirectMessages((chats: Map<string, any>) => {
-      const sortedChats: string[] = Array.from(chats.keys()).sort((a: string, b: string) => {
-        const aEventIds: any[] = chats.get(a).eventIds;
-        const bEventIds: any[] = chats.get(b).eventIds;
-        const aLatestEvent: any = aEventIds.length ? Events.db.by('id', aEventIds[0]) : null;
-        const bLatestEvent: any = bEventIds.length ? Events.db.by('id', bEventIds[0]) : null;
-        if (bLatestEvent?.created_at > aLatestEvent?.created_at) {
-          return 1;
-        } else if (bLatestEvent?.created_at < aLatestEvent?.created_at) {
-          return -1;
-        }
-        return 0;
-      });
-      this.setState({ chats, sortedChats });
-    });
+  useEffect(() => {
+    const unsubs = [] as any[];
 
-    localState.get('scrollUp').on(this.sub(() => window.scrollTo(0, 0)));
+    unsubs.push(
+      Events.getDirectMessages(async (incomingChats) => {
+        let keys = Array.from(incomingChats.keys());
+        const maxFollowDistance = await localState
+          .get('globalFilter')
+          .get('maxFollowDistance')
+          .once();
+        const blockedUsers = Object.keys((await localState.get('blockedUsers').once()) || {});
+        keys = keys.filter(
+          (key) =>
+            !blockedUsers.includes(key) &&
+            SocialNetwork.getFollowDistance(key) <= maxFollowDistance,
+        );
 
-    if (
-      window.Notification &&
-      Notification.permission !== 'granted' &&
-      Notification.permission !== 'denied'
-    ) {
-      // setTimeout logic here, currently commented out.
-    }
-
-    localState.get('groups').map((group: any, localKey) => {
-      if (!(group && localKey)) {
-        return;
-      }
-      console.log('group', group);
-      // add localKey to chat list
-      const chats = this.state.chats;
-      chats.set(localKey, { eventIds: [], group });
-      console.log('chats', chats);
-      const sortedChats: string[] = Array.from(chats.keys()).sort((a: string, b: string) => {
-        const aEventIds: any[] = chats.get(a).eventIds;
-        const bEventIds: any[] = chats.get(b).eventIds;
-        const aLatestEvent: any = aEventIds.length ? Events.db.by('id', aEventIds[0]) : null;
-        const bLatestEvent: any = bEventIds.length ? Events.db.by('id', bEventIds[0]) : null;
-        if (bLatestEvent?.created_at > aLatestEvent?.created_at) {
-          return 1;
-        } else if (bLatestEvent?.created_at < aLatestEvent?.created_at) {
-          return -1;
-        }
-        return 0;
-      });
-      this.setState({ chats, sortedChats });
-    });
-  }
-
-  render() {
-    const activeChat =
-      (this.props.activeChat && Key.toNostrHexAddress(this.props.activeChat)) ||
-      this.props.activeChat;
-
-    return (
-      <section
-        className={`border-r border-neutral-800 overflow-x-hidden overflow-y-auto h-full px-4 md:px-0 w-full md:w-64 ${
-          this.props.className || ''
-        }`}
-      >
-        <div
-          id="enable-notifications-prompt"
-          className="hidden"
-          onClick={() => this.enableDesktopNotifications()}
-        >
-          <div className="title">{t('get_notified_new_messages')}</div>
-          <div>
-            <a>{t('turn_on_desktop_notifications')}</a>
-          </div>
-        </div>
-        <div className="flex flex-1 flex-col">
-          <NewChatButton active={activeChat === 'new'} />
-          {this.state.sortedChats.map((pubkey) => (
-            <ChatListItem
-              active={pubkey === activeChat}
-              key={pubkey}
-              chat={pubkey}
-              latestMsgId={this.state.chats.get(pubkey).eventIds[0]}
-            />
-          ))}
-        </div>
-      </section>
+        const filteredChats = new Map(keys.map((k) => [k, incomingChats.get(k)]));
+        setDirectMessages(filteredChats);
+      }),
     );
-  }
-}
+
+    unsubs.push(localState.get('scrollUp').on(() => window.scrollTo(0, 0)));
+
+    unsubs.push(
+      localState.get('groups').map((group, localKey) => {
+        if (!(group && localKey)) return;
+        group.eventIds = new Map();
+        setGroups((prevGroups) => new Map(prevGroups.set(localKey, group)));
+      }),
+    );
+
+    return () => unsubs.forEach((unsub) => unsub());
+  }, []);
+
+  const throttledSortChats = useCallback(
+    // TODO use SortedMap instead
+    throttle(
+      (directMessages, groups) => {
+        const chats: Map<string, any> = new Map(directMessages);
+        groups.forEach((value, key) => {
+          chats.set(key, value);
+        });
+        const sorted = Array.from(chats.keys()).sort((a, b) => {
+          if (a.length < b.length) return -1; // show groups first until their last msg is implemented
+          const aEventIds = chats.get(a).eventIds;
+          const bEventIds = chats.get(b).eventIds;
+          const aLatestEvent = aEventIds.length ? Events.db.by('id', aEventIds[0]) : null;
+          const bLatestEvent = bEventIds.length ? Events.db.by('id', bEventIds[0]) : null;
+
+          return bLatestEvent?.created_at - aLatestEvent?.created_at;
+        }) as string[];
+        setSortedChats(sorted);
+      },
+      300,
+      { leading: true },
+    ),
+    [],
+  );
+
+  useEffect(() => {
+    throttledSortChats(directMessages, groups);
+  }, [directMessages, groups]);
+
+  const activeChatHex = (activeChat && Key.toNostrHexAddress(activeChat)) || activeChat;
+
+  return (
+    <section
+      className={`border-r border-neutral-800 overflow-x-hidden overflow-y-auto h-full px-4 md:px-0 w-full md:w-64 ${className}`}
+    >
+      <div id="enable-notifications-prompt" className="hidden" onClick={enableDesktopNotifications}>
+        <div className="title">{t('get_notified_new_messages')}</div>
+        <div>
+          <a>{t('turn_on_desktop_notifications')}</a>
+        </div>
+      </div>
+      <div className="flex flex-1 flex-col">
+        <NewChatButton active={activeChatHex === 'new'} />
+        {sortedChats.map((pubkey) => (
+          <ChatListItem
+            active={pubkey === activeChatHex}
+            key={pubkey}
+            chat={pubkey}
+            latestMsgId={directMessages.get(pubkey)?.eventIds[0]}
+          />
+        ))}
+      </div>
+    </section>
+  );
+};
 
 export default ChatList;
