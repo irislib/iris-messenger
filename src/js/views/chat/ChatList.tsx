@@ -10,10 +10,13 @@ import { translate as t } from '../../translations/Translation.mjs';
 import ChatListItem from './ChatListItem';
 import NewChatButton from './NewChatButton';
 
+const loadedTime = Date.now();
+
 const ChatList = ({ activeChat, className }) => {
   const [directMessages, setDirectMessages] = useState(new Map());
   const [groups, setGroups] = useState(new Map());
   const [sortedChats, setSortedChats] = useState([] as string[]);
+  const [shouldWait] = useState(Date.now() - loadedTime < 1000);
 
   const enableDesktopNotifications = () => {
     if (Notification) {
@@ -28,24 +31,31 @@ const ChatList = ({ activeChat, className }) => {
 
   useEffect(() => {
     const unsubs = [] as any[];
-    unsubs.push(
-      Events.getDirectMessages(async (incomingChats) => {
-        let keys = Array.from(incomingChats.keys()) as string[];
-        const maxFollowDistance = await localState
-          .get('globalFilter')
-          .get('maxFollowDistance')
-          .once();
-        const blockedUsers = Object.keys((await localState.get('blockedUsers').once()) || {});
-        keys = keys.filter(
-          (key: string) =>
-            !blockedUsers.includes(key) &&
-            SocialNetwork.getFollowDistance(key) <= maxFollowDistance,
-        );
+    const go = () => {
+      unsubs.push(
+        Events.getDirectMessages(async (incomingChats) => {
+          let keys = Array.from(incomingChats.keys()) as string[];
+          const maxFollowDistance = await localState
+            .get('globalFilter')
+            .get('maxFollowDistance')
+            .once();
+          const blockedUsers = Object.keys((await localState.get('blockedUsers').once()) || {});
+          keys = keys.filter(
+            (key: string) =>
+              !blockedUsers.includes(key) &&
+              SocialNetwork.getFollowDistance(key) <= maxFollowDistance,
+          );
 
-        const filteredChats = new Map(keys.map((k) => [k, incomingChats.get(k)]));
-        setDirectMessages(filteredChats);
-      }),
-    );
+          const filteredChats = new Map(keys.map((k) => [k, incomingChats.get(k)]));
+          setDirectMessages(filteredChats);
+        }),
+      );
+    };
+    if (shouldWait) {
+      setTimeout(go, 1000); // timeout always helps
+    } else {
+      go();
+    }
 
     unsubs.push(localState.get('scrollUp').on(() => window.scrollTo(0, 0)));
 
