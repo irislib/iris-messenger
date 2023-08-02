@@ -169,13 +169,31 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       twoSecondsPassed = true;
     }, 2000);
     const update = () => {
-      const events = results.events().map((event) => event.id);
+      const oldestEventId =
+        this.state.events[Math.min(this.state.events.length - 1, this.state.displayCount)];
+      const oldestEvent = Events.db.by('id', oldestEventId);
+
+      const events = [] as string[];
+      const queuedEvents = [] as string[];
+
+      results.events().forEach((event) => {
+        if (event.created_at < oldestEvent?.created_at) {
+          events.push(event.id);
+        } else {
+          queuedEvents.push(event.id);
+        }
+      });
+
       if (twoSecondsPassed && !this.state.settings.realtime && this.state.events.length > 5) {
-        this.setState({ queuedEvents: events });
+        this.setState({ events: [...this.state.events, ...events], queuedEvents });
       } else {
-        this.setState({ events, queuedEvents: [] });
+        this.setState({
+          events: [...this.state.events, ...events, ...queuedEvents],
+          queuedEvents: [],
+        });
       }
     };
+
     const debouncedUpdate = debounce(update, 1000, { leading: true });
     let updated = false;
     const callback = (event) => {
