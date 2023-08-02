@@ -11,7 +11,6 @@ export interface FeedState {
   events: string[];
   queuedEvents: string[];
   displayCount: number;
-  eventsShownTime: number;
   settings: {
     display: string;
     realtime: boolean;
