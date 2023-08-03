@@ -104,7 +104,7 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
     >
       <input
         ref={inputRef}
-        className="input input-sm flex-1 new-msg"
+        className="input input-sm flex-1 new-msg bg-neutral-700 text-white"
         onInput={handleInputChange}
         onKeyDown={handleKeyDown}
         type="text"
@@ -115,7 +115,13 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
         spellCheck={true}
         value={message}
       />
-      <button className="btn btn-neutral btn-sm" style={{ marginRight: '0' }}>
+      <button
+        className={`btn btn-sm ${
+          message.length > 0 ? 'text-white bg-iris-blue' : 'bg-neutral-700'
+        }`}
+        style={{ marginRight: '0' }}
+        disabled={message.length === 0}
+      >
         <PaperAirplaneIcon width="24" />
       </button>
     </form>
