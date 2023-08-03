@@ -400,11 +400,6 @@ const Events = {
     let user = event.pubkey;
     if (event.pubkey === myPub) {
       user = event.tags?.find((tag) => tag[0] === 'p')?.[1] || user;
-    } else {
-      const forMe = event.tags?.some((tag) => tag[0] === 'p' && tag[1] === myPub);
-      if (!forMe) {
-        return;
-      }
     }
     try {
       // TODO trying to json parse all dms might be slow, how to avoid?

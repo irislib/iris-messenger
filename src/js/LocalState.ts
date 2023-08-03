@@ -83,7 +83,9 @@ class Node {
         this.once(callback, unsubscribe, false);
       }
       if (this.parent) {
-        this.parent.doCallbacks();
+        this.parent.doCallbacks(); // maybe this shouldn't be recursive after all? in a file tree analogy, you wouldn't want
+        // a change in a subdirectory to trigger a callback in all parent directories.
+        // there could be a separate open() fn for recursive subscriptions.
         for (const [id, callback] of this.parent.map_subscriptions) {
           const unsubscribe = () => this.parent?.map_subscriptions.delete(id);
           this.once(callback, unsubscribe, false);
