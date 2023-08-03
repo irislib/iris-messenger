@@ -15,6 +15,20 @@ const TIMESPANS = {
 };
 
 class Feed extends BaseFeed {
+  addSinceUntil(filter) {
+    const since = this.getSince();
+    const until = this.oldestEventCreatedAt();
+    if (since) {
+      filter.since = since;
+    }
+    if (until) {
+      // problem: there might be events newer than this that we don't have yet
+      // filters.not.ids = bloomFilter would be cool
+      filter.until = until;
+    }
+    return filter;
+  }
+
   getSince() {
     if (this.state.settings.timespan !== 'all') {
       return Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
@@ -34,51 +48,58 @@ class Feed extends BaseFeed {
     };
   }
 
-  subscribeToNostrUser(since, callback) {
+  subscribeToNostrUser(callback) {
+    let filter = {
+      authors: [this.props.nostrUser || ''],
+      kinds: [1, 6],
+    };
+    filter = this.addSinceUntil(filter);
+
+    console.log('subscribing to nostr user', this.props.nostrUser, filter);
+
     if (this.props.index === 'likes') {
-      return PubSub.subscribe(
-        { authors: [this.props.nostrUser || ''], kinds: [7], since },
-        callback,
-        false,
-        false,
-      );
+      filter.kinds = [7];
+      return PubSub.subscribe(filter, callback, false, false);
     } else {
-      return PubSub.subscribe(
-        { authors: [this.props.nostrUser || ''], kinds: [1, 6], since },
-        this.getCallbackForPostsIndex(callback),
-        false,
-        false,
-      );
+      return PubSub.subscribe(filter, this.getCallbackForPostsIndex(callback), false, false);
     }
   }
 
-  subscribeToKeyword(since, callback) {
-    const keyword = this.props.keyword.toLowerCase();
-    return PubSub.subscribe(
+  subscribeToKeyword(callback) {
+    let filter = {
       // Filter type doesn't have "keywords"...
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      { keywords: [keyword], kinds: [1], limit: 1000, since },
-      (e) => e.content?.toLowerCase().includes(keyword) && callback(e),
+      keywords: [this.props.keyword.toLowerCase()],
+      kinds: [1],
+      limit: 1000,
+    };
+    filter = this.addSinceUntil(filter);
+
+    return PubSub.subscribe(
+      filter,
+      (e) => e.content?.toLowerCase().includes(this.props.keyword.toLowerCase()) && callback(e),
       false,
     );
   }
 
-  subscribeToFollows(since, callback) {
+  subscribeToFollows(callback) {
     const myPub = Key.getPubKey();
     const followedUsers = Array.from(SocialNetwork.followedByUser.get(ID(myPub)) || []).map(
       (user) => PUB(user),
     );
     followedUsers.push(myPub);
-    const filter = {
+
+    let filter = {
       kinds: [1, 6],
       limit: 300,
-      since,
-      authors: undefined as any,
-    };
+    } as any;
+
     if (followedUsers.length < 1000) {
       filter.authors = followedUsers;
     }
+    filter = this.addSinceUntil(filter);
+
     return PubSub.subscribe(
       filter,
       (e) => {
@@ -90,21 +111,21 @@ class Feed extends BaseFeed {
     );
   }
 
-  subscribeToGlobalFeed(since, callback) {
-    return PubSub.subscribe({ kinds: [1, 6], limit: 300, since }, callback, true);
+  subscribeToGlobalFeed(callback) {
+    let filter = { kinds: [1, 6], limit: 300 };
+    filter = this.addSinceUntil(filter);
+    return PubSub.subscribe(filter, callback, true);
   }
 
   getEvents(callback) {
-    const since = this.getSince();
-
     if (this.props.nostrUser) {
-      return this.subscribeToNostrUser(since, callback);
+      return this.subscribeToNostrUser(callback);
     } else if (this.props.keyword) {
-      return this.subscribeToKeyword(since, callback);
+      return this.subscribeToKeyword(callback);
     } else if (this.props.index === 'follows') {
-      return this.subscribeToFollows(since, callback);
+      return this.subscribeToFollows(callback);
     } else {
-      return this.subscribeToGlobalFeed(since, callback);
+      return this.subscribeToGlobalFeed(callback);
     }
   }
 }
