@@ -12,6 +12,7 @@ import { translate as t } from '../../translations/Translation.mjs';
 import { ViewComponentProps, parseEntityType } from './GraphView';
 import GraphDirectionSelect from '../components/GraphDirectionSelect';
 import { Link } from 'preact-router';
+import { useIsMounted } from '../hooks/useIsMounted';
 
 const defaultOptions = {
   layout: {
@@ -83,7 +84,9 @@ export function filterNodes(nodes: DataSetNodes, target:DataSetNodes, filter: st
 
 
 const VisGraph = ({ props }: ViewComponentProps) => {
+
   const visJsRef = useRef<HTMLDivElement>(null);
+  const isMounted = useIsMounted();
   const [vId, setVid] = useState<number | null>(null);
   const [network, setNetwork] = useState<Network | null>();
   const [rawNodes] = useState<DataSetNodes>(new DataSet());
@@ -107,6 +110,7 @@ const VisGraph = ({ props }: ViewComponentProps) => {
 
     instance.on('click', function (params) {
       if (params.nodes.length == 0) return;
+      if (!isMounted()) return;
 
       const vId = params.nodes[0] as number;
 
@@ -143,6 +147,8 @@ const VisGraph = ({ props }: ViewComponentProps) => {
 
     // Running asynchroniously, so other effects will run before nodes are added
     loadNode(id as number).then((nodes) => { 
+      if (!isMounted()) return; // Check if component is still mounted
+
       let includes = new Set<number>([ID(props.hexKey)]);
       if(nodes) filterNodes(nodes, displayNodes, props.filter, includes);
     });
@@ -206,6 +212,8 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     let vertices = Object.values(distinctV);
     let addresses = vertices.map((v) => PUB(v.id)); // convert to pub hex format
     let unsub = await profileManager.getProfiles(addresses, (profiles) => {
+      if (!isMounted()) return;
+
       // Update the nodes with the new profile pictures and names
     });
     unsubscribe.push(unsub);

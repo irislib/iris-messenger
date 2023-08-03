@@ -11,6 +11,7 @@ import dwotrDB from './network/DWoTRDB';
 import ProfileRecord from './model/ProfileRecord';
 import { throttle } from 'lodash';
 import Identicon from 'identicon.js';
+import QueueCall from './QueueCall';
 
 class ProfileManager {
   loaded: boolean = false;
@@ -71,7 +72,7 @@ class ProfileManager {
       this.loadProfile(hexPub).then((profile) => {
         if (profile) {
           // exists in DB
-          if (this.profileIsNewer(profile)) this.addProfileToMemory(profile);
+          if (this.isProfileNewer(profile)) this.addProfileToMemory(profile);
 
           callback(); // callback with profile
         } else {
@@ -79,7 +80,7 @@ class ProfileManager {
           profileManager.fetchProfile(npub).then((profile) => {
             if (!profile) return; // not in API
             // TODO verify sig
-            if (this.profileIsNewer(profile))
+            if (this.isProfileNewer(profile))
               // but is it newer?
               this.addProfileEvent(profile);
 
@@ -160,10 +161,17 @@ class ProfileManager {
       result.push(profile); // Fill in default profile with animal names
     }
 
+    // Then save to memory
+    for(const profile of result) {
+      if (!profile || !this.isProfileNewer(profile)) continue;
+
+      this.addProfileToMemory(profile);
+    }
+
     // Then callback
     if (result.length > 0)
       // The list should contain a profile for each address
-      cb?.(result);
+      cb?.(result); 
 
     // Then subscribe to updates via nostr relays
     const callback = (event: Event) => {
@@ -175,17 +183,15 @@ class ProfileManager {
     return PubSub.subscribe({ kinds: [0], authors: npubs }, callback, false);
   }
 
-  async loadProfiles(addresses: Set<string>) {
-    const list = await dwotrDB.profiles.where('key').anyOf(Array.from(addresses)).toArray();
-    if (!list) return undefined;
-    const profiles = list.map((p) => this.addProfileToMemory(p));
-    return profiles;
+  async loadProfiles(addresses: Set<string>) : Promise<ProfileRecord[]> {
+    return await dwotrDB.profiles.where('key').anyOf(Array.from(addresses)).toArray();
+    // if (!list) return undefined;
+    // const profiles = list.map((p) => this.addProfileToMemory(p));
+    // return profiles;
   }
 
-  async loadProfile(address: string) {
-    const dbProfile = (await dwotrDB.profiles.get({ key: address })) as ProfileRecord;
-
-    return this.addProfileToMemory(dbProfile);
+  async loadProfile(address: string) : Promise<ProfileRecord> {
+    return await QueueCall<ProfileRecord>(`loadProfile${address}`, async () => dwotrDB.profiles.get({ key: address }));
   }
 
   saveProfile(profile: ProfileRecord) {
@@ -252,7 +258,7 @@ class ProfileManager {
   }
 
 
-  profileIsNewer(profile: ProfileRecord) {
+  isProfileNewer(profile: ProfileRecord) {
     const existingProfile = SocialNetwork.profiles.get(ID(profile.key));
     if (existingProfile) {
       if (existingProfile.created_at > profile.created_at) return false;

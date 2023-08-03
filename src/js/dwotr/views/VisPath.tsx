@@ -13,6 +13,7 @@ import TrustScore from '../model/TrustScore';
 import { ViewComponentProps } from './GraphView';
 import { Link } from 'preact-router';
 import { filterNodes } from './VisGraph';
+import { useIsMounted } from '../hooks/useIsMounted';
 
 const defaultOptions = {
   layout: {
@@ -61,6 +62,7 @@ const defaultOptions = {
 
 const VisPath = ({ props }: ViewComponentProps) => {
   const visJsRef = useRef<HTMLDivElement>(null);
+  const isMounted = useIsMounted();
   const [network, setNetwork] = useState<Network | null>();
   const [state, setState] = useState<any>(null);
   const [rawNodes] = useState<DataSetNodes>(new DataSet());
@@ -113,6 +115,8 @@ const VisPath = ({ props }: ViewComponentProps) => {
 
     profileManager
       .getProfiles(addresses, (_) => {
+        if (!isMounted()) return;
+
         for (let vertice of vertices) {
           let profile = SocialNetwork.profiles.get(vertice.id);
           let image = profileManager.ensurePicture(profile);
@@ -120,10 +124,11 @@ const VisPath = ({ props }: ViewComponentProps) => {
           let node = rawNodes.get(vertice.id);
           if (node) {
             // Update the node if user name or image has changed
-            if(node.label != profile.name + ` (ID: ${vertice.id})`) node.label = profile.name + ` (ID: ${vertice.id})`;
-            if(node.image != image) node.image = image;
+            if (node.label != profile.name + ` (ID: ${vertice.id})`)
+              node.label = profile.name + ` (ID: ${vertice.id})`;
+            if (node.image != image) node.image = image;
             continue;
-          };
+          }
 
           rawNodes.add({
             id: vertice.id,
@@ -148,9 +153,13 @@ const VisPath = ({ props }: ViewComponentProps) => {
 
         let includes = new Set<number>([ID(props.hexKey)]);
         filterNodes(rawNodes, displayNodes, props.filter, includes);
-
       })
-      .then((unsub: Unsubscribe) => unsubscribe.push(unsub));
+      .then((unsub: Unsubscribe) => {
+        if (!isMounted()) {
+          unsub();
+        } else
+          unsubscribe.push(unsub)
+      });
 
     setState((prevState) => ({
       ...prevState,
@@ -162,16 +171,15 @@ const VisPath = ({ props }: ViewComponentProps) => {
     };
   }, [props.npub]);
 
-    // Implement filter on rawList using the filter property
-    useEffect(() => {
-      if (rawNodes.length == 0 && displayNodes.length == 0) return;
+  // Implement filter on rawList using the filter property
+  useEffect(() => {
+    if (rawNodes.length == 0 && displayNodes.length == 0) return;
 
-      displayNodes.clear();
-      let includes = new Set<number>([ID(props.hexKey)]);
+    displayNodes.clear();
+    let includes = new Set<number>([ID(props.hexKey)]);
 
-      filterNodes(rawNodes, displayNodes, props.filter, includes);
-    }, [props.filter]);
-
+    filterNodes(rawNodes, displayNodes, props.filter, includes);
+  }, [props.filter]);
 
   // const reset = (selectedId?: number) => {
   //   let id = selectedId || state?.vId;
