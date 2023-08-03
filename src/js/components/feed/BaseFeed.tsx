@@ -18,7 +18,7 @@ import FeedTypeSelector from './FeedTypeSelector';
 import ImageGrid from './ImageGrid';
 import ShowMore from './ShowMore';
 import ShowNewEvents from './ShowNewEvents';
-import SortedEventMap from './SortedEventMap';
+import SortedEventMap from '../../utils/SortedEventMap';
 import { FeedProps, FeedState } from './types';
 
 const INITIAL_PAGE_SIZE = 10;

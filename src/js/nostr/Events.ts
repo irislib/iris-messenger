@@ -377,6 +377,24 @@ const Events = {
     }
     this.zapsByNote.get(zappedNote)?.add(event);
   },
+  async saveDM(event: Event) {
+    const myPub = Key.getPubKey();
+    let user = event.pubkey;
+    if (event.pubkey === myPub) {
+      user = event.tags?.find((tag) => tag[0] === 'p')?.[1] || user;
+    } else {
+      const forMe = event.tags?.some((tag) => tag[0] === 'p' && tag[1] === myPub);
+      if (!forMe) {
+        return;
+      }
+    }
+    const latest = localState.get('chats').get(user).get('latest');
+    latest.once((e) => {
+      if (!e || !e.created_at || e.created_at < event.created_at) {
+        latest.put({ id: event.id, created_at: event.created_at, text: '' });
+      }
+    });
+  },
   async handleDirectMessage(event: Event) {
     const myPub = Key.getPubKey();
     let user = event.pubkey;
@@ -426,6 +444,7 @@ const Events = {
     const byUser = this.directMessagesByUser.get(user) ?? new SortedLimitedEventSet(500);
     byUser.add(event);
     this.directMessagesByUser.set(user, byUser);
+    this.saveDM(event);
   },
   handleKeyValue(event: Event) {
     if (event.pubkey !== Key.getPubKey()) {

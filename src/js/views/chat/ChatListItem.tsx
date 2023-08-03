@@ -11,10 +11,9 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
 
-const ChatListItem = ({ chat, active = false, latestMsgId = null }) => {
+const ChatListItem = ({ chat, active = false, latestMsg = {} as any }) => {
   const [name, setName] = useState(null);
-  const [latest, setLatest] = useState({} as any);
-  const [latestText, setLatestText] = useState('');
+  const [latestText, setLatestText] = useState(latestMsg.text || '');
 
   useEffect(() => {
     const isGroup = chat.length < 20;
@@ -28,12 +27,21 @@ const ChatListItem = ({ chat, active = false, latestMsgId = null }) => {
           }
         });
     }
-    getLatestMsg();
   }, [chat]);
 
   useEffect(() => {
-    getLatestMsg();
-  }, [latestMsgId]);
+    if (latestMsg.text || !latestMsg.id) {
+      return;
+    }
+    Events.getEventById(latestMsg.id, false, (event) => {
+      if (event) {
+        Key.decryptMessage(latestMsg.id, (text: string) => {
+          setLatestText(text);
+          localState.get('chats').get(chat).get('latest').get('text').put(text);
+        });
+      }
+    });
+  }, [latestMsg.id]);
 
   const onKeyUp = (e: KeyboardEvent) => {
     // if enter was pressed, click the element
@@ -42,22 +50,10 @@ const ChatListItem = ({ chat, active = false, latestMsgId = null }) => {
     }
   };
 
-  const getLatestMsg = () => {
-    if (!latestMsgId) {
-      return;
-    }
-    const event = Events.db.by('id', latestMsgId);
-    if (event) {
-      setLatest(event);
-      Key.decryptMessage(latestMsgId, (text: string) => {
-        setLatestText(text);
-      });
-    }
-  };
-
   const activeClass = active ? 'bg-neutral-800' : 'hover:bg-neutral-900';
   const time =
-    (latest.created_at && Helpers.getRelativeTimeText(new Date(latest.created_at * 1000))) || '';
+    (latestMsg.created_at && Helpers.getRelativeTimeText(new Date(latestMsg.created_at * 1000))) ||
+    '';
 
   const npub = Key.toNostrBech32Address(chat, 'npub');
 

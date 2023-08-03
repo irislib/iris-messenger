@@ -70,6 +70,12 @@ export default class SortedMap<K, V> {
     }
   }
 
+  *entries(): IterableIterator<[K, V]> {
+    for (const key of this.sortedKeys) {
+      yield [key, this.map.get(key) as V];
+    }
+  }
+
   has(key: K): boolean {
     return this.map.has(key);
   }
