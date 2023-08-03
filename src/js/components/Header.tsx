@@ -65,6 +65,10 @@ export default class Header extends Component {
       }
     }
 
+    if (activeRoute.indexOf('/search/') === 0) {
+      title = `${t('search')}: ${decodeURIComponent(activeRoute.replace('/search/', ''))}`
+    }
+
     this.setState({ title });
   }
 

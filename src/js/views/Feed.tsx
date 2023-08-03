@@ -1,4 +1,5 @@
 import FeedComponent from '../components/feed/Feed';
+import Show from '../components/helpers/Show';
 import OnboardingNotification from '../components/OnboardingNotification';
 import PublicMessageForm from '../components/PublicMessageForm';
 import { translate as t } from '../translations/Translation.mjs';
@@ -22,18 +23,12 @@ class Feed extends View {
     return (
       <div className="flex flex-row">
         <div className="flex flex-col w-full">
-          {this.props.keyword ? (
-            <h2 className="text-2xl mb-2">
-              {t('search')}: "{this.props.keyword}"
-            </h2>
-          ) : (
-            <>
-              <OnboardingNotification />
-              <div className="hidden md:block px-4">
-                <PublicMessageForm autofocus={false} placeholder={t('whats_on_your_mind')} />
-              </div>
-            </>
-          )}
+          <Show when={!this.props.keyword}>
+            <OnboardingNotification />
+            <div className="hidden md:block px-4">
+              <PublicMessageForm autofocus={false} placeholder={t('whats_on_your_mind')} />
+            </div>
+          </Show>
           <FeedComponent
             keyword={this.props.keyword}
             key={this.props.index || 'feed'}
