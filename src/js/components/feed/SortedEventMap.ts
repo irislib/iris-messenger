@@ -82,6 +82,14 @@ export default class SortedEventMap {
     return this.sortedEventIds.map((id) => this.eventMap.get(id)!);
   }
 
+  last(): Event | undefined {
+    return this.eventMap.get(this.sortedEventIds[this.sortedEventIds.length - 1]);
+  }
+
+  first(): Event | undefined {
+    return this.eventMap.get(this.sortedEventIds[0]);
+  }
+
   get size(): number {
     return this.eventMap.size;
   }

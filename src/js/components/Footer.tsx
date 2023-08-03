@@ -37,11 +37,23 @@ const Footer = () => {
     });
   }, []);
 
+  const scrollToTop = (shouldScroll) => {
+    if (shouldScroll) {
+      window.scrollTo({
+        top: 0,
+      });
+    }
+  };
+
   const renderButton = (href, Icon, IconActive) => {
     const isActive = new RegExp(`^${href}(/|$)`).test(activeRoute);
 
     return (
-      <Link href={href} className={`btn flex-grow ${isActive ? 'active' : ''}`}>
+      <Link
+        href={href}
+        className={`btn flex-grow ${isActive ? 'active' : ''}`}
+        onClick={() => scrollToTop(isActive)}
+      >
         <Show when={isActive}>
           <IconActive width={24} />
         </Show>
@@ -59,7 +71,11 @@ const Footer = () => {
       <footer className="fixed md:hidden bottom-0 z-10 w-full bg-base-200 pb-safe-area">
         <div className="flex">
           {MENU_ITEMS.map((item) => renderButton(item.url, item.icon, item.activeIcon))}
-          <Link href={`/${key}`} className="rounded-full btn flex flex-grow">
+          <Link
+            href={`/${key}`}
+            onClick={() => scrollToTop(isMyProfile)}
+            className="rounded-full btn flex flex-grow"
+          >
             <span
               className={`${
                 isMyProfile ? 'border-white' : 'border-black'
