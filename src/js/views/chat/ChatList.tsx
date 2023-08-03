@@ -36,25 +36,17 @@ const ChatList = ({ activeChat, className }) => {
 
   useEffect(() => {
     const unsubs = [] as any[];
-    unsubs.push(
-      localState.get('chats').map((value, key) => {
-        setChats((prevChats) => {
-          prevChats.set(key, { ...value });
-          return prevChats;
-        });
-        setRenderCount((prevCount) => prevCount + 1);
-      }),
-    );
 
-    unsubs.push(
-      localState.get('groups').map((value, key) => {
-        setChats((prevChats) => {
-          prevChats.set(key, { ...value });
-          return prevChats;
-        });
-        setRenderCount((prevCount) => prevCount + 1);
-      }),
-    );
+    const addToChats = (value, key) => {
+      setChats((prevChats) => {
+        prevChats.set(key, { ...value });
+        return prevChats;
+      });
+      setRenderCount((prevCount) => prevCount + 1);
+    };
+
+    unsubs.push(localState.get('chats').map(addToChats));
+    unsubs.push(localState.get('groups').map(addToChats));
 
     unsubs.push(
       localState.get('scrollUp').on(() => {

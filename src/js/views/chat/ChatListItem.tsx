@@ -12,11 +12,11 @@ import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
 
 const ChatListItem = ({ chat, active = false, latestMsg = {} as any }) => {
+  const [isGroup] = useState(chat.length < 20);
   const [name, setName] = useState(null);
   const [latestText, setLatestText] = useState(latestMsg.text || '');
 
   useEffect(() => {
-    const isGroup = chat.length < 20;
     if (isGroup) {
       localState
         .get('groups')
@@ -30,7 +30,7 @@ const ChatListItem = ({ chat, active = false, latestMsg = {} as any }) => {
   }, [chat]);
 
   useEffect(() => {
-    if (latestMsg.text || !latestMsg.id) {
+    if (isGroup || latestMsg.text || !latestMsg.id) {
       return;
     }
     Events.getEventById(latestMsg.id, false, (event) => {

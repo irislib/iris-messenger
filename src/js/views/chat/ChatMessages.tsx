@@ -245,22 +245,30 @@ function ChatMessages({ id }) {
       });
 
     const subscribeGroup = () => {
-      localState
-        .get('groups')
-        .get(id)
-        .on((group) => {
-          const privKey = group.key;
-          const pubKey = getPublicKey(privKey);
-          setKeyPair({ privKey, pubKey });
-          unsub = PubSub.subscribe(
-            { kinds: [4], '#p': [pubKey], authors: [pubKey] },
-            async (event) => {
-              const decrypted = await nip04.decrypt(privKey, pubKey, event.content);
-              messagesById.set(event.id, { ...event, text: decrypted });
-              setSortedMessages(Array.from(messagesById.values()));
-            },
-          );
-        });
+      const node = localState.get('groups').get(id);
+      node.on((group) => {
+        const privKey = group.key;
+        const pubKey = getPublicKey(privKey);
+        setKeyPair({ privKey, pubKey });
+        unsub = PubSub.subscribe(
+          { kinds: [4], '#p': [pubKey], authors: [pubKey] },
+          async (event) => {
+            const decrypted = await nip04.decrypt(privKey, pubKey, event.content);
+            messagesById.set(event.id, { ...event, text: decrypted });
+            const latest = node.get('latest');
+            latest.once((e) => {
+              if (!e || !e.created_at || e.created_at < event.created_at) {
+                latest.put({
+                  id: event.id,
+                  created_at: event.created_at,
+                  text: decrypted.slice(0, decrypted.indexOf('{')),
+                });
+              }
+            });
+            setSortedMessages(Array.from(messagesById.values()));
+          },
+        );
+      });
     };
 
     if (hexId) {
