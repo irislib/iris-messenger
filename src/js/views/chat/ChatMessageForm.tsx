@@ -116,9 +116,7 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
         value={message}
       />
       <button
-        className={`btn btn-sm ${
-          message.length > 0 ? 'text-white bg-iris-blue' : 'bg-neutral-700'
-        }`}
+        className={`btn btn-sm ${message.length > 0 ? 'text-white bg-iris-blue' : ''}`}
         style={{ marginRight: '0' }}
         disabled={message.length === 0}
       >

@@ -377,33 +377,36 @@ const Events = {
     }
     this.zapsByNote.get(zappedNote)?.add(event);
   },
-  async saveDM(event: Event) {
-    const myPub = Key.getPubKey();
-    let user = event.pubkey;
-    if (event.pubkey === myPub) {
-      user = event.tags?.find((tag) => tag[0] === 'p')?.[1] || user;
-    } else {
-      const forMe = event.tags?.some((tag) => tag[0] === 'p' && tag[1] === myPub);
-      if (!forMe) {
-        return;
-      }
+  async saveDMToLocalState(event: Event, chatId: string) {
+    const latest = localState.get('chats').get(chatId).get('latest');
+    const e = await latest.once();
+    if (!e || !e.created_at || e.created_at < event.created_at) {
+      latest.put({ id: event.id, created_at: event.created_at, text: '' });
     }
-    const latest = localState.get('chats').get(user).get('latest');
-    latest.once((e) => {
-      if (!e || !e.created_at || e.created_at < event.created_at) {
-        latest.put({ id: event.id, created_at: event.created_at, text: '' });
-      }
-    });
   },
   async handleDirectMessage(event: Event) {
     const myPub = Key.getPubKey();
-    let user = event.pubkey;
+    let chatId;
+    let maybeSecretChat = false;
     if (event.pubkey === myPub) {
-      user = event.tags?.find((tag) => tag[0] === 'p')?.[1] || user;
+      chatId = event.tags?.find((tag) => tag[0] === 'p')?.[1] || chatId;
+    } else {
+      chatId = event.pubkey;
+      const forMe = event.tags?.some((tag) => tag[0] === 'p' && tag[1] === myPub);
+      if (!forMe) {
+        maybeSecretChat =
+          event.tags?.length === 1 &&
+          event.tags?.some((tag) => tag[0] === 'p' && tag[1] === event.pubkey);
+        if (!maybeSecretChat) {
+          return;
+        }
+      }
     }
     try {
-      // TODO trying to json parse all dms might be slow, how to avoid?
+      // TODO decrypting & trying to json parse all dms might be slow, how to avoid? only process new msgs?
       const decrypted = await Key.decrypt(event.content, event.pubkey);
+      decrypted && this.decryptedMessages.set(event.id, decrypted); // don't do if maybeSecretChat?
+      // also save to localState so we don't have to decrypt every time?
       const innerEvent = JSON.parse(decrypted.slice(decrypted.indexOf('{')));
       if (validateEvent(innerEvent) && verifySignature(innerEvent)) {
         // parse nsec from message by regex. nsec is bech32 encoded in the message
@@ -436,10 +439,13 @@ const Events = {
      */
 
     this.insert(event);
-    const byUser = this.directMessagesByUser.get(user) ?? new SortedLimitedEventSet(500);
+    // the following is not actually necessary for groups, because their messages are queried via PubSub?
+    const byUser = this.directMessagesByUser.get(chatId) ?? new SortedLimitedEventSet(500);
     byUser.add(event);
-    this.directMessagesByUser.set(user, byUser);
-    this.saveDM(event);
+    this.directMessagesByUser.set(chatId, byUser);
+    if (!maybeSecretChat) {
+      this.saveDMToLocalState(event, chatId);
+    }
   },
   handleKeyValue(event: Event) {
     if (event.pubkey !== Key.getPubKey()) {
