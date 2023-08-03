@@ -47,6 +47,16 @@ const ChatList = ({ activeChat, className }) => {
     );
 
     unsubs.push(
+      localState.get('groups').map((value, key) => {
+        setChats((prevChats) => {
+          prevChats.set(key, { ...value });
+          return prevChats;
+        });
+        setRenderCount((prevCount) => prevCount + 1);
+      }),
+    );
+
+    unsubs.push(
       localState.get('scrollUp').on(() => {
         window.scrollTo(0, 0);
         if (chatListRef.current) {
