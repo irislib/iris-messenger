@@ -2,7 +2,7 @@ import { DataSetNodes, Network, Node as VisNode, Edge as VisEdge } from 'vis-net
 import { DataSet } from 'vis-data';
 import { useEffect, useState, useRef } from 'preact/hooks';
 import graphNetwork from '../GraphNetwork';
-import { Vertice } from '../model/Graph';
+import { Edge, Vertice } from '../model/Graph';
 import { RenderTrust1Color } from '../components/RenderGraph';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import profileManager from '../ProfileManager';
@@ -12,8 +12,9 @@ import { translate as t } from '../../translations/Translation.mjs';
 import TrustScore from '../model/TrustScore';
 import { ViewComponentProps } from './GraphView';
 import { Link } from 'preact-router';
-import { filterNodes } from './VisGraph';
 import { useIsMounted } from '../hooks/useIsMounted';
+import Key from '../../nostr/Key';
+import { filterNodes } from './VisGraph';
 
 const defaultOptions = {
   layout: {
@@ -60,10 +61,11 @@ const defaultOptions = {
   },
 };
 
+
 const VisPath = ({ props }: ViewComponentProps) => {
   const visJsRef = useRef<HTMLDivElement>(null);
+  const network = useRef<Network>();
   const isMounted = useIsMounted();
-  const [network, setNetwork] = useState<Network | null>();
   const [state, setState] = useState<any>(null);
   const [rawNodes] = useState<DataSetNodes>(new DataSet());
   const [displayNodes] = useState<DataSetNodes>(new DataSet());
@@ -78,9 +80,9 @@ const VisPath = ({ props }: ViewComponentProps) => {
       edges: edges,
     };
 
-    const instance = visJsRef.current && new Network(visJsRef.current, data, defaultOptions);
+    network.current = visJsRef.current && new Network(visJsRef.current, data, defaultOptions);
 
-    instance.on('click', function (params) {
+    network.current.on('click', function (params) {
       if (params.nodes.length == 0) return;
 
       const vId = params.nodes[0] as number;
@@ -88,13 +90,13 @@ const VisPath = ({ props }: ViewComponentProps) => {
       props.setNpub(BECH32(vId));
     });
 
-    setNetwork(instance);
+    //setNetwork(instance);
     return () => {
       // Cleanup the network on component unmount
-      network?.off('click');
-      network?.destroy();
+      network.current?.off('click');
+      network.current?.destroy();
     };
-  }, [visJsRef]);
+  }, []);
 
   useEffect(() => {
     let vId = ID(props.hexKey);
@@ -113,46 +115,12 @@ const VisPath = ({ props }: ViewComponentProps) => {
 
     let addresses = vertices.map((v) => PUB(v.id));
 
-    profileManager
-      .getProfiles(addresses, (_) => {
+    profileManager.getProfiles(addresses, (_) => {
         if (!isMounted()) return;
+        // All profiles are now ready
 
-        for (let vertice of vertices) {
-          let profile = SocialNetwork.profiles.get(vertice.id);
-          let image = profileManager.ensurePicture(profile);
-
-          let node = rawNodes.get(vertice.id);
-          if (node) {
-            // Update the node if user name or image has changed
-            if (node.label != profile.name + ` (ID: ${vertice.id})`)
-              node.label = profile.name + ` (ID: ${vertice.id})`;
-            if (node.image != image) node.image = image;
-            continue;
-          }
-
-          rawNodes.add({
-            id: vertice.id,
-            label: profile.name + ` (ID: ${vertice.id})`,
-            image,
-            shape: 'circularImage',
-          });
-        }
-
-        for (let edge of paths) {
-          let color = RenderTrust1Color(edge.val);
-
-          if (edges.get(edge.key)) continue;
-
-          edges.add({
-            id: edge.key,
-            from: edge.out?.id,
-            to: edge.in?.id,
-            color,
-          });
-        }
-
-        let includes = new Set<number>([ID(props.hexKey)]);
-        filterNodes(rawNodes, displayNodes, props.filter, includes);
+        loadVertices(vertices, paths);
+        network.current?.redraw();
       })
       .then((unsub: Unsubscribe) => {
         if (!isMounted()) {
@@ -171,14 +139,56 @@ const VisPath = ({ props }: ViewComponentProps) => {
     };
   }, [props.npub]);
 
+
+  function loadVertices(vertices: Vertice[], paths: Edge[]) {
+    for (let vertice of vertices) {
+      let profile = SocialNetwork.profiles.get(vertice.id);
+      let image = profileManager.ensurePicture(profile);
+
+      let node = rawNodes.get(vertice.id);
+      if (node) {
+        // Update the node if user name or image has changed
+        if (node.label != profile.name + ` (ID: ${vertice.id})`)
+          node.label = profile.name + ` (ID: ${vertice.id})`;
+        if (node.image != image) node.image = image;
+        continue;
+      }
+
+      rawNodes.add({
+        id: vertice.id,
+        label: profile.name + ` (ID: ${vertice.id})`,
+        image,
+        shape: 'circularImage',
+      });
+    }
+
+    for (let edge of paths) {
+      let color = RenderTrust1Color(edge.val);
+
+      if (edges.get(edge.key)) continue;
+
+      edges.add({
+        id: edge.key,
+        from: edge.out?.id,
+        to: edge.in?.id,
+        color,
+      });
+    }
+
+    let includes = new Set<number>([ID(props.hexKey)]);
+    filterNodes(rawNodes, displayNodes, props.filter, includes);
+  }
+
+
+
   // Implement filter on rawList using the filter property
   useEffect(() => {
     if (rawNodes.length == 0 && displayNodes.length == 0) return;
 
-    displayNodes.clear();
-    let includes = new Set<number>([ID(props.hexKey)]);
+    let includes = new Set<number>([ID(props.hexKey), ID(Key.getPubKey())]);
 
     filterNodes(rawNodes, displayNodes, props.filter, includes);
+    network.current?.redraw();
   }, [props.filter]);
 
   // const reset = (selectedId?: number) => {

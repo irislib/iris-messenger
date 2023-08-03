@@ -55,30 +55,33 @@ export function filterNodes(nodes: DataSetNodes, target:DataSetNodes, filter: st
   if (nodes.length == 0) return;
 
   nodes.forEach(function(node) {
-    if(target.get(node.id as number))
-      return;
+    let hasNode = target.get(node.id as number);
 
     if(!filter) { 
-      target.add(node);
+      if(!hasNode) target.add(node);
       return;
     }
+  
 
     if(includes?.has(node.id as number)) {
-      target.add(node);
+      if(!hasNode) target.add(node);
       return;
     }
 
     let profile = profileManager.getDefaultProfile(node.id as number);
 
     if (profile?.name?.toLowerCase().includes(filter.toLowerCase())) {
-       target.add(node);
+        if(!hasNode) target.add(node);
         return;
     }
 
     if (profile?.display_name?.toLowerCase().includes(filter.toLowerCase())) {
-      target.add(node);
+      if(!hasNode) target.add(node);
       return;
     }
+
+    if(hasNode) // remove
+      target.remove(node.id as number);
   });
 }
 
@@ -86,9 +89,9 @@ export function filterNodes(nodes: DataSetNodes, target:DataSetNodes, filter: st
 const VisGraph = ({ props }: ViewComponentProps) => {
 
   const visJsRef = useRef<HTMLDivElement>(null);
+  const network = useRef<Network>();
   const isMounted = useIsMounted();
   const [vId, setVid] = useState<number | null>(null);
-  const [network, setNetwork] = useState<Network | null>();
   const [rawNodes] = useState<DataSetNodes>(new DataSet());
   const [displayNodes] = useState<DataSetNodes>(new DataSet());
   const [edges] = useState<DataSetEdges>(new DataSet());
@@ -106,9 +109,9 @@ const VisGraph = ({ props }: ViewComponentProps) => {
       edges: edges,
     };
 
-    const instance = visJsRef.current && new Network(visJsRef.current, data, defaultOptions);
+    network.current = visJsRef.current && new Network(visJsRef.current, data, defaultOptions);
 
-    instance.on('click', function (params) {
+    network.current.on('click', function (params) {
       if (params.nodes.length == 0) return;
       if (!isMounted()) return;
 
@@ -122,11 +125,10 @@ const VisGraph = ({ props }: ViewComponentProps) => {
       });
     });
 
-    setNetwork(instance);
     return () => {
       // Cleanup the network on component unmount
-      network?.off('click');
-      network?.destroy();
+      network.current?.off('click');
+      network.current?.destroy();
     };
   }, [visJsRef]);
 
@@ -163,10 +165,9 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     useEffect(() => {
       if (rawNodes.length == 0 && displayNodes.length == 0) return;
 
-      displayNodes.clear();
       let includes = new Set<number>([ID(props.hexKey)]);
-
       filterNodes(rawNodes, displayNodes, props.filter, includes);
+
     }, [props.filter]);
 
   async function loadNode(vId: number) : Promise<DataSetNodes | undefined> {
@@ -246,9 +247,16 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     let id = selectedId || vId;
     if (!id) return;
 
+    displayNodes.clear();
     rawNodes.clear();
     edges.clear();
-    loadNode(id);
+    // loadNode(id);
+    loadNode(id as number).then((nodes) => { 
+      if (!isMounted()) return; // Check if component is still mounted
+
+      let includes = new Set<number>([ID(props.hexKey)]);
+      if(nodes) filterNodes(nodes, displayNodes, props.filter, includes);
+    });
 
     const n = BECH32(id);
     if (n != props.npub) {
@@ -268,7 +276,7 @@ const VisGraph = ({ props }: ViewComponentProps) => {
         <div className="flex gap-4">
           <button
             className="btn btn-primary btn-sm"
-            onClick={() => reset(network?.getSelectedNodes()[0] as number)}
+            onClick={() => reset(network.current?.getSelectedNodes()[0] as number)}
           >
             {t('Focus')}
           </button>
