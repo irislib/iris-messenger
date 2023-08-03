@@ -10,6 +10,7 @@ import PubSub, { Unsubscribe } from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { ID } from '../../nostr/UserIds';
 import { translate as t } from '../../translations/Translation.mjs';
+import SortedEventMap from '../../utils/SortedEventMap';
 import Show from '../helpers/Show';
 
 import EventList from './EventList';
@@ -18,7 +19,6 @@ import FeedTypeSelector from './FeedTypeSelector';
 import ImageGrid from './ImageGrid';
 import ShowMore from './ShowMore';
 import ShowNewEvents from './ShowNewEvents';
-import SortedEventMap from '../../utils/SortedEventMap';
 import { FeedProps, FeedState } from './types';
 
 const INITIAL_PAGE_SIZE = 10;

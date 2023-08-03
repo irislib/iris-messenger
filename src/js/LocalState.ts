@@ -83,10 +83,7 @@ class Node {
         this.once(callback, unsubscribe, false);
       }
       if (this.parent) {
-        for (const [id, callback] of this.parent.on_subscriptions) {
-          const unsubscribe = () => this.parent?.on_subscriptions.delete(id);
-          this.parent.once(callback, unsubscribe, false);
-        }
+        this.parent.doCallbacks();
         for (const [id, callback] of this.parent.map_subscriptions) {
           const unsubscribe = () => this.parent?.map_subscriptions.delete(id);
           this.once(callback, unsubscribe, false);
