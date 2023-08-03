@@ -144,6 +144,7 @@ const Session = {
   init: function (options: any) {
     Key.getOrCreate(options);
     localState.get('loggedIn').on(() => this.onLoggedIn());
+    localState.get('loggedIn').on(() => this.onLoggedIn());
   },
 };
 
