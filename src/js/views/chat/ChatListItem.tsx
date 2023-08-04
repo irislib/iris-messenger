@@ -35,7 +35,7 @@ const ChatListItem = ({ chat, active = false, latestMsg = {} as any }) => {
     }
     Events.getEventById(latestMsg.id, false, (event) => {
       if (event) {
-        Key.decryptMessage(latestMsg.id, (text: string) => {
+        Key.decryptMessage(latestMsg, (text: string) => {
           setLatestText(text);
           localState.get('chats').get(chat).get('latest').get('text').put(text);
         });

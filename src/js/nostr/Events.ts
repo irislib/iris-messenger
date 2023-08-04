@@ -426,9 +426,7 @@ const Events = {
         }
       }
     } catch (e) {
-      if (maybeSecretChat) {
-        return;
-      }
+      // ignore
     }
 
     /*

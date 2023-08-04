@@ -13,7 +13,6 @@ import PrivateMessage from '../../components/PrivateMessage';
 import QrCode from '../../components/QrCode';
 import Helpers from '../../Helpers';
 import localState from '../../LocalState';
-import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import PubSub from '../../nostr/PubSub';
 import { translate as t } from '../../translations/Translation.mjs';
@@ -22,7 +21,7 @@ import SortedMap from '../../utils/SortedMap';
 import ChatMessageForm from './ChatMessageForm.tsx';
 import { addGroup, sendSecretInvite } from './NewChat';
 
-type DecryptedEvent = Event & { text?: string };
+export type DecryptedEvent = Event & { text?: string };
 
 function ChatMessages({ id }) {
   const ref = useRef(null);
@@ -105,17 +104,11 @@ function ChatMessages({ id }) {
     const msgListContent = [] as any[];
 
     if (id && id.length > 4) {
-      sortedMessages.forEach((msgOrId) => {
-        let msg;
-        if (typeof msgOrId === 'string') {
-          msg = Events.db.by('id', msgOrId);
-        } else {
-          msg = msgOrId;
-        }
-        if (!msg) {
+      sortedMessages.forEach((event) => {
+        if (!event) {
           return null;
         }
-        const date = new Date(msg.created_at * 1000);
+        const date = new Date(event.created_at * 1000);
         let isDifferentDay;
         if (date) {
           const dateStr = date.toLocaleDateString();
@@ -132,18 +125,17 @@ function ChatMessages({ id }) {
         }
 
         let showName = isDifferentDay;
-        if (!isDifferentDay && previousFrom && msg.pubkey !== previousFrom) {
+        if (!isDifferentDay && previousFrom && event.pubkey !== previousFrom) {
           msgListContent.push(<div className="m-2" />);
           showName = true;
         }
-        previousFrom = msg.pubkey;
+        previousFrom = event.pubkey;
         msgListContent.push(
           <PrivateMessage
-            {...msg}
+            event={event}
             showName={showName}
-            selfAuthored={msg.pubkey === myPub}
-            key={`${msg.created_at}${msg.pubkey}`}
-            chatId={id}
+            selfAuthored={event.pubkey === myPub}
+            key={`${event.created_at}${event.pubkey}`}
           />,
         );
       });
@@ -257,18 +249,17 @@ function ChatMessages({ id }) {
         subs.push(
           PubSub.subscribe({ kinds: [4], '#p': [pubKey], authors: [pubKey] }, async (event) => {
             const decrypted = await nip04.decrypt(privKey, pubKey, event.content);
-            messages.current.set(event.id, event);
+            messages.current.set(event.id, { ...event, text: decrypted });
             setSortedMessages(Array.from(messages.current.values()));
             const latest = node.get('latest');
-            latest.once((e) => {
-              if (!e || !e.created_at || e.created_at < event.created_at) {
-                latest.put({
-                  id: event.id,
-                  created_at: event.created_at,
-                  text: decrypted.slice(0, decrypted.indexOf('{')),
-                });
-              }
-            });
+            const e = await latest.once();
+            if (!e || !e.created_at || e.created_at < event.created_at) {
+              latest.put({
+                id: event.id,
+                created_at: event.created_at,
+                text: decrypted.slice(0, decrypted.indexOf('{')),
+              });
+            }
           }),
         );
       });

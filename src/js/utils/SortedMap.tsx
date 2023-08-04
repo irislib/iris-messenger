@@ -12,9 +12,17 @@ export default class SortedMap<K, V> {
       if (typeof compare === 'string') {
         this.compare = (a, b) => {
           if (direction === 'desc') {
-            return a.value[compare] > b.value[compare] ? -1 : a.value[compare] < b.value[compare] ? 1 : 0;
+            return a.value[compare] > b.value[compare]
+              ? -1
+              : a.value[compare] < b.value[compare]
+              ? 1
+              : 0;
           } else {
-            return a.value[compare] > b.value[compare] ? 1 : a.value[compare] < b.value[compare] ? -1 : 0;
+            return a.value[compare] > b.value[compare]
+              ? 1
+              : a.value[compare] < b.value[compare]
+              ? -1
+              : 0;
           }
         };
       } else {
