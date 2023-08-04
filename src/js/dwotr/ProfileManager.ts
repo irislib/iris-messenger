@@ -7,27 +7,39 @@ import SocialNetwork from '../nostr/SocialNetwork';
 import { BECH32, ID } from '../nostr/UserIds';
 import Key from '../nostr/Key';
 import FuzzySearch from '../FuzzySearch';
-import dwotrDB from './network/DWoTRDB';
 import ProfileRecord from './model/ProfileRecord';
 import { throttle } from 'lodash';
 import Identicon from 'identicon.js';
-import QueueCall from './QueueCall';
+import OneCallQueue from './Utils/OneCallQueue';
+import storage from './Storage';
 
 class ProfileManager {
   loaded: boolean = false;
-  saveQueue: ProfileRecord[] = [];
+  #saveQueue: ProfileRecord[] = [];
+  #saving: boolean = false;
 
-  save = throttle((p?: ProfileRecord) => {
-    if (p) this.saveQueue.push(p);
-    const queue = this.saveQueue;
-    this.saveQueue = [];
 
-    dwotrDB.profiles.bulkPut(queue).catch(() => {});
+  saveBulk = throttle(() => {
+    if (this.#saving) { 
+      this.saveBulk(); // try again later
+      return;
+    }
+
+    this.#saving = true;
+
+    const queue = this.#saveQueue;
+    this.#saveQueue = [];
+    
+    storage.profiles.bulkPut(queue).finally(() => {
+      this.#saving = false;
+    });
+
   }, 500);
 
   async init() {
     this.loaded = true;
   }
+
 
   // TODO: Disable for now as it's not working because of CORS
   async fetchProfile(npub: string) {
@@ -184,24 +196,24 @@ class ProfileManager {
   }
 
   async loadProfiles(addresses: Set<string>) : Promise<ProfileRecord[]> {
-    return await dwotrDB.profiles.where('key').anyOf(Array.from(addresses)).toArray();
+    return await storage.profiles.where('key').anyOf(Array.from(addresses)).toArray();
     // if (!list) return undefined;
     // const profiles = list.map((p) => this.addProfileToMemory(p));
     // return profiles;
   }
 
   async loadProfile(address: string) : Promise<ProfileRecord> {
-    return await QueueCall<ProfileRecord>(`loadProfile${address}`, async () => dwotrDB.profiles.get({ key: address }));
+    return await OneCallQueue<ProfileRecord>(`loadProfile${address}`, async () => storage.profiles.get({ key: address }));
   }
 
   saveProfile(profile: ProfileRecord) {
-    this.saveQueue.push(profile);
-    this.save();
+    this.#saveQueue.push(profile);
+    this.saveBulk();
   }
 
   async loadAllProfiles() {
     console.time('Loading profiles from DWoTRDB');
-    const list = await dwotrDB.profiles.toArray();
+    const list = await storage.profiles.toArray();
     if (!list) return undefined;
     for (const p of list) {
       this.addProfileToMemory(p);
@@ -286,7 +298,7 @@ class ProfileManager {
       rawProfile.created_at = event.created_at;
 
       let profile = this.sanitizeProfile(rawProfile, event.pubkey);
-      this.save(profile); // Save to DWoTRDB
+      this.saveProfile(profile); // Save to DWoTRDB
 
       return this.addProfileToMemory(profile);
     } catch (e) {

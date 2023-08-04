@@ -3,7 +3,7 @@ import Graph, { Edge, EdgeRecord, EntityType, Vertice } from './model/Graph';
 import WOTPubSub from './network/WOTPubSub';
 import Key from '../nostr/Key';
 import { MAX_DEGREE } from './model/TrustScore';
-import dwotrDB from './network/DWoTRDB';
+import dwotrDB from './network/DWoTRDexie';
 import { debounce } from 'lodash';
 import { MonitorItem } from './model/MonitorItem';
 import { BECH32, ID } from '../nostr/UserIds';

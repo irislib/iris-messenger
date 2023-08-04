@@ -13,7 +13,7 @@ import InfoList from '../components/Display/InfoList';
 import ProfileRecord from '../model/ProfileRecord';
 import { Edge } from '../model/Graph';
 import SocialNetwork from '../../nostr/SocialNetwork';
-import { resetWoTDatabase } from '../network/DWoTRDB';
+import { resetWoTDatabase } from '../network/DWoTRDexie';
 
 type TestDataProps = {
   id?: string;
