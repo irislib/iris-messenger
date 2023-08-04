@@ -133,7 +133,9 @@ const Session = {
     });
     setTimeout(() => {
       PubSub.subscribe({ authors: [myPub] }, undefined, true); // our stuff
-      PubSub.subscribe({ '#p': [myPub], kinds: [1, 3, 4, 6, 7, 9735] }, undefined, true); // mentions, reactions, DMs
+      PubSub.subscribe({ '#p': [myPub], kinds: [1, 3, 6, 7, 9735] }, undefined, true); // mentions, reactions, DMs
+      PubSub.subscribe({ '#p': [myPub], kinds: [4] }, undefined, false); // comments, likes
+      PubSub.subscribe({ authors: [myPub], kinds: [4] }, undefined, false); // comments, likes
     }, 200);
     setInterval(() => {
       console.log('handled msgs per second', Math.round(Events.handledMsgsPerSecond / 5));
@@ -144,6 +146,7 @@ const Session = {
     Key.getOrCreate(options);
     localState.get('loggedIn').on(() => this.onLoggedIn());
     localState.get('loggedIn').on(() => this.onLoggedIn());
+    Events.subscribeGroups();
   },
 };
 

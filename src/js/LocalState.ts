@@ -17,7 +17,7 @@ localForage.config({
 /**
   Our very own implementation of the Gun (https://github.com/amark/gun) API. Used for local state management.
  */
-class Node {
+export class Node {
   id: string;
   parent: Node | null;
   children = new Map<string, Node>();
