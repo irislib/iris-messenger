@@ -32,6 +32,8 @@ type State = {
 class MyAvatar extends Component<Props, State> {
   activityTimeout?: ReturnType<typeof setTimeout>;
   unsub: Unsubscribe | undefined;
+  handleEvent: any;
+
 
   componentDidMount() {
     const pub = this.props.str as string;
@@ -39,30 +41,20 @@ class MyAvatar extends Component<Props, State> {
       return;
     }
 
-      // if (pub) {
-    //   this.unsub = profileManager.getProfile(pub, (profile) => {
-    //     profile &&
-    //       this.setState({
-    //         // TODO why profile undefined sometimes?
-    //         picture: profile.picture,
-    //         name: profile.name,
-    //       });
-    //   });
-    // }
     let id = ID(pub);
 
-    const handleEvent = (e: any) => {
+    this.handleEvent = (e: any) => {
       let p = e.detail as ProfileRecord;
-      if (!p || p.created_at <= profile.created_at) return;
+      //if (!p || p.created_at <= profile.created_at) return;
       this.setState({
         picture: p.picture,
         name: p.name,
       });
     };
-
+  
 
     let eventID = TrustScoreEvent.getEventId(id);
-    window.addEventListener(eventID, handleEvent);
+    window.addEventListener(eventID, this.handleEvent);
 
     let profile = profileManager.getCurrentProfile(id);
     this.setState({
@@ -81,6 +73,14 @@ class MyAvatar extends Component<Props, State> {
     if (this.activityTimeout !== undefined) {
       clearTimeout(this.activityTimeout);
     }
+    const pub = this.props.str as string;
+    if (!pub) {
+      return;
+    }
+
+    let id = ID(pub);
+    let eventID = TrustScoreEvent.getEventId(id);
+    window.removeEventListener(eventID, this.handleEvent);
     //this.unsub?.();
     profileManager.unsubscribe(this.props.str as string);
   }
