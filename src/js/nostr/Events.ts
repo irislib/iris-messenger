@@ -328,15 +328,10 @@ const Events = {
   },
   handleMetadata(event: Event) {
     if (!event.content?.length) {
-      return;
+      return false;
     }
+    
     try {
-      const existing = SocialNetwork.profiles.get(ID(event.pubkey));
-      if (existing?.created_at >= event.created_at) {
-        return false;
-      }
-
-      
       // MemoryDB
       // let savedEvent = Events.db.findOne({ kind: event.kind, pubkey: event.pubkey });
       
@@ -354,7 +349,9 @@ const Events = {
       // }
 
       //this.insert(event);
-      profileManager.addProfileEvent(event); 
+      let profile = profileManager.addProfileEvent(event); 
+      if(profile) return true; 
+       
       // const profile = JSON.parse(event.content);
       // // if we have previously deleted our account, log out. appease app store.
       // if (event.pubkey === Key.getPubKey() && profile.deleted) {
@@ -374,7 +371,9 @@ const Events = {
       //}
     } catch (e) {
       console.log('error parsing nostr profile', e, event);
+      
     }
+    return false;
   },
   handleDelete(event: Event) {
     const id = event.tags?.find((tag) => tag[0] === 'e')?.[1];

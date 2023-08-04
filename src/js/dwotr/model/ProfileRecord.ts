@@ -3,6 +3,7 @@ class ProfileRecord {
     //id: number = 0; // autoincrement by dexie
     key: string = '';
     name: string = '';
+    //displayName: string | undefined;
     display_name: string | undefined;
     description: string | undefined;
     avatar: string | undefined;

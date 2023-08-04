@@ -163,7 +163,9 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
           <div className={profile.banner ? '-mt-24' : ''}>{profilePicture}</div>
           <div className="flex-1 justify-end items-center flex gap-2">
             <div onClick={onClickHandler}>
-              <a href={"/graph/"+ npub} className="link px-2" >Web of Trust</a>
+              <a href={'/graph/' + npub} className="link px-2">
+                Web of Trust
+              </a>
               <Show when={isMyProfile}>
                 <a className="btn btn-sm btn-neutral" href="/profile/edit">
                   {t('edit_profile')}
@@ -202,7 +204,9 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
           <div className="py-2">
             <p className="text-sm">{profile.about}</p>
             <div className="flex flex-1 flex-row align-center justify-center mt-4">
-              <TrustProfileButtons hexPub={hexPub} />
+              <Show when={!isMyProfile}>
+                <TrustProfileButtons hexPub={hexPub} />
+              </Show>
               <Show when={lightning}>
                 <div className="flex-1">
                   <a

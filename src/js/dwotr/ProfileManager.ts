@@ -12,6 +12,7 @@ import { throttle } from 'lodash';
 import Identicon from 'identicon.js';
 import OneCallQueue from './Utils/OneCallQueue';
 import storage from './Storage';
+import { ProfileEvent } from './hooks/useProfile';
 
 class ProfileManager {
   loaded: boolean = false;
@@ -38,22 +39,28 @@ class ProfileManager {
     this.loaded = true;
   }
 
-  // TODO: Disable for now as it's not working because of CORS
-  async fetchProfile(npub: string) {
-    let timeKey = `fetchProfile:${npub}`;
-    console.time(timeKey);
+  async fetchProfile(hexPub: string) {
+    try {
+      let url = `https://api.iris.to/profile/${hexPub}`;
 
-    let url = `https://api.iris.to/profile/${npub}`;
-    let res = await OneCallQueue<any>(url, async () => fetch(url));
-    
-    console.timeEnd(timeKey);
+      // let res = await OneCallQueue<any>(url, async () => fetch(url));
+      let res = await fetch(url);
 
-    if (res && res.status === 200) return res.json();
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
 
-    return undefined;
+      if (res && res.status === 200) {
+        //console.log('fetchProfile success', npub);
+        let data = await res.json();
+        return data;
+      }
 
-//    console.log('fetchProfile disabled. CORS issue. Requested address:', npub);
-//    return undefined;
+      //console.log('fetchProfile failed', npub, res.status, res.statusText);
+      return undefined;
+    } catch (error: any) {
+      console.log('There was a problem with the fetch operation: ' + error.message);
+    }
   }
 
   getProfile(
@@ -73,15 +80,15 @@ class ProfileManager {
 
     if (profile && !profile.isDefault) {
       callback();
-      // if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
-      //   // TODO verify NIP05 address
-      //     Key.verifyNip05Address(profile.nip05, address).then((isValid) => {
-      //       console.log('NIP05 address is valid?', isValid, profile.nip05, address);
-      //       profile.nip05valid = isValid;
-      //       SocialNetwork.profiles.set(id, profile);
-      //       callback();
-      //     });
-      // }
+      if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
+        // TODO verify NIP05 address
+        Key.verifyNip05Address(profile.nip05, address).then((isValid) => {
+          console.log('NIP05 address is valid?', isValid, profile.nip05, address);
+          profile.nip05valid = isValid;
+          SocialNetwork.profiles.set(id, profile);
+          callback();
+        });
+      }
     } else {
       // Check if profile is in IndexedDB
       this.loadProfile(hexPub).then((profile) => {
@@ -92,7 +99,7 @@ class ProfileManager {
           callback(); // callback with profile
         } else {
           // Check if profile is in API
-          profileManager.fetchProfile(npub).then((profile) => {
+          profileManager.fetchProfile(hexPub).then((profile) => {
             if (!profile) return; // not in API
             // TODO verify sig
             if (this.isProfileNewer(profile))
@@ -117,7 +124,7 @@ class ProfileManager {
     }
 
     // Then subscribe to updates via nostr relays
-    return PubSub.subscribe({ kinds: [0], authors: [npub] }, callback, false);
+    return PubSub.subscribe({ kinds: [0], authors: [hexPub] }, callback, false);
   }
 
   async getProfiles(
@@ -128,7 +135,7 @@ class ProfileManager {
 
     let result: Array<any> = [];
     let dbLookups: Array<string> = [];
-    let npubs: Array<string> = [];
+    let authors: Array<string> = [];
 
     // First load from memory
     for (const address of addresses) {
@@ -141,7 +148,7 @@ class ProfileManager {
         dbLookups.push(hexPub);
       }
 
-      npubs.push(Key.toNostrBech32Address(address, 'npub') as string);
+      authors.push(hexPub);
     }
 
     // Then load from DB
@@ -159,7 +166,7 @@ class ProfileManager {
     if (lookupSet.size > 0 && lookupSet.size <= 100) {
       const apiProfiles = await Promise.all(
         Array.from(lookupSet).map((address) =>
-          this.fetchProfile(Key.toNostrBech32Address(address, 'npub') as string),
+          this.fetchProfile(Key.toNostrHexAddress(address) as string),
         ),
       );
       if (apiProfiles && apiProfiles.length > 0) {
@@ -199,7 +206,7 @@ class ProfileManager {
       cb?.([profile]);
     };
 
-    return PubSub.subscribe({ kinds: [0], authors: npubs }, callback, false);
+    return PubSub.subscribe({ kinds: [0], authors }, callback, false);
   }
 
   async loadProfiles(addresses: Set<string>): Promise<ProfileRecord[]> {
@@ -250,7 +257,8 @@ class ProfileManager {
       ...p,
       key: npub,
       name,
-      displayName: display_name,
+      //displayName: display_name,
+      display_name,
       picture,
       isDefault,
     } as ProfileRecord;
@@ -278,6 +286,7 @@ class ProfileManager {
   }
 
   isProfileNewer(profile: ProfileRecord) {
+    if(!profile || !profile.key) return false;
     const existingProfile = SocialNetwork.profiles.get(ID(profile.key));
     if (existingProfile) {
       if (existingProfile.created_at > profile.created_at) return false;
@@ -302,12 +311,17 @@ class ProfileManager {
   addProfileEvent(event: Event) {
     try {
       const rawProfile = JSON.parse(event.content);
-      rawProfile.created_at = event.created_at;
+      if(!rawProfile || !rawProfile.pubkey) return undefined;
+
+      rawProfile.created_at = event.created_at; // Add the event timestamp to the profile
 
       let profile = this.sanitizeProfile(rawProfile, event.pubkey);
+
+      if(!this.isProfileNewer(rawProfile)) return undefined;
+
       this.saveProfile(profile); // Save to DWoTRDB
 
-      return this.addProfileToMemory(profile);
+      return this.addProfileToMemory(profile); // Save to memory
     } catch (e) {
       // Remove the event from IndexedDB if it has an id wich means it was saved there
       if (event.id) {
@@ -335,6 +349,87 @@ class ProfileManager {
     }
     return profile.picture;
   }
+
+
+  // ---- New system ----
+
+  subscriptions = new Map<string, any>();  
+
+  subscribe(address: string) {
+    const hexPub = Key.toNostrHexAddress(address) as string;
+    const npub = Key.toNostrBech32Address(address, 'npub') as string;
+    const id = ID(hexPub);
+
+    let profile = SocialNetwork.profiles.get(id);
+
+    if (!profile || profile.isDefault) {
+      // Check if profile is in IndexedDB
+      this.loadProfile(hexPub).then((profile) => {
+        if (profile) {
+          // exists in DB
+          this.dispatchProfileIfNewer(profile);
+        } else {
+          // Check if profile is in API
+          profileManager.fetchProfile(hexPub).then((data) => {
+            // TODO verify sig
+            if (!data) return;
+
+            let profile = this.addProfileEvent(data);
+            if(!profile) return;
+
+            this.dispatchProfileIfNewer(profile as ProfileRecord);
+          });
+        }
+      });
+    }
+
+    const callback = (event: Event) => {
+      let profile = SocialNetwork.profiles.get(ID(event.pubkey));
+      this.dispatchProfileIfNewer(profile);
+    };
+
+    if (this.subscriptions.has(hexPub)) return;
+
+    // Then subscribe to updates via nostr relays
+    let unsub = PubSub.subscribe({ kinds: [0], authors: [hexPub] }, callback, false);
+    this.subscriptions.set(hexPub, unsub);
+  }
+
+  unsubscribe(address: string) {
+    const unsub = this.subscriptions.get(Key.toNostrHexAddress(address) as string);
+    unsub?.();
+  }
+
+  dispatchProfileIfNewer(profile: ProfileRecord) {
+    if(!profile) return;
+    if(!this.isProfileNewer(profile)) return;
+    this.addProfileToMemory(profile);
+
+    this.dispatchProfile(profile);
+  }
+
+  dispatchProfile(profile: ProfileRecord) {
+    let event = new ProfileEvent(ID(profile.key), profile);
+    window.dispatchEvent(event);
+  }
+
+  // if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
+  //   // TODO verify NIP05 address
+  //   Key.verifyNip05Address(profile.nip05, address).then((isValid) => {
+  //     console.log('NIP05 address is valid?', isValid, profile.nip05, address);
+  //     profile.nip05valid = isValid;
+  //     SocialNetwork.profiles.set(id, profile);
+  //     callback();
+  //   });
+  // }
+  getCurrentProfile(id: number | undefined) {
+    if (!id) return undefined;
+    const profile = SocialNetwork.profiles.get(id);
+
+    if (profile) return profile;
+    return this.createDefaultProfile(BECH32(id));
+  }
+
 }
 
 const profileManager = new ProfileManager();

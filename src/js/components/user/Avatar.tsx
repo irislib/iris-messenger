@@ -8,6 +8,9 @@ import SocialNetwork from '../../nostr/SocialNetwork';
 import Show from '../helpers/Show';
 import SafeImg from '../SafeImg';
 import profileManager from '../../dwotr/ProfileManager';
+import { ID } from '../../nostr/UserIds';
+import ProfileRecord from '../../dwotr/model/ProfileRecord';
+import { TrustScoreEvent } from '../../dwotr/GraphNetwork';
 
 type Props = {
   str: unknown;
@@ -30,45 +33,45 @@ class MyAvatar extends Component<Props, State> {
   activityTimeout?: ReturnType<typeof setTimeout>;
   unsub: Unsubscribe | undefined;
 
-  updateAvatar() {
-
-    // const hash = sha256(this.props.str as string);
-    // // convert to hex
-    // const hex = Array.from(new Uint8Array(hash))
-    //   .map((b) => b.toString(16).padStart(2, '0'))
-    //   .join('');
-
-    // const identicon = new Identicon(hex, {
-    //   width: this.props.width,
-    //   format: `svg`,
-    // });
-    // this.setState({
-    //   avatar: `data:image/svg+xml;base64,${identicon.toString()}`,
-    // });
-
-    this.setState({
-        avatar: profileManager.createImageUrl(this.props.str as string, this.props.width),
-      });
-  }
-
   componentDidMount() {
     const pub = this.props.str as string;
     if (!pub) {
       return;
     }
 
-    this.updateAvatar();
+      // if (pub) {
+    //   this.unsub = profileManager.getProfile(pub, (profile) => {
+    //     profile &&
+    //       this.setState({
+    //         // TODO why profile undefined sometimes?
+    //         picture: profile.picture,
+    //         name: profile.name,
+    //       });
+    //   });
+    // }
+    let id = ID(pub);
 
-    if (pub) {
-      this.unsub = profileManager.getProfile(pub, (profile) => {
-        profile &&
-          this.setState({
-            // TODO why profile undefined sometimes?
-            picture: profile.picture,
-            name: profile.name,
-          });
+    const handleEvent = (e: any) => {
+      let p = e.detail as ProfileRecord;
+      if (!p || p.created_at <= profile.created_at) return;
+      this.setState({
+        picture: p.picture,
+        name: p.name,
       });
-    }
+    };
+
+
+    let eventID = TrustScoreEvent.getEventId(id);
+    window.addEventListener(eventID, handleEvent);
+
+    let profile = profileManager.getCurrentProfile(id);
+    this.setState({
+      picture: profile.picture,
+      name: profile.name,
+      avatar: profileManager.createImageUrl(pub, this.props.width),
+    });
+
+    profileManager.subscribe(pub);
 
     this.setState({ activity: null });
   }
@@ -78,7 +81,8 @@ class MyAvatar extends Component<Props, State> {
     if (this.activityTimeout !== undefined) {
       clearTimeout(this.activityTimeout);
     }
-    this.unsub?.();
+    //this.unsub?.();
+    profileManager.unsubscribe(this.props.str as string);
   }
 
   render() {
