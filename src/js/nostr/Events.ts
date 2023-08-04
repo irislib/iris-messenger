@@ -406,7 +406,7 @@ const Events = {
       // TODO decrypting & trying to json parse all dms might be slow, how to avoid? only process new msgs?
       const decrypted = await Key.decrypt(event.content, event.pubkey);
       decrypted && this.decryptedMessages.set(event.id, decrypted); // don't do if maybeSecretChat?
-      // also save to localState so we don't have to decrypt every time?
+      // also save to localState, so we don't have to decrypt every time?
       const innerEvent = JSON.parse(decrypted.slice(decrypted.indexOf('{')));
       if (validateEvent(innerEvent) && verifySignature(innerEvent)) {
         // parse nsec from message by regex. nsec is bech32 encoded in the message
@@ -419,12 +419,16 @@ const Events = {
             addGroup(hexPriv, false, innerEvent.pubkey);
             setGroupNameByInvite(hexPriv, innerEvent.pubkey);
             localState.get('chatInvites').get(innerEvent.pubkey).put({ priv: hexPriv });
-            return;
+            if (maybeSecretChat) {
+              return;
+            }
           }
         }
       }
     } catch (e) {
-      // ignore
+      if (maybeSecretChat) {
+        return;
+      }
     }
 
     /*
@@ -439,10 +443,6 @@ const Events = {
      */
 
     this.insert(event);
-    // the following is not actually necessary for groups, because their messages are queried via PubSub?
-    const byUser = this.directMessagesByUser.get(chatId) ?? new SortedLimitedEventSet(500);
-    byUser.add(event);
-    this.directMessagesByUser.set(chatId, byUser);
     if (!maybeSecretChat) {
       this.saveDMToLocalState(event, chatId);
     }
@@ -891,36 +891,6 @@ const Events = {
     } else {
       PubSub.subscribe({ ids: [id] }, cb, false);
     }
-  },
-  getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
-    const callback = () => {
-      cb?.(this.directMessagesByUser.get(address)?.eventIds ?? []);
-    };
-    this.directMessagesByUser.has(address) && callback();
-    const myPub = Key.getPubKey();
-    const unsub1 = PubSub.subscribe({ kinds: [4], '#p': [address], authors: [myPub] }, callback);
-    const unsub2 = PubSub.subscribe({ kinds: [4], '#p': [myPub], authors: [address] }, callback);
-    return () => {
-      unsub1();
-      unsub2();
-    };
-  },
-  getDirectMessages(cb?: (chats: SortedMap<string, SortedLimitedEventSet>) => void): Unsubscribe {
-    const callback = () => {
-      const map = this.directMessagesByUser ?? new Map();
-      if (map.size === 0) {
-        // Add "note to self" chat so the list is not empty
-        map.set(Key.getPubKey(), new SortedLimitedEventSet(500));
-      }
-      cb?.(map);
-    };
-    callback();
-    const unsub1 = PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()] }, callback);
-    const unsub2 = PubSub.subscribe({ kinds: [4], authors: [Key.getPubKey()] }, callback);
-    return () => {
-      unsub1();
-      unsub2();
-    };
   },
 };
 

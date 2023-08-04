@@ -5,10 +5,24 @@ export default class SortedMap<K, V> {
   private sortedKeys: K[];
   private compare: Comparator<K, V>;
 
-  constructor(compare?: Comparator<K, V>) {
+  constructor(compare?: string | Comparator<K, V>, direction?: 'asc' | 'desc') {
     this.map = new Map();
     this.sortedKeys = [];
-    this.compare = compare ?? ((a, b) => (a.key > b.key ? 1 : a.key < b.key ? -1 : 0));
+    if (compare) {
+      if (typeof compare === 'string') {
+        this.compare = (a, b) => {
+          if (direction === 'desc') {
+            return a.value[compare] > b.value[compare] ? -1 : a.value[compare] < b.value[compare] ? 1 : 0;
+          } else {
+            return a.value[compare] > b.value[compare] ? 1 : a.value[compare] < b.value[compare] ? -1 : 0;
+          }
+        };
+      } else {
+        this.compare = compare;
+      }
+    } else {
+      this.compare = (a, b) => (a.key > b.key ? 1 : a.key < b.key ? -1 : 0);
+    }
   }
 
   set(key: K, value: V) {

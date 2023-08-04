@@ -8,7 +8,7 @@ export default class SortedEventMap {
   private sortBy: string;
   private sortDirection: string;
 
-  constructor(sortBy: string, sortDirection = 'desc') {
+  constructor(sortBy = 'created_at', sortDirection = 'desc') {
     this.sortBy = sortBy;
     this.sortDirection = sortDirection;
     this.eventMap = new Map<string, Event>();

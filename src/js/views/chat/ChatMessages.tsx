@@ -4,7 +4,7 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { QrCodeIcon } from '@heroicons/react/24/solid';
 import $ from 'jquery';
 import throttle from 'lodash/throttle';
-import { getPublicKey, nip04 } from 'nostr-tools';
+import { Event, getPublicKey, nip04 } from 'nostr-tools';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 import Copy from '../../components/buttons/Copy';
@@ -17,12 +17,16 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import PubSub from '../../nostr/PubSub';
 import { translate as t } from '../../translations/Translation.mjs';
+import SortedMap from '../../utils/SortedMap';
 
 import ChatMessageForm from './ChatMessageForm.tsx';
 import { addGroup, sendSecretInvite } from './NewChat';
 
+type DecryptedEvent = Event & { text?: string };
+
 function ChatMessages({ id }) {
   const ref = useRef(null);
+  const messages = useRef(new SortedMap<string, DecryptedEvent>('created_at'));
   const [sortedMessages, setSortedMessages] = useState([] as any[]);
   const [stickToBottom, setStickToBottom] = useState(true);
   const [invitedToPriv, setInvitedToPriv] = useState('');
@@ -31,7 +35,7 @@ function ChatMessages({ id }) {
     undefined as { pubKey: string; privKey: string } | undefined,
   );
   const [isGroup, setIsGroup] = useState(false);
-  let unsub;
+  const subs = [] as any[];
   let messageViewScrollHandler;
 
   const addFloatingDaySeparator = () => {
@@ -211,8 +215,6 @@ function ChatMessages({ id }) {
     return mainView;
   };
 
-  const messagesById = new Map<string, any>();
-
   const renderMsgForm = () => {
     return (
       <>
@@ -227,12 +229,14 @@ function ChatMessages({ id }) {
   useEffect(() => {
     const hexId = Key.toNostrHexAddress(id);
     const subscribePrivate = (hexId) => {
-      unsub = PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()], authors: [hexId] });
-      Events.getDirectMessagesByUser(hexId, (msgIds) => {
-        if (msgIds) {
-          setSortedMessages(msgIds.reverse());
-        }
-      });
+      const cb = (event) => {
+        messages.current.set(event.id, event);
+        setSortedMessages(Array.from(messages.current.values()));
+      };
+      subs.push(PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()], authors: [hexId] }, cb));
+      if (hexId !== Key.getPubKey()) {
+        subs.push(PubSub.subscribe({ kinds: [4], '#p': [hexId], authors: [Key.getPubKey()] }, cb));
+      }
     };
 
     localState
@@ -250,11 +254,11 @@ function ChatMessages({ id }) {
         const privKey = group.key;
         const pubKey = getPublicKey(privKey);
         setKeyPair({ privKey, pubKey });
-        unsub = PubSub.subscribe(
-          { kinds: [4], '#p': [pubKey], authors: [pubKey] },
-          async (event) => {
+        subs.push(
+          PubSub.subscribe({ kinds: [4], '#p': [pubKey], authors: [pubKey] }, async (event) => {
             const decrypted = await nip04.decrypt(privKey, pubKey, event.content);
-            messagesById.set(event.id, { ...event, text: decrypted });
+            messages.current.set(event.id, event);
+            setSortedMessages(Array.from(messages.current.values()));
             const latest = node.get('latest');
             latest.once((e) => {
               if (!e || !e.created_at || e.created_at < event.created_at) {
@@ -265,8 +269,7 @@ function ChatMessages({ id }) {
                 });
               }
             });
-            setSortedMessages(Array.from(messagesById.values()));
-          },
+          }),
         );
       });
     };
@@ -280,8 +283,6 @@ function ChatMessages({ id }) {
 
     const container = document.getElementById('message-list');
     if (container) {
-      container.style.paddingBottom = '0';
-      container.style.paddingTop = '0';
       const el = $('#message-view');
       el.off('scroll').on('scroll', () => {
         const scrolledToBottom = el[0].scrollHeight - el.scrollTop() == el.outerHeight();
@@ -294,7 +295,7 @@ function ChatMessages({ id }) {
     }
 
     return () => {
-      unsub && unsub();
+      subs.forEach((unsub) => unsub());
     };
   }, [id]);
 
