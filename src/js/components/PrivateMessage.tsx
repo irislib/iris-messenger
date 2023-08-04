@@ -6,12 +6,20 @@ import { route } from 'preact-router';
 
 import Helpers from '../Helpers';
 import Key from '../nostr/Key';
+import { DecryptedEvent } from '../views/chat/ChatMessages';
 
 import Name from './user/Name';
 import Torrent from './Torrent';
 
-const PrivateMessage = (props) => {
-  const [text, setText] = useState(props.text || '');
+type Props = {
+  event: DecryptedEvent;
+  selfAuthored?: boolean;
+  showName?: boolean;
+  torrentId?: string;
+};
+
+const PrivateMessage = ({ event, selfAuthored, showName, torrentId }: Props) => {
+  const [text, setText] = useState(event.text || '');
   const [innerEvent, setInnerEvent] = useState<any>(null as any);
   const [checked, setChecked] = useState(false);
 
@@ -26,27 +34,24 @@ const PrivateMessage = (props) => {
 
     let initialText = text;
     if (!initialText) {
-      Key.decryptMessage(props.id, (decryptedText) => {
+      Key.decryptMessage(event, (decryptedText) => {
         initialText = decryptedText;
         checkTextForJson(initialText);
       });
     } else {
       checkTextForJson(initialText);
     }
-  }, [props.id, text]);
+  }, [event.id, text]);
 
   const checkTextForJson = (textContent) => {
     try {
       const maybeJson = textContent.slice(textContent.indexOf('{'));
-      const event = JSON.parse(maybeJson);
-      if (validateEvent(event) && verifySignature(event)) {
-        if (
-          event.tags.length === 1 &&
-          event.tags[0][0] === 'p' &&
-          event.tags[0][1] === props.pubkey
-        ) {
-          event.text = event.content;
-          setInnerEvent(event);
+      const e = JSON.parse(maybeJson);
+      if (validateEvent(e) && verifySignature(e)) {
+        console.log(111, e.tags.length === 1, e.tags[0][0] === 'p', e.tags[0][1] === e.pubkey);
+        if (e.tags.length === 1 && e.tags[0][0] === 'p' && e.tags[0][1] === event.pubkey) {
+          e.text = e.content;
+          setInnerEvent(e);
           return;
         }
       }
@@ -60,7 +65,7 @@ const PrivateMessage = (props) => {
   if (innerEvent) {
     return (
       <PrivateMessage
-        {...innerEvent}
+        event={innerEvent}
         showName={true}
         selfAuthored={innerEvent.pubkey === Key.getPubKey()}
       />
@@ -72,7 +77,7 @@ const PrivateMessage = (props) => {
   }
 
   const onNameClick = () => {
-    route(`/${Key.toNostrBech32Address(props.pubkey, 'npub')}`);
+    route(`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`);
   };
 
   const emojiOnly = text && text.length === 2 && Helpers.isEmoji(text);
@@ -80,12 +85,12 @@ const PrivateMessage = (props) => {
   // TODO opts.onImageClick show image in modal
 
   const time =
-    typeof props.created_at === 'object' ? props.created_at : new Date(props.created_at * 1000);
+    typeof event.created_at === 'object' ? event.created_at : new Date(event.created_at * 1000);
 
   const status: any = ''; // this.getSeenStatus();
   const seen = status.seen ? 'text-green-500' : 'text-neutral-500';
   const delivered = status.delivered ? 'border-green-500' : 'border-neutral-500';
-  const whose = props.selfAuthored
+  const whose = selfAuthored
     ? 'self-end bg-iris-blue text-white'
     : 'self-start bg-neutral-700 text-white';
 
@@ -95,18 +100,18 @@ const PrivateMessage = (props) => {
     >
       <div className="w-full">
         <div className="mb-2">
-          {props.showName && (
+          {showName && (
             <small onClick={onNameClick} className="cursor-pointer text-xs">
-              <Name key={props.pubkey} pub={props.pubkey} />
+              <Name key={event.pubkey} pub={event.pubkey} />
             </small>
           )}
         </div>
-        {props.torrentId && <Torrent torrentId={props.torrentId} />}
+        {torrentId && <Torrent torrentId={torrentId} />}
         <div className={`preformatted-wrap text-base ${emojiOnly ? 'text-4xl' : ''}`}>
           {formattedText}
         </div>
-        <div className={`${props.selfAuthored ? 'text-right' : 'text-left'} text-xs text-white`}>
-          {props.id ? Helpers.getRelativeTimeText(time) : Helpers.formatTime(time)}
+        <div className={`${selfAuthored ? 'text-right' : 'text-left'} text-xs text-white`}>
+          {event.id ? Helpers.getRelativeTimeText(time) : Helpers.formatTime(time)}
         </div>
       </div>
     </div>

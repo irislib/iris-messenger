@@ -2,21 +2,25 @@ import { useEffect, useRef, useState } from 'react';
 import $ from 'jquery';
 
 import localState from '../../LocalState';
-import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
+import SortedMap from '../../utils/SortedMap';
 
 import ChatListItem from './ChatListItem';
 import NewChatButton from './NewChatButton';
 
-const loadedTime = Date.now();
+const sortChats = (a: { key: string; value: any }, b: { key: string; value: any }) => {
+  const aLatest = a.value.latest;
+  const bLatest = b.value.latest;
+  if (!aLatest) return 1;
+  if (!bLatest) return -1;
+  return bLatest.created_at - aLatest.created_at;
+};
 
 const ChatList = ({ activeChat, className }) => {
-  const [directMessages, setDirectMessages] = useState(new Map());
-  const [groups, setGroups] = useState(new Map());
-  const [sortedChats, setSortedChats] = useState([] as string[]);
-  const [shouldWait] = useState(Date.now() - loadedTime < 1000);
+  const [chats, setChats] = useState(new SortedMap<string, any>(sortChats) as any);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_renderCount, setRenderCount] = useState(0); // new state variable
   const chatListRef = useRef(null as any);
 
   const enableDesktopNotifications = () => {
@@ -32,31 +36,17 @@ const ChatList = ({ activeChat, className }) => {
 
   useEffect(() => {
     const unsubs = [] as any[];
-    const go = () => {
-      unsubs.push(
-        Events.getDirectMessages(async (incomingChats) => {
-          let keys = Array.from(incomingChats.keys()) as string[];
-          const maxFollowDistance = await localState
-            .get('globalFilter')
-            .get('maxFollowDistance')
-            .once();
-          const blockedUsers = Object.keys((await localState.get('blockedUsers').once()) || {});
-          keys = keys.filter(
-            (key: string) =>
-              !blockedUsers.includes(key) &&
-              SocialNetwork.getFollowDistance(key) <= maxFollowDistance,
-          );
 
-          const filteredChats = new Map(keys.map((k) => [k, incomingChats.get(k)]));
-          setDirectMessages(filteredChats);
-        }),
-      );
+    const addToChats = (value, key) => {
+      setChats((prevChats) => {
+        prevChats.set(key, { ...value });
+        return prevChats;
+      });
+      setRenderCount((prevCount) => prevCount + 1);
     };
-    if (shouldWait) {
-      setTimeout(go, 1000); // timeout always helps
-    } else {
-      go();
-    }
+
+    unsubs.push(localState.get('chats').map(addToChats));
+    unsubs.push(localState.get('groups').map(addToChats));
 
     unsubs.push(
       localState.get('scrollUp').on(() => {
@@ -67,6 +57,7 @@ const ChatList = ({ activeChat, className }) => {
       }),
     );
 
+    /*
     unsubs.push(
       localState.get('groups').map((group, localKey) => {
         if (!(group && localKey)) return;
@@ -74,26 +65,10 @@ const ChatList = ({ activeChat, className }) => {
         setGroups((prevGroups) => new Map(prevGroups.set(localKey, group)));
       }),
     );
+     */
 
     return () => unsubs.forEach((unsub) => unsub());
   }, []);
-
-  useEffect(() => {
-    const chats: Map<string, any> = new Map(directMessages);
-    groups.forEach((value, key) => {
-      chats.set(key, value);
-    });
-    const sorted = Array.from(chats.keys()).sort((a, b) => {
-      if (a.length < b.length) return -1; // show groups first until their last msg is implemented
-      const aEventIds = chats.get(a).eventIds;
-      const bEventIds = chats.get(b).eventIds;
-      const aLatestEvent = aEventIds.length ? Events.db.by('id', aEventIds[0]) : null;
-      const bLatestEvent = bEventIds.length ? Events.db.by('id', bEventIds[0]) : null;
-
-      return bLatestEvent?.created_at - aLatestEvent?.created_at;
-    }) as string[];
-    setSortedChats(sorted);
-  }, [directMessages, groups]);
 
   const activeChatHex = (activeChat && Key.toNostrHexAddress(activeChat)) || activeChat;
 
@@ -110,12 +85,12 @@ const ChatList = ({ activeChat, className }) => {
       </div>
       <div className="flex flex-1 flex-col">
         <NewChatButton active={activeChatHex === 'new'} />
-        {sortedChats.map((pubkey) => (
+        {Array.from<[string, any]>(chats.entries() as any).map(([pubkey, data]) => (
           <ChatListItem
             active={pubkey === activeChatHex}
             key={pubkey}
             chat={pubkey}
-            latestMsgId={directMessages.get(pubkey)?.eventIds[0]}
+            latestMsg={data?.latest}
           />
         ))}
       </div>

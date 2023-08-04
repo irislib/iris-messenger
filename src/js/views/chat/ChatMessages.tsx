@@ -4,7 +4,7 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { QrCodeIcon } from '@heroicons/react/24/solid';
 import $ from 'jquery';
 import throttle from 'lodash/throttle';
-import { getPublicKey, nip04 } from 'nostr-tools';
+import { Event, getPublicKey, nip04 } from 'nostr-tools';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 import Copy from '../../components/buttons/Copy';
@@ -13,16 +13,19 @@ import PrivateMessage from '../../components/PrivateMessage';
 import QrCode from '../../components/QrCode';
 import Helpers from '../../Helpers';
 import localState from '../../LocalState';
-import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import PubSub from '../../nostr/PubSub';
 import { translate as t } from '../../translations/Translation.mjs';
+import SortedMap from '../../utils/SortedMap';
 
 import ChatMessageForm from './ChatMessageForm.tsx';
 import { addGroup, sendSecretInvite } from './NewChat';
 
+export type DecryptedEvent = Event & { text?: string };
+
 function ChatMessages({ id }) {
   const ref = useRef(null);
+  const messages = useRef(new SortedMap<string, DecryptedEvent>('created_at'));
   const [sortedMessages, setSortedMessages] = useState([] as any[]);
   const [stickToBottom, setStickToBottom] = useState(true);
   const [invitedToPriv, setInvitedToPriv] = useState('');
@@ -31,7 +34,7 @@ function ChatMessages({ id }) {
     undefined as { pubKey: string; privKey: string } | undefined,
   );
   const [isGroup, setIsGroup] = useState(false);
-  let unsub;
+  const subs = [] as any[];
   let messageViewScrollHandler;
 
   const addFloatingDaySeparator = () => {
@@ -101,17 +104,11 @@ function ChatMessages({ id }) {
     const msgListContent = [] as any[];
 
     if (id && id.length > 4) {
-      sortedMessages.forEach((msgOrId) => {
-        let msg;
-        if (typeof msgOrId === 'string') {
-          msg = Events.db.by('id', msgOrId);
-        } else {
-          msg = msgOrId;
-        }
-        if (!msg) {
+      sortedMessages.forEach((event) => {
+        if (!event) {
           return null;
         }
-        const date = new Date(msg.created_at * 1000);
+        const date = new Date(event.created_at * 1000);
         let isDifferentDay;
         if (date) {
           const dateStr = date.toLocaleDateString();
@@ -128,18 +125,17 @@ function ChatMessages({ id }) {
         }
 
         let showName = isDifferentDay;
-        if (!isDifferentDay && previousFrom && msg.pubkey !== previousFrom) {
+        if (!isDifferentDay && previousFrom && event.pubkey !== previousFrom) {
           msgListContent.push(<div className="m-2" />);
           showName = true;
         }
-        previousFrom = msg.pubkey;
+        previousFrom = event.pubkey;
         msgListContent.push(
           <PrivateMessage
-            {...msg}
+            event={event}
             showName={showName}
-            selfAuthored={msg.pubkey === myPub}
-            key={`${msg.created_at}${msg.pubkey}`}
-            chatId={id}
+            selfAuthored={event.pubkey === myPub}
+            key={`${event.created_at}${event.pubkey}`}
           />,
         );
       });
@@ -211,8 +207,6 @@ function ChatMessages({ id }) {
     return mainView;
   };
 
-  const messagesById = new Map<string, any>();
-
   const renderMsgForm = () => {
     return (
       <>
@@ -227,12 +221,14 @@ function ChatMessages({ id }) {
   useEffect(() => {
     const hexId = Key.toNostrHexAddress(id);
     const subscribePrivate = (hexId) => {
-      unsub = PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()], authors: [hexId] });
-      Events.getDirectMessagesByUser(hexId, (msgIds) => {
-        if (msgIds) {
-          setSortedMessages(msgIds.reverse());
-        }
-      });
+      const cb = (event) => {
+        messages.current.set(event.id, event);
+        setSortedMessages(Array.from(messages.current.values()));
+      };
+      subs.push(PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()], authors: [hexId] }, cb));
+      if (hexId !== Key.getPubKey()) {
+        subs.push(PubSub.subscribe({ kinds: [4], '#p': [hexId], authors: [Key.getPubKey()] }, cb));
+      }
     };
 
     localState
@@ -245,22 +241,28 @@ function ChatMessages({ id }) {
       });
 
     const subscribeGroup = () => {
-      localState
-        .get('groups')
-        .get(id)
-        .on((group) => {
-          const privKey = group.key;
-          const pubKey = getPublicKey(privKey);
-          setKeyPair({ privKey, pubKey });
-          unsub = PubSub.subscribe(
-            { kinds: [4], '#p': [pubKey], authors: [pubKey] },
-            async (event) => {
-              const decrypted = await nip04.decrypt(privKey, pubKey, event.content);
-              messagesById.set(event.id, { ...event, text: decrypted });
-              setSortedMessages(Array.from(messagesById.values()));
-            },
-          );
-        });
+      const node = localState.get('groups').get(id);
+      node.on((group) => {
+        const privKey = group.key;
+        const pubKey = getPublicKey(privKey);
+        setKeyPair({ privKey, pubKey });
+        subs.push(
+          PubSub.subscribe({ kinds: [4], '#p': [pubKey], authors: [pubKey] }, async (event) => {
+            const decrypted = await nip04.decrypt(privKey, pubKey, event.content);
+            messages.current.set(event.id, { ...event, text: decrypted });
+            setSortedMessages(Array.from(messages.current.values()));
+            const latest = node.get('latest');
+            const e = await latest.once();
+            if (!e || !e.created_at || e.created_at < event.created_at) {
+              latest.put({
+                id: event.id,
+                created_at: event.created_at,
+                text: decrypted.slice(0, decrypted.indexOf('{')),
+              });
+            }
+          }),
+        );
+      });
     };
 
     if (hexId) {
@@ -272,8 +274,6 @@ function ChatMessages({ id }) {
 
     const container = document.getElementById('message-list');
     if (container) {
-      container.style.paddingBottom = '0';
-      container.style.paddingTop = '0';
       const el = $('#message-view');
       el.off('scroll').on('scroll', () => {
         const scrolledToBottom = el[0].scrollHeight - el.scrollTop() == el.outerHeight();
@@ -286,7 +286,7 @@ function ChatMessages({ id }) {
     }
 
     return () => {
-      unsub && unsub();
+      subs.forEach((unsub) => unsub());
     };
   }, [id]);
 
