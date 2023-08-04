@@ -40,15 +40,20 @@ class ProfileManager {
 
   // TODO: Disable for now as it's not working because of CORS
   async fetchProfile(npub: string) {
-    // let url = `https://api.iris.to/profile/${npub}`;
-    // let res = await OneCallQueue<any>(url, async () => fetch(url));
+    let timeKey = `fetchProfile:${npub}`;
+    console.time(timeKey);
+
+    let url = `https://api.iris.to/profile/${npub}`;
+    let res = await OneCallQueue<any>(url, async () => fetch(url));
     
-    // if (res && res.status === 200) return res.json();
+    console.timeEnd(timeKey);
 
-    // return undefined;
+    if (res && res.status === 200) return res.json();
 
-    console.log('fetchProfile disabled. CORS issue. Requested address:', npub);
     return undefined;
+
+//    console.log('fetchProfile disabled. CORS issue. Requested address:', npub);
+//    return undefined;
   }
 
   getProfile(
@@ -68,15 +73,15 @@ class ProfileManager {
 
     if (profile && !profile.isDefault) {
       callback();
-      if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
-        // TODO verify NIP05 address
-        // Key.verifyNip05Address(profile.nip05, address).then((isValid) => {
-        //   console.log('NIP05 address is valid?', isValid, profile.nip05, address);
-        //   profile.nip05valid = isValid;
-        //   SocialNetwork.profiles.set(id, profile);
-        //   callback();
-        // });
-      }
+      // if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
+      //   // TODO verify NIP05 address
+      //     Key.verifyNip05Address(profile.nip05, address).then((isValid) => {
+      //       console.log('NIP05 address is valid?', isValid, profile.nip05, address);
+      //       profile.nip05valid = isValid;
+      //       SocialNetwork.profiles.set(id, profile);
+      //       callback();
+      //     });
+      // }
     } else {
       // Check if profile is in IndexedDB
       this.loadProfile(hexPub).then((profile) => {

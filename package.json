@@ -5,7 +5,7 @@
   "version": "0.2.4",
   "type": "module",
   "scripts": {
-    "predeploy": "vite build && echo 'dpeep.com' > dist/CNAME",
+    "predeploy": "vite build",
     "deploy": "gh-pages -d dist",
     "dev": "vite",
     "build": "tsc && vite build",
