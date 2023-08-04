@@ -91,6 +91,7 @@ const ChatList = ({ activeChat, className }) => {
             key={pubkey}
             chat={pubkey}
             latestMsg={data?.latest}
+            name={data?.name}
           />
         ))}
       </div>
