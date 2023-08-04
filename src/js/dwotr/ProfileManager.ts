@@ -18,9 +18,8 @@ class ProfileManager {
   #saveQueue: ProfileRecord[] = [];
   #saving: boolean = false;
 
-
   saveBulk = throttle(() => {
-    if (this.#saving) { 
+    if (this.#saving) {
       this.saveBulk(); // try again later
       return;
     }
@@ -29,26 +28,25 @@ class ProfileManager {
 
     const queue = this.#saveQueue;
     this.#saveQueue = [];
-    
+
     storage.profiles.bulkPut(queue).finally(() => {
       this.#saving = false;
     });
-
   }, 500);
 
   async init() {
     this.loaded = true;
   }
 
-
   // TODO: Disable for now as it's not working because of CORS
   async fetchProfile(npub: string) {
-    // const npub = Key.toNostrBech32Address(address, 'npub') as string;
-    // const profile = await fetch(`https://api.iris.to/profile/${npub}`).then((res) => {
-    //   if (res.status === 200) return res.json();
-    //   else return undefined;
-    // });
-    // return profile;
+    // let url = `https://api.iris.to/profile/${npub}`;
+    // let res = await OneCallQueue<any>(url, async () => fetch(url));
+    
+    // if (res && res.status === 200) return res.json();
+
+    // return undefined;
+
     console.log('fetchProfile disabled. CORS issue. Requested address:', npub);
     return undefined;
   }
@@ -68,7 +66,7 @@ class ProfileManager {
 
     let profile = SocialNetwork.profiles.get(id);
 
-    if (profile) {
+    if (profile && !profile.isDefault) {
       callback();
       if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
         // TODO verify NIP05 address
@@ -101,6 +99,10 @@ class ProfileManager {
           return;
         }
       });
+    }
+
+    if (profile && profile.isDefault) {
+      callback();
     }
 
     if (!profile) {
@@ -174,7 +176,7 @@ class ProfileManager {
     }
 
     // Then save to memory
-    for(const profile of result) {
+    for (const profile of result) {
       if (!profile || !this.isProfileNewer(profile)) continue;
 
       this.addProfileToMemory(profile);
@@ -183,7 +185,7 @@ class ProfileManager {
     // Then callback
     if (result.length > 0)
       // The list should contain a profile for each address
-      cb?.(result); 
+      cb?.(result);
 
     // Then subscribe to updates via nostr relays
     const callback = (event: Event) => {
@@ -195,15 +197,17 @@ class ProfileManager {
     return PubSub.subscribe({ kinds: [0], authors: npubs }, callback, false);
   }
 
-  async loadProfiles(addresses: Set<string>) : Promise<ProfileRecord[]> {
+  async loadProfiles(addresses: Set<string>): Promise<ProfileRecord[]> {
     return await storage.profiles.where('key').anyOf(Array.from(addresses)).toArray();
     // if (!list) return undefined;
     // const profiles = list.map((p) => this.addProfileToMemory(p));
     // return profiles;
   }
 
-  async loadProfile(address: string) : Promise<ProfileRecord> {
-    return await OneCallQueue<ProfileRecord>(`loadProfile${address}`, async () => storage.profiles.get({ key: address }));
+  async loadProfile(address: string): Promise<ProfileRecord> {
+    return await OneCallQueue<ProfileRecord>(`loadProfile${address}`, async () =>
+      storage.profiles.get({ key: address }),
+    );
   }
 
   saveProfile(profile: ProfileRecord) {
@@ -249,7 +253,6 @@ class ProfileManager {
     return profile;
   }
 
-
   createDefaultProfile(npub: string): ProfileRecord {
     let profile = this.sanitizeProfile({}, npub);
     return profile;
@@ -268,7 +271,6 @@ class ProfileManager {
     if (profile) return profile;
     return this.createDefaultProfile(BECH32(id));
   }
-
 
   isProfileNewer(profile: ProfileRecord) {
     const existingProfile = SocialNetwork.profiles.get(ID(profile.key));

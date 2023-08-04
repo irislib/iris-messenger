@@ -62,9 +62,6 @@ class Storage {
   // }
 
   async deleteDB() {
-    let exists = await Dexie.exists(DB_NAME);
-    if (!exists) return;
-
     await Dexie.delete(DB_NAME);
     console.log('Database deleted');
   }

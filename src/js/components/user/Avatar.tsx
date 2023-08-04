@@ -59,9 +59,8 @@ class MyAvatar extends Component<Props, State> {
 
     this.updateAvatar();
 
-    const nostrAddr = Key.toNostrHexAddress(pub);
-    if (nostrAddr) {
-      this.unsub = SocialNetwork.getProfile(nostrAddr, (profile) => {
+    if (pub) {
+      this.unsub = profileManager.getProfile(pub, (profile) => {
         profile &&
           this.setState({
             // TODO why profile undefined sometimes?
