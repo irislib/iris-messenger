@@ -169,26 +169,25 @@ export default {
         callback(null);
       });
   },
-  async decryptMessage(id, cb: (decrypted: string) => void) {
-    const existing = Events.decryptedMessages.get(id);
+  async decryptMessage(event: Event, cb: (decrypted: string) => void) {
+    const existing = Events.decryptedMessages.get(event.id);
     if (existing) {
       cb(existing);
       return;
     }
     try {
       const myPub = this.getPubKey();
-      const msg = Events.db.by('id', id);
       const theirPub =
-        msg.pubkey === myPub ? msg.tags?.find((tag: any) => tag[0] === 'p')[1] : msg.pubkey;
-      if (!(msg && theirPub)) {
+        event.pubkey === myPub ? event.tags?.find((tag: any) => tag[0] === 'p')?.[1] : event.pubkey;
+      if (!(event && theirPub)) {
         return;
       }
 
-      let decrypted = (await this.decrypt(msg.content, theirPub)) as any;
+      let decrypted = (await this.decrypt(event.content, theirPub)) as any;
       if (decrypted?.content) {
         decrypted = decrypted.content; // what? TODO debug
       }
-      Events.decryptedMessages.set(id, decrypted);
+      Events.decryptedMessages.set(event.id, decrypted);
       cb(decrypted);
     } catch (e) {
       console.error(e);

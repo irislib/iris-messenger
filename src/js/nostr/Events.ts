@@ -4,7 +4,9 @@ import {
   Event,
   Filter,
   getEventHash,
+  getPublicKey,
   matchFilter,
+  nip04,
   validateEvent,
   verifySignature,
 } from 'nostr-tools';
@@ -12,7 +14,9 @@ import { EventTemplate } from 'nostr-tools';
 
 import FuzzySearch from '../FuzzySearch';
 import localState from '../LocalState';
+import { Node } from '../LocalState';
 import SortedMap from '../utils/SortedMap';
+import { DecryptedEvent } from '../views/chat/ChatMessages';
 import { addGroup, setGroupNameByInvite } from '../views/chat/NewChat';
 
 import EventMetaStore from './EventsMeta';
@@ -377,30 +381,51 @@ const Events = {
     }
     this.zapsByNote.get(zappedNote)?.add(event);
   },
-  async handleDirectMessage(event: Event) {
+  async saveDMToLocalState(event: DecryptedEvent, chatNode: Node) {
+    const latest = chatNode.get('latest');
+    const e = await latest.once();
+    if (!e || !e.created_at || e.created_at < event.created_at) {
+      latest.put({ id: event.id, created_at: event.created_at, text: event.text });
+    }
+  },
+  async handleDirectMessage(event: DecryptedEvent) {
     const myPub = Key.getPubKey();
-    let user = event.pubkey;
+    let chatId;
+    let maybeSecretChat = false;
     if (event.pubkey === myPub) {
-      user = event.tags?.find((tag) => tag[0] === 'p')?.[1] || user;
+      chatId = event.tags?.find((tag) => tag[0] === 'p')?.[1] || chatId;
     } else {
+      chatId = event.pubkey;
       const forMe = event.tags?.some((tag) => tag[0] === 'p' && tag[1] === myPub);
       if (!forMe) {
-        return;
+        maybeSecretChat =
+          event.tags?.length === 1 &&
+          event.tags?.some((tag) => tag[0] === 'p' && tag[1] === event.pubkey);
+        if (!maybeSecretChat) {
+          return;
+        }
       }
     }
     try {
-      // TODO trying to json parse all dms might be slow, how to avoid?
+      // TODO decrypting & trying to json parse all dms might be slow, how to avoid? only process new msgs?
       const decrypted = await Key.decrypt(event.content, event.pubkey);
+      if (decrypted) {
+        event.text = decrypted;
+        this.decryptedMessages.set(event.id, decrypted); // don't do if maybeSecretChat?
+      }
+      // also save to localState, so we don't have to decrypt every time?
       const innerEvent = JSON.parse(decrypted.slice(decrypted.indexOf('{')));
       if (validateEvent(innerEvent) && verifySignature(innerEvent)) {
+        console.log('innerEvent', innerEvent);
         // parse nsec from message by regex. nsec is bech32 encoded in the message
         // no follow distance check here for now
         const nsec = innerEvent.content.match(/nsec1[023456789acdefghjklmnpqrstuvwxyz]{6,}/gi)?.[0];
         if (nsec) {
           const hexPriv = Key.toNostrHexAddress(nsec);
           if (hexPriv) {
+            console.log('nsec & hexpriv');
             // TODO browser notification?
-            addGroup(hexPriv, false, innerEvent.pubkey);
+            addGroup(hexPriv, false, innerEvent.pubkey); // for some reason, groups don't appear on 1st load after login
             setGroupNameByInvite(hexPriv, innerEvent.pubkey);
             localState.get('chatInvites').get(innerEvent.pubkey).put({ priv: hexPriv });
             return;
@@ -423,9 +448,45 @@ const Events = {
      */
 
     this.insert(event);
-    const byUser = this.directMessagesByUser.get(user) ?? new SortedLimitedEventSet(500);
-    byUser.add(event);
-    this.directMessagesByUser.set(user, byUser);
+    if (!maybeSecretChat) {
+      this.saveDMToLocalState(event, localState.get('chats').get(chatId));
+    }
+  },
+  getEventFromText(text) {
+    try {
+      const maybeJson = text.slice(text.indexOf('{'));
+      console.log('maybeJson', maybeJson);
+      const e = JSON.parse(maybeJson);
+      if (validateEvent(e) && verifySignature(e)) {
+        return e;
+      }
+    } catch (e) {
+      // ignore
+    }
+  },
+  subscribeGroups() {
+    localState.get('groups').map((data, groupId) => {
+      if (data.key) {
+        const pubKey = getPublicKey(data.key);
+        if (pubKey) {
+          console.log('subscribing to group', groupId, pubKey);
+          PubSub.subscribe({ authors: [pubKey], kinds: [4], '#p': [pubKey] }, async (event) => {
+            const decrypted = await nip04.decrypt(data.key, pubKey, event.content);
+            const innerEvent = this.getEventFromText(decrypted);
+            if (
+              innerEvent &&
+              innerEvent.tags.length === 1 &&
+              innerEvent.tags[0][0] === 'p' &&
+              innerEvent.tags[0][1] === pubKey
+            ) {
+              innerEvent.text = innerEvent.content;
+              console.log('saving innerEvent', innerEvent);
+              this.saveDMToLocalState(innerEvent, localState.get('groups').get(groupId));
+            }
+          });
+        }
+      }
+    });
   },
   handleKeyValue(event: Event) {
     if (event.pubkey !== Key.getPubKey()) {
@@ -871,36 +932,6 @@ const Events = {
     } else {
       PubSub.subscribe({ ids: [id] }, cb, false);
     }
-  },
-  getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
-    const callback = () => {
-      cb?.(this.directMessagesByUser.get(address)?.eventIds ?? []);
-    };
-    this.directMessagesByUser.has(address) && callback();
-    const myPub = Key.getPubKey();
-    const unsub1 = PubSub.subscribe({ kinds: [4], '#p': [address], authors: [myPub] }, callback);
-    const unsub2 = PubSub.subscribe({ kinds: [4], '#p': [myPub], authors: [address] }, callback);
-    return () => {
-      unsub1();
-      unsub2();
-    };
-  },
-  getDirectMessages(cb?: (chats: SortedMap<string, SortedLimitedEventSet>) => void): Unsubscribe {
-    const callback = () => {
-      const map = this.directMessagesByUser ?? new Map();
-      if (map.size === 0) {
-        // Add "note to self" chat so the list is not empty
-        map.set(Key.getPubKey(), new SortedLimitedEventSet(500));
-      }
-      cb?.(map);
-    };
-    callback();
-    const unsub1 = PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()] }, callback);
-    const unsub2 = PubSub.subscribe({ kinds: [4], authors: [Key.getPubKey()] }, callback);
-    return () => {
-      unsub1();
-      unsub2();
-    };
   },
 };
 
