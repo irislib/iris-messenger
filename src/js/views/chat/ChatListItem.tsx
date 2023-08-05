@@ -27,11 +27,11 @@ const ChatListItem = ({ chat, active = false, latestMsg = {} as any, name }) => 
       onKeyUp={onKeyUp}
       role="button"
       tabIndex={0}
-      className={`flex p-2 flex-row gap-4 ${active ? 'bg-neutral-800' : 'hover:bg-neutral-900'}`}
+      className={`p-2 ${active ? 'bg-neutral-800' : 'hover:bg-neutral-900'}`}
       onClick={() => route(`/chat/${npub || chat}`)}
     >
-      <Avatar str={npub || chat} width={49} />
-      <div className="flex flex-row">
+      <div className="flex gap-4 overflow-x-hidden">
+        <Avatar str={npub || chat} width={49} />
         <div className="flex flex-col">
           <span className="name">
             <Show when={name}>{name}</Show>
