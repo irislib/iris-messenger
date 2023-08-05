@@ -142,16 +142,16 @@ function ChatMessages({ id }) {
 
       mainView = (
         <div
-          className="main-view p-2 overflow-y-auto overflow-x-hidden flex-grow min-h-screen"
+          className="main-view p-2 overflow-y-auto overflow-x-hidden flex flex-col flex-grow h-full"
           id="message-view"
           onScroll={() => onMessageViewScroll()}
         >
-          <div id="message-list" className="w-full flex flex-col items-center">
+          <div id="message-list" className="w-full flex flex-col items-center justify-end">
             {msgListContent}
-            <div className="italic my-2 text-neutral-500 w-full text-center">
+            <div className="italic my-2 text-neutral-500 w-full text-center justify-self-center">
               <Show when={isGroup && keyPair}>
                 <div>{t('secret_chat')}</div>
-                <div className="flex gap-2 flex-1 items-center justify-center my-4">
+                <div className="flex gap-2 flex-1 items-center justify-center mt-4">
                   <button
                     className="btn btn-neutral btn-sm"
                     onClick={() => setShowQr((showQr) => !showQr)}
@@ -210,8 +210,15 @@ function ChatMessages({ id }) {
   const renderMsgForm = () => {
     return (
       <>
-        <div id="scroll-down-btn" style={{ display: 'none' }} onClick={() => scrollDown()}>
-          <ChevronDownIcon width="24" />
+        <div className="relative">
+          <div
+            id="scroll-down-btn"
+            style={{ display: 'none' }}
+            className="absolute bottom-1 left-2 p-1.5 rounded-3xl bg-neutral-900 opacity-85 hover:cursor-pointer"
+            onClick={() => scrollDown()}
+          >
+            <ChevronDownIcon width="24" />
+          </div>
         </div>
         <ChatMessageForm key={id} activeChat={id} onSubmit={() => scrollDown()} keyPair={keyPair} />
       </>

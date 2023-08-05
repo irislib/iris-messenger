@@ -104,7 +104,7 @@ class MyAvatar extends Component<Props, State> {
           maxHeight: `${width}px`,
           cursor: this.props.onClick ? 'pointer' : undefined,
         }}
-        className={`inline-flex flex-col items-center justify-center relative select-none ${hasPictureStyle} ${showTooltip} ${activity}`}
+        className={`inline-flex flex-col flex-shrink-0 items-center justify-center relative select-none ${hasPictureStyle} ${showTooltip} ${activity}`}
         onClick={this.props.onClick}
       >
         <div>

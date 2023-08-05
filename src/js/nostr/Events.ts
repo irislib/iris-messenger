@@ -472,7 +472,6 @@ const Events = {
   getEventFromText(text) {
     try {
       const maybeJson = text.slice(text.indexOf('{'));
-      console.log('maybeJson', maybeJson);
       const e = JSON.parse(maybeJson);
       if (validateEvent(e) && verifySignature(e)) {
         return e;
@@ -486,7 +485,6 @@ const Events = {
       if (data.key) {
         const pubKey = getPublicKey(data.key);
         if (pubKey) {
-          console.log('subscribing to group', groupId, pubKey);
           PubSub.subscribe({ authors: [pubKey], kinds: [4], '#p': [pubKey] }, async (event) => {
             const decrypted = await nip04.decrypt(data.key, pubKey, event.content);
             const innerEvent = this.getEventFromText(decrypted);
@@ -497,7 +495,6 @@ const Events = {
               innerEvent.tags[0][1] === pubKey
             ) {
               innerEvent.text = innerEvent.content;
-              console.log('saving innerEvent', innerEvent);
               this.saveDMToLocalState(innerEvent, localState.get('groups').get(groupId));
             }
           });
