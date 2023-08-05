@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useLayoutEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { QrCodeIcon } from '@heroicons/react/24/solid';
@@ -24,7 +24,7 @@ import { addGroup, sendSecretInvite } from './NewChat';
 export type DecryptedEvent = Event & { text?: string };
 
 function ChatMessages({ id }) {
-  const ref = useRef(null);
+  const ref = useRef(null as any);
   const messages = useRef(new SortedMap<string, DecryptedEvent>('created_at'));
   const [sortedMessages, setSortedMessages] = useState([] as any[]);
   const [stickToBottom, setStickToBottom] = useState(true);
@@ -48,11 +48,11 @@ function ChatMessages({ id }) {
     const center = $('<div>')
       .css({ position: 'fixed', top: 70, 'text-align': 'center' })
       .attr('id', 'floating-day-separator')
-      .width($('#message-view').width())
+      .width($(ref.current).width())
       .append(s);
     $('#floating-day-separator').remove();
     setTimeout(() => s.fadeOut(), 2000);
-    $('#message-view').prepend(center);
+    $(ref.current).prepend(center);
   };
 
   const onClickSecretInvite = () => {
@@ -61,7 +61,7 @@ function ChatMessages({ id }) {
   };
 
   const toggleScrollDownBtn = () => {
-    const el = $('#message-view');
+    const el = $(ref.current);
     const scrolledToBottom = el[0].scrollHeight - el.scrollTop() <= el.outerHeight() + 200;
     if (scrolledToBottom) {
       $('#scroll-down-btn:visible').fadeOut(150);
@@ -89,9 +89,8 @@ function ChatMessages({ id }) {
   };
 
   const scrollDown = () => {
-    Helpers.scrollToMessageListBottom();
-    const el = document.getElementById('message-list');
-    el && (el.style.paddingBottom = '0');
+    const el = ref.current;
+    el?.scrollTo({ top: el.scrollHeight });
   };
 
   const renderMainView = () => {
@@ -142,11 +141,11 @@ function ChatMessages({ id }) {
 
       mainView = (
         <div
+          ref={ref}
           className="main-view p-2 overflow-y-auto overflow-x-hidden flex flex-col flex-grow h-full"
-          id="message-view"
           onScroll={() => onMessageViewScroll()}
         >
-          <div id="message-list" className="w-full flex flex-col items-center justify-end">
+          <div className="w-full flex flex-col items-center justify-end">
             {msgListContent}
             <div className="italic my-2 text-neutral-500 w-full text-center justify-self-center">
               <Show when={isGroup && keyPair}>
@@ -225,6 +224,20 @@ function ChatMessages({ id }) {
     );
   };
 
+  // on ref.current height change scroll down. TODO only if stickToBottom
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (el) {
+      const observer = new ResizeObserver(() => {
+        scrollDown();
+      });
+      observer.observe(el);
+      return () => {
+        observer.disconnect();
+      };
+    }
+  });
+
   useEffect(() => {
     const hexId = Key.toNostrHexAddress(id);
     const subscribePrivate = (hexId) => {
@@ -279,11 +292,11 @@ function ChatMessages({ id }) {
       subscribeGroup();
     }
 
-    const container = document.getElementById('message-list');
-    if (container) {
-      const el = $('#message-view');
+    const el = $(ref.current);
+    if (el) {
       el.off('scroll').on('scroll', () => {
-        const scrolledToBottom = el[0].scrollHeight - el.scrollTop() == el.outerHeight();
+        const scrolledToBottom = el.scrollTop() + el.innerHeight() >= el[0].scrollHeight;
+        console.log('scrolledToBottom', scrolledToBottom);
         if (stickToBottom && !scrolledToBottom) {
           setStickToBottom(false);
         } else if (!stickToBottom && scrolledToBottom) {
@@ -312,7 +325,7 @@ function ChatMessages({ id }) {
       <Helmet>
         <title>{'Messages'}</title>
       </Helmet>
-      <div id="chat-main" ref={ref} className={`${id ? '' : 'hidden'} flex flex-1 flex-col`}>
+      <div className={`${id ? '' : 'hidden'} flex flex-1 flex-col`}>
         {renderMainView()}
         <Show when={id && id.length > 4}>{renderMsgForm()}</Show>
       </div>
