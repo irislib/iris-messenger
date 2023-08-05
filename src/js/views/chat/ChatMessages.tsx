@@ -171,7 +171,9 @@ function ChatMessages({ id }) {
                   />
                 </div>
                 <Show when={showQr}>
-                  <QrCode data={'nostr:' + formatPrivateKey()} />
+                  <div className="mt-4">
+                    <QrCode data={'nostr:' + formatPrivateKey()} />
+                  </div>
                 </Show>
               </Show>
               <Show when={!isGroup && Key.toNostrHexAddress(id) !== myPub}>

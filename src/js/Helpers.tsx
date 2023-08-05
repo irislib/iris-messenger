@@ -306,7 +306,7 @@ export default {
       });
     }
 
-    // Spotify album
+    // SpotifyTrack album
     if (settings.enableSpotify !== false) {
       const spotifyRegex =
         /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/album\/)([\w-]+)(?:\S+)?/g;
@@ -327,7 +327,7 @@ export default {
       });
     }
 
-    // Spotify playlist
+    // SpotifyTrack playlist
     if (settings.enableSpotify !== false) {
       const spotifyPlaylistRegex =
         /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/playlist\/)([\w-]+)(?:\S+)?/g;
