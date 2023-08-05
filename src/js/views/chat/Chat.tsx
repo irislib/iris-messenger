@@ -52,19 +52,19 @@ class Chat extends View {
     const { id } = this.props;
 
     return (
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-full max-h-screen">
         <Header key={id} activeChat={id} />
         <div className="flex flex-row flex-grow overflow-hidden">
           <div
             className={`flex-shrink-0 ${
-              id ? 'hidden md:flex overflow-y-auto h-screen' : 'flex overflow-y-auto h-screen'
+              id ? 'hidden md:flex overflow-y-auto' : 'flex overflow-y-auto'
             }`}
           >
             <ChatList activeChat={id} className={id ? 'hidden md:flex' : 'flex'} />
           </div>
           <div
             key={`chat-content-${id}`}
-            className={`flex-grow min-h-screen overflow-y-scroll ${
+            className={`flex-grow overflow-y-auto ${
               !id ? 'hidden md:flex' : 'flex'
             }`}
           >

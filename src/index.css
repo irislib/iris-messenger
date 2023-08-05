@@ -54,3 +54,22 @@ img, video {
   word-break: break-word;
   overflow: hidden;
 }
+
+/** Scroll bar settings **/
+* {
+  scrollbar-width: thin;  /* Mozilla specific */
+}
+
+::-webkit-scrollbar {
+  @apply w-2;
+}
+::-webkit-scrollbar-track {
+  /* box-shadow: inset 0 0 5px grey; */
+  @apply bg-neutral-800;
+  @apply rounded-md;
+}
+::-webkit-scrollbar-thumb {
+  /* @apply bg-primary; */
+  @apply bg-neutral-600;
+  @apply rounded-md;
+}
