@@ -39,6 +39,7 @@ import VisGraph from './dwotr/views/VisGraph';
 import VisPath from './dwotr/views/VisPath';
 import Diagnostics from './dwotr/views/Diagnostics';
 import GraphView from './dwotr/views/GraphView';
+import ProfileHistory from './dwotr/views/ProfileHistory';
 
 type Props = Record<string, unknown>;
 
@@ -155,6 +156,7 @@ class Main extends Component<Props, ReactState> {
               <VisPath path="/path/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" /> */}
               <GraphView path="/graph/:npub?/:entitytype?/:dir?/:trusttype?/:view?/:filter?" />
               <Diagnostics path="/diagnostics/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
+              <ProfileHistory path="/history/:id?" />
               {/* <WotView path="/wot/events/:id"  entitytype={EntityType.Item} /> */}
               {/* <Score path="/trustedby/:id" trust1={1} dir="in" title="Trusted by" />
               <Score path="/distrustedby/:id" trust1={-1} dir="in" title="Distrusted by" />

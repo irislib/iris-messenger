@@ -300,6 +300,7 @@ export default {
     verifyNip05 = false,
   ): Unsubscribe {
     const id = ID(address);
+    const hexPub = PUB(id);
     const callback = () => {
       cb?.(this.profiles.get(id), address);
     };
@@ -312,15 +313,32 @@ export default {
         Key.verifyNip05Address(profile.nip05, address).then((isValid) => {
           console.log('NIP05 address is valid?', isValid, profile.nip05, address);
           profile.nip05valid = isValid;
+
+          profileManager.prefixHistory = "SocialNetwork.getProfile()->Key.verifyNip05Address";
+          profileManager.recordHistory(hexPub, "this.profiles.set(id, profile)");
+
           this.profiles.set(id, profile);
           callback();
         });
       }
     } else {
-      profileManager.fetchProfile(address).then((profile) => {
-        if (!profile) return;
-        Events.handle(profile);
-        callback();
+      profileManager.prefixHistory = "SocialNetwork.getProfile()";
+      profileManager.loadProfile(hexPub).then((profile) => {
+        if (profile) {
+          // exists in DB
+          profileManager.prefixHistory = "SocialNetwork.getProfile()->loadProfile()";
+          profileManager.recordHistory(hexPub, "this.profiles.set(id, profile)");
+          this.profiles.set(id, profile);
+          callback();
+        } else {
+          profileManager.prefixHistory = "SocialNetwork.getProfile()";
+          profileManager.fetchProfile(hexPub).then((profile) => {
+            if (!profile) return;
+            profileManager.prefixHistory = "SocialNetwork.getProfile() -> fetchProfile()";
+            Events.handle(profile);
+            callback();
+          });
+        }
       });
       // fetch(`https://api.iris.to/profile/${address}`).then((res) => {
       //   if (res.status === 200) {

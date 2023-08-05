@@ -8,12 +8,13 @@ import SearchBox from '../components/SearchBox';
 import Avatar from '../components/user/Avatar';
 import Name from '../components/user/Name';
 import useCachedFetch from '../hooks/useCachedFetch';
-import { useProfile } from '../hooks/useProfile';
+//import { useProfile } from '../hooks/useProfile';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
+import { useProfile } from '../dwotr/hooks/useProfile';
 
 const SuggestionProfile = memo(({ pubkey }: { pubkey: string }) => {
-  const profile = useProfile(pubkey);
+  const profile = useProfile(pubkey) as any;
   return (
     <Link
       href={`/${nip19.npubEncode(pubkey)}`}

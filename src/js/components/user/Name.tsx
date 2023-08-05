@@ -5,7 +5,6 @@ import { ID } from '../../nostr/UserIds';
 
 import Badge from './Badge';
 import useVerticeMonitor from '../../dwotr/hooks/useVerticeMonitor';
-import profileManager from '../../dwotr/ProfileManager';
 import { useProfile } from '../../dwotr/hooks/useProfile';
 
 type Props = {
@@ -35,7 +34,7 @@ const Name = (props: Props) => {
       <span className={(profile.isDefault ? 'text-neutral-500' : '') + ' ' + wot?.option}>
         {profile.name || profile.display_name || props.placeholder}
       </span>
-      {props.hideBadge ? '' : <Badge pub={props.pub} hexKey={hexKey} />}
+      {props.hideBadge ? '' : <Badge pub={hexKey} />}
     </>
   );
 };

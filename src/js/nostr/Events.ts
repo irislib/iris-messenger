@@ -349,6 +349,7 @@ const Events = {
       // }
 
       //this.insert(event);
+      profileManager.prefixHistory = "Events.handleMetadata";
       let profile = profileManager.addProfileEvent(event); 
       if(profile) return true; 
        
