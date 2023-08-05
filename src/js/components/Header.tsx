@@ -156,7 +156,7 @@ export default class Header extends Component {
             <ChevronDownIcon width={20} />
           </button>
           <dialog id="feed_selector_modal" className="modal focus:outline-none">
-            <ul className="p-2 shadow menu bg-base-100 rounded-box w-52 border-2 border-neutral-900 gap-2">
+            <ul className="modal-box p-2 shadow menu bg-base-100 rounded-box w-52 border-2 border-neutral-900 gap-2">
               <li>
                 <Link className={r === '/' ? 'active' : ''} href="/">
                   {t('follows')}
@@ -168,6 +168,9 @@ export default class Header extends Component {
                 </Link>
               </li>
             </ul>
+            <form method="dialog" className="modal-backdrop">
+              <button>close</button>
+            </form>
           </dialog>
         </Show>
       </div>
