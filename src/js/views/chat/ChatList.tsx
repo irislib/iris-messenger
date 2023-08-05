@@ -74,7 +74,7 @@ const ChatList = ({ activeChat, className }) => {
 
   return (
     <section
-      className={`md:border-r border-neutral-800 overflow-x-hidden overflow-y-auto h-full md:px-0 w-full md:w-64 ${className}`}
+      className={`md:border-r flex flex-shrink-0 border-neutral-800 overflow-x-hidden overflow-y-auto md:px-0 w-full md:w-64 ${className}`}
       ref={chatListRef}
     >
       <div id="enable-notifications-prompt" className="hidden" onClick={enableDesktopNotifications}>
@@ -83,7 +83,7 @@ const ChatList = ({ activeChat, className }) => {
           <a>{t('turn_on_desktop_notifications')}</a>
         </div>
       </div>
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col overflow-y-auto">
         <NewChatButton active={activeChatHex === 'new'} />
         {Array.from<[string, any]>(chats.entries() as any).map(([pubkey, data]) => (
           <ChatListItem
