@@ -433,14 +433,12 @@ const Events = {
       // also save to localState, so we don't have to decrypt every time?
       const innerEvent = JSON.parse(decrypted.slice(decrypted.indexOf('{')));
       if (validateEvent(innerEvent) && verifySignature(innerEvent)) {
-        console.log('innerEvent', innerEvent);
         // parse nsec from message by regex. nsec is bech32 encoded in the message
         // no follow distance check here for now
         const nsec = innerEvent.content.match(/nsec1[023456789acdefghjklmnpqrstuvwxyz]{6,}/gi)?.[0];
         if (nsec) {
           const hexPriv = Key.toNostrHexAddress(nsec);
           if (hexPriv) {
-            console.log('nsec & hexpriv');
             // TODO browser notification?
             addGroup(hexPriv, false, innerEvent.pubkey); // for some reason, groups don't appear on 1st load after login
             setGroupNameByInvite(hexPriv, innerEvent.pubkey);
