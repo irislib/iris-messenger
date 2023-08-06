@@ -1,21 +1,22 @@
 import { useState } from 'react';
 
+import Show from '../helpers/Show';
 import Modal from '../modal/Modal';
 import SafeImg from '../SafeImg';
 
 import Embed from './index';
-import Show from "../helpers/Show";
 
 const Image: Embed = {
   regex: /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg|webp)(?:\?\S*)?)/gi,
-  component: ({ match, key }) => {
+  settingsKey: 'enableImages',
+  component: ({ match }) => {
     const [showModal, setShowModal] = useState(false);
     const onClick = (e) => {
       e.stopPropagation();
       setShowModal(true);
     };
     return (
-      <div key={key}>
+      <div>
         <div className="relative w-full overflow-hidden object-contain my-2">
           <SafeImg
             onClick={onClick}

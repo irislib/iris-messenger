@@ -4,9 +4,9 @@ import Embed from './index';
 
 const Hashtag: Embed = {
   regex: /(?<=\s|^)(#\w+)/g,
-  component: ({ match, key }) => {
+  component: ({ match }) => {
     return (
-      <Link key={key} href={`/search/${encodeURIComponent(match)}`} className="link">
+      <Link href={`/search/${encodeURIComponent(match)}`} className="link">
         {' '}
         {match}{' '}
       </Link>

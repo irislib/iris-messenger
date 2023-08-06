@@ -1,6 +1,5 @@
 import Key from '../../../nostr/Key';
 import EventComponent from '../../events/EventComponent';
-
 import Embed from '../index';
 
 const eventRegex =
@@ -8,9 +7,9 @@ const eventRegex =
 
 const NostrUser: Embed = {
   regex: eventRegex,
-  component: ({ match, key }) => {
+  component: ({ match }) => {
     const hex = Key.toNostrHexAddress(match.replace('@', ''))!;
-    return <EventComponent key={key} id={hex} asInlineQuote={true} />;
+    return <EventComponent id={hex} asInlineQuote={true} />;
   },
 };
 

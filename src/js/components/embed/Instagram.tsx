@@ -2,11 +2,11 @@ import Embed from './index';
 
 const Instagram: Embed = {
   regex: /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com\/)((?:p|reel)\/[\w-]{11})(?:\S+)?/g,
-  component: ({ match, key }) => {
+  settingsKey: 'enableInstagram',
+  component: ({ match }) => {
     return (
       <iframe
         className="instagram"
-        key={key}
         width="650"
         height="400"
         style={{ maxWidth: '100%' }}

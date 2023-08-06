@@ -1,8 +1,8 @@
 import Embed from '../index';
 
-const SpotifyPlaylist: Embed = {
+const AppleMusic: Embed = {
   regex: /(?:https?:\/\/)(?:.*?)(music\.apple\.com\/.*)/gi,
-  settingsKey: 'enableSpotify',
+  settingsKey: 'enableAppleMusic',
   component: ({ match }) => {
     return (
       <iframe
@@ -20,4 +20,4 @@ const SpotifyPlaylist: Embed = {
   },
 };
 
-export default SpotifyPlaylist;
+export default AppleMusic;

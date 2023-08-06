@@ -4,10 +4,10 @@ import Embed from './index';
 
 const Url: Embed = {
   regex: /(https?:\/\/[^\s]+)/g,
-  component: ({ match, key }) => {
+  component: ({ match }) => {
     const url = match.replace(/^(https:\/\/)?iris.to/, '');
     return (
-      <Link key={key} className="link" target="_blank" href={url}>
+      <Link className="link" target="_blank" href={url}>
         {match.replace(/^https?:\/\//, '').replace(/\/$/, '')}
       </Link>
     );

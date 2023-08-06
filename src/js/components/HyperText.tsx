@@ -2,7 +2,12 @@ import { memo } from 'react';
 import reactStringReplace from 'react-string-replace';
 import { Event } from 'nostr-tools';
 
+import localState from '../LocalState';
+
 import { allEmbeds, textEmbeds } from './embed';
+
+let settings: any = {};
+localState.get('settings').on((s) => (settings = s));
 
 const HyperText = memo(
   ({ children, event, textOnly }: { children: string; event?: Event; textOnly?: boolean }) => {
@@ -11,6 +16,7 @@ const HyperText = memo(
     const embeds = textOnly ? textEmbeds : allEmbeds;
 
     embeds.forEach((embed) => {
+      if (settings[embed.settingsKey || ''] === false) return;
       processedChildren = reactStringReplace(processedChildren, embed.regex, (match, i) => {
         return embed.component({
           match,

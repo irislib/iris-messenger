@@ -11,13 +11,13 @@ import { ID } from '../../nostr/UserIds';
 import { translate as t } from '../../translations/Translation.mjs';
 import Follow from '../buttons/Follow';
 import Show from '../helpers/Show';
+import HyperText from '../HyperText';
 
 import Avatar from './Avatar';
 import ProfileDropdown from './Dropdown';
 import Name from './Name';
 import ProfilePicture from './ProfilePicture';
 import Stats from './Stats';
-import HyperText from "../HyperText";
 
 const ProfileCard = (props: { hexPub: string; npub: string }) => {
   const { hexPub, npub } = props;

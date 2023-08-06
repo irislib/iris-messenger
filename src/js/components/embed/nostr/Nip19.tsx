@@ -3,21 +3,20 @@ import { Link } from 'preact-router';
 
 import EventComponent from '../../events/EventComponent';
 import Name from '../../user/Name';
-
 import Embed from '../index';
 
 const nip19Regex = /\bnostr:(n(?:event|profile)1\w+)\b/g;
 
 const NostrUser: Embed = {
   regex: nip19Regex,
-  component: ({ match, key }) => {
+  component: ({ match }) => {
     try {
       const { type, data } = nip19.decode(match);
       if (type === 'nprofile') {
         return (
           <>
             {' '}
-            <Link key={key} className="text-iris-blue hover:underline" href={`/${data.pubkey}`}>
+            <Link className="text-iris-blue hover:underline" href={`/${data.pubkey}`}>
               <Name pub={data.pubkey} />
             </Link>
           </>
@@ -25,7 +24,7 @@ const NostrUser: Embed = {
       } else if (type === 'nevent') {
         // same as note
         return (
-          <div key={key} className="rounded-lg border border-gray-500 my-2">
+          <div className="rounded-lg border border-gray-500 my-2">
             <EventComponent id={data.id} asInlineQuote={true} />
           </div>
         );
@@ -33,7 +32,7 @@ const NostrUser: Embed = {
     } catch (e) {
       console.log(e);
     }
-    return <span key={key}>{match}</span>;
+    return <span>{match}</span>;
   },
 };
 

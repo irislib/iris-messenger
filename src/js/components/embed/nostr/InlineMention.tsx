@@ -5,14 +5,13 @@ import { Link } from 'preact-router';
 
 import EventComponent from '../../events/EventComponent';
 import Name from '../../user/Name';
-
 import Embed from '../index';
 
 const fail = (s: string) => `#[${s}]`;
 
 const InlineMention: Embed = {
   regex: /#\[([0-9]+)]/g,
-  component: ({ match, index, event, key }) => {
+  component: ({ match, index, event }) => {
     if (!event?.tags) {
       console.log('no tags', event);
       return <>{fail(match)}</>;
@@ -25,7 +24,7 @@ const InlineMention: Embed = {
     const [type, id] = tag;
     if (type === 'p') {
       return (
-        <Link key={key} href={`/${nip19.npubEncode(id)}`} className="link">
+        <Link href={`/${nip19.npubEncode(id)}`} className="link">
           <Name pub={id} hideBadge={true} />
         </Link>
       );

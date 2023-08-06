@@ -2,12 +2,12 @@ import Embed from '../index';
 
 const SpotifyTrack: Embed = {
   regex: /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/track\/)([\w-]+)(?:\S+)?/g,
-  component: ({ match, key }) => {
+  settingsKey: 'enableSpotify',
+  component: ({ match }) => {
     return (
       <iframe
         className="audio"
         scrolling="no"
-        key={key}
         width="650"
         height="200"
         style={{ maxWidth: '100%' }}

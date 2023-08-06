@@ -1,17 +1,19 @@
 import Embed from '../index';
 
-const SpotifyPlaylist: Embed = {
+const ApplePodcast: Embed = {
   regex: /(?:https?:\/\/)(?:.*?)(music\.apple\.com\/.*)/gi,
-  settingsKey: 'enableSpotify',
+  settingsKey: 'enableAppleMusic',
   component: ({ match }) => {
+    const cssClass = match.includes('?i=') ? 'applepodcast-small' : 'applepodcast-large';
     return (
       <iframe
-        className="applemusic"
+        // class="applepodcast"
+        className={cssClass}
         scrolling="no"
         width="650"
-        height="150"
+        height="175"
         style={{ maxWidth: '100%' }}
-        src={`https://embed.music.apple.com/${match}`}
+        src={`https://embed.${match}`}
         frameBorder="0"
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
@@ -20,4 +22,4 @@ const SpotifyPlaylist: Embed = {
   },
 };
 
-export default SpotifyPlaylist;
+export default ApplePodcast;

@@ -9,8 +9,8 @@ import Key from '../nostr/Key';
 import { DecryptedEvent } from '../views/chat/ChatMessages';
 
 import Name from './user/Name';
+import HyperText from './HyperText';
 import Torrent from './Torrent';
-import HyperText from "./HyperText";
 
 type Props = {
   event: DecryptedEvent;

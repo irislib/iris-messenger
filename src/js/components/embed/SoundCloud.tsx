@@ -3,10 +3,10 @@ import Embed from './index';
 const SoundCloud: Embed = {
   regex:
     /(?:https?:\/\/)?(?:www\.)?(soundcloud\.com\/(?!live)[a-zA-Z0-9-_]+\/[a-zA-Z0-9-_]+)(?:\?.*)?/g,
-  component: ({ match, key }) => {
+  settingsKey: 'enableSoundCloud',
+  component: ({ match }) => {
     return (
       <iframe
-        key={key}
         className="audio"
         scrolling="no"
         width="650"

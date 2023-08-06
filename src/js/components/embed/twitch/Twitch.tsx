@@ -1,17 +1,17 @@
 import Embed from '../index';
 
-const SpotifyPlaylist: Embed = {
-  regex: /(?:https?:\/\/)(?:.*?)(music\.apple\.com\/.*)/gi,
-  settingsKey: 'enableSpotify',
+const Twitch: Embed = {
+  regex: /(?:https?:\/\/)?(?:www\.)?(?:twitch\.tv\/videos\/)([\d]+)?/g,
+  settingsKey: 'enableTwitch',
   component: ({ match }) => {
     return (
       <iframe
-        className="applemusic"
+        className="video"
         scrolling="no"
         width="650"
-        height="150"
+        height="400"
         style={{ maxWidth: '100%' }}
-        src={`https://embed.music.apple.com/${match}`}
+        src={`https://player.twitch.tv/?video=${match}&parent=${window.location.hostname}&autoplay=false`}
         frameBorder="0"
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
@@ -20,4 +20,4 @@ const SpotifyPlaylist: Embed = {
   },
 };
 
-export default SpotifyPlaylist;
+export default Twitch;

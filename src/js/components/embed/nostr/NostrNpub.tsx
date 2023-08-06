@@ -1,7 +1,6 @@
 import { Link } from 'preact-router';
 
 import Name from '../../user/Name';
-
 import Embed from '../index';
 
 const pubKeyRegex =
@@ -9,10 +8,10 @@ const pubKeyRegex =
 
 const NostrNpub: Embed = {
   regex: pubKeyRegex,
-  component: ({ match, key }) => {
+  component: ({ match }) => {
     const pub = match.replace('@', '');
     return (
-      <Link key={key} href={`/${pub}`} className="link mr-1">
+      <Link href={`/${pub}`} className="link mr-1">
         <Name pub={pub} hideBadge={true} />
       </Link>
     );
