@@ -195,7 +195,6 @@ export default class Header extends Component {
           <img src="/img/dwotr/logo30.png" style="padding-top:5px" />
           <h1 className="text-3xl">Dpeep</h1>
         </div>
-        <h6>Iris clone with DWoTR</h6>
       </>
     ) : (
       <ArrowLeftIcon width={24} onClick={() => this.backButtonClicked()} />
