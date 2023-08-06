@@ -27,6 +27,7 @@ const DEFAULT_RELAYS = [
   'wss://nos.lol',
   'wss://relay.snort.social',
   'wss://relay.current.fyi',
+  'wss://soloco.nl',
 ];
 
 const SEARCH_RELAYS = ['wss://relay.nostr.band'];
