@@ -2,7 +2,7 @@ import Embed from './index';
 
 const TikTok: Embed = {
   regex: /(?:https?:\/\/)?(?:www\.)?tiktok\.com\/.*?video\/(\d{1,19})/g,
-  settingsKey: 'enableTikTok',
+  settingsKey: 'enableTiktok',
   component: ({ match }) => {
     return (
       <iframe
