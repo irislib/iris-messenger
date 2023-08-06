@@ -11,7 +11,7 @@ const NostrNpub: Embed = {
   component: ({ match }) => {
     const pub = match.replace('@', '');
     return (
-      <Link href={`/${pub}`} className="link mr-1">
+      <Link href={`/${pub}`} className="link mx-1">
         <Name pub={pub} hideBadge={true} />
       </Link>
     );

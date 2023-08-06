@@ -15,8 +15,7 @@ const NostrUser: Embed = {
       if (type === 'nprofile') {
         return (
           <>
-            {' '}
-            <Link className="text-iris-blue hover:underline" href={`/${data.pubkey}`}>
+            <Link className="link mx-1" href={`/${data.pubkey}`}>
               <Name pub={data.pubkey} />
             </Link>
           </>

@@ -24,7 +24,7 @@ const InlineMention: Embed = {
     const [type, id] = tag;
     if (type === 'p') {
       return (
-        <Link href={`/${nip19.npubEncode(id)}`} className="link">
+        <Link href={`/${nip19.npubEncode(id)}`} className="mx-1 link">
           <Name pub={id} hideBadge={true} />
         </Link>
       );
