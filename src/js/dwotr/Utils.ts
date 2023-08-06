@@ -12,3 +12,8 @@ export function sha256(data: string): string {
 export function toTimestamp(date: number = Date.now()) : number {
     return Math.floor(date / 1000);
 }
+
+
+export function hexName(hexPub: string) {
+  return hexPub.slice(0, 4) + '...' + hexPub.slice(-4);	
+}

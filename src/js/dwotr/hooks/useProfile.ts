@@ -1,46 +1,64 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import profileManager from '../ProfileManager';
 import { ID } from '../../nostr/UserIds';
 import ProfileRecord from '../model/ProfileRecord';
-import { TrustScoreEvent } from '../GraphNetwork';
 
 export const ProfileEventName = 'profileEvent';
 
 export class ProfileEvent extends CustomEvent<ProfileRecord> {
   constructor(id: number, item: ProfileRecord) {
-    super(TrustScoreEvent.getEventId(id), { detail: item });
+    super(ProfileEvent.getEventId(id), { detail: item });
   }
 
   static getEventId(id: number): string {
     return ProfileEventName + id;
   }
+
+  static dispatch(id: number, item: ProfileRecord) {
+    document.dispatchEvent(new ProfileEvent(id, item));
+  }
+
+  static add(id: number, callback: (e: any) => void) {
+    document.addEventListener(ProfileEvent.getEventId(id), callback);
+  }
+
+  static remove(id: number, callback: (e: any) => void) {
+    document.removeEventListener(ProfileEvent.getEventId(id), callback);
+  }
+
+
 }
 
 // Address can be of type hex of BECH32
 export const useProfile = (address: string) => {
-  const id = useRef<number>(ID(address));
-  const [profile, setProfile] = useState<ProfileRecord>(
-    profileManager.getCurrentProfile(id.current),
-  );
+
+  console.log('useProfile.address', address)
+
+  const [profile, setProfile] = useState<ProfileRecord>(() => profileManager.getMemoryProfile(ID(address)));
 
   useEffect(() => {
     if (!address) return;
 
+    let mem = profileManager.getMemoryProfile(ID(address));
+    if(profile.created_at != mem.created_at) {
+      setProfile(mem);
+    }
+
     const handleEvent = (e: any) => {
       let p = e.detail as ProfileRecord;
-      if (!p || p.created_at <= profile.created_at) return;
-      setProfile(e.detail);
+      setProfile(prevProfile => {
+        if (!p || p.created_at <= prevProfile.created_at) return prevProfile;
+        return p;
+      });
     };
 
-    let eventID = TrustScoreEvent.getEventId(id.current);
-    window.addEventListener(eventID, handleEvent);
+    ProfileEvent.add(ID(address), handleEvent);
 
-    profileManager.subscribe(address);
+    let unsub = profileManager.subscribe(address);
 
     return () => {
-      // remove the event listener when the component unmounts
-      window.removeEventListener(eventID, handleEvent);
-      profileManager.unsubscribe(address);
+      ProfileEvent.remove(ID(address), handleEvent);
+      unsub?.();
     };
   }, [address]);
 

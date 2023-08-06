@@ -156,7 +156,7 @@ const VisPath = ({ props }: ViewComponentProps) => {
 
       rawNodes.add({
         id: vertice.id,
-        label: profile.name + ` (ID: ${vertice.id})`,
+        label: profile.name,
         image,
         shape: 'circularImage',
       });
@@ -191,24 +191,7 @@ const VisPath = ({ props }: ViewComponentProps) => {
     network.current?.redraw();
   }, [props.filter]);
 
-  // const reset = (selectedId?: number) => {
-  //   let id = selectedId || state?.vId;
-  //   if (!id) return;
-
-  //   // nodes.clear();
-  //   // edges.clear();
-  //   // loadNode(id);
-
-  //   const n = BECH32(id);
-  //   if (n != props.npub) {
-  //     // Only set the npub if it's not equal to the current one
-  //     props.setNpub(n);
-  //   }
-
-  //   // network?.selectNodes([id], true);
-  // };
-
-  const renderScoreResultNumbers = (score: TrustScore) => {
+ const renderScoreResultNumbers = (score: TrustScore) => {
     let result = score?.values();
     if (!result) return null;
 
@@ -260,6 +243,7 @@ const VisPath = ({ props }: ViewComponentProps) => {
         </Link>
       </div>
       <hr className="-mx-2 opacity-10 my-2" />
+      {/* { (displayNodes.length == 0) && (<div className="text-center">{t('No results')}</div>) } */}
       <div className="h-full w-full flex items-stretch justify-center">
         <div className="flex-grow" ref={visJsRef} />
       </div>

@@ -11,7 +11,6 @@ import VisGraph from './VisGraph';
 import { Vertice } from '../model/Graph';
 import { ID } from '../../nostr/UserIds';
 import { debounce } from 'lodash';
-import { number } from '@noble/hashes/_assert';
 
 type GraphViewProps = {
   npub?: string;

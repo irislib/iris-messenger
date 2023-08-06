@@ -11,6 +11,7 @@ import profileManager from '../../dwotr/ProfileManager';
 import { ID } from '../../nostr/UserIds';
 import ProfileRecord from '../../dwotr/model/ProfileRecord';
 import { TrustScoreEvent } from '../../dwotr/GraphNetwork';
+import { ProfileEvent } from '../../dwotr/hooks/useProfile';
 
 type Props = {
   str: unknown;
@@ -27,6 +28,7 @@ type State = {
   activity: string | null;
   avatar: string | null;
   hasError: boolean;
+  created_at: number;
 };
 
 class MyAvatar extends Component<Props, State> {
@@ -45,25 +47,27 @@ class MyAvatar extends Component<Props, State> {
 
     this.handleEvent = (e: any) => {
       let p = e.detail as ProfileRecord;
-      //if (!p || p.created_at <= profile.created_at) return;
+      let created_at = this.state.created_at || 0;
+      if (!p || p.created_at <= created_at) return;
       this.setState({
         picture: p.picture,
         name: p.name,
+        created_at: p.created_at,
       });
     };
   
 
-    let eventID = TrustScoreEvent.getEventId(id);
-    window.addEventListener(eventID, this.handleEvent);
+    ProfileEvent.add(id, this.handleEvent);
 
-    let profile = profileManager.getCurrentProfile(id);
+    let profile = profileManager.getMemoryProfile(id);
+
     this.setState({
       picture: profile.picture,
       name: profile.name,
       avatar: profileManager.createImageUrl(pub, this.props.width),
     });
 
-    profileManager.subscribe(pub);
+    this.unsub = profileManager.subscribe(pub);
 
     this.setState({ activity: null });
   }
@@ -78,11 +82,8 @@ class MyAvatar extends Component<Props, State> {
       return;
     }
 
-    let id = ID(pub);
-    let eventID = TrustScoreEvent.getEventId(id);
-    window.removeEventListener(eventID, this.handleEvent);
-    //this.unsub?.();
-    profileManager.unsubscribe(this.props.str as string);
+    ProfileEvent.remove(ID(pub), this.handleEvent);
+    this.unsub?.();
   }
 
   render() {

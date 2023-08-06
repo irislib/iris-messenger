@@ -22,6 +22,16 @@ export class TrustScoreEvent extends CustomEvent<MonitorItem> {
   static getEventId(id: number): string {
     return TrustScoreEventName + id;
   }
+
+  static registerEvent(id: number, callback: (e: any) => void) {
+    let eventID = TrustScoreEvent.getEventId(id);
+    document.addEventListener(eventID, callback);
+  }
+
+  static unregisterEvent(id: number, callback: (e: any) => void) {
+    let eventID = TrustScoreEvent.getEventId(id);
+    document.removeEventListener(eventID, callback);
+  }
 }
 
 export const TRUST1 = 'trust1';

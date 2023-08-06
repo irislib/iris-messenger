@@ -1,10 +1,9 @@
 import { Event } from 'nostr-tools';
-import AnimalName from '../AnimalName';
 import Events from '../nostr/Events';
 import IndexedDB from '../nostr/IndexedDB';
 import PubSub, { Unsubscribe } from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
-import { BECH32, ID } from '../nostr/UserIds';
+import { ID, PUB } from '../nostr/UserIds';
 import Key from '../nostr/Key';
 import FuzzySearch from '../FuzzySearch';
 import ProfileRecord from './model/ProfileRecord';
@@ -13,12 +12,14 @@ import Identicon from 'identicon.js';
 import OneCallQueue from './Utils/OneCallQueue';
 import storage from './Storage';
 import { ProfileEvent } from './hooks/useProfile';
+import { hexName } from './Utils';
+
 
 class ProfileManager {
   loaded: boolean = false;
   #saveQueue: ProfileRecord[] = [];
   #saving: boolean = false;
-  prefixHistory: string = "";
+  prefixHistory: string = '';
   history: { [key: string]: any } = {};
 
   saveBulk = throttle(() => {
@@ -42,55 +43,67 @@ class ProfileManager {
   }
 
   recordHistory(hexPub: string, name: string) {
-    this.history[hexPub] = this.history[hexPub] || [];
+    // this.history[hexPub] = this.history[hexPub] || [];
 
-    let profile = SocialNetwork.profiles.get(ID(hexPub));
-    let prefix =""
-    
-    if(this.prefixHistory)
-      prefix = this.prefixHistory + " -> ";
+    // let profile = SocialNetwork.profiles.get(ID(hexPub));
+    // let prefix = '';
 
-    let event = {
-       name: prefix+name,
-       isProfileLoaded: profile != undefined,
-       time: Date.now(),
-    }
-    this.history[hexPub].push(event);
-    this.prefixHistory = "";
+    // if (this.prefixHistory) prefix = this.prefixHistory + ' -> ';
+
+    // let event = {
+    //   name: prefix + name,
+    //   isProfileLoaded: profile != undefined,
+    //   time: Date.now(),
+    // };
+    // this.history[hexPub].push(event);
+    this.prefixHistory = '';
   }
 
   async fetchProfile(hexPub: string) {
     try {
-      // Make sure that we only call this once per pub
-      // if (this.#urlcallindex[hexPub]) return undefined;
-      // this.#urlcallindex[hexPub] = true;
-
-      // if (hexPub == 'baf27a4cc4da49913e7fdecc951fd3b971c9279959af62b02b761a043c33384c') {
-      //   console.log('fetchProfile', hexPub, this.#counter++);
-      // }
       this.recordHistory(hexPub, 'fetchProfile');
 
       let url = `https://api.iris.to/profile/${hexPub}`;
 
-      // let res = await OneCallQueue<any>(url, async () => fetch(url));
-      let res = await fetch(url);
+      let { data } = await OneCallQueue<any>(url, async () => {
+        // Fetch the resource and return the response body as a JSON object
+        let res = await fetch(url);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        if (res && res.status === 200) {
+          let data = await res.json();
+          this.recordHistory(hexPub, 'fetchProfile->Dataloaded');
+          return { res,  data };
+        }
+        return { res, data: undefined };
+      });
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
-      if (res && res.status === 200) {
-        //console.log('fetchProfile success', npub);
-        let data = await res.json();
-        this.recordHistory(hexPub, 'fetchProfile->Dataloaded');
-        return data;
-      }
-
-      //console.log('fetchProfile failed', npub, res.status, res.statusText);
-      return undefined;
+      return data;
     } catch (error: any) {
       console.log('There was a problem with the fetch operation: ' + error.message);
     }
+  }
+
+  async loadProfiles(addresses: Set<string>): Promise<ProfileRecord[]> {
+    return await storage.profiles.where('key').anyOf(Array.from(addresses)).toArray();
+  }
+
+  async loadProfile(hexPub: string): Promise<ProfileRecord | undefined> {
+    this.recordHistory(hexPub, 'loadProfile');
+
+    let profile = await OneCallQueue<ProfileRecord>(`loadProfile${hexPub}`, async () => {
+      this.recordHistory(hexPub, 'loadProfile->Storage loading data now');
+      return storage.profiles.get({ key: hexPub });
+    });
+
+    this.recordHistory(hexPub, 'loadProfile->Dataloaded');
+    if(profile?.isDefault) {
+      this.recordHistory(hexPub, 'Dataloaded with default profile :(');
+      return undefined;
+    }
+
+    return profile;
   }
 
   getProfile(
@@ -99,10 +112,9 @@ class ProfileManager {
     verifyNip05 = false,
   ): Unsubscribe {
     const hexPub = Key.toNostrHexAddress(address) as string;
-    const npub = Key.toNostrBech32Address(address, 'npub') as string;
     const id = ID(hexPub);
 
-    this.prefixHistory = "getProfile";
+    this.prefixHistory = 'getProfile';
 
     const callback = () => {
       cb?.(SocialNetwork.profiles.get(id), hexPub);
@@ -117,7 +129,9 @@ class ProfileManager {
         Key.verifyNip05Address(profile.nip05, address).then((isValid) => {
           console.log('NIP05 address is valid?', isValid, profile.nip05, address);
           profile.nip05valid = isValid;
-          SocialNetwork.profiles.set(id, profile);
+
+          this.dispatchProfile(profile);
+          //SocialNetwork.profiles.set(id, profile);
           callback();
         });
       }
@@ -136,8 +150,8 @@ class ProfileManager {
             // TODO verify sig
             if (this.isProfileNewer(profile))
               // but is it newer?
-              this.prefixHistory = "getProfile->fetchProfile->isProfileNewer"
-              this.addProfileEvent(profile);
+              this.prefixHistory = 'getProfile->fetchProfile->isProfileNewer';
+            this.addProfileEvent(profile);
 
             callback();
           });
@@ -151,7 +165,7 @@ class ProfileManager {
     }
 
     if (!profile) {
-      profile = this.createDefaultProfile(npub);
+      profile = this.createDefaultProfile(hexPub);
       SocialNetwork.profiles.set(id, profile);
       callback();
     }
@@ -242,35 +256,10 @@ class ProfileManager {
     return PubSub.subscribe({ kinds: [0], authors }, callback, false);
   }
 
-  async loadProfiles(addresses: Set<string>): Promise<ProfileRecord[]> {
-    return await storage.profiles.where('key').anyOf(Array.from(addresses)).toArray();
-    // if (!list) return undefined;
-    // const profiles = list.map((p) => this.addProfileToMemory(p));
-    // return profiles;
-  }
 
-  async loadProfile(hexPub: string): Promise<ProfileRecord | undefined> {
-    // Make sure that we only call this once per pub
-    // if (this.#dbcallindex[hexPub]) return undefined;
-    // this.#dbcallindex[hexPub] = true;
-
-    // if (hexPub == 'baf27a4cc4da49913e7fdecc951fd3b971c9279959af62b02b761a043c33384c') {
-    //   console.log('fetchProfile', hexPub, this.#counter++);
-    // }
-    this.recordHistory(hexPub, 'loadProfile');
-
-    let profile = await OneCallQueue<ProfileRecord>(`loadProfile${hexPub}`, 
-    async () => {
-      this.recordHistory(hexPub, 'loadProfile->Storage loading data now');
-      return storage.profiles.get({ key: hexPub });
-      }
-    );
-    this.recordHistory(hexPub, 'loadProfile->Dataloaded');
-
-    return profile;
-  }
 
   saveProfile(profile: ProfileRecord) {
+    if (!profile?.isDefault) return; // don't save default profiles
     this.#saveQueue.push(profile);
     this.saveBulk();
   }
@@ -288,34 +277,48 @@ class ProfileManager {
     console.log('Loaded profiles from DWoTRDB - ' + list.length + ' profiles');
   }
 
-  sanitizeProfile(p: any, npub: string): ProfileRecord {
-    if (!p) p = { name: '', displayName: '', default: false };
+  sanitizeProfile(p: any, hexPub: string): ProfileRecord {
+    if (!p) return this.createDefaultProfile(hexPub);
 
-    let name = p.name?.trim().slice(0, 100) || '';
-    let isDefault = p.name || p.display_name ? false : true;
-    let picture = p.picture;
+    // Make sure we have a name
+    let name = p.name || p.username || p.display_name || p.displayName || p.nip05 || p.lud16 || p.lud06; // Find a name
+    name = p.name?.trim().slice(0, 100) || ''; // Trim and limit to 100 chars
 
-    if (!name) {
-      name = AnimalName(Key.toNostrBech32Address(npub, 'npub') || npub);
-    }
+    // Make sure we have a display name
+    let display_name = p.display_name || p.displayName;
 
-    let display_name = p.display_name?.trim().slice(0, 100) || name;
+    // Make sure that we don't store large values
+    display_name = p.display_name?.trim().slice(0, 200);
+    let about = p.about.trim().slice(0, 10000);
+    let picture = p.picture?.trim().slice(0, 4096);
+    let banner = p.banner?.trim().slice(0, 4096);
+    let website = p.website?.trim().slice(0, 4096);
+    let nip05 = p.nip05?.trim().slice(0, 4096);
+    let lud06 = p.lud06?.trim().slice(0, 4096);
+    let lud16 = p.lud16?.trim().slice(0, 4096);
 
     let profile = {
       ...p,
-      key: npub,
+      key: hexPub,
       name,
-      //displayName: display_name,
       display_name,
+      about,
       picture,
-      isDefault,
+      banner,
+      website,
+      nip05,
+      lud06,
+      lud16,
     } as ProfileRecord;
 
     return profile;
   }
 
-  createDefaultProfile(npub: string): ProfileRecord {
-    let profile = this.sanitizeProfile({}, npub);
+  createDefaultProfile(hexPub: string): ProfileRecord {
+    let profile = new ProfileRecord();
+    profile.key = hexPub;
+    profile.name = hexName(hexPub);
+    profile.isDefault = true;
     return profile;
   }
 
@@ -323,23 +326,22 @@ class ProfileManager {
     if (!id) return undefined;
     const profile = SocialNetwork.profiles.get(id);
     if (profile) return profile;
-    return this.createDefaultProfile(BECH32(id));
+    return this.createDefaultProfile(PUB(id));
   }
 
   quickProfile(address: string) {
     const id = ID(address);
     const profile = SocialNetwork.profiles.get(id);
     if (profile) return profile;
-    return this.createDefaultProfile(BECH32(id));
+    return this.createDefaultProfile(PUB(id));
   }
 
-  isProfileNewer(profile: ProfileRecord) {
-    if (!profile || !profile.key) return false;
+  isProfileNewer(profile: ProfileRecord): boolean {
+    if (!profile?.key) return false;
+  
     const existingProfile = SocialNetwork.profiles.get(ID(profile.key));
-    if (existingProfile) {
-      if (profile.created_at <= existingProfile.created_at) return false;
-    }
-    return true;
+  
+    return !existingProfile || (profile.isDefault === false && profile.created_at > existingProfile.created_at);
   }
 
   addProfileToMemory(profile: ProfileRecord) {
@@ -358,7 +360,6 @@ class ProfileManager {
   }
 
   addProfileEvent(event: Event) {
-
     if (!event || !event.pubkey || !event.content) return undefined;
 
     this.recordHistory(event.pubkey, 'addProfileEvent');
@@ -371,11 +372,10 @@ class ProfileManager {
 
       let profile = this.sanitizeProfile(raw, event.pubkey);
 
-      if (!this.isProfileNewer(profile)) return undefined;
-
+      //Always save the profile to DWoTRDB
       this.saveProfile(profile); // Save to DWoTRDB
 
-      this.prefixHistory = "addProfileEvent";
+      this.prefixHistory = 'addProfileEvent';
       return this.addProfileToMemory(profile); // Save to memory
     } catch (e) {
       // Remove the event from IndexedDB if it has an id wich means it was saved there
@@ -409,36 +409,13 @@ class ProfileManager {
 
   subscriptions = new Map<string, any>();
 
-  // load(hexPub: string) {
-  //   this.loadProfile(hexPub).then((profile) => {
-  //     if (profile) {
-  //       // exists in DB
-  //       this.dispatchProfileIfNewer(profile);
-  //     } else {
-  //       // Check if profile is in API
-  //       profileManager.fetchProfile(hexPub).then((data) => {
-  //         // TODO verify sig
-  //         if (!data) return;
-
-  //         let profile = this.addProfileEvent(data);
-  //         if (!profile) return;
-
-  //         this.dispatchProfileIfNewer(profile as ProfileRecord);
-  //       });
-  //     }
-  //   });
-  // }
-
-
-   subscriptionCallback(event: Event) {
-
-    this.recordHistory(event.pubkey, 'subscriptionCallback');
+  subscriptionCallback(event: Event) {
+    profileManager.recordHistory(event.pubkey, 'subscriptionCallback');
     let profile = SocialNetwork.profiles.get(ID(event.pubkey));
-    profileManager.dispatchProfileIfNewer(profile);
-  };
+    profileManager.dispatchProfile(profile);
+  }
 
-
-  subscribe(address: string) : void {
+  subscribe(address: string): Unsubscribe {
     const hexPub = Key.toNostrHexAddress(address) as string;
     const id = ID(hexPub);
 
@@ -446,58 +423,48 @@ class ProfileManager {
 
     if (!profile || profile.isDefault) {
       // Check if profile is in IndexedDB
-      this.prefixHistory ="subscribe()";
+      this.prefixHistory = 'subscribe()';
       this.loadProfile(hexPub).then((profile) => {
         if (profile) {
           // exists in DB
-          this.prefixHistory ="subscribe() -> loadProfile()";
-          this.dispatchProfileIfNewer(profile);
+          this.prefixHistory = 'subscribe() -> loadProfile()';
+          this.dispatchProfile(profile);
         } else {
           // Check if profile is in API
-          this.prefixHistory ="subscribe()";
+          this.prefixHistory = 'subscribe()';
           profileManager.fetchProfile(hexPub).then((data) => {
             // TODO verify sig
             if (!data) return;
 
-            this.prefixHistory = "subscribe() -> fetchProfile() -> addProfileEvent()";
+            this.prefixHistory = 'subscribe() -> fetchProfile() -> addProfileEvent()';
             let profile = this.addProfileEvent(data);
             if (!profile) return;
 
-            this.prefixHistory = "subscribe() -> fetchProfile() -> dispatchProfileIfNewer()";
-            this.dispatchProfileIfNewer(profile as ProfileRecord);
+            this.prefixHistory = 'subscribe() -> fetchProfile() -> dispatchProfileIfNewer()';
+            this.dispatchProfile(profile as ProfileRecord);
           });
         }
       });
     }
 
-    if (this.subscriptions.has(hexPub)) return;
-
-    this.recordHistory(hexPub, 'subscribe to nostr');
-
     // Then subscribe to updates via nostr relays
-    let unsub = PubSub.subscribe({ kinds: [0], authors: [hexPub] }, this.subscriptionCallback, false);
-    this.subscriptions.set(hexPub, unsub);
-  }
-
-  unsubscribe(address: string) {
-    this.recordHistory(address, 'unsubscribe');
-    
-    const unsub = this.subscriptions.get(Key.toNostrHexAddress(address) as string);
-    unsub?.();
-  }
-
-  dispatchProfileIfNewer(profile: ProfileRecord) {
-    if (!profile) return;
-    if (!this.isProfileNewer(profile)) return;
-    this.prefixHistory += "dispatchProfileIfNewer()";
-    this.addProfileToMemory(profile);
-
-    this.dispatchProfile(profile);
+    let unsub = PubSub.subscribe(
+      { kinds: [0], authors: [hexPub] },
+      this.subscriptionCallback,
+      false,
+    );
+    return unsub;
   }
 
   dispatchProfile(profile: ProfileRecord) {
-    let event = new ProfileEvent(ID(profile.key), profile);
-    window.dispatchEvent(event);
+    if (!profile) return;
+    
+    this.prefixHistory += 'dispatchProfileIfNewer()';
+
+    if (this.isProfileNewer(profile))
+      this.addProfileToMemory(profile);
+
+    ProfileEvent.dispatch(ID(profile.key), profile);
   }
 
   // if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
@@ -509,12 +476,12 @@ class ProfileManager {
   //     callback();
   //   });
   // }
-  getCurrentProfile(id: number | undefined) {
+  getMemoryProfile(id: number | undefined) {
     if (!id) return undefined;
     const profile = SocialNetwork.profiles.get(id);
 
     if (profile) return profile;
-    return this.createDefaultProfile(BECH32(id));
+    return this.createDefaultProfile(PUB(id));
   }
 }
 

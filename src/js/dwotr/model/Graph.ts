@@ -25,8 +25,9 @@ export class Vertice {
     score: TrustScore = new TrustScore(); // The score of the vertice, calculated from the trust edges, used to subscribe to updates from relays when the score is positive.
     profile: any = undefined; // The profile of the vertice, used to display the name and avatar of the vertice.
 
-    constructor(id: number) {
+    constructor(id: number, degree: number = UNDEFINED_DEGREE) {
         this.id = id;
+        this.degree = degree;
     }
 }
 

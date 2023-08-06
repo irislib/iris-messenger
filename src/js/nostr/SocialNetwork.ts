@@ -317,7 +317,8 @@ export default {
           profileManager.prefixHistory = "SocialNetwork.getProfile()->Key.verifyNip05Address";
           profileManager.recordHistory(hexPub, "this.profiles.set(id, profile)");
 
-          this.profiles.set(id, profile);
+          //this.profiles.set(id, profile);
+          profileManager.dispatchProfile(profile);
           callback();
         });
       }
@@ -328,7 +329,9 @@ export default {
           // exists in DB
           profileManager.prefixHistory = "SocialNetwork.getProfile()->loadProfile()";
           profileManager.recordHistory(hexPub, "this.profiles.set(id, profile)");
-          this.profiles.set(id, profile);
+
+          profileManager.dispatchProfile(profile);
+          //this.profiles.set(id, profile);
           callback();
         } else {
           profileManager.prefixHistory = "SocialNetwork.getProfile()";

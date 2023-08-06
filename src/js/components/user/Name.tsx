@@ -16,25 +16,16 @@ type Props = {
 
 
 const Name = (props: Props) => {
-  const hexKey = props.hexKey || Key.toNostrHexAddress(props.pub) || '';
+  const profile = useProfile(props.pub);
 
-  //const [profile, setProfile] = useState<any>(() => profileManager.quickProfile(hexKey));
-  const profile = useProfile(hexKey);
-
-  const wot = useVerticeMonitor(ID(hexKey), ['badName', 'neutralName', 'goodName'], '');
-
-  // useEffect(() => {
-  //   return profileManager.getProfile(hexKey, (p) => {
-  //     setProfile(p);
-  //   });
-  // }, [props.pub, props.hexKey]);
+  const wot = useVerticeMonitor(ID(props.pub), ['badName', 'neutralName', 'goodName'], '');
 
   return (
     <>
       <span className={(profile.isDefault ? 'text-neutral-500' : '') + ' ' + wot?.option}>
         {profile.name || profile.display_name || props.placeholder}
       </span>
-      {props.hideBadge ? '' : <Badge pub={hexKey} />}
+      {props.hideBadge ? '' : <Badge pub={props.pub} />}
     </>
   );
 };

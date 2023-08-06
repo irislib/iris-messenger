@@ -9,6 +9,7 @@ import Helpers from '../Helpers';
 import { translate as t } from '../translations/Translation.mjs';
 
 const IRIS_INFO_ACCOUNT = 'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8';
+const KEUTMANN_INFO_ACCOUNT = 'npub1srpfc36pes9urzcnmrev38c9ypewahmggqc56dj7czr4k6zd4qcs4m5mn8';
 
 class About extends Component {
   render() {
@@ -18,8 +19,11 @@ class About extends Component {
         <div className="main-view prose" id="settings">
           <div className="px-2 md:px-4 py-2">
             <h2 className="mt-0">{t('about')}</h2>
-            <p>Iris is like the social networking apps we're used to, but better:</p>
+            <p>Dpeep, building upon the code by <b>Iris.to</b> (<a href="https://github.com/irislib/iris-messenger">Github</a>), introduces a transformative experience in social networking by seamlessly integrating the Decentralized Web of Trust Reputation system:</p>
             <ul>
+              <li>
+                Features the <b>Decentralized Web of Trust Reputation</b> system: a decentralized network that evaluates and displays trust based on each user's unique perspective.
+              </li>
               <li>
                 <b>Accessible.</b> No phone number or signup is required. Just type in your name or
                 alias and go!
@@ -40,11 +44,11 @@ class About extends Component {
                   <ul>
                     <li>
                       <a target="_blank" href="https://iris.to">
-                        iris.to
+                        dpeep.com
                       </a>{' '}
                       (web)
                     </li>
-                    <li>
+                    {/* <li>
                       <a
                         target="_blank"
                         href="https://github.com/irislib/iris-messenger/releases/latest"
@@ -76,16 +80,21 @@ class About extends Component {
                         apk
                       </a>
                       )
-                    </li>
+                    </li> */}
                   </ul>
                 </p>
               </>
             )}
 
-            <h3>Iris docs</h3>
+
+
+            <h3>Docs</h3>
             <p>
               Visit Iris <a href="https://docs.iris.to">docs</a> for features, explanations and
               troubleshooting.
+            </p>
+            <p>
+              Visit Dpeep <a href="https://github.com/DigitalTrustProtocol/DWoTR-Documentation">docs</a> explanations on the Decentralized Web of Trust Reputation system.
             </p>
 
             <h3>Privacy</h3>
@@ -99,14 +108,22 @@ class About extends Component {
               </Link>
               <Follow className="btn btn-neutral btn-sm" id={IRIS_INFO_ACCOUNT} />
             </div>
+            <div className="flex flex-row items-center w-full justify-between py-5">
+              <Link href={`/${KEUTMANN_INFO_ACCOUNT}`} className="flex flex-row items-center gap-2">
+                <Avatar str={KEUTMANN_INFO_ACCOUNT} width={40} />
+                <Name pub={KEUTMANN_INFO_ACCOUNT} placeholder="Iris" />
+              </Link>
+              <Follow className="btn btn-neutral btn-sm" id={KEUTMANN_INFO_ACCOUNT} />
+            </div>
 
-            <p>
+            {/* <p>
               <a href="https://t.me/irismessenger">Telegram</a> channel.
-            </p>
+            </p> */}
 
+            <h3>Released under MIT license</h3>
             <p>
-              Released under MIT license. Code:{' '}
-              <a href="https://github.com/irislib/iris-messenger">Github</a>.
+              Dpeep code:&nbsp;
+              <a href="https://github.com/DigitalTrustProtocol/Dpeep">Github</a>.
             </p>
             <br />
           </div>

@@ -6,6 +6,7 @@ import { EntityType } from "../model/Graph";
 import Key from "../../nostr/Key";
 import SocialNetwork from "../../nostr/SocialNetwork";
 import { ID } from "../../nostr/UserIds";
+import profileManager from "../ProfileManager";
 
 
 export type OnEvent = (
@@ -106,7 +107,7 @@ const WOTPubSub = {
 
             let profile = JSON.parse(event.content) as any;
 
-            SocialNetwork.profiles.set(ID(event.pubkey), profile); 
+            profileManager.addProfileToMemory(profile);
         }
 
         return PubSub.subscribe({ kinds: [0], authors: missingAddresses }, callback, false);

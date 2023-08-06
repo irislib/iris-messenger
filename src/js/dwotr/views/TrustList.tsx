@@ -156,7 +156,7 @@ const TrustList = ({ props }: ViewComponentProps) => {
         <Link href={props.setSearch({ npub: itemNpub })} className="flex flex-1 gap-2">
           <MyAvatar str={itemNpub} width={49} />
           <div>
-            <Name pub={itemNpub} hexKey={itemKey} /> <span className="text-sm">ID {v.id}</span>
+            <Name pub={itemNpub} hexKey={itemKey} />
             <br />
             <span className="text-sm">Degree {degree}</span>
           </div>

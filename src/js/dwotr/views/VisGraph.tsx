@@ -134,7 +134,6 @@ const VisGraph = ({ props }: ViewComponentProps) => {
 
   useEffect(() => {
     let id = ID(props.hexKey);
-    if (!id) return;
 
     setVid(id as number);
 
@@ -172,7 +171,10 @@ const VisGraph = ({ props }: ViewComponentProps) => {
 
   async function loadNode(vId: number) : Promise<DataSetNodes | undefined> {
     let sourceV = graphNetwork.g.vertices[vId] as Vertice;
-    if (!sourceV) return;
+    if (!sourceV) {
+      // Make dummy vertice if it doesn't exist, so we can still render the source node in the graph
+      sourceV = new Vertice(vId, 0);
+    };
 
     let distinctV = {} as { [key: number]: Vertice };
     distinctV[vId] = sourceV; // add the source vertice
@@ -231,7 +233,7 @@ const VisGraph = ({ props }: ViewComponentProps) => {
       //let border = v.degree > MAX_DEGREE ? '#808080' : '#222222';
       let node = {
         id: v.id,
-        label: profile.name + ' (D:' + v.degree + ')',
+        label: profile.name,
         image,
         shape: 'circularImage',
       } as VisNode;
