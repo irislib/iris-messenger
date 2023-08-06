@@ -5,7 +5,7 @@ import _ from 'lodash';
 import throttle from 'lodash/throttle';
 
 import Key from './nostr/Key';
-import { language, translate as t } from './translations/Translation.mjs';
+import { language } from './translations/Translation.mjs';
 import localState from './LocalState';
 
 const emojiRegex =
@@ -232,35 +232,6 @@ export default {
     } catch (e) {
       console.error('bech32ToText failed', e);
       return '';
-    }
-  },
-
-  getRelativeTimeText(date: Date): string {
-    const currentTime = new Date();
-    const timeDifference = Math.floor((currentTime.getTime() - date.getTime()) / 1000);
-    const secondsInAMinute = 60;
-    const secondsInAnHour = 60 * secondsInAMinute;
-    const secondsInADay = 24 * secondsInAnHour;
-
-    if (timeDifference < secondsInAMinute) {
-      return t('now');
-    } else if (timeDifference < secondsInAnHour) {
-      return Math.floor(timeDifference / secondsInAMinute) + 'm';
-    } else if (timeDifference < secondsInADay) {
-      return Math.floor(timeDifference / secondsInAnHour) + 'h';
-    } else {
-      if (date.getFullYear() === currentTime.getFullYear()) {
-        return date.toLocaleDateString(undefined, {
-          month: 'short',
-          day: 'numeric',
-        });
-      } else {
-        return date.toLocaleDateString(undefined, {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        });
-      }
     }
   },
 

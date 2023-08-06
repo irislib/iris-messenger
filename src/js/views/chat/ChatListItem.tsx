@@ -2,9 +2,9 @@ import { memo } from 'react';
 import { route } from 'preact-router';
 
 import Show from '../../components/helpers/Show';
+import RelativeTime from '../../components/RelativeTime';
 import Avatar from '../../components/user/Avatar';
 import Name from '../../components/user/Name';
-import Helpers from '../../Helpers';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
 
@@ -15,10 +15,6 @@ const ChatListItem = ({ chat, active = false, latestMsg = {} as any, name }) => 
       (e.target as HTMLElement).click();
     }
   };
-
-  const time =
-    (latestMsg.created_at && Helpers.getRelativeTimeText(new Date(latestMsg.created_at * 1000))) ||
-    '';
 
   const npub = Key.toNostrBech32Address(chat, 'npub');
 
@@ -42,7 +38,9 @@ const ChatListItem = ({ chat, active = false, latestMsg = {} as any, name }) => 
               <Show when={chat !== Key.getPubKey()}>
                 <Name pub={chat} />
               </Show>
-              <small className="ml-2 latest-time text-neutral-500">{time}</small>
+              <small className="ml-2 latest-time text-neutral-500">
+                <RelativeTime date={new Date(latestMsg.created_at * 1000)} />
+              </small>
             </Show>
           </span>
           <small className="text-neutral-500 truncate">{latestMsg.text}</small>

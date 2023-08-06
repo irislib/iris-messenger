@@ -208,24 +208,6 @@ function ChatMessages({ id }) {
     return mainView;
   };
 
-  const renderMsgForm = () => {
-    return (
-      <>
-        <div className="relative">
-          <div
-            id="scroll-down-btn"
-            style={{ display: 'none' }}
-            className="absolute bottom-1 left-2 p-1.5 rounded-3xl bg-neutral-900 opacity-85 hover:cursor-pointer"
-            onClick={() => scrollDown()}
-          >
-            <ChevronDownIcon width="24" />
-          </div>
-        </div>
-        <ChatMessageForm key={id} activeChat={id} onSubmit={() => scrollDown()} keyPair={keyPair} />
-      </>
-    );
-  };
-
   // on ref.current height change scroll down. TODO only if stickToBottom
   useLayoutEffect(() => {
     const el = ref.current;
@@ -298,7 +280,6 @@ function ChatMessages({ id }) {
     if (el) {
       el.off('scroll').on('scroll', () => {
         const scrolledToBottom = el.scrollTop() + el.innerHeight() >= el[0].scrollHeight;
-        console.log('scrolledToBottom', scrolledToBottom);
         if (stickToBottom && !scrolledToBottom) {
           setStickToBottom(false);
         } else if (!stickToBottom && scrolledToBottom) {
@@ -325,11 +306,28 @@ function ChatMessages({ id }) {
   return (
     <>
       <Helmet>
-        <title>{'Messages'}</title>
+        <title>{t('messages')}</title>
       </Helmet>
       <div className={`${id ? '' : 'hidden'} flex flex-1 flex-col`}>
         {renderMainView()}
-        <Show when={id && id.length > 4}>{renderMsgForm()}</Show>
+        <Show when={id && id.length > 4}>
+          <div className="relative">
+            <div
+              id="scroll-down-btn"
+              style={{ display: 'none' }}
+              className="absolute bottom-1 left-2 p-1.5 rounded-3xl bg-neutral-900 opacity-85 hover:cursor-pointer"
+              onClick={() => scrollDown()}
+            >
+              <ChevronDownIcon width="24" />
+            </div>
+          </div>
+          <ChatMessageForm
+            key={id}
+            activeChat={id}
+            onSubmit={() => scrollDown()}
+            keyPair={keyPair}
+          />
+        </Show>
       </div>
     </>
   );

@@ -11,7 +11,7 @@ localState.get('settings').on((s) => (settings = s));
 
 const HyperText = memo(
   ({ children, event, textOnly }: { children: string; event?: Event; textOnly?: boolean }) => {
-    let processedChildren = [children.trim()];
+    let processedChildren = [children?.trim()] as any[];
 
     const embeds = textOnly ? textEmbeds : allEmbeds;
 
@@ -27,9 +27,19 @@ const HyperText = memo(
       });
     });
 
-    processedChildren = processedChildren.map((x) =>
-      typeof x === 'string' ? x.replace(/^\n+|\n+$/g, '') : x,
-    );
+    processedChildren = processedChildren.map((x, index, array) => {
+      if (typeof x === 'string') {
+        console.log(' array[index + 1]', array[index + 1]);
+        if (index < array.length - 1 && !array[index + 1].props?.href) {
+          x = x.replace(/\n+$/, ''); // Remove trailing newlines if next element is not a link
+        }
+
+        if (index > 0 && !array[index - 1].props?.href) {
+          x = x.replace(/^\n+/, ''); // Remove leading newlines if previous element is not a link
+        }
+      }
+      return x;
+    });
 
     return <>{processedChildren}</>;
   },
