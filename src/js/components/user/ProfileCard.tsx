@@ -11,6 +11,7 @@ import { ID } from '../../nostr/UserIds';
 import { translate as t } from '../../translations/Translation.mjs';
 import Follow from '../buttons/Follow';
 import Show from '../helpers/Show';
+import HyperText from '../HyperText';
 
 import Avatar from './Avatar';
 import ProfileDropdown from './Dropdown';
@@ -197,7 +198,9 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
           </div>
           <Stats address={hexPub} />
           <div className="py-2">
-            <p className="text-sm">{profile.about}</p>
+            <p className="text-sm">
+              <HyperText textOnly={true}>{profile.about?.slice(0, 500)}</HyperText>
+            </p>
             <div className="flex flex-1 flex-row align-center justify-center mt-4">
               <Show when={lightning}>
                 <div className="flex-1">

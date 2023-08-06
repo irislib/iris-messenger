@@ -30,7 +30,6 @@ const Overlay = styled.div<Props>`
 const ModalContentContainer = styled.div<{ width?: string; height?: string }>`
   width: ${(props) => props.width || 'auto'};
   height: ${(props) => props.height || 'auto'};
-  max-height: calc(100% - 40px);
   overflow-y: auto;
   display: flex;
   flex-direction: column;

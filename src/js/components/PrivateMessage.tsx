@@ -9,6 +9,8 @@ import Key from '../nostr/Key';
 import { DecryptedEvent } from '../views/chat/ChatMessages';
 
 import Name from './user/Name';
+import HyperText from './HyperText';
+import RelativeTime from './RelativeTime';
 import Torrent from './Torrent';
 
 type Props = {
@@ -81,11 +83,7 @@ const PrivateMessage = ({ event, selfAuthored, showName, torrentId }: Props) => 
   };
 
   const emojiOnly = text && text.length === 2 && Helpers.isEmoji(text);
-  const formattedText = Helpers.highlightEverything(text || '');
   // TODO opts.onImageClick show image in modal
-
-  const time =
-    typeof event.created_at === 'object' ? event.created_at : new Date(event.created_at * 1000);
 
   const status: any = ''; // this.getSeenStatus();
   const seen = status.seen ? 'text-green-500' : 'text-neutral-500';
@@ -108,10 +106,10 @@ const PrivateMessage = ({ event, selfAuthored, showName, torrentId }: Props) => 
         </div>
         {torrentId && <Torrent torrentId={torrentId} />}
         <div className={`preformatted-wrap text-base ${emojiOnly ? 'text-4xl' : ''}`}>
-          {formattedText}
+          <HyperText event={event}>{text}</HyperText>
         </div>
         <div className={`${selfAuthored ? 'text-right' : 'text-left'} text-xs text-white`}>
-          {event.id ? Helpers.getRelativeTimeText(time) : Helpers.formatTime(time)}
+          <RelativeTime date={new Date(event.created_at * 1000)} />
         </div>
       </div>
     </div>

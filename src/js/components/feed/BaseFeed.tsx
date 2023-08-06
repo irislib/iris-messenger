@@ -16,7 +16,6 @@ import Show from '../helpers/Show';
 import EventList from './EventList';
 import FeedSettings from './FeedSettings';
 import FeedTypeSelector from './FeedTypeSelector';
-import ImageGrid from './ImageGrid';
 import ShowMore from './ShowMore';
 import ShowNewEvents from './ShowNewEvents';
 import { FeedProps, FeedState } from './types';
@@ -417,7 +416,11 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         <Show when={this.state.events.length === 0}>
           <div className="px-2 md:px-4 py-2">{this.props.emptyMessage || t('no_events_yet')}</div>
         </Show>
-        {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
+        {renderAs === 'NoteImage' ? (
+          <div className="grid grid-cols-3 gap-px xl:gap-1">{events}</div>
+        ) : (
+          events
+        )}
         <Show when={displayCount < this.state.events.length}>
           <ShowMore
             onClick={() =>

@@ -6,7 +6,7 @@ import localState from '../../../LocalState';
 import SocialNetwork from '../../../nostr/SocialNetwork';
 import { translate as t } from '../../../translations/Translation.mjs';
 import Show from '../../helpers/Show';
-import ImageModal from '../../modal/Image';
+import HyperText from '../../HyperText';
 import PublicMessageForm from '../../PublicMessageForm';
 import Torrent from '../../Torrent';
 import Reactions from '../buttons/ReactionButtons';
@@ -32,7 +32,6 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta })
   const [translatedText, setTranslatedText] = useState('');
   const [showMore, setShowMore] = useState(false);
   const [name, setName] = useState('');
-  const [showImageModal, setShowImageModal] = useState(false);
 
   useEffect(() => {
     if (standalone) {
@@ -74,16 +73,6 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta })
       ? `${lines.slice(0, MSG_TRUNCATE_LINES).join('\n')}...`
       : text;
 
-  text = Helpers.highlightEverything(text.trim(), event, {
-    showMentionedMessages: !asInlineQuote,
-    onImageClick: (e) => imageClicked(e),
-  });
-
-  function imageClicked(e) {
-    e.preventDefault();
-    setShowImageModal(true);
-  }
-
   function isTooLong() {
     return (
       attachments?.length > 1 ||
@@ -109,7 +98,7 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta })
       </Show>
       <Show when={text?.length > 0}>
         <div className={`preformatted-wrap pb-1 ${emojiOnly && 'text-2xl'}`}>
-          {text}
+          <HyperText event={event}>{text}</HyperText>
           <Show when={translatedText}>
             <p>
               <i>{translatedText}</i>
@@ -146,12 +135,6 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta })
           autofocus={!standalone}
           replyingTo={event.id}
           placeholder={t('write_your_reply')}
-        />
-      </Show>
-      <Show when={showImageModal}>
-        <ImageModal
-          images={attachments?.map((a) => a.data)}
-          onClose={() => setShowImageModal(false)}
         />
       </Show>
     </div>

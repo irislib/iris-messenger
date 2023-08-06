@@ -1,4 +1,4 @@
-const t = (key: string) => key; // TODO translate
+import { translate as t } from '../translations/Translation.mjs';
 
 export default function RelativeTime({ date }: { date: Date }) {
   const currentTime = new Date();

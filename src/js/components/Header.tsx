@@ -1,3 +1,4 @@
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { Cog8ToothIcon, HeartIcon } from '@heroicons/react/24/outline';
 import { ArrowLeftIcon, HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { Link, route } from 'preact-router';
@@ -12,6 +13,12 @@ import { translate as t } from '../translations/Translation.mjs';
 import Show from './helpers/Show';
 import Name from './user/Name';
 import SearchBox from './SearchBox';
+
+declare global {
+  interface Window {
+    feed_selector_modal: any;
+  }
+}
 
 export default class Header extends Component {
   userId = null as string | null;
@@ -40,7 +47,7 @@ export default class Header extends Component {
   }
 
   setTitle(activeRoute: string) {
-    let title: any = activeRoute.split('/')[1] || t('home');
+    let title: any = activeRoute.split('/')[1] || t('follows');
     if (title.startsWith('note')) {
       title = t('post');
     } else if (title.startsWith('npub')) {
@@ -130,13 +137,42 @@ export default class Header extends Component {
   }
 
   renderTitle() {
-    const isHome = this.state.activeRoute === '/';
+    const r = this.state.activeRoute;
+    const isFeed = ['/', '/global'].includes(r);
     return (
       <div
-        className={`flex-1 text-center ${isHome ? 'invisible md:visible' : ''}`}
+        className={`flex flex-1 items-center justify-center`}
         onClick={() => this.onTitleClicked()}
       >
         {this.state.title}
+        <Show when={isFeed}>
+          <button
+            className="ml-2 focus:outline-none rounded-full p-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.feed_selector_modal.showModal();
+            }}
+          >
+            <ChevronDownIcon width={20} />
+          </button>
+          <dialog id="feed_selector_modal" className="modal focus:outline-none">
+            <ul className="modal-box p-2 shadow menu bg-base-100 rounded-box w-52 border-2 border-neutral-900 gap-2">
+              <li>
+                <Link className={r === '/' ? 'active' : ''} href="/">
+                  {t('follows')}
+                </Link>
+              </li>
+              <li>
+                <Link className={r === '/global' ? 'active' : ''} href="/global">
+                  {t('global_feed')}
+                </Link>
+              </li>
+            </ul>
+            <form method="dialog" className="modal-backdrop">
+              <button>close</button>
+            </form>
+          </dialog>
+        </Show>
       </div>
     );
   }

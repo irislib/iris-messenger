@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { Link } from 'preact-router';
 
-import Helpers from '../../../Helpers';
 import Key from '../../../nostr/Key';
 import Show from '../../helpers/Show';
+import RelativeTime from '../../RelativeTime';
 import Name from '../../user/Name';
 import EventDropdown from '../EventDropdown';
 
@@ -42,7 +42,7 @@ const Author = ({ event, fullWidth, isQuote, standalone, setTranslatedText }) =>
               className="tooltip"
               data-tip={`${dateStr} ${timeStr}`}
             >
-              {time && Helpers.getRelativeTimeText(time)}
+              <RelativeTime date={time} />
             </Link>
           </small>
         </div>

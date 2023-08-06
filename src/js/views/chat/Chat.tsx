@@ -64,9 +64,7 @@ class Chat extends View {
           </div>
           <div
             key={`chat-content-${id}`}
-            className={`flex-grow overflow-y-auto ${
-              !id ? 'hidden md:flex' : 'flex'
-            }`}
+            className={`flex-grow overflow-y-auto ${!id ? 'hidden md:flex' : 'flex'}`}
           >
             {this.renderContent(id)}
           </div>
