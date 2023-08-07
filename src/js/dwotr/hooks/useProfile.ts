@@ -32,12 +32,13 @@ export class ProfileEvent extends CustomEvent<ProfileRecord> {
 // Address can be of type hex of BECH32
 export const useProfile = (address: string) => {
 
-  console.log('useProfile.address', address)
+  //console.log('dwotr.useProfile.address', address)
 
   const [profile, setProfile] = useState<ProfileRecord>(() => profileManager.getMemoryProfile(ID(address)));
 
   useEffect(() => {
     if (!address) return;
+    console.log('dwotr.useProfile.mount', address);
 
     let mem = profileManager.getMemoryProfile(ID(address));
     if(profile.created_at != mem.created_at) {
@@ -57,6 +58,7 @@ export const useProfile = (address: string) => {
     let unsub = profileManager.subscribe(address);
 
     return () => {
+      console.log('dwotr.useProfile.unmount', address);
       ProfileEvent.remove(ID(address), handleEvent);
       unsub?.();
     };

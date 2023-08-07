@@ -61,14 +61,16 @@ const defaultOptions = {
   },
 };
 
-
 const VisPath = ({ props }: ViewComponentProps) => {
   const visJsRef = useRef<HTMLDivElement>(null);
   const network = useRef<Network>();
-  const isMounted = useIsMounted();
-  const [state, setState] = useState<any>(null);
+
   const [rawNodes] = useState<DataSetNodes>(new DataSet());
   const [displayNodes] = useState<DataSetNodes>(new DataSet());
+
+  const isMounted = useIsMounted();
+
+  const [state, setState] = useState<any>(null);
   const [edges] = useState<DataSet<any>>(new DataSet());
   const [unsubscribe] = useState<Array<() => void>>([]);
 
@@ -115,7 +117,8 @@ const VisPath = ({ props }: ViewComponentProps) => {
 
     let addresses = vertices.map((v) => PUB(v.id));
 
-    profileManager.getProfiles(addresses, (_) => {
+    profileManager
+      .getProfiles(addresses, (_) => {
         if (!isMounted()) return;
         // All profiles are now ready
 
@@ -125,8 +128,7 @@ const VisPath = ({ props }: ViewComponentProps) => {
       .then((unsub: Unsubscribe) => {
         if (!isMounted()) {
           unsub();
-        } else
-          unsubscribe.push(unsub)
+        } else unsubscribe.push(unsub);
       });
 
     setState((prevState) => ({
@@ -138,7 +140,6 @@ const VisPath = ({ props }: ViewComponentProps) => {
       unsubscribe.forEach((u) => u?.());
     };
   }, [props.npub]);
-
 
   function loadVertices(vertices: Vertice[], paths: Edge[]) {
     for (let vertice of vertices) {
@@ -179,8 +180,6 @@ const VisPath = ({ props }: ViewComponentProps) => {
     filterNodes(rawNodes, displayNodes, props.filter, includes);
   }
 
-
-
   // Implement filter on rawList using the filter property
   useEffect(() => {
     if (rawNodes.length == 0 && displayNodes.length == 0) return;
@@ -191,7 +190,7 @@ const VisPath = ({ props }: ViewComponentProps) => {
     network.current?.redraw();
   }, [props.filter]);
 
- const renderScoreResultNumbers = (score: TrustScore) => {
+  const renderScoreResultNumbers = (score: TrustScore) => {
     let result = score?.values();
     if (!result) return null;
 
@@ -228,22 +227,22 @@ const VisPath = ({ props }: ViewComponentProps) => {
   if (!props.npub) return null;
   return (
     <>
+      {!state?.score && <div className="text-center">{t('No results')}</div>}
+      {state?.score && (
+        <>
       <div className="flex flex-col gap-4">
         <div>Aggregated result of score is {renderScoreResultNumbers(state?.score)}</div>
         <div>{renderScoreResultText(state?.score)}</div>
       </div>
       <hr className="-mx-2 opacity-10 my-2" />
-      <div className="flex flex-wrap gap-4">
-        <Link
-          className="btn btn-primary btn-sm"
-          href={props.setSearch({ view: 'graph' })}
-          // onClick={() => reset(network?.getSelectedNodes()[0] as number)}
-        >
-          {t('Focus')}
-        </Link>
-      </div>
+        <div className="flex flex-wrap gap-4">
+          <Link className="btn btn-primary btn-sm" href={props.setSearch({ view: 'graph' })}>
+            {t('Focus')}
+          </Link>
+        </div>
+        </>
+      )}
       <hr className="-mx-2 opacity-10 my-2" />
-      {/* { (displayNodes.length == 0) && (<div className="text-center">{t('No results')}</div>) } */}
       <div className="h-full w-full flex items-stretch justify-center">
         <div className="flex-grow" ref={visJsRef} />
       </div>

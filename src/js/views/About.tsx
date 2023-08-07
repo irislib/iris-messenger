@@ -19,10 +19,10 @@ class About extends Component {
         <div className="main-view prose" id="settings">
           <div className="px-2 md:px-4 py-2">
             <h2 className="mt-0">{t('about')}</h2>
-            <p>Dpeep, building upon the code by <b>Iris.to</b> (<a href="https://github.com/irislib/iris-messenger">Github</a>), introduces a transformative experience in social networking by seamlessly integrating the Decentralized Web of Trust Reputation system:</p>
+            <p>Dpeep, a clone of the innovative <b>Iris.to</b> (<a href="https://github.com/irislib/iris-messenger">Github</a>), serves as a proof-of-concept project for the integration of the Decentralized Web of Trust Reputation system (DWoTR). Apart from showcasing the unique benefits provided by the DWoTR system, Dpeep does not aim to offer additional significant functionality.</p>
             <ul>
               <li>
-                Features the <b>Decentralized Web of Trust Reputation</b> system: a decentralized network that evaluates and displays trust based on each user's unique perspective.
+                <b>Decentralized Web of Trust Reputation</b> system: a decentralized network that evaluates and displays trust based on each user's unique perspective.
               </li>
               <li>
                 <b>Accessible.</b> No phone number or signup is required. Just type in your name or
