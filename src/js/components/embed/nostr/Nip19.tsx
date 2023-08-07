@@ -22,11 +22,7 @@ const NostrUser: Embed = {
         );
       } else if (type === 'nevent') {
         // same as note
-        return (
-          <div className="rounded-lg border border-gray-500 my-2">
-            <EventComponent id={data.id} asInlineQuote={true} />
-          </div>
-        );
+        return <EventComponent id={data.id} asInlineQuote={true} />;
       }
     } catch (e) {
       console.log(e);
