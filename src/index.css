@@ -82,3 +82,7 @@ img, video {
 .full-width-note > iframe {
   @apply w-[100vw] md:w-full;
 }
+
+html {
+  @apply overflow-y-scroll; /* Always show scrollbar to avoid layout shift */
+}
