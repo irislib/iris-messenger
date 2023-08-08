@@ -61,10 +61,12 @@ const GraphView = (props: GraphViewProps) => {
 
   // State is preserved on route change, when props change
   // Each time props change, we update the state
+
+  const [entitytype, setEntityType] = useState<string>(getEntityType(props.npub));
+
   const [npub, setNpubPrivate] = useState<string>(
     props.npub || (Key.toNostrBech32Address(Key.getPubKey(), 'npub') as string),
   );
-  const [entitytype, setEntityType] = useState<string>(getEntityType(props.npub));
   const [trusttype, setTrustType] = useState<string>(props.trusttype || 'trust');
   const [dir, setDirection] = useState<string>(props.dir || 'out');
   const [view, setView] = useState<string>(props.view || 'graph');
@@ -95,6 +97,7 @@ const GraphView = (props: GraphViewProps) => {
   const setNpub = useCallback((npub: string) => {
     setVertice(graphNetwork.g.vertices[ID(npub)]);
     setNpubPrivate(npub);
+    setEntityType(getEntityType(npub));
   }, []);
 
   // Update the state when the props change

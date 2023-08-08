@@ -79,6 +79,14 @@ class ProfileManager {
     return profile;
   }
 
+  async getProfile(
+    address: string,
+  ): Promise<ProfileRecord> {
+    let result = await this.getProfiles([address]);
+    return result?.[0];
+  }
+
+
   async getProfiles(
     addresses: string[],
   ): Promise<Array<ProfileRecord>> {

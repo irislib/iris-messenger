@@ -16,7 +16,7 @@ const ItemName = (props: Props) => {
   return (
     <>
       <span className={wot?.option}>
-        {`${t('Post')} ${props.hexPub.slice(0, 4)}`}
+        {`${t('note')} ${props.hexPub.slice(0, 4)}`}
       </span>
     </>
   );

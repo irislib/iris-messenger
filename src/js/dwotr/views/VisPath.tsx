@@ -5,7 +5,7 @@ import graphNetwork from '../GraphNetwork';
 import { Edge, Vertice } from '../model/Graph';
 import { RenderTrust1Color } from '../components/RenderGraph';
 import profileManager from '../ProfileManager';
-import { BECH32, ID, PUB } from '../../nostr/UserIds';
+import { BECH32, ID, PUB, UserIds } from '../../nostr/UserIds';
 import { translate as t } from '../../translations/Translation.mjs';
 import TrustScore from '../model/TrustScore';
 import { ViewComponentProps } from './GraphView';
@@ -15,6 +15,8 @@ import Key from '../../nostr/Key';
 import { filterNodes } from './VisGraph';
 import Events from '../../nostr/Events';
 import eventManager from '../EventManager';
+import { Event } from 'nostr-tools';
+import ProfileRecord from '../model/ProfileRecord';
 
 const defaultOptions = {
   layout: {
@@ -88,19 +90,21 @@ export async function loadItemVertice(vertice: Vertice, nodes: DataSetNodes) {
 
   let event = Events.db.by('id',key);
   if (!event) {
-    event = await eventManager.getEventById(key);
+    event = await eventManager.getEventById(key); 
   }
 
-  let profile = profileManager.getDefaultProfile(vertice.id);
-  let text = (event?.content || '').trim().slice(0, 10);
-  let created_at = event?.created_at ? new Date(event?.created_at * 1000).toDateString() : '';
-  let author = profile?.name || '';
+  let profile = await profileManager.getProfile(event?.pubkey);
 
-  let label = `Note\n${text}\n${author}\n${created_at}\n`;
+  let author = profile?.name || '';
+  let shortId = event.id.slice(0, 4);
+  let text = (event?.content || '').trim().slice(0, 25) + (event?.content.length > 25 ? '...' : '');
+  let created_at = event?.created_at ? new Date(event?.created_at * 1000).toDateString() : '';
+
+  let label = `Note ${shortId}\n${author}\n${created_at}\n${text}\n`;
 
   let node = nodes.get(vertice.id);
-  if (node && node.label != label) {
-    node.label = label;
+  if (node) {
+    if(node.label != label) node.label = label;
     return undefined;
   } 
 
@@ -108,6 +112,7 @@ export async function loadItemVertice(vertice: Vertice, nodes: DataSetNodes) {
     id: vertice.id,
     label: label,
     shape: "box",
+    font: {  align: 'left' },
   };
   nodes.add(node);
   return node;
@@ -142,9 +147,12 @@ const VisPath = ({ props }: ViewComponentProps) => {
     network.current.on('click', function (params) {
       if (params.nodes.length == 0) return;
 
-      const vId = params.nodes[0] as number;
+      const selectedId = params.nodes[0] as number;
+      const selectedV = graphNetwork.g.vertices[selectedId] as Vertice;
 
-      props.setNpub(BECH32(vId));
+      //if (vId == state.vId) return;
+      let npub = selectedV.entityType == 1 ? BECH32(selectedId) : Key.toNostrBech32Address(UserIds.pub(selectedId), 'note');
+      props.setNpub(npub as string);
     });
 
     //setNetwork(instance);

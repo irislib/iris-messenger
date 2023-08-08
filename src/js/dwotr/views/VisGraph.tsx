@@ -5,7 +5,7 @@ import graphNetwork from '../GraphNetwork';
 import { Edge, Vertice } from '../model/Graph';
 import { RenderTrust1Color } from '../components/RenderGraph';
 import profileManager from '../ProfileManager';
-import { BECH32, ID, PUB } from '../../nostr/UserIds';
+import { BECH32, ID, PUB, UserIds } from '../../nostr/UserIds';
 import { MAX_DEGREE } from '../model/TrustScore';
 import { translate as t } from '../../translations/Translation.mjs';
 import { ViewComponentProps, parseEntityType } from './GraphView';
@@ -14,6 +14,7 @@ import { Link } from 'preact-router';
 import { useIsMounted } from '../hooks/useIsMounted';
 import { loadItemVertice, loadKeyVertice } from './VisPath';
 import Show from '@/components/helpers/Show';
+import Key from '@/nostr/Key';
 
 const defaultOptions = {
   layout: {
@@ -116,12 +117,17 @@ const VisGraph = ({ props }: ViewComponentProps) => {
       if (params.nodes.length == 0) return;
       if (!isMounted()) return;
 
-      const vId = params.nodes[0] as number;
+      const selectedId = params.nodes[0] as number;
+      const selectedV = graphNetwork.g.vertices[selectedId] as Vertice;
 
-      props.setNpub(BECH32(vId));
+      if (selectedId == vId) return;
 
-      loadNode(vId).then((nodes) => {
-        let includes = new Set<number>([ID(props.hexKey), vId]);
+      let npub = selectedV.entityType == 1 ? BECH32(selectedId) : Key.toNostrBech32Address(UserIds.pub(selectedId), 'note');
+      props.setNpub(npub as string);
+      setVid(selectedId);
+
+      loadNode(selectedId).then((nodes) => {
+        let includes = new Set<number>([ID(props.hexKey), selectedId]);
         if (nodes) filterNodes(nodes, displayNodes, props.filter, includes);
       });
     });
@@ -176,7 +182,8 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     }
 
     let distinctV = {} as { [key: number]: Vertice };
-    distinctV[vId] = sourceV; // add the source vertice
+    if(sourceV.entityType == 1)
+      distinctV[vId] = sourceV; // add the source vertice if it's a user/key
 
     // Add all the in and out edges
     if (props.dir == 'in') {
@@ -217,6 +224,10 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     if (!isMounted()) return; // Check if component is still mounted
 
     let delta = new DataSet() as DataSetNodes; // new nodes to added to the graph and returned to the caller, enables more efficient filtering
+
+    // Add the source node now, after profiles have been loaded!
+    if(sourceV.entityType == 2)
+      vertices.push(sourceV);
 
     // Create nodes in vis
     for (const v of vertices) {
