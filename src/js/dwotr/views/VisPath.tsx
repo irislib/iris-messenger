@@ -95,7 +95,7 @@ export async function loadItemVertice(vertice: Vertice, nodes: DataSetNodes) {
 
   let profile = await profileManager.getProfile(event?.pubkey);
 
-  let author = profile?.name || '';
+  let author = (profile?.name || '').trim().slice(0, 25);
   let shortId = event.id.slice(0, 4);
   let text = (event?.content || '').trim().slice(0, 25) + (event?.content.length > 25 ? '...' : '');
   let created_at = event?.created_at ? new Date(event?.created_at * 1000).toDateString() : '';
