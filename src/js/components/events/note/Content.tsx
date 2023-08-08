@@ -82,7 +82,7 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta, w
   }
 
   return (
-    <div className="flex-grow">
+    <div className={`flex-grow`}>
       <Author
         standalone={standalone}
         event={event}
@@ -97,7 +97,11 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta, w
         <Torrent torrentId={meta.torrentId} autopause={!standalone} />
       </Show>
       <Show when={text?.length > 0}>
-        <div className={`preformatted-wrap pb-1 ${emojiOnly && 'text-2xl'} ${wot?.option}`}>
+        <div
+          className={`preformatted-wrap pb-1 ${emojiOnly && 'text-2xl'} ${
+            fullWidth ? 'full-width-note' : ''
+          } ${asInlineQuote ? 'inline-quote' : ''} ${wot?.option}`}
+        >
           <HyperText event={event}>{text}</HyperText>
           <Show when={translatedText}>
             <p>

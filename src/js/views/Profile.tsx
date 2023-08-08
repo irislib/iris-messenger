@@ -91,13 +91,17 @@ class Profile extends View {
     if (this.props.tab === 'replies') {
       return (
         <Feed
-          key={`replies${this.state.hexPub}`}
-          index="postsAndReplies"
-          nostrUser={this.state.hexPub}
+          key={`posts${this.state.hexPub}`}
+          filterOptions={[{ name: 'likes', filter: { authors: [this.state.hexPub], kinds: [1] } }]}
         />
       );
     } else if (this.props.tab === 'likes') {
-      return <Feed key={`likes${this.state.hexPub}`} index="likes" nostrUser={this.state.hexPub} />;
+      return (
+        <Feed
+          key={`likes${this.state.hexPub}`}
+          filterOptions={[{ name: 'likes', filter: { authors: [this.state.hexPub], kinds: [7] } }]}
+        />
+      );
     } else if (this.props.tab === 'media') {
       return <div>TODO media message feed</div>;
     }
@@ -105,7 +109,10 @@ class Profile extends View {
     return (
       <div>
         {this.getNotification()}
-        <Feed key={`posts${this.state.hexPub}`} index="posts" nostrUser={this.state.hexPub} />
+        <Feed
+          key={`posts${this.state.hexPub}`}
+          filterOptions={[{ name: 'likes', filter: { authors: [this.state.hexPub], kinds: [1] } }]}
+        />
       </div>
     );
   }
