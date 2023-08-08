@@ -48,7 +48,7 @@ export const RenderScoreTrustLink = (
   if (!score || (!forceRender && !score.hasTrustScore())) return null;
   return (
     // <div className="flex-shrink-0">
-      <a href={`/graph/${npub}/key/in/trust/path`} className="cursor-pointer hover:underline" title="Trusts at degree 0/1/2">
+      <a href={`/graph/${npub}/in/trust/path`} className="cursor-pointer hover:underline" title="Trusts at degree 0/1/2">
         {renderTrustCount(score, forceRender)}&nbsp;
         <span className="text-neutral-500">Trusts</span>
       </a>
@@ -64,7 +64,7 @@ export const RenderScoreDistrustLink = (
   if (!score || (!forceRender && !score.hasDistrustScore())) return null;
   return (
     // <div className="flex-shrink-0">
-      <a href={`/graph/${npub}/key/in/distrust/path`} className="cursor-pointer hover:underline" title="Distrusts at degree 0/1/2">
+      <a href={`/graph/${npub}/in/distrust/path`} className="cursor-pointer hover:underline" title="Distrusts at degree 0/1/2">
         {renderDistrustCount(score, forceRender)}&nbsp;
         <span className="text-neutral-500">Distrusts</span>
       </a>

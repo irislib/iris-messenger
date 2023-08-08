@@ -150,17 +150,9 @@ class Main extends Component<Props, ReactState> {
               <Follows path="/follows/:id" />
               <Follows followers={true} path="/followers/:id" />
 
-              {/* <TrustList path="/wot/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?"  />
-              <VisGraph path="/vis/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
-              <VisPath path="/path/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" /> */}
-              <GraphView path="/graph/:npub?/:entitytype?/:dir?/:trusttype?/:view?/:filter?" />
-              <Diagnostics path="/diagnostics/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" />
-              <ProfileHistory path="/history/:id?" />
-              {/* <WotView path="/wot/events/:id"  entitytype={EntityType.Item} /> */}
-              {/* <Score path="/trustedby/:id" trust1={1} dir="in" title="Trusted by" />
-              <Score path="/distrustedby/:id" trust1={-1} dir="in" title="Distrusted by" />
-              <Score path="/trusting/:id" trust1={1} dir="out" title="Trusting" />
-              <Score path="/distrusting/:id" trust1={-1} dir="out" title="Distrusting" /> */}
+              <GraphView path="/graph/:npub?/:dir?/:trusttype?/:view?/:filter?" />
+              {/* <Diagnostics path="/diagnostics/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" /> */}
+              {/* <ProfileHistory path="/history/:id?" /> */}
 
               <NoteOrProfile path="/:id" />
             </Router>

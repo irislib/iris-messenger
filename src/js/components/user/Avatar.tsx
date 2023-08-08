@@ -5,7 +5,7 @@ import Show from '../helpers/Show';
 import SafeImg from '../SafeImg';
 import profileManager from '../../dwotr/ProfileManager';
 import { ID } from '../../nostr/UserIds';
-import ProfileRecord from '../../dwotr/model/ProfileRecord';
+import ProfileRecord, { ProfileMemory } from '../../dwotr/model/ProfileRecord';
 import { ProfileEvent } from '../../dwotr/network/ProfileEvent';
 
 type Props = {
@@ -41,9 +41,9 @@ class MyAvatar extends Component<Props, State> {
     let id = ID(pub);
 
     this.handleEvent = (e: any) => {
-      let p = e.detail as ProfileRecord;
+      let p = e.detail as ProfileMemory;
       let created_at = this.state.created_at || 0;
-      if (!p || p.created_at <= created_at) return;
+      if (!p || p.id != id || p.created_at <= created_at) return;
       this.setState({
         picture: p.picture,
         name: p.name,

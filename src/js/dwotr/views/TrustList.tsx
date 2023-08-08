@@ -24,6 +24,7 @@ import GraphEntityTypeSelect from '../components/GraphEntityTypeSelect';
 import GraphDirectionSelect from '../components/GraphDirectionSelect';
 import GraphTrust1Select from '../components/GraphTrust1Select';
 import { translate as t } from '../../translations/Translation.mjs';
+import Show from '@/components/helpers/Show';
 
 export function filterByName(list: Vertice[], filter: string) {
   if (!filter || list.length == 0) return [...list]; // Return a copy of the list
@@ -143,9 +144,6 @@ const TrustList = ({ props }: ViewComponentProps) => {
       }
     }
 
-    // const outE = graphNetwork.g.edges[v.out[id]] as Edge;
-    // const inE = graphNetwork.g.edges[v.in[id]] as Edge;
-
     return (
       <div key={itemKey} className="flex w-full py-2">
         <div className="flex-0 self-center px-4">
@@ -159,17 +157,6 @@ const TrustList = ({ props }: ViewComponentProps) => {
             <span className="text-sm">Degree {degree}</span>
           </div>
         </Link>
-        {/* <div className="flex flex-1 gap-2">
-          <div className="flex flex-col flex-1 gap-2">
-            <div title={outE && `${RenderTrust1Value(outE.val)} to ${name}`}>
-              {outE && `-> ${RenderTrust1Value(outE.val)}`}
-            </div>
-            <div title={inE && `${RenderTrust1Value(inE.val)} from ${name}`}>
-              {inE && `<- ${RenderTrust1Value(inE.val)}`}{' '}
-            </div>
-          </div>
-        </div> */}
-
         {renderScoreLine(score, itemNpub)}
       </div>
     );
@@ -179,7 +166,9 @@ const TrustList = ({ props }: ViewComponentProps) => {
   return (
     <>
       <div className="flex flex-wrap gap-4">
-        <GraphDirectionSelect dir={props.dir} setSearch={props.setSearch} />
+        <Show when={props.entitytype == "key"}>
+          <GraphDirectionSelect dir={props.dir} setSearch={props.setSearch} />
+        </Show>
         <GraphTrust1Select trusttype={props.trusttype} setSearch={props.setSearch} />
         <GraphEntityTypeSelect
           entitytype={props.entitytype}

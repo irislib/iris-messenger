@@ -1,10 +1,9 @@
-import { DataSetEdges, DataSetNodes, Network, Node as VisNode, Edge as VisEdge } from 'vis-network';
+import { DataSetEdges, DataSetNodes, Network } from 'vis-network';
 import { DataSet } from 'vis-data';
 import { useEffect, useState, useRef } from 'preact/hooks';
 import graphNetwork from '../GraphNetwork';
 import { Edge, Vertice } from '../model/Graph';
 import { RenderTrust1Color } from '../components/RenderGraph';
-import SocialNetwork from '../../nostr/SocialNetwork';
 import profileManager from '../ProfileManager';
 import { BECH32, ID, PUB } from '../../nostr/UserIds';
 import { MAX_DEGREE } from '../model/TrustScore';
@@ -13,6 +12,8 @@ import { ViewComponentProps, parseEntityType } from './GraphView';
 import GraphDirectionSelect from '../components/GraphDirectionSelect';
 import { Link } from 'preact-router';
 import { useIsMounted } from '../hooks/useIsMounted';
+import { loadItemVertice, loadKeyVertice } from './VisPath';
+import Show from '@/components/helpers/Show';
 
 const defaultOptions = {
   layout: {
@@ -28,8 +29,7 @@ const defaultOptions = {
   autoResize: false,
   nodes: {
     borderWidth: 1,
-    size: 30,
-    //shape: "circularImage",
+    shape: "circularImage",
     color: {
       border: '#222222',
       background: '#666666',
@@ -190,24 +190,24 @@ const VisGraph = ({ props }: ViewComponentProps) => {
         let dashes = edge.out.degree > MAX_DEGREE; // Dash the edge line if the out vertice has no degree or above max degree
 
         edges.get(edge.key) ||
-          edges.add({ id: edge.key, from: edge.out.id, to: vId, color, dashes } as VisEdge);
+          edges.add({ id: edge.key, from: edge.out.id, to: vId, color, dashes });
       }
     }
 
-    let entityType = parseEntityType(props.entitytype);
+    let entityTypeId = parseEntityType(props.entitytype);
 
     if (props.dir == 'out') {
       for (const id in sourceV.out) {
         const edge = sourceV.out[id] as Edge;
         if (!edge || edge.val == 0 || !edge.in) continue; // Skip if the edge has no value / neutral
 
-        if (edge.in.entityType != entityType) continue; // Skip if the distination node is not the selected entity type
+        if (edge.in.entityType != entityTypeId) continue; // Skip if the distination node is not the selected entity type
 
         distinctV[edge.in.id] = edge.in;
 
         let color = RenderTrust1Color(edge.val);
         edges.get(edge.key) ||
-          edges.add({ id: edge.key, from: vId, to: edge.in.id, color } as VisEdge);
+          edges.add({ id: edge.key, from: vId, to: edge.in.id, color });
       }
     }
 
@@ -220,20 +220,14 @@ const VisGraph = ({ props }: ViewComponentProps) => {
 
     // Create nodes in vis
     for (const v of vertices) {
-      if (rawNodes.get(v.id as number)) continue; // already added
-
-      const profile = SocialNetwork.profiles.get(v.id);
-      let image = profileManager.ensurePicture(profile);
-
-      //let border = v.degree > MAX_DEGREE ? '#808080' : '#222222';
-      let node = {
-        id: v.id,
-        label: profile.name,
-        image,
-        shape: 'circularImage',
-      } as VisNode;
-
-      rawNodes.add(node);
+      //if (rawNodes.get(v.id as number)) continue; // already added
+      let node: any;
+      if (v.entityType == 1) {
+        node = loadKeyVertice(v, rawNodes);
+      } else {
+        node = await loadItemVertice(v, rawNodes);
+      }
+      if (!node) continue;
       delta.add(node);
     }
 
@@ -268,7 +262,9 @@ const VisGraph = ({ props }: ViewComponentProps) => {
   return (
     <>
       <div className="flex flex-wrap gap-4">
-        <GraphDirectionSelect dir={props.dir} setSearch={props.setSearch} />
+        <Show when={entitytype == "key"}>
+          <GraphDirectionSelect dir={props.dir} setSearch={props.setSearch} />
+        </Show>
         <div className="flex gap-4">&nbsp;</div>
         <div className="flex gap-4">
           <button

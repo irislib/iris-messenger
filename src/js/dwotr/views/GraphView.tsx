@@ -11,10 +11,11 @@ import VisGraph from './VisGraph';
 import { Vertice } from '../model/Graph';
 import { ID } from '../../nostr/UserIds';
 import { debounce } from 'lodash';
+import ItemName from '../components/ItemName';
 
 type GraphViewProps = {
   npub?: string;
-  entitytype?: string;
+  //entitytype?: string;
   trusttype?: string;
   dir?: string;
   filter?: string;
@@ -50,6 +51,10 @@ export function parseEntityType(entityType: string | undefined, defaultEntityTyp
   return defaultEntityType;
 }
 
+function getEntityType(npub: string | undefined) {
+  return npub?.toLocaleLowerCase().startsWith('note') ? 'item' : 'key';
+}
+
 const GraphView = (props: GraphViewProps) => {
   // Create a ref to provide DOM access
   const [state, setState] = useState<any>({ ready: false });
@@ -59,7 +64,7 @@ const GraphView = (props: GraphViewProps) => {
   const [npub, setNpubPrivate] = useState<string>(
     props.npub || (Key.toNostrBech32Address(Key.getPubKey(), 'npub') as string),
   );
-  const [entitytype, setEntityType] = useState<string>(props.entitytype || 'key');
+  const [entitytype, setEntityType] = useState<string>(getEntityType(props.npub));
   const [trusttype, setTrustType] = useState<string>(props.trusttype || 'trust');
   const [dir, setDirection] = useState<string>(props.dir || 'out');
   const [view, setView] = useState<string>(props.view || 'graph');
@@ -95,25 +100,29 @@ const GraphView = (props: GraphViewProps) => {
   // Update the state when the props change
   // Check if the props have changed
   useEffect(() => {
-    if (props.npub != npub) setNpub(props.npub || (Key.toNostrBech32Address(Key.getPubKey(), 'npub') as string));
-    if (props.entitytype != entitytype) setEntityType(props.entitytype || 'key');
+
+    if (props.npub != npub) { 
+      let pub = props.npub || (Key.toNostrBech32Address(Key.getPubKey(), 'npub') as string);
+      setEntityType(getEntityType(pub));
+      setNpub(pub);
+    }
+
     if (props.trusttype != trusttype) setTrustType(props.trusttype || 'trust');
     if (props.dir != dir) setDirection(props.dir || 'out');
     if (props.view != view) setView(props.view || 'graph');
     if (props.filter != filter) setFilter(props.filter || '');
-  }, [props.npub, props.entitytype, props.trusttype, props.dir, props.view, props.filter]);
+  }, [props.npub, props.trusttype, props.dir, props.view, props.filter]);
 
   function setSearch(params: any) {
     const p = {
       npub,
-      entitytype,
       trusttype,
       dir,
       view,
       filter,
       ...params,
     };
-    return `/graph/${p.npub}/${p.entitytype}/${p.dir}/${p.trusttype}/${p.view}${
+    return `/graph/${p.npub}/${p.dir}/${p.trusttype}/${p.view}${
       p.filter ? '/' + p.filter : ''
     }`;
   }
@@ -145,7 +154,8 @@ const GraphView = (props: GraphViewProps) => {
       <div className="flex justify-between mb-4">
         <span className="text-2xl font-bold">
           <a className="link" href={`/${npub}`}>
-            <Name pub={npub} />
+            { entitytype == 'key' && (<Name pub={npub} />)}
+            { entitytype == 'item' && (<ItemName hexPub={hexKey} />)}
           </a>
           <span style={{ flex: 1 }} className="ml-1">
             {view}
@@ -153,6 +163,9 @@ const GraphView = (props: GraphViewProps) => {
         </span>
       </div>
       {renderScoreLine(vertice?.score, npub, true)}
+      <div className="text-sm flex flex-2 gap-2">
+        In the context of <Name pub={Key.getPubKey()} />
+      </div>
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-wrap gap-8">
         <GraphViewSelect view={view} setSearch={setSearch} me={me} />

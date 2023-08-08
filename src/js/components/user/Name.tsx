@@ -1,6 +1,3 @@
-import { memo, useEffect, useState } from 'react';
-
-import Key from '../../nostr/Key';
 import { ID } from '../../nostr/UserIds';
 
 import Badge from './Badge';

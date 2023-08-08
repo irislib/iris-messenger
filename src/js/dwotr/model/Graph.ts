@@ -42,6 +42,12 @@ export class EdgeBase  {
 
 }
 
+// Used in IndexedDB
+export class EdgeRecord extends EdgeBase {
+    from = ""; // The public key of the source vertice
+    to = ""; // The public key of the target vertice
+}
+
 
 // Used in memory
 export class Edge extends EdgeBase {
@@ -55,9 +61,14 @@ export class Edge extends EdgeBase {
     static partialFrom(record: EdgeRecord) : Edge {
         let edge = new Edge();
         edge.key = record.key;
+        edge.entityType = record.entityType;
         edge.type = record.type;
         edge.val = record.val;
         edge.timestamp = record.timestamp;
+        edge.partial = true;
+        //edge.context = record.context;
+        //edge.note = record.note;
+
         return edge;
     }
     
@@ -75,11 +86,7 @@ export class Edge extends EdgeBase {
     }
 }
 
-// Used in IndexedDB
-export class EdgeRecord extends EdgeBase {
-    from = ""; // The public key of the source vertice
-    to = ""; // The public key of the target vertice
-}
+
 
 
 export default class Graph {

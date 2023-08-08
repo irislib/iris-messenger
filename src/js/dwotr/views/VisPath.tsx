@@ -1,13 +1,11 @@
-import { DataSetNodes, Network, Node as VisNode, Edge as VisEdge } from 'vis-network';
+import { DataSetNodes, Network } from 'vis-network';
 import { DataSet } from 'vis-data';
 import { useEffect, useState, useRef } from 'preact/hooks';
 import graphNetwork from '../GraphNetwork';
 import { Edge, Vertice } from '../model/Graph';
 import { RenderTrust1Color } from '../components/RenderGraph';
-import SocialNetwork from '../../nostr/SocialNetwork';
 import profileManager from '../ProfileManager';
 import { BECH32, ID, PUB } from '../../nostr/UserIds';
-import { Unsubscribe } from '../../nostr/PubSub';
 import { translate as t } from '../../translations/Translation.mjs';
 import TrustScore from '../model/TrustScore';
 import { ViewComponentProps } from './GraphView';
@@ -16,7 +14,7 @@ import { useIsMounted } from '../hooks/useIsMounted';
 import Key from '../../nostr/Key';
 import { filterNodes } from './VisGraph';
 import Events from '../../nostr/Events';
-import Helpers from '../../Helpers';
+import eventManager from '../EventManager';
 
 const defaultOptions = {
   layout: {
@@ -42,8 +40,7 @@ const defaultOptions = {
   autoResize: false,
   nodes: {
     borderWidth: 1,
-    size: 30,
-    //shape: "circularImage",
+    shape: "circularImage",
     color: {
       border: '#222222',
       background: '#666666',
@@ -62,6 +59,62 @@ const defaultOptions = {
     },
   },
 };
+
+export function loadKeyVertice(vertice: Vertice, nodes: DataSetNodes) {
+  let profile = profileManager.getDefaultProfile(vertice.id);
+  let image = profileManager.ensurePicture(profile);
+
+  let node = nodes.get(vertice.id);
+  if (node) {
+    // Update the node if user name or image has changed
+    if (node.label != profile.name) node.label = profile.name;
+    if (node.image != image) node.image = image;
+    return undefined;
+  }
+
+  node = {
+    id: vertice.id,
+    label: profile.name,
+    image,
+    size: 30,
+  };
+  nodes.add(node);
+  return node;
+}
+
+
+export async function loadItemVertice(vertice: Vertice, nodes: DataSetNodes) {
+  let key = PUB(vertice.id);
+
+  let event = Events.db.by('id',key);
+  if (!event) {
+    event = await eventManager.getEventById(key);
+  }
+
+  let profile = profileManager.getDefaultProfile(vertice.id);
+  let text = (event?.content || '').trim().slice(0, 10);
+  let created_at = event?.created_at ? new Date(event?.created_at * 1000).toDateString() : '';
+  let author = profile?.name || '';
+
+  let label = `Note\n${text}\n${author}\n${created_at}\n`;
+
+  let node = nodes.get(vertice.id);
+  if (node && node.label != label) {
+    node.label = label;
+    return undefined;
+  } 
+
+  node = {
+    id: vertice.id,
+    label: label,
+    shape: "box",
+  };
+  nodes.add(node);
+  return node;
+}
+
+
+
 
 const VisPath = ({ props }: ViewComponentProps) => {
   const visJsRef = useRef<HTMLDivElement>(null);
@@ -142,15 +195,19 @@ const VisPath = ({ props }: ViewComponentProps) => {
 
     await profileManager.getProfiles(addresses); // Load all profiles in memory first
     if (!isMounted()) return; // Check if component is still mounted
-    
+
+    // Readd the current vertice if its not a key
+    if (vertice.entityType != 1) 
+        vertices.push(vertice);
+
     await loadVertices(vertices, paths);
     network.current?.redraw();
   }
 
   async function loadVertices(vertices: Vertice[], paths: Edge[]) {
     for (let vertice of vertices) {
-      if (vertice.entityType == 1) loadKeyVertice(vertice); // Key vertice
-      else await loadItemVertice(vertice); // Item vertice
+      if (vertice.entityType == 1) loadKeyVertice(vertice, rawNodes); // Key vertice
+      else await loadItemVertice(vertice, rawNodes); // Item vertice
     }
 
     for (let edge of paths) {
@@ -170,58 +227,7 @@ const VisPath = ({ props }: ViewComponentProps) => {
     filterNodes(rawNodes, displayNodes, props.filter, includes);
   }
 
-  function loadKeyVertice(vertice: Vertice) {
-    let profile = SocialNetwork.profiles.get(vertice.id);
-    let image = profileManager.ensurePicture(profile);
 
-    let node = rawNodes.get(vertice.id);
-    if (node) {
-      // Update the node if user name or image has changed
-      if (node.label != profile.name) node.label = profile.name;
-      if (node.image != image) node.image = image;
-      return;
-    }
-
-    rawNodes.add({
-      id: vertice.id,
-      label: profile.name,
-      image,
-      shape: 'circularImage',
-    });
-  }
-
-  async function loadItemVertice(vertice: Vertice) {
-    let event = Events.db.by('id', props.hexKey);
-    if (!event) {
-      // TODO: Load event from server as async/await
-      //Events.getEventById(props.hexKey, true, (event : any) => handleItemEvent(event));
-    }
-
-    let node = rawNodes.get(vertice.id);
-    if (node) return;
-
-    let profile = profileManager.getDefaultProfile(vertice.id);
-    let text = (event?.content || '').trim().slice(0, 10);
-    let created_at = event?.created_at ? new Date(event?.created_at * 1000).toDateString() : '';
-    let author = profile?.name || 'Unknown';
-
-    let label = `Note\n${text}\n${author}\n${created_at}`;
-
-    rawNodes.add({
-      id: vertice.id,
-      label: label,
-      margin: { top: 20, right: 0, left: 0, bottom: 0 },
-    });
-
-    // let eventOwnerPub = event.pubkey;
-    // profileManager.getProfile(eventOwnerPub, (profile) => {
-    //   if (!isMounted()) return;
-    //   // All profiles are now ready
-    //   handleItemEvent(event);
-    // });
-
-    //addItemNode(vertice, event);
-  }
 
   // function addItemNode(vertice: Vertice, event: any) {
 

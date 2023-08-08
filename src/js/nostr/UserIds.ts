@@ -10,7 +10,7 @@ export class UserIds {
   static currentUserId = 0;
 
   static id(pubKey: string): number {
-    if (pubKey.startsWith('npub')) {
+    if (pubKey.startsWith('npub') || pubKey.startsWith('note')) {
       pubKey = Key.toNostrHexAddress(pubKey) || '';
       if (!pubKey) {
         throw new Error('addFollower: invalid pubKey ' + pubKey);
