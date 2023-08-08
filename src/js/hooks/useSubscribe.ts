@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Event, Filter } from 'nostr-tools';
 
 import PubSub, { Unsubscribe } from '@/nostr/PubSub';
@@ -32,7 +32,7 @@ const useSubscribe = (ops: {
   }, [ops]);
 
   // Using useCallback to memoize the loadMore function.
-  const loadMore = useCallback(() => {
+  const loadMore = () => {
     const until = sortedEvents.last()?.created_at;
     if (!until) return;
 
@@ -42,13 +42,13 @@ const useSubscribe = (ops: {
       setLoadMoreUnsubscribe(null); // Reset the stored unsubscribe function
     }
 
-    const newFilter = Object.assign({}, filter, { until, limit: 50 });
+    const newFilter = Object.assign({}, filter, { until, limit: 10 });
     console.log('load more until', new Date(until * 1000), 'filter', newFilter);
 
     // Subscribe with the new filter and store the returned unsubscribe function
-    const unsubscribe = PubSub.subscribe(newFilter, handleEvent, false, false);
+    const unsubscribe = PubSub.subscribe(newFilter, handleEvent, false, true);
     setLoadMoreUnsubscribe(unsubscribe);
-  }, [ops, sortedEvents]); // Dependencies for the useCallback
+  }; // Dependencies for the useCallback
 
   return { events, loadMore };
 };
