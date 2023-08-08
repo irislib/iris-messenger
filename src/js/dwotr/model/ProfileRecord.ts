@@ -23,5 +23,13 @@ class ProfileRecord {
 
 export default ProfileRecord;
 
+export class ProfileMemory extends ProfileRecord {
+    id: number = 0;
 
-export type ProfileMemory = ProfileRecord & { id: number };
+    constructor(id: number) {
+        super();
+        this.id = id;
+    }
+}
+
+//export type ProfileMemory = ProfileRecord & { id: number };

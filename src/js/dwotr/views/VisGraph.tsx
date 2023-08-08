@@ -51,43 +51,46 @@ const defaultOptions = {
   },
 };
 
-export function filterNodes(nodes: DataSetNodes, target:DataSetNodes, filter: string, includes: Set<number> | undefined) {
+export function filterNodes(
+  nodes: DataSetNodes,
+  target: DataSetNodes,
+  filter: string,
+  includes: Set<number> | undefined,
+) {
   if (nodes.length == 0) return;
 
-  nodes.forEach(function(node) {
+  nodes.forEach(function (node) {
     let hasNode = target.get(node.id as number);
 
-    if(!filter) { 
-      if(!hasNode) target.add(node);
+    if (!filter) {
+      if (!hasNode) target.add(node);
       return;
     }
-  
 
-    if(includes?.has(node.id as number)) {
-      if(!hasNode) target.add(node);
+    if (includes?.has(node.id as number)) {
+      if (!hasNode) target.add(node);
       return;
     }
 
     let profile = profileManager.getDefaultProfile(node.id as number);
 
     if (profile?.name?.toLowerCase().includes(filter.toLowerCase())) {
-        if(!hasNode) target.add(node);
-        return;
-    }
-
-    if (profile?.display_name?.toLowerCase().includes(filter.toLowerCase())) {
-      if(!hasNode) target.add(node);
+      if (!hasNode) target.add(node);
       return;
     }
 
-    if(hasNode) // remove
+    if (profile?.display_name?.toLowerCase().includes(filter.toLowerCase())) {
+      if (!hasNode) target.add(node);
+      return;
+    }
+
+    if (hasNode)
+      // remove
       target.remove(node.id as number);
   });
 }
 
-
 const VisGraph = ({ props }: ViewComponentProps) => {
-
   const visJsRef = useRef<HTMLDivElement>(null);
   const network = useRef<Network>();
   const isMounted = useIsMounted();
@@ -98,8 +101,6 @@ const VisGraph = ({ props }: ViewComponentProps) => {
   const [unsubscribe] = useState<Array<() => void>>([]);
   const [dir, setDir] = useState<string>(props.dir || 'in');
   const [entitytype, setEntityType] = useState<string>(props.entitytype);
-
-
 
   useEffect(() => {
     if (!visJsRef.current) return;
@@ -119,9 +120,9 @@ const VisGraph = ({ props }: ViewComponentProps) => {
 
       props.setNpub(BECH32(vId));
 
-      loadNode(vId).then((nodes) => { 
+      loadNode(vId).then((nodes) => {
         let includes = new Set<number>([ID(props.hexKey), vId]);
-        if(nodes) filterNodes(nodes, displayNodes, props.filter, includes);
+        if (nodes) filterNodes(nodes, displayNodes, props.filter, includes);
       });
     });
 
@@ -142,16 +143,16 @@ const VisGraph = ({ props }: ViewComponentProps) => {
       edges.clear();
       rawNodes.clear();
       displayNodes.clear();
-      setDir(props.dir); 
+      setDir(props.dir);
       setEntityType(props.entitytype);
     }
 
     // Running asynchroniously, so other effects will run before nodes are added
-    loadNode(id as number).then((nodes) => { 
+    loadNode(id as number).then((nodes) => {
       if (!isMounted()) return; // Check if component is still mounted
 
       let includes = new Set<number>([ID(props.hexKey)]);
-      if(nodes) filterNodes(nodes, displayNodes, props.filter, includes);
+      if (nodes) filterNodes(nodes, displayNodes, props.filter, includes);
     });
 
     return () => {
@@ -159,22 +160,20 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     };
   }, [props.npub, props.dir, props.entitytype]);
 
- 
-    // Implement filter on rawList using the filter property
-    useEffect(() => {
-      if (rawNodes.length == 0 && displayNodes.length == 0) return;
+  // Implement filter on rawList using the filter property
+  useEffect(() => {
+    if (rawNodes.length == 0 && displayNodes.length == 0) return;
 
-      let includes = new Set<number>([ID(props.hexKey)]);
-      filterNodes(rawNodes, displayNodes, props.filter, includes);
+    let includes = new Set<number>([ID(props.hexKey)]);
+    filterNodes(rawNodes, displayNodes, props.filter, includes);
+  }, [props.filter]);
 
-    }, [props.filter]);
-
-  async function loadNode(vId: number) : Promise<DataSetNodes | undefined> {
+  async function loadNode(vId: number): Promise<DataSetNodes | undefined> {
     let sourceV = graphNetwork.g.vertices[vId] as Vertice;
     if (!sourceV) {
       // Make dummy vertice if it doesn't exist, so we can still render the source node in the graph
       sourceV = new Vertice(vId, 0);
-    };
+    }
 
     let distinctV = {} as { [key: number]: Vertice };
     distinctV[vId] = sourceV; // add the source vertice
@@ -189,7 +188,6 @@ const VisGraph = ({ props }: ViewComponentProps) => {
 
         let color = RenderTrust1Color(edge.val);
         let dashes = edge.out.degree > MAX_DEGREE; // Dash the edge line if the out vertice has no degree or above max degree
-        
 
         edges.get(edge.key) ||
           edges.add({ id: edge.key, from: edge.out.id, to: vId, color, dashes } as VisEdge);
@@ -203,24 +201,22 @@ const VisGraph = ({ props }: ViewComponentProps) => {
         const edge = sourceV.out[id] as Edge;
         if (!edge || edge.val == 0 || !edge.in) continue; // Skip if the edge has no value / neutral
 
-        if(edge.in.entityType != entityType) continue; // Skip if the distination node is not the selected entity type 
+        if (edge.in.entityType != entityType) continue; // Skip if the distination node is not the selected entity type
 
         distinctV[edge.in.id] = edge.in;
 
         let color = RenderTrust1Color(edge.val);
-        edges.get(edge.key) || edges.add({ id: edge.key, from: vId, to: edge.in.id, color } as VisEdge);
+        edges.get(edge.key) ||
+          edges.add({ id: edge.key, from: vId, to: edge.in.id, color } as VisEdge);
       }
     }
 
     let vertices = Object.values(distinctV);
     let addresses = vertices.map((v) => PUB(v.id)); // convert to pub hex format
-    let unsub = await profileManager.getProfiles(addresses, (profiles) => {
-      if (!isMounted()) return;
-
-      // Update the nodes with the new profile pictures and names
-    });
+    let { unsub } = await profileManager.getProfiles(addresses);
+    if (!isMounted()) return;
     unsubscribe.push(unsub);
-    
+
     let delta = new DataSet() as DataSetNodes; // new nodes to added to the graph and returned to the caller, enables more efficient filtering
 
     // Create nodes in vis
@@ -253,11 +249,11 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     rawNodes.clear();
     edges.clear();
     // loadNode(id);
-    loadNode(id as number).then((nodes) => { 
+    loadNode(id as number).then((nodes) => {
       if (!isMounted()) return; // Check if component is still mounted
 
       let includes = new Set<number>([ID(props.hexKey)]);
-      if(nodes) filterNodes(nodes, displayNodes, props.filter, includes);
+      if (nodes) filterNodes(nodes, displayNodes, props.filter, includes);
     });
 
     const n = BECH32(id);

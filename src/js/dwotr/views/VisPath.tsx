@@ -15,6 +15,8 @@ import { Link } from 'preact-router';
 import { useIsMounted } from '../hooks/useIsMounted';
 import Key from '../../nostr/Key';
 import { filterNodes } from './VisGraph';
+import Events from '../../nostr/Events';
+import Helpers from '../../Helpers';
 
 const defaultOptions = {
   layout: {
@@ -102,34 +104,15 @@ const VisPath = ({ props }: ViewComponentProps) => {
 
   useEffect(() => {
     let vId = ID(props.hexKey);
-    let v = graphNetwork.g.vertices[vId];
-    let score = v?.score;
-
-    let paths = graphNetwork.g.getPaths(vId);
-    let verticeIndex = Object.create(null);
-
-    for (let edge of paths) {
-      if (edge?.in) verticeIndex[edge.in.id] = edge.in;
-      if (edge?.out) verticeIndex[edge.out.id] = edge.out;
+    let sourceV = graphNetwork.g.vertices[vId];
+    if (!sourceV) {
+      // Make dummy vertice if it doesn't exist, so we can still render the source node in the graph
+      sourceV = new Vertice(vId, 0);
     }
 
-    let vertices = Object.values(verticeIndex) as Vertice[];
+    loadNodes(sourceV);
 
-    let addresses = vertices.map((v) => PUB(v.id));
-
-    profileManager
-      .getProfiles(addresses, (_) => {
-        if (!isMounted()) return;
-        // All profiles are now ready
-
-        loadVertices(vertices, paths);
-        network.current?.redraw();
-      })
-      .then((unsub: Unsubscribe) => {
-        if (!isMounted()) {
-          unsub();
-        } else unsubscribe.push(unsub);
-      });
+    let score = sourceV?.score;
 
     setState((prevState) => ({
       ...prevState,
@@ -141,26 +124,34 @@ const VisPath = ({ props }: ViewComponentProps) => {
     };
   }, [props.npub]);
 
-  function loadVertices(vertices: Vertice[], paths: Edge[]) {
+  async function loadNodes(vertice: Vertice) {
+    let paths = graphNetwork.g.getPaths(vertice.id);
+    let verticeIndex = Object.create(null);
+
+    for (let edge of paths) {
+      if (edge?.in) verticeIndex[edge.in.id] = edge.in;
+      if (edge?.out) verticeIndex[edge.out.id] = edge.out;
+    }
+
+    // Remove the current vertice from index if its not a key
+    if (vertice.entityType != 1) delete verticeIndex[vertice.id];
+
+    let vertices = Object.values(verticeIndex) as Vertice[];
+
+    let addresses = vertices.map((v) => PUB(v.id));
+
+    let { unsub } = await profileManager.getProfiles(addresses); // Load all profiles in memory first
+    if (!isMounted()) return;
+    unsubscribe?.push(unsub);
+
+    await loadVertices(vertices, paths);
+    network.current?.redraw();
+  }
+
+  async function loadVertices(vertices: Vertice[], paths: Edge[]) {
     for (let vertice of vertices) {
-      let profile = SocialNetwork.profiles.get(vertice.id);
-      let image = profileManager.ensurePicture(profile);
-
-      let node = rawNodes.get(vertice.id);
-      if (node) {
-        // Update the node if user name or image has changed
-        if (node.label != profile.name + ` (ID: ${vertice.id})`)
-          node.label = profile.name + ` (ID: ${vertice.id})`;
-        if (node.image != image) node.image = image;
-        continue;
-      }
-
-      rawNodes.add({
-        id: vertice.id,
-        label: profile.name,
-        image,
-        shape: 'circularImage',
-      });
+      if (vertice.entityType == 1) loadKeyVertice(vertice); // Key vertice
+      else await loadItemVertice(vertice); // Item vertice
     }
 
     for (let edge of paths) {
@@ -179,6 +170,96 @@ const VisPath = ({ props }: ViewComponentProps) => {
     let includes = new Set<number>([ID(props.hexKey)]);
     filterNodes(rawNodes, displayNodes, props.filter, includes);
   }
+
+  function loadKeyVertice(vertice: Vertice) {
+    let profile = SocialNetwork.profiles.get(vertice.id);
+    let image = profileManager.ensurePicture(profile);
+
+    let node = rawNodes.get(vertice.id);
+    if (node) {
+      // Update the node if user name or image has changed
+      if (node.label != profile.name) node.label = profile.name;
+      if (node.image != image) node.image = image;
+      return;
+    }
+
+    rawNodes.add({
+      id: vertice.id,
+      label: profile.name,
+      image,
+      shape: 'circularImage',
+    });
+  }
+
+  async function loadItemVertice(vertice: Vertice) {
+    let event = Events.db.by('id', props.hexKey);
+    if (!event) {
+      // TODO: Load event from server as async/await
+      //Events.getEventById(props.hexKey, true, (event : any) => handleItemEvent(event));
+    }
+
+    let node = rawNodes.get(vertice.id);
+    if (node) return;
+
+    let profile = profileManager.getDefaultProfile(vertice.id);
+    let text = (event?.content || '').trim().slice(0, 10);
+    let created_at = event?.created_at ? new Date(event?.created_at * 1000).toDateString() : '';
+    let author = profile?.name || 'Unknown';
+
+    let label = `Note\n${text}\n${author}\n${created_at}`;
+
+    rawNodes.add({
+      id: vertice.id,
+      label: label,
+      margin: { top: 20, right: 0, left: 0, bottom: 0 },
+    });
+
+    // let eventOwnerPub = event.pubkey;
+    // profileManager.getProfile(eventOwnerPub, (profile) => {
+    //   if (!isMounted()) return;
+    //   // All profiles are now ready
+    //   handleItemEvent(event);
+    // });
+
+    //addItemNode(vertice, event);
+  }
+
+  // function addItemNode(vertice: Vertice, event: any) {
+
+  //   let node = rawNodes.get(vertice.id);
+  //   if (node && !event) return;
+
+  //   // let eventOwnerPub = event.pubkey;
+  //   // let noteId = Key.toNostrBech32Address(event.id, 'note');
+  //   // const emojiOnly = event.content?.length === 2 && Helpers.isEmoji(event.content);
+  //   // let text = event.content || '';
+  //   // let created_at = event.created_at || 0;
+  //   // let authorKey = event.pubkey;
+  //   let profile = profileManager.getDefaultProfile(vertice.id);
+
+  //   if(node) {
+  //     // Update the node if event has changed
+
+  //     //if (node.label != profile.name)
+
+  //     return;
+  //   }
+  //   //{ id: 2, label: "Single Value\n(25)", margin: 20, x: 0, y: 0 },
+
+  //   rawNodes.add({
+  //     id: vertice.id,
+  //     label:  `Item`,
+  //     margin: {top:20, right: 0, left: 0, bottom: 0},
+  //   });
+  // }
+
+  // function handleItemEvent(event: any) {
+  //   if (!event?.id) return;
+  //   let vId = ID(event.id);
+  //   let vertice = graphNetwork.g.vertices[vId];
+
+  //   addItemNode(vertice, event);
+  // }
 
   // Implement filter on rawList using the filter property
   useEffect(() => {
@@ -230,16 +311,16 @@ const VisPath = ({ props }: ViewComponentProps) => {
       {!state?.score && <div className="text-center">{t('No results')}</div>}
       {state?.score && (
         <>
-      <div className="flex flex-col gap-4">
-        <div>Aggregated result of score is {renderScoreResultNumbers(state?.score)}</div>
-        <div>{renderScoreResultText(state?.score)}</div>
-      </div>
-      <hr className="-mx-2 opacity-10 my-2" />
-        <div className="flex flex-wrap gap-4">
-          <Link className="btn btn-primary btn-sm" href={props.setSearch({ view: 'graph' })}>
-            {t('Focus')}
-          </Link>
-        </div>
+          <div className="flex flex-col gap-4">
+            <div>Aggregated result of score is {renderScoreResultNumbers(state?.score)}</div>
+            <div>{renderScoreResultText(state?.score)}</div>
+          </div>
+          <hr className="-mx-2 opacity-10 my-2" />
+          <div className="flex flex-wrap gap-4">
+            <Link className="btn btn-primary btn-sm" href={props.setSearch({ view: 'graph' })}>
+              {t('Focus')}
+            </Link>
+          </div>
         </>
       )}
       <hr className="-mx-2 opacity-10 my-2" />

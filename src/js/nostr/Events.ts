@@ -332,24 +332,6 @@ const Events = {
     }
     
     try {
-      // MemoryDB
-      // let savedEvent = Events.db.findOne({ kind: event.kind, pubkey: event.pubkey });
-      
-      // if (savedEvent) {
-      //   if(savedEvent.created_at >= event.created_at) return false;
-
-      //   this.db.findAndRemove({ pubkey: event.pubkey, kind: 0 });
-      //   //savedEvent = IndexedDB.db.events.get({ pubkey: event.pubkey, kind: 0 }) as any;
-      //   //if (savedEvent) {
-      //     IndexedDB.db.events.update(savedEvent.id, event as Event & { id: string });
-      //   //} 
-      // } 
-      // if(!savedEvent) {
-      //IndexedDB.saveEvent(event as Event & { id: string });
-      // }
-
-      //this.insert(event);
-      profileManager.prefixHistory = "Events.handleMetadata";
       let profile = profileManager.addProfileEvent(event); 
       if(profile) return true; 
        
@@ -362,13 +344,6 @@ const Events = {
       // profile.created_at = event.created_at;
       // delete profile['nip05valid']; // not robust
       // SocialNetwork.profiles.set(event.pubkey, profile);
-      // const key = Key.toNostrBech32Address(event.pubkey, 'npub');
-      // FuzzySearch.add({
-      //   key,
-      //   name: profile.name,
-      //   display_name: profile.display_name,
-      //   followers: SocialNetwork.followersByUser.get(event.pubkey) ?? new Set(),
-      // });
       //}
     } catch (e) {
       console.log('error parsing nostr profile', e, event);

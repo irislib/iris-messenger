@@ -1,33 +1,9 @@
 import { useEffect, useState } from 'react';
 import profileManager from '../ProfileManager';
 import { ID } from '../../nostr/UserIds';
-import ProfileRecord from '../model/ProfileRecord';
+import ProfileRecord, { ProfileMemory } from '../model/ProfileRecord';
+import { ProfileEvent } from '../network/ProfileEvent';
 
-export const ProfileEventName = 'profileEvent';
-
-export class ProfileEvent extends CustomEvent<ProfileRecord> {
-  constructor(id: number, item: ProfileRecord) {
-    super(ProfileEvent.getEventId(id), { detail: item });
-  }
-
-  static getEventId(id: number): string {
-    return ProfileEventName + id;
-  }
-
-  static dispatch(id: number, item: ProfileRecord) {
-    document.dispatchEvent(new ProfileEvent(id, item));
-  }
-
-  static add(id: number, callback: (e: any) => void) {
-    document.addEventListener(ProfileEvent.getEventId(id), callback);
-  }
-
-  static remove(id: number, callback: (e: any) => void) {
-    document.removeEventListener(ProfileEvent.getEventId(id), callback);
-  }
-
-
-}
 
 // Address can be of type hex of BECH32
 export const useProfile = (address: string) => {
@@ -37,29 +13,33 @@ export const useProfile = (address: string) => {
   const [profile, setProfile] = useState<ProfileRecord>(() => profileManager.getMemoryProfile(ID(address)));
 
   useEffect(() => {
-    if (!address) return;
-    console.log('dwotr.useProfile.mount', address);
+    //if (!address) return;
+    //console.log('dwotr.useProfile.mount', address);
 
-    let mem = profileManager.getMemoryProfile(ID(address));
+    let id = ID(address);
+
+    let mem = profileManager.getMemoryProfile(id);
     if(profile.created_at != mem.created_at) {
       setProfile(mem);
     }
 
     const handleEvent = (e: any) => {
-      let p = e.detail as ProfileRecord;
+      let p = e.detail as ProfileMemory;
+      if(!p || p.id != id) return; // not for me
+
       setProfile(prevProfile => {
-        if (!p || p.created_at <= prevProfile.created_at) return prevProfile;
+        if (p.created_at <= prevProfile.created_at) return prevProfile; // ignore older events
         return p;
       });
     };
 
-    ProfileEvent.add(ID(address), handleEvent);
+    ProfileEvent.add(handleEvent);
 
     let unsub = profileManager.subscribe(address);
 
     return () => {
-      console.log('dwotr.useProfile.unmount', address);
-      ProfileEvent.remove(ID(address), handleEvent);
+      //console.log('dwotr.useProfile.unmount', address);
+      ProfileEvent.remove(handleEvent);
       unsub?.();
     };
   }, [address]);

@@ -7,32 +7,12 @@ import dwotrDB from './network/DWoTRDexie';
 import { debounce } from 'lodash';
 import { MonitorItem } from './model/MonitorItem';
 import { BECH32, ID } from '../nostr/UserIds';
+import { TrustScoreEvent } from './network/TrustScoreEvent';
 
 export type ResolveTrustCallback = (result: any) => any;
 
 export type ReadyCallback = () => void;
 
-export const TrustScoreEventName = 'trustScoreEvent';
-
-export class TrustScoreEvent extends CustomEvent<MonitorItem> {
-  constructor(id: number, item: MonitorItem) {
-    super(TrustScoreEvent.getEventId(id), { detail: item });
-  }
-
-  static getEventId(id: number): string {
-    return TrustScoreEventName + id;
-  }
-
-  static registerEvent(id: number, callback: (e: any) => void) {
-    let eventID = TrustScoreEvent.getEventId(id);
-    document.addEventListener(eventID, callback);
-  }
-
-  static unregisterEvent(id: number, callback: (e: any) => void) {
-    let eventID = TrustScoreEvent.getEventId(id);
-    document.removeEventListener(eventID, callback);
-  }
-}
 
 export const TRUST1 = 'trust1';
 
@@ -228,7 +208,7 @@ class GraphNetwork {
     let clone = monitorItem.clone();
     monitorItem.setScore(vertice); // Reset the old score to the current score
 
-    document.dispatchEvent(new TrustScoreEvent(id, clone)); // Dispatch event with an clone of the monitorItem so oldScore is not changed when the syncScore() is called
+    TrustScoreEvent.dispatch(clone); // Dispatch event with an clone of the monitorItem so oldScore is not changed when the syncScore() is called
   }
 
   addVerticeMonitor(id: number) {

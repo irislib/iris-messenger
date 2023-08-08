@@ -1,8 +1,4 @@
-import { sha256 } from '@noble/hashes/sha256';
-import Identicon from 'identicon.js';
-
 import Component from '../../BaseComponent';
-import Key from '../../nostr/Key';
 import { Unsubscribe } from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import Show from '../helpers/Show';
@@ -10,8 +6,7 @@ import SafeImg from '../SafeImg';
 import profileManager from '../../dwotr/ProfileManager';
 import { ID } from '../../nostr/UserIds';
 import ProfileRecord from '../../dwotr/model/ProfileRecord';
-import { TrustScoreEvent } from '../../dwotr/GraphNetwork';
-import { ProfileEvent } from '../../dwotr/hooks/useProfile';
+import { ProfileEvent } from '../../dwotr/network/ProfileEvent';
 
 type Props = {
   str: unknown;
@@ -57,7 +52,7 @@ class MyAvatar extends Component<Props, State> {
     };
   
 
-    ProfileEvent.add(id, this.handleEvent);
+    ProfileEvent.add(this.handleEvent);
 
     let profile = profileManager.getMemoryProfile(id);
 
@@ -82,7 +77,7 @@ class MyAvatar extends Component<Props, State> {
       return;
     }
 
-    ProfileEvent.remove(ID(pub), this.handleEvent);
+    ProfileEvent.remove(this.handleEvent);
     this.unsub?.();
   }
 

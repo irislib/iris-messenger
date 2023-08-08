@@ -6,14 +6,13 @@ import SocialNetwork from '../nostr/SocialNetwork';
 import { ID, PUB } from '../nostr/UserIds';
 import Key from '../nostr/Key';
 import FuzzySearch from '../FuzzySearch';
-import ProfileRecord from './model/ProfileRecord';
+import ProfileRecord, { ProfileMemory } from './model/ProfileRecord';
 import { throttle } from 'lodash';
 import Identicon from 'identicon.js';
 import OneCallQueue from './Utils/OneCallQueue';
 import storage from './Storage';
-import { ProfileEvent } from './hooks/useProfile';
 import { hexName } from './Utils';
-
+import { ProfileEvent } from './network/ProfileEvent';
 
 class ProfileManager {
   loaded: boolean = false;
@@ -74,7 +73,7 @@ class ProfileManager {
         if (res && res.status === 200) {
           let data = await res.json();
           this.recordHistory(hexPub, 'fetchProfile->Dataloaded');
-          return { res,  data };
+          return { res, data };
         }
         return { res, data: undefined };
       });
@@ -98,7 +97,7 @@ class ProfileManager {
     });
 
     this.recordHistory(hexPub, 'loadProfile->Dataloaded');
-    if(profile?.isDefault) {
+    if (profile?.isDefault) {
       this.recordHistory(hexPub, 'Dataloaded with default profile :(');
       return undefined;
     }
@@ -106,81 +105,81 @@ class ProfileManager {
     return profile;
   }
 
-  getProfile(
-    address: string,
-    cb?: (profile: any, address: string) => void,
-    verifyNip05 = false,
-  ): Unsubscribe {
-    const hexPub = Key.toNostrHexAddress(address) as string;
-    const id = ID(hexPub);
+  // getProfile(
+  //   address: string,
+  //   cb?: (profile: any, address: string) => void,
+  //   verifyNip05 = false,
+  // ): Unsubscribe {
+  //   const hexPub = Key.toNostrHexAddress(address) as string;
+  //   const id = ID(hexPub);
 
-    this.prefixHistory = 'getProfile';
+  //   this.prefixHistory = 'getProfile';
 
-    const callback = () => {
-      cb?.(SocialNetwork.profiles.get(id), hexPub);
-    };
+  //   const callback = () => {
+  //     cb?.(SocialNetwork.profiles.get(id), hexPub);
+  //   };
 
-    let profile = SocialNetwork.profiles.get(id);
+  //   let profile = SocialNetwork.profiles.get(id);
 
-    if (profile && !profile.isDefault) {
-      callback();
-      if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
-        // TODO verify NIP05 address
-        Key.verifyNip05Address(profile.nip05, address).then((isValid) => {
-          console.log('NIP05 address is valid?', isValid, profile.nip05, address);
-          profile.nip05valid = isValid;
+  //   if (profile && !profile.isDefault) {
+  //     callback();
+  //     if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
+  //       // TODO verify NIP05 address
+  //       Key.verifyNip05Address(profile.nip05, address).then((isValid) => {
+  //         console.log('NIP05 address is valid?', isValid, profile.nip05, address);
+  //         profile.nip05valid = isValid;
 
-          this.dispatchProfile(profile);
-          //SocialNetwork.profiles.set(id, profile);
-          callback();
-        });
-      }
-    } else {
-      // Check if profile is in IndexedDB
-      this.loadProfile(hexPub).then((profile) => {
-        if (profile) {
-          // exists in DB
-          if (this.isProfileNewer(profile)) this.addProfileToMemory(profile);
+  //         this.dispatchProfile(profile);
+  //         //SocialNetwork.profiles.set(id, profile);
+  //         callback();
+  //       });
+  //     }
+  //   } else {
+  //     // Check if profile is in IndexedDB
+  //     this.loadProfile(hexPub).then((profile) => {
+  //       if (profile) {
+  //         // exists in DB
+  //         if (this.isProfileNewer(profile)) this.addProfileToMemory(profile);
 
-          callback(); // callback with profile
-        } else {
-          // Check if profile is in API
-          profileManager.fetchProfile(hexPub).then((profile) => {
-            if (!profile) return; // not in API
-            // TODO verify sig
-            if (this.isProfileNewer(profile))
-              // but is it newer?
-              this.prefixHistory = 'getProfile->fetchProfile->isProfileNewer';
-            this.addProfileEvent(profile);
+  //         callback(); // callback with profile
+  //       } else {
+  //         // Check if profile is in API
+  //         profileManager.fetchProfile(hexPub).then((profile) => {
+  //           if (!profile) return; // not in API
+  //           // TODO verify sig
+  //           if (this.isProfileNewer(profile))
+  //             // but is it newer?
+  //             this.prefixHistory = 'getProfile->fetchProfile->isProfileNewer';
+  //           this.addProfileEvent(profile);
 
-            callback();
-          });
-          return;
-        }
-      });
-    }
+  //           callback();
+  //         });
+  //         return;
+  //       }
+  //     });
+  //   }
 
-    if (profile && profile.isDefault) {
-      callback();
-    }
+  //   if (profile && profile.isDefault) {
+  //     callback();
+  //   }
 
-    if (!profile) {
-      profile = this.createDefaultProfile(hexPub);
-      SocialNetwork.profiles.set(id, profile);
-      callback();
-    }
+  //   if (!profile) {
+  //     profile = this.createDefaultProfile(hexPub);
+  //     SocialNetwork.profiles.set(id, profile);
+  //     callback();
+  //   }
 
-    // Then subscribe to updates via nostr relays
-    return PubSub.subscribe({ kinds: [0], authors: [hexPub] }, callback, false);
-  }
+  //   // Then subscribe to updates via nostr relays
+  //   return PubSub.subscribe({ kinds: [0], authors: [hexPub] }, callback, false);
+  // }
 
   async getProfiles(
     addresses: string[],
-    cb?: (profiles: Array<any>) => void,
-  ): Promise<Unsubscribe> {
-    if (!addresses || addresses.length === 0) return () => {};
+  ): Promise<{ unsub: Unsubscribe; profiles: Array<ProfileRecord> }> {
+    //
+    if (!addresses || addresses.length === 0) return { unsub: () => {}, profiles: [] };
 
-    let result: Array<any> = [];
+    let profiles: Array<any> = [];
     let dbLookups: Array<string> = [];
     let authors: Array<string> = [];
 
@@ -190,7 +189,7 @@ class ProfileManager {
       const hexPub = Key.toNostrHexAddress(address) as string;
       const profile = SocialNetwork.profiles.get(ID(hexPub)); // ID() makes sure to register the address with an ID in the UserIds map if it's not already there
       if (profile) {
-        result.push(profile);
+        profiles.push(profile);
       } else {
         dbLookups.push(hexPub);
       }
@@ -198,65 +197,56 @@ class ProfileManager {
       authors.push(hexPub);
     }
 
-    // Then load from DB
-    let lookupSet = new Set(dbLookups);
-    const dbProfiles = await this.loadProfiles(lookupSet);
+    if (dbLookups.length > 0) {
+      let lookupSet = new Set(dbLookups);
 
-    if (dbProfiles && dbProfiles.length > 0) {
-      result = result.concat(dbProfiles);
-      for (const profile of dbProfiles) {
-        if (profile) lookupSet.delete(profile.key);
+      // Then load from DB
+      const dbProfiles = await this.loadProfiles(lookupSet);
+
+      if (dbProfiles && dbProfiles.length > 0) {
+        profiles = profiles.concat(dbProfiles);
+        for (const profile of dbProfiles) {
+          if (profile) lookupSet.delete(profile.key);
+        }
       }
-    }
 
-    // Then load from API
-    if (lookupSet.size > 0 && lookupSet.size <= 100) {
-      const apiProfiles = await Promise.all(
-        Array.from(lookupSet).map((address) =>
-          this.fetchProfile(Key.toNostrHexAddress(address) as string),
-        ),
-      );
-      if (apiProfiles && apiProfiles.length > 0) {
-        for (const profile of apiProfiles as Array<any>) {
-          if (profile) {
-            Events.handle(profile);
-            result.push(profile);
-            lookupSet.delete(profile.key);
+      // Then load from API
+      if (lookupSet.size > 0 && lookupSet.size <= 100) {
+        const apiProfiles = await Promise.all(
+          Array.from(lookupSet).map((address) =>
+            this.fetchProfile(Key.toNostrHexAddress(address) as string),
+          ),
+        );
+        if (apiProfiles && apiProfiles.length > 0) {
+          for (const profile of apiProfiles as Array<any>) {
+            if (profile) {
+              Events.handle(profile);
+              profiles.push(profile);
+              lookupSet.delete(profile.key);
+            }
           }
         }
       }
+
+      // Fill in default profile for missing profiles
+      for (const hexPub of lookupSet) {
+        let profile = this.createDefaultProfile(hexPub);
+        SocialNetwork.profiles.set(ID(profile.key), profile);
+        profiles.push(profile); // Fill in default profile with animal names
+      }
+
+      // Then save to memory
+      for (const profile of profiles) {
+        if (!profile || !this.isProfileNewer(profile)) continue;
+
+        this.addProfileToMemory(profile);
+      }
     }
-
-    // Fill in default profile for missing profiles
-    for (const hexPub of lookupSet) {
-      let profile = this.createDefaultProfile(hexPub);
-      SocialNetwork.profiles.set(ID(profile.key), profile);
-      result.push(profile); // Fill in default profile with animal names
-    }
-
-    // Then save to memory
-    for (const profile of result) {
-      if (!profile || !this.isProfileNewer(profile)) continue;
-
-      this.addProfileToMemory(profile);
-    }
-
-    // Then callback
-    if (result.length > 0)
-      // The list should contain a profile for each address
-      cb?.(result);
 
     // Then subscribe to updates via nostr relays
-    const callback = (event: Event) => {
-      const id = ID(event.pubkey);
-      let profile = SocialNetwork.profiles.get(id);
-      cb?.([profile]);
-    };
-
-    return PubSub.subscribe({ kinds: [0], authors }, callback, false);
+    let unsub = PubSub.subscribe({ kinds: [0], authors }, this.subscriptionCallback, false);
+    return { unsub, profiles };
   }
-
-
 
   saveProfile(profile: ProfileRecord) {
     if (!profile?.isDefault) return; // don't save default profiles
@@ -281,7 +271,8 @@ class ProfileManager {
     if (!p) return this.createDefaultProfile(hexPub);
 
     // Make sure we have a name
-    let name = p.name || p.username || p.display_name || p.displayName || p.nip05 || p.lud16 || p.lud06; // Find a name
+    let name =
+      p.name || p.username || p.display_name || p.displayName || p.nip05 || p.lud16 || p.lud06; // Find a name
     name = p.name?.trim().slice(0, 100) || ''; // Trim and limit to 100 chars
 
     // Make sure we have a display name
@@ -338,10 +329,13 @@ class ProfileManager {
 
   isProfileNewer(profile: ProfileRecord): boolean {
     if (!profile?.key) return false;
-  
+
     const existingProfile = SocialNetwork.profiles.get(ID(profile.key));
-  
-    return !existingProfile || (profile.isDefault === false && profile.created_at > existingProfile.created_at);
+
+    return (
+      !existingProfile ||
+      (profile.isDefault === false && profile.created_at > existingProfile.created_at)
+    );
   }
 
   addProfileToMemory(profile: ProfileRecord) {
@@ -458,13 +452,12 @@ class ProfileManager {
 
   dispatchProfile(profile: ProfileRecord) {
     if (!profile) return;
-    
+
     this.prefixHistory += 'dispatchProfileIfNewer()';
 
-    if (this.isProfileNewer(profile))
-      this.addProfileToMemory(profile);
+    if (this.isProfileNewer(profile)) this.addProfileToMemory(profile);
 
-    ProfileEvent.dispatch(ID(profile.key), profile);
+    ProfileEvent.dispatch(ID(profile.key), profile as ProfileMemory);
   }
 
   // if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
@@ -476,8 +469,7 @@ class ProfileManager {
   //     callback();
   //   });
   // }
-  getMemoryProfile(id: number | undefined) {
-    if (!id) return undefined;
+  getMemoryProfile(id: number) : ProfileRecord {
     const profile = SocialNetwork.profiles.get(id);
 
     if (profile) return profile;

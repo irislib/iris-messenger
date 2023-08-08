@@ -43,7 +43,7 @@ class About extends Component {
                 <p>
                   <ul>
                     <li>
-                      <a target="_blank" href="https://iris.to">
+                      <a target="_blank" href="https://dpeep.com">
                         dpeep.com
                       </a>{' '}
                       (web)

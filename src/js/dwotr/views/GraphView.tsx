@@ -32,7 +32,6 @@ export type ViewComponentProps = {
     filter: string;
     view: string;
     setNpub: (npub: string) => void;
-    route: (params: any) => void;
     setSearch: (params: any) => string;
   };
 };
@@ -119,13 +118,6 @@ const GraphView = (props: GraphViewProps) => {
     }`;
   }
 
-  // Reload the graph when the view changes
-  const route = useCallback((params: any) => {
-    //console.log('route', params);
-    //setNpub
-    //window.history.pushState(null, '', setSearch(params));
-  }, []);
-
   // Render the view from 3 different components, graph, path, and list
   // selected by the name of the view useState property
   const renderView = () => {
@@ -138,7 +130,6 @@ const GraphView = (props: GraphViewProps) => {
       view,
       filter,
       setNpub,
-      route,
       setSearch,
     };
     if (view == 'path') return <VisPath props={props} />;

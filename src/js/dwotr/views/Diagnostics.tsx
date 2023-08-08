@@ -20,19 +20,13 @@ type TestDataProps = {
   path?: string;
 };
 
-
 interface EdgeItem {
   from: string;
   to: string;
   val: number;
 }
 
-
-
-
-// npub1dergggklka99wwrs92yz8wdjs952h2ux2ha2ed598ngwu9w7a6fsh9xzpc  
-
-
+// npub1dergggklka99wwrs92yz8wdjs952h2ux2ha2ed598ngwu9w7a6fsh9xzpc
 
 // Use exiting users for better visualisation
 const RealTestUsers = [
@@ -106,10 +100,7 @@ const yegorpetrovGraphData = [
   { from: yegorpetrov, to: fiatjaf, val: 1 },
 ];
 
-const nvkGraphData = [
-  { from: nvk, to: jack, val: -1 },
-];
-
+const nvkGraphData = [{ from: nvk, to: jack, val: -1 }];
 
 function addEdge(props: any) {
   let { from, to } = props;
@@ -123,49 +114,49 @@ function trust(from: string, to: string, val: number) {
   return { from, to, val, entityType: 1, context: 'nostr', note: '', timestamp: toTimestamp() };
 }
 
-
 function loadGraphData(data: Array<EdgeItem>) {
   Object.values(data).forEach((e) => {
     addEdge(trust(e.from, e.to, e.val));
   });
 }
 
-
-
 const Diagnostics = (props: TestDataProps) => {
   const [state, setState] = useState<any>(null);
   const [unsubscribe] = useState<Array<() => void>>([]);
 
-  const pub =  (Key.toNostrHexAddress(props.id as string) as string) || Key.getPubKey();
+  const pub = (Key.toNostrHexAddress(props.id as string) as string) || Key.getPubKey();
   const npub = Key.toNostrBech32Address(pub as string, 'npub') as string;
 
   useEffect(() => {
     graphNetwork.whenReady(() => {
       // Make sure we have the profiles for the test users
-      profileManager
-        .getProfiles(RealTestUsers, (profiles: Array<any>) => {
-          let profileIndex = {};
-          profiles.forEach((p) => {
-            profileIndex[ID(p.key)] = p;
-          });
-
-          let edgesCount = Object.values(graphNetwork.g.edges).length;
-          let nodesCount = Object.values(graphNetwork.g.vertices).length;
-
-          setState((prevState) => ({
-            ...prevState,
-            profiles,
-            profileIndex,
-            edgesCount,
-            nodesCount,
-          }));
-        })
-        .then((unsub: Unsubscribe) => unsubscribe.push(unsub));
+      loadProfiles();
     });
     return () => {
       unsubscribe.forEach((u) => u?.());
     };
   }, [pub]);
+
+  async function loadProfiles() {
+    let { unsub, profiles } = await profileManager.getProfiles(RealTestUsers);
+    unsubscribe.push(unsub);
+
+    let profileIndex = {};
+    profiles.forEach((p) => {
+      profileIndex[ID(p.key)] = p;
+    });
+
+    let edgesCount = Object.values(graphNetwork.g.edges).length;
+    let nodesCount = Object.values(graphNetwork.g.vertices).length;
+
+    setState((prevState) => ({
+      ...prevState,
+      profiles,
+      profileIndex,
+      edgesCount,
+      nodesCount,
+    }));
+  }
 
   function updateState() {
     let edgesCount = Object.values(graphNetwork.g.edges).length;
@@ -183,16 +174,13 @@ const Diagnostics = (props: TestDataProps) => {
     }));
   }
 
-
-
-  
   const resetProfiles = (e: JSX.TargetedEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
     SocialNetwork.profiles = new Map<number, any>();
 
     updateState();
-  }
+  };
 
   const resetGraph = (e: JSX.TargetedEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -205,14 +193,13 @@ const Diagnostics = (props: TestDataProps) => {
 
   const resetDatabase = (e: JSX.TargetedEvent<HTMLButtonElement, MouseEvent>) => {
     resetWoTDatabase();
-  }    
+  };
 
   const resetAll = (e: JSX.TargetedEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     resetDatabase(e);
     resetGraph(e);
     resetProfiles(e);
-    
   };
 
   const jackGraphClick = (e: JSX.TargetedEvent<HTMLButtonElement, MouseEvent>) => {
@@ -260,7 +247,7 @@ const Diagnostics = (props: TestDataProps) => {
     addEdge(trust(pub, nvk, 1));
     addEdge(trust(pub, fiatjaf, 1));
     addEdge(trust(pub, carla, 1));
-    
+
     loadGraphData(jackGraphData);
     loadGraphData(saylorGraphData);
     loadGraphData(siriusGraphData);
@@ -272,7 +259,6 @@ const Diagnostics = (props: TestDataProps) => {
 
     updateState();
   };
-
 
   // Visualize a list of users from the state.profiles object
   const listUsers = () => {
@@ -323,7 +309,9 @@ const Diagnostics = (props: TestDataProps) => {
         </span>
       </div>
       <hr className="-mx-2 opacity-10 my-2" />
-      All trust data generated is solely for testing and will not be submitted to the relays. The profiles used are exclusively for demonstration purposes and do not reflect any real-life trust situations.
+      All trust data generated is solely for testing and will not be submitted to the relays. The
+      profiles used are exclusively for demonstration purposes and do not reflect any real-life
+      trust situations.
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-wrap gap-4">
         <Button className="btn btn-sm" onClick={jackGraphClick}>
@@ -345,7 +333,6 @@ const Diagnostics = (props: TestDataProps) => {
           Reset All
         </Button>
       </div>
-
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex">
         <div className="flex flex-1 gap-4">{Overview()}</div>

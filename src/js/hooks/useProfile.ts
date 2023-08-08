@@ -9,14 +9,14 @@ export const useProfile = (address: string) => {
   useEffect(() => {
     if (!address) return;
 
-    const unsub = profileManager.getProfile(address, (p) => {
-      if (p) {
-        setProfile(p);
-      }
-    });
+    // const unsub = profileManager.getProfile(address, (p) => {
+    //   if (p) {
+    //     setProfile(p);
+    //   }
+    // });
 
     return () => {
-      unsub();
+      //unsub();
     };
   }, [address]);
 
