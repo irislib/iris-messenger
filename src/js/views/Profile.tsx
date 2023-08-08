@@ -208,7 +208,7 @@ class Profile extends View {
           }
           banner = isSafeOrigin(banner)
             ? banner
-            : `https://imgproxy.iris.to/insecure/plain/${banner}`;
+            : `https://imgproxy.iris.to/insecure/rs:fill:948:192/plain/${banner}`;
           this.setState({ banner });
         } catch (e) {
           console.log('Invalid banner URL', profile.banner);
