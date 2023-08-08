@@ -51,10 +51,12 @@ const Feed = ({ showDisplayAs, filterOptions, emptyMessage }: Props) => {
   const lastElementRef = useRef(null);
   const [mutedUsers] = useLocalState('muted', {});
 
-  console.log('subscribe to filter', filterOption.filter);
-
   const { events: allEvents, loadMore } = useSubscribe({
     filter: filterOption.filter,
+    // in keyword search, relays should be queried for all events, not just sinceLastOpened
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    sinceLastOpened: false,
   });
 
   // deduplicate
@@ -156,19 +158,19 @@ const Feed = ({ showDisplayAs, filterOptions, emptyMessage }: Props) => {
 
   const renderFilterOptions = () => {
     return (
-      <div className="flex mb-4 gap-2 mx-2 md:mx-0">
-        {filterOptions.map((filterOption) => (
+      <div className="flex mb-4 gap-2 mx-2 md:mx-4">
+        {filterOptions.map((opt) => (
           <button
-            key={filterOption.name}
+            key={opt.name}
             className={`btn btn-sm ${
-              filterOption.name === filterOption.name ? 'btn-primary' : 'btn-ghost'
+              filterOption.name === opt.name ? 'btn-primary' : 'btn-neutral'
             }`}
             onClick={() => {
-              setFilterOption(filterOption);
+              setFilterOption(opt);
               setDisplayCount(PAGE_SIZE);
             }}
           >
-            {filterOption.name}
+            {opt.name}
           </button>
         ))}
       </div>

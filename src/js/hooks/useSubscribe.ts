@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Event, Filter } from 'nostr-tools';
 
-import PubSub from '@/nostr/PubSub';
+import PubSub, { Unsubscribe } from '@/nostr/PubSub';
 import SortedEventMap from '@/utils/SortedEventMap';
 
 const useSubscribe = (ops: {
@@ -10,28 +10,45 @@ const useSubscribe = (ops: {
   mergeSubscriptions?: boolean;
   enabled?: boolean;
 }) => {
-  const [sortedEvents] = useState(new SortedEventMap());
-  const { filter, enabled = true, sinceLastOpened = true, mergeSubscriptions = true } = ops;
+  const [sortedEvents, setSortedEvents] = useState(new SortedEventMap());
+  const [loadMoreUnsubscribe, setLoadMoreUnsubscribe] = useState<Unsubscribe | null>(null);
+  const { filter, enabled = true, sinceLastOpened = false, mergeSubscriptions = true } = ops;
   const [events, setEvents] = useState<Event[]>([]);
-  // TODO save into SortedMap
+
+  const handleEvent = (event: Event) => {
+    if (sortedEvents.has(event.id)) return;
+    sortedEvents.add(event);
+    setEvents(sortedEvents.events());
+  };
+
+  useEffect(() => {
+    setSortedEvents(new SortedEventMap());
+  }, [filter]);
 
   useEffect(() => {
     if (!enabled || !filter) return;
-    return PubSub.subscribe(
-      filter,
-      (event: any) => {
-        if (sortedEvents.has(event.id)) return;
-        sortedEvents.add(event);
-        setEvents(sortedEvents.events());
-      },
-      sinceLastOpened,
-      mergeSubscriptions,
-    );
+    filter.limit = filter.limit || 10;
+    return PubSub.subscribe(filter, handleEvent, sinceLastOpened, mergeSubscriptions);
   }, [ops]);
 
+  // Using useCallback to memoize the loadMore function.
   const loadMore = () => {
-    // TODO
-  };
+    const until = sortedEvents.last()?.created_at;
+    if (!until) return;
+
+    // If there's a previous subscription from loadMore, unsubscribe from it
+    if (loadMoreUnsubscribe) {
+      loadMoreUnsubscribe();
+      setLoadMoreUnsubscribe(null); // Reset the stored unsubscribe function
+    }
+
+    const newFilter = Object.assign({}, filter, { until, limit: 10 });
+    console.log('load more until', new Date(until * 1000), 'filter', newFilter);
+
+    // Subscribe with the new filter and store the returned unsubscribe function
+    const unsubscribe = PubSub.subscribe(newFilter, handleEvent, false, true);
+    setLoadMoreUnsubscribe(unsubscribe);
+  }; // Dependencies for the useCallback
 
   return { events, loadMore };
 };

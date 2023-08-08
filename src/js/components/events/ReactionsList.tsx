@@ -99,7 +99,7 @@ const ReactionsList = ({ event, wot }) => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold">{modalTitle}</h2>
           </div>
-          <div className="flex flex-col gap-4 overflow-y-scroll max-h-[50vh] w-96">
+          <div className="flex flex-col gap-4 overflow-y-auto max-h-[50vh]">
             {modalReactions.map((data) => (
               <Reaction key={data.pubkey} data={data} />
             ))}

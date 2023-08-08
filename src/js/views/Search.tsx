@@ -84,10 +84,10 @@ const Search = (props: any) => {
           route('/' + key);
         }}
       />
-      <div className="max-h-[50vh] overflow-y-scroll">
+      <div className="max-h-[50vh] overflow-y-auto">
         <SmallFeed events={trendingPosts} />
       </div>
-      <div className="max-h-[50vh] overflow-y-scroll">
+      <div className="max-h-[50vh] overflow-y-auto">
         <FollowSuggestionsAPI />
       </div>
     </div>

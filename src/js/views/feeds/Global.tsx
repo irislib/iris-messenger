@@ -1,6 +1,7 @@
 import FeedComponent from '@/components/feed/Feed';
 import OnboardingNotification from '@/components/OnboardingNotification';
 import PublicMessageForm from '@/components/PublicMessageForm';
+import Events from '@/nostr/Events';
 import { translate as t } from '@/translations/Translation.mjs';
 
 import View from '../View';
@@ -25,7 +26,19 @@ class Feed extends View {
           <div className="hidden md:block px-4">
             <PublicMessageForm autofocus={false} placeholder={t('whats_on_your_mind')} />
           </div>
-          <FeedComponent filterOptions={[{ name: 'Global', filter: { kinds: [1] } }]} />
+          <FeedComponent
+            filterOptions={[
+              {
+                name: t('posts'),
+                filter: { kinds: [1] },
+                filterFn: (event) => !Events.getEventReplyingTo(event),
+              },
+              {
+                name: t('posts_and_replies'),
+                filter: { kinds: [1], authors: this.state.followedUsers },
+              },
+            ]}
+          />
         </div>
       </div>
     );

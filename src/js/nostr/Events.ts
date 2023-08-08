@@ -292,12 +292,8 @@ const Events = {
       let content;
       try {
         content = await Key.decrypt(event.content);
-        const blockList = JSON.parse(content);
-        const set = new Set<UserId>();
-        for (const id of blockList) {
-          set.add(ID(id));
-        }
-        SocialNetwork.blockedUsers = set;
+        const blockList = JSON.parse(content).map(ID);
+        SocialNetwork.blockedUsers = new Set(blockList);
       } catch (e) {
         console.log('failed to parse your block list', content, event);
       }
@@ -310,7 +306,7 @@ const Events = {
     const myPub = Key.getPubKey();
     if (event.pubkey === myPub) {
       try {
-        const flaggedUsers = JSON.parse(event.content);
+        const flaggedUsers = JSON.parse(event.content).map(ID);
         SocialNetwork.flaggedUsers = new Set(flaggedUsers);
       } catch (e) {
         console.log('failed to parse your flagged users list', event);
