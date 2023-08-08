@@ -1,4 +1,5 @@
 import FeedComponent from '@/components/feed/Feed';
+import Show from '@/components/helpers/Show';
 import OnboardingNotification from '@/components/OnboardingNotification';
 import PublicMessageForm from '@/components/PublicMessageForm';
 import Key from '@/nostr/Key';
@@ -37,8 +38,6 @@ class Feed extends View {
   }
 
   renderView() {
-    if (!this.state.followedUsers.length) return <></>;
-    console.log('this.state.followedUsers', this.state.followedUsers);
     return (
       <div className="flex flex-row">
         <div className="flex flex-col w-full">
@@ -46,14 +45,16 @@ class Feed extends View {
           <div className="hidden md:block px-4">
             <PublicMessageForm autofocus={false} placeholder={t('whats_on_your_mind')} />
           </div>
-          <FeedComponent
-            filterOptions={[
-              {
-                name: 'Followed users',
-                filter: { kinds: [1], authors: this.state.followedUsers, limit: 100 },
-              },
-            ]}
-          />
+          <Show when={this.state.followedUsers.length}>
+            <FeedComponent
+              filterOptions={[
+                {
+                  name: 'Followed users',
+                  filter: { kinds: [1], authors: this.state.followedUsers, limit: 100 },
+                },
+              ]}
+            />
+          </Show>
         </div>
       </div>
     );
