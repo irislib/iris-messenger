@@ -73,12 +73,12 @@ img, video {
   @apply rounded-md;
 }
 
-.full-width-note > div > img, .full-width-note > div > video {
+.full-width-note > div > img, .full-width-note > div > video, .full-width-note > iframe {
   @apply -mx-2 md:mx-0;
   max-width: 100vw;
   @apply rounded-none md:rounded-sm;
 }
 
 .full-width-note > iframe {
-  width: 100vw;
+  @apply w-[100vw] md:w-full;
 }
