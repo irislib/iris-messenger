@@ -11,12 +11,13 @@ const useSubscribe = (ops: {
   enabled?: boolean;
 }) => {
   const [sortedEvents] = useState(new SortedEventMap());
-  const { filter, enabled = true, sinceLastOpened = true, mergeSubscriptions = true } = ops;
+  const { filter, enabled = true, sinceLastOpened = false, mergeSubscriptions = true } = ops;
   const [events, setEvents] = useState<Event[]>([]);
   // TODO save into SortedMap
 
   useEffect(() => {
     if (!enabled || !filter) return;
+    filter.limit = filter.limit || 10;
     return PubSub.subscribe(
       filter,
       (event: any) => {

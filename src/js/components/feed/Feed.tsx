@@ -51,10 +51,12 @@ const Feed = ({ showDisplayAs, filterOptions, emptyMessage }: Props) => {
   const lastElementRef = useRef(null);
   const [mutedUsers] = useLocalState('muted', {});
 
-  console.log('subscribe to filter', filterOption.filter);
-
   const { events: allEvents, loadMore } = useSubscribe({
     filter: filterOption.filter,
+    // in keyword search, relays should be queried for all events, not just sinceLastOpened
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    sinceLastOpened: false,
   });
 
   // deduplicate

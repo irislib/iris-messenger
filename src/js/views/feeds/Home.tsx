@@ -1,24 +1,44 @@
 import FeedComponent from '@/components/feed/Feed';
 import OnboardingNotification from '@/components/OnboardingNotification';
 import PublicMessageForm from '@/components/PublicMessageForm';
+import Key from '@/nostr/Key';
+import { Unsubscribe } from '@/nostr/PubSub';
+import { ID, PUB } from '@/nostr/UserIds';
 import { translate as t } from '@/translations/Translation.mjs';
 
 import SocialNetwork from '../../nostr/SocialNetwork';
 import View from '../View';
 
 class Feed extends View {
+  unsub?: Unsubscribe;
+
   constructor() {
     super();
-    this.state = { sortedMessages: [] };
+    const followedUsers: string[] = Array.from(
+      SocialNetwork.followedByUser.get(ID(Key.getPubKey())) || [],
+    ).map((n) => PUB(n));
+    this.state = {
+      followedUsers,
+    };
     this.id = 'message-view';
     this.class = 'public-messages-view';
   }
 
   componentDidMount() {
     this.restoreScrollPosition();
+    this.unsub = SocialNetwork.getFollowedByUser(Key.getPubKey(), (followedUsers) => {
+      this.setState({ followedUsers: Array.from(followedUsers) });
+    });
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    this.unsub?.();
   }
 
   renderView() {
+    if (!this.state.followedUsers.length) return <></>;
+    console.log('this.state.followedUsers', this.state.followedUsers);
     return (
       <div className="flex flex-row">
         <div className="flex flex-col w-full">
@@ -30,8 +50,7 @@ class Feed extends View {
             filterOptions={[
               {
                 name: 'Followed users',
-                filter: { kinds: [1] },
-                filterFn: (event) => SocialNetwork.getFollowDistance(event.pubkey) <= 1,
+                filter: { kinds: [1], authors: this.state.followedUsers, limit: 100 },
               },
             ]}
           />

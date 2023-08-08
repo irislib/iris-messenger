@@ -29,7 +29,6 @@ const HyperText = memo(
 
     processedChildren = processedChildren.map((x, index, array) => {
       if (typeof x === 'string') {
-        console.log(' array[index + 1]', array[index + 1]);
         if (index < array.length - 1 && !array[index + 1].props?.href) {
           x = x.replace(/\n+$/, ''); // Remove trailing newlines if next element is not a link
         }

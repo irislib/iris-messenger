@@ -25,7 +25,7 @@ class Feed extends View {
           <div className="hidden md:block px-4">
             <PublicMessageForm autofocus={false} placeholder={t('whats_on_your_mind')} />
           </div>
-          <FeedComponent filterOptions={[{ name: 'Global', filter: { kinds: [1] } }]} />
+          <FeedComponent filterOptions={[{ name: 'Global', filter: { kinds: [1], limit: 50 } }]} />
         </div>
       </div>
     );
