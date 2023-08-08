@@ -16,14 +16,12 @@ const Image: Embed = {
       setShowModal(true);
     };
     return (
-      <div>
-        <div className="relative w-full overflow-hidden object-contain my-2">
-          <SafeImg
-            onClick={onClick}
-            className="rounded max-h-[70vh] md:max-h-96 max-w-full cursor-pointer"
-            src={match}
-          />
-        </div>
+      <div className="flex justify-center md:justify-start">
+        <SafeImg
+          onClick={onClick}
+          className="my-2 rounded max-h-[70vh] md:max-h-96 max-w-full cursor-pointer"
+          src={match}
+        />
         <Show when={showModal}>
           <Modal onClose={() => setShowModal(false)}>
             <SafeImg className="rounded max-h-[90vh] max-w-[90vw]" src={match} />
