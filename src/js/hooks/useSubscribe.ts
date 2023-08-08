@@ -10,7 +10,7 @@ const useSubscribe = (ops: {
   mergeSubscriptions?: boolean;
   enabled?: boolean;
 }) => {
-  const [sortedEvents] = useState(new SortedEventMap());
+  const [sortedEvents, setSortedEvents] = useState(new SortedEventMap());
   const [loadMoreUnsubscribe, setLoadMoreUnsubscribe] = useState<Unsubscribe | null>(null);
   const { filter, enabled = true, sinceLastOpened = false, mergeSubscriptions = true } = ops;
   const [events, setEvents] = useState<Event[]>([]);
@@ -20,6 +20,10 @@ const useSubscribe = (ops: {
     sortedEvents.add(event);
     setEvents(sortedEvents.events());
   };
+
+  useEffect(() => {
+    setSortedEvents(new SortedEventMap());
+  }, [filter]);
 
   useEffect(() => {
     if (!enabled || !filter) return;
