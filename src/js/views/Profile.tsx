@@ -116,14 +116,18 @@ class Profile extends View {
       return (
         <Feed
           key={`posts${this.state.hexPub}`}
-          filterOptions={[{ name: 'likes', filter: { authors: [this.state.hexPub], kinds: [1] } }]}
+          filterOptions={[
+            { name: 'likes', filter: { authors: [this.state.hexPub], kinds: [1], limit: 5 } },
+          ]}
         />
       );
     } else if (this.props.tab === 'likes') {
       return (
         <Feed
           key={`likes${this.state.hexPub}`}
-          filterOptions={[{ name: 'likes', filter: { authors: [this.state.hexPub], kinds: [7] } }]}
+          filterOptions={[
+            { name: 'likes', filter: { authors: [this.state.hexPub], kinds: [7], limit: 5 } },
+          ]}
         />
       );
     } else if (this.props.tab === 'media') {
@@ -135,7 +139,9 @@ class Profile extends View {
         {this.getNotification()}
         <Feed
           key={`posts${this.state.hexPub}`}
-          filterOptions={[{ name: 'likes', filter: { authors: [this.state.hexPub], kinds: [1] } }]}
+          filterOptions={[
+            { name: 'likes', filter: { authors: [this.state.hexPub], kinds: [1], limit: 5 } },
+          ]}
         />
       </div>
     );
