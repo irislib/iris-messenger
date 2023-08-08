@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { route } from 'preact-router';
-import { Link } from 'preact-router/match';
+
+import Events from '@/nostr/Events';
 
 import Copy from '../components/buttons/Copy';
 import Feed from '../components/feed/Feed';
@@ -76,71 +77,6 @@ class Profile extends View {
     Key.login({ rpub: this.state.hexPub });
   }
 
-  renderTabs() {
-    const currentProfileUrl = window.location.pathname.split('/')[1];
-    const path = window.location.pathname;
-
-    const linkClass = (href) =>
-      path === href ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-neutral';
-
-    return (
-      <div className="flex mx-4 gap-2 mb-4 overflow-x-auto">
-        <Link className={linkClass('/' + currentProfileUrl)} href={'/' + currentProfileUrl}>
-          {t('posts')}
-          <Show when={this.state.noPosts}>{' (0)'}</Show>
-        </Link>
-        <Link
-          className={linkClass('/' + currentProfileUrl + '/replies')}
-          href={'/' + currentProfileUrl + '/replies'}
-        >
-          {t('posts')} & {t('replies')}
-          <Show when={this.state.noReplies}>{' (0)'}</Show>
-        </Link>
-        <Link
-          className={linkClass('/' + currentProfileUrl + '/likes')}
-          href={'/' + currentProfileUrl + '/likes'}
-        >
-          {t('likes')}
-          <Show when={this.state.noLikes}>{' (0)'}</Show>
-        </Link>
-      </div>
-    );
-  }
-
-  renderTab() {
-    if (!this.state.hexPub) {
-      return <div></div>;
-    }
-
-    if (this.props.tab === 'replies') {
-      return (
-        <Feed
-          key={`posts${this.state.hexPub}`}
-          filterOptions={[{ name: 'likes', filter: { authors: [this.state.hexPub], kinds: [1] } }]}
-        />
-      );
-    } else if (this.props.tab === 'likes') {
-      return (
-        <Feed
-          key={`likes${this.state.hexPub}`}
-          filterOptions={[{ name: 'likes', filter: { authors: [this.state.hexPub], kinds: [7] } }]}
-        />
-      );
-    } else if (this.props.tab === 'media') {
-      return <div>TODO media message feed</div>;
-    }
-
-    return (
-      <div>
-        {this.getNotification()}
-        <Feed
-          key={`posts${this.state.hexPub}`}
-          filterOptions={[{ name: 'likes', filter: { authors: [this.state.hexPub], kinds: [1] } }]}
-        />
-      </div>
-    );
-  }
-
   renderView() {
     const { hexPub, display_name, name, profile, banner, picture, blocked } = this.state;
 
@@ -176,8 +112,24 @@ class Profile extends View {
           </Helmet>
           <ProfileCard npub={this.state.npub} hexPub={this.state.hexPub} />
           <Show when={!blocked}>
-            {this.renderTabs()}
-            {this.renderTab()}
+            <Feed
+              key={`posts${this.state.hexPub}`}
+              filterOptions={[
+                {
+                  name: t('posts'),
+                  filter: { authors: [this.state.hexPub], kinds: [1], limit: 5 },
+                  filterFn: (event) => !Events.getEventReplyingTo(event),
+                },
+                {
+                  name: t('posts_and_replies'),
+                  filter: { authors: [this.state.hexPub], kinds: [1], limit: 5 },
+                },
+                {
+                  name: t('likes'),
+                  filter: { authors: [this.state.hexPub], kinds: [7], limit: 5 },
+                },
+              ]}
+            />
           </Show>
         </div>
       </>
@@ -215,7 +167,7 @@ class Profile extends View {
           }
           banner = isSafeOrigin(banner)
             ? banner
-            : `https://imgproxy.iris.to/insecure/plain/${banner}`;
+            : `https://imgproxy.iris.to/insecure/rs:fill:948:192/plain/${banner}`;
           this.setState({ banner });
         } catch (e) {
           console.log('Invalid banner URL', profile.banner);

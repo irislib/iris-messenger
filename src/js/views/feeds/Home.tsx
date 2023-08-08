@@ -1,21 +1,41 @@
 import FeedComponent from '@/components/feed/Feed';
+import Show from '@/components/helpers/Show';
 import OnboardingNotification from '@/components/OnboardingNotification';
 import PublicMessageForm from '@/components/PublicMessageForm';
+import Events from '@/nostr/Events';
+import Key from '@/nostr/Key';
+import { Unsubscribe } from '@/nostr/PubSub';
+import { ID, PUB } from '@/nostr/UserIds';
 import { translate as t } from '@/translations/Translation.mjs';
 
 import SocialNetwork from '../../nostr/SocialNetwork';
 import View from '../View';
 
 class Feed extends View {
+  unsub?: Unsubscribe;
+
   constructor() {
     super();
-    this.state = { sortedMessages: [] };
+    const followedUsers: string[] = Array.from(
+      SocialNetwork.followedByUser.get(ID(Key.getPubKey())) || [],
+    ).map((n) => PUB(n));
+    this.state = {
+      followedUsers,
+    };
     this.id = 'message-view';
     this.class = 'public-messages-view';
   }
 
   componentDidMount() {
     this.restoreScrollPosition();
+    this.unsub = SocialNetwork.getFollowedByUser(Key.getPubKey(), (followedUsers) => {
+      this.setState({ followedUsers: Array.from(followedUsers) });
+    });
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    this.unsub?.();
   }
 
   renderView() {
@@ -26,15 +46,21 @@ class Feed extends View {
           <div className="hidden md:block px-4">
             <PublicMessageForm autofocus={false} placeholder={t('whats_on_your_mind')} />
           </div>
-          <FeedComponent
-            filterOptions={[
-              {
-                name: 'Followed users',
-                filter: { kinds: [1] },
-                filterFn: (event) => SocialNetwork.getFollowDistance(event.pubkey) <= 1,
-              },
-            ]}
-          />
+          <Show when={this.state.followedUsers.length}>
+            <FeedComponent
+              filterOptions={[
+                {
+                  name: t('posts'),
+                  filter: { kinds: [1], authors: this.state.followedUsers, limit: 100 },
+                  filterFn: (event) => !Events.getEventReplyingTo(event),
+                },
+                {
+                  name: t('posts_and_replies'),
+                  filter: { kinds: [1], authors: this.state.followedUsers, limit: 100 },
+                },
+              ]}
+            />
+          </Show>
         </div>
       </div>
     );
