@@ -1,12 +1,8 @@
-//import { Event } from 'nostr-tools';
 import localState from '../LocalState';
 import Key from './Key';
 import LocalForage from './LocalForage';
 import PubSub, { Unsubscribe } from './PubSub';
-//import FuzzySearch from '../FuzzySearch';
 import Events from './Events';
-//import IndexedDB from './IndexedDB';
-//import AnimalName from '../AnimalName';
 import { ID, PUB, UserId } from './UserIds';
 import profileManager from '../dwotr/ProfileManager';
 
@@ -314,44 +310,25 @@ export default {
           console.log('NIP05 address is valid?', isValid, profile.nip05, address);
           profile.nip05valid = isValid;
 
-          profileManager.prefixHistory = "SocialNetwork.getProfile()->Key.verifyNip05Address";
-          profileManager.recordHistory(hexPub, "this.profiles.set(id, profile)");
-
-          //this.profiles.set(id, profile);
-          profileManager.dispatchProfile(profile);
+          profileManager.dispatchProfile(profile); // Sets the profile in memory if it's not already there and is newer
           callback();
         });
       }
     } else {
-      profileManager.prefixHistory = "SocialNetwork.getProfile()";
       profileManager.loadProfile(hexPub).then((profile) => {
         if (profile) {
           // exists in DB
-          profileManager.prefixHistory = "SocialNetwork.getProfile()->loadProfile()";
-          profileManager.recordHistory(hexPub, "this.profiles.set(id, profile)");
 
           profileManager.dispatchProfile(profile);
-          //this.profiles.set(id, profile);
           callback();
         } else {
-          profileManager.prefixHistory = "SocialNetwork.getProfile()";
           profileManager.fetchProfile(hexPub).then((profile) => {
             if (!profile) return;
-            profileManager.prefixHistory = "SocialNetwork.getProfile() -> fetchProfile()";
             Events.handle(profile);
             callback();
           });
         }
       });
-      // fetch(`https://api.iris.to/profile/${address}`).then((res) => {
-      //   if (res.status === 200) {
-      //     res.json().then((profile) => {
-      //       // TODO verify sig
-      //       Events.handle(profile);
-      //       callback();
-      //     });
-      //   }
-      // });
     }
     return PubSub.subscribe({ kinds: [0], authors: [address] }, callback, false);
   },

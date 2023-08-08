@@ -213,9 +213,8 @@ const VisGraph = ({ props }: ViewComponentProps) => {
 
     let vertices = Object.values(distinctV);
     let addresses = vertices.map((v) => PUB(v.id)); // convert to pub hex format
-    let { unsub } = await profileManager.getProfiles(addresses);
-    if (!isMounted()) return;
-    unsubscribe.push(unsub);
+    await profileManager.getProfiles(addresses);
+    if (!isMounted()) return; // Check if component is still mounted
 
     let delta = new DataSet() as DataSetNodes; // new nodes to added to the graph and returned to the caller, enables more efficient filtering
 

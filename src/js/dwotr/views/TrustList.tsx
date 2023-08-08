@@ -103,8 +103,8 @@ const TrustList = ({ props }: ViewComponentProps) => {
     let addresses = list.map((v) => PUB(v.id));
 
     // Make sure we have the profiles for the addresses
-    let { unsub } = await profileManager.getProfiles(addresses);
-    unsubscribe.push(unsub);
+    await profileManager.getProfiles(addresses);
+    //unsubscribe.push(unsub);
 
     list = list.sort(compareDegree);
     setRawList(list);

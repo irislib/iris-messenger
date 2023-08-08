@@ -140,10 +140,9 @@ const VisPath = ({ props }: ViewComponentProps) => {
 
     let addresses = vertices.map((v) => PUB(v.id));
 
-    let { unsub } = await profileManager.getProfiles(addresses); // Load all profiles in memory first
-    if (!isMounted()) return;
-    unsubscribe?.push(unsub);
-
+    await profileManager.getProfiles(addresses); // Load all profiles in memory first
+    if (!isMounted()) return; // Check if component is still mounted
+    
     await loadVertices(vertices, paths);
     network.current?.redraw();
   }

@@ -138,8 +138,8 @@ const Diagnostics = (props: TestDataProps) => {
   }, [pub]);
 
   async function loadProfiles() {
-    let { unsub, profiles } = await profileManager.getProfiles(RealTestUsers);
-    unsubscribe.push(unsub);
+    let profiles = await profileManager.getProfiles(RealTestUsers);
+    //unsubscribe.push(unsub);
 
     let profileIndex = {};
     profiles.forEach((p) => {
