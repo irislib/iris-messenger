@@ -2,6 +2,7 @@ import FeedComponent from '@/components/feed/Feed';
 import Show from '@/components/helpers/Show';
 import OnboardingNotification from '@/components/OnboardingNotification';
 import PublicMessageForm from '@/components/PublicMessageForm';
+import Events from '@/nostr/Events';
 import Key from '@/nostr/Key';
 import { Unsubscribe } from '@/nostr/PubSub';
 import { ID, PUB } from '@/nostr/UserIds';
@@ -49,7 +50,12 @@ class Feed extends View {
             <FeedComponent
               filterOptions={[
                 {
-                  name: 'Followed users',
+                  name: t('posts'),
+                  filter: { kinds: [1], authors: this.state.followedUsers, limit: 100 },
+                  filterFn: (event) => !Events.getEventReplyingTo(event),
+                },
+                {
+                  name: t('posts_and_replies'),
                   filter: { kinds: [1], authors: this.state.followedUsers, limit: 100 },
                 },
               ]}

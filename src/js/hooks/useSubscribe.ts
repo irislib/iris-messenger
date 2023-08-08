@@ -48,7 +48,7 @@ const useSubscribe = (ops: {
     // Subscribe with the new filter and store the returned unsubscribe function
     const unsubscribe = PubSub.subscribe(newFilter, handleEvent, false, false);
     setLoadMoreUnsubscribe(unsubscribe);
-  }, [filter, loadMoreUnsubscribe, sortedEvents]); // Dependencies for the useCallback
+  }, [ops, sortedEvents]); // Dependencies for the useCallback
 
   return { events, loadMore };
 };
