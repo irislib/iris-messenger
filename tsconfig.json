@@ -25,8 +25,9 @@
     /* preact/compat paths */
     "paths": {
       "react": ["./node_modules/preact/compat/"],
-      "react-dom": ["./node_modules/preact/compat/"]
-    }
+      "react-dom": ["./node_modules/preact/compat/"],
+      "@/*": ["./src/js/*"]
+    },
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

@@ -45,6 +45,11 @@ export default defineConfig({
       },
     }),
   ],
+  resolve: {
+    alias: {
+      '@': '/src/js',
+    },
+  },
   /* preact/compat paths */
   alias: {
     react: 'preact/compat',

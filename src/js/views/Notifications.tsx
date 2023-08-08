@@ -1,5 +1,7 @@
 import { debounce } from 'lodash';
 
+import Key from '@/nostr/Key';
+
 import Feed from '../components/feed/Feed';
 import localState from '../LocalState';
 import Session from '../nostr/Session';
@@ -33,9 +35,16 @@ export default class Notifications extends View {
 
   renderView() {
     return (
-      <div class="centered-container">
-        <Feed key="notifications" index="notifications" emptyMessage={t('no_notifications_yet')} />
-      </div>
+      <Feed
+        key="notifications"
+        emptyMessage={t('no_notifications_yet')}
+        filterOptions={[
+          {
+            name: 'notifications',
+            filter: { '#p': [Key.getPubKey()] },
+          },
+        ]}
+      />
     );
   }
 }
