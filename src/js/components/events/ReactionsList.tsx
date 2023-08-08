@@ -7,8 +7,9 @@ import Events from '../../nostr/Events'; // Import Events module
 import Modal from '../modal/Modal';
 import Avatar from '../user/Avatar';
 import Name from '../user/Name';
-import graphNetwork from '../../dwotr/GraphNetwork';
 import TrustScore from '../../dwotr/model/TrustScore';
+import { RenderScoreDistrustLink, RenderScoreTrustLink } from '@/dwotr/components/RenderGraph';
+import Key from '@/nostr/Key';
 
 type ReactionData = {
   pubkey: string;
@@ -157,32 +158,12 @@ const ReactionsList = ({ event, wot }) => {
         )}
         {hasTrust && (
           <div className="flex-shrink-0" title="Degree 0/1/2">
-            <a
-              onClick={() => {
-                let list = graphNetwork.getTrustList(wot?.vertice, 1);
-                const data = list.map(({outV, edge}) => ({ pubkey: outV.key, text: edge.note }));
-                setModalReactions(data);
-                setModalTitle('Trusted by');
-              }}
-              className="cursor-pointer hover:underline"
-            >
-              {score.renderTrustCount()} <span className="text-neutral-500">Trusts</span>
-            </a>
+            {RenderScoreTrustLink(score, Key.toNostrBech32Address(event.id, 'note') as string, true)}
           </div>
         )}
         {hasDistrust && (
           <div className="flex-shrink-0" title="Degree 0/1/2">
-            <a
-              onClick={() => {
-                let list = graphNetwork.getTrustList(wot?.vertice, -1);
-                const data = list.map(({outV, edge}) => ({ pubkey: outV.key, text: edge.note }));
-                setModalReactions(data);
-                setModalTitle('Distrusted by');
-              }}
-              className="cursor-pointer hover:underline"
-            >
-              {score.renderDistrustCount()} <span className="text-neutral-500">Distrusts</span>
-            </a>
+            {RenderScoreDistrustLink(score, Key.toNostrBech32Address(event.id, 'note') as string, true)}
           </div>
         )}
       </div>

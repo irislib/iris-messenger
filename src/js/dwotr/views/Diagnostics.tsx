@@ -5,7 +5,6 @@ import graphNetwork from '../GraphNetwork';
 import Header from '../../components/Header';
 import { Button } from '../../components/buttons/Button';
 import profileManager from '../ProfileManager';
-import { Unsubscribe } from '../../nostr/PubSub';
 import { ID } from '../../nostr/UserIds';
 import { toTimestamp } from '../Utils';
 import Name from '../../components/user/Name';
