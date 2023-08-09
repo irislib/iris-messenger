@@ -1,6 +1,6 @@
+import CreateNoteForm from '@/components/create/CreateNoteForm';
 import FeedComponent from '@/components/feed/Feed';
 import OnboardingNotification from '@/components/OnboardingNotification';
-import PublicMessageForm from '@/components/PublicMessageForm';
 import Events from '@/nostr/Events';
 import { translate as t } from '@/translations/Translation.mjs';
 
@@ -24,7 +24,7 @@ class Feed extends View {
         <div className="flex flex-col w-full">
           <OnboardingNotification />
           <div className="hidden md:block px-4">
-            <PublicMessageForm autofocus={false} placeholder={t('whats_on_your_mind')} />
+            <CreateNoteForm autofocus={false} placeholder={t('whats_on_your_mind')} />
           </div>
           <FeedComponent
             filterOptions={[
@@ -36,7 +36,7 @@ class Feed extends View {
               },
               {
                 name: t('posts_and_replies'),
-                filter: { kinds: [1], authors: this.state.followedUsers },
+                filter: { kinds: [1] },
                 eventProps: { showRepliedMsg: true, fullWidth: false },
               },
             ]}
