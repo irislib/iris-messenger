@@ -36,6 +36,7 @@ export default class Notifications extends View {
     return (
       <Feed
         key="notifications"
+        showDisplayAs={false}
         emptyMessage={t('no_notifications_yet')}
         filterOptions={[
           {

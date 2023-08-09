@@ -15,6 +15,22 @@ import { useLocalState } from '@/LocalState';
 
 const PAGE_SIZE = 6;
 
+function mapEventsToMedia(events: any[]): ImageOrVideo[] {
+  return events.flatMap((event) => {
+    const imageMatches = (event.content.match(Image.regex) || []).map((url: string) => ({
+      type: 'image',
+      url,
+      created_at: event.created_at,
+    }));
+    const videoMatches = (event.content.match(Video.regex) || []).map((url: string) => ({
+      type: 'video',
+      url,
+      created_at: event.created_at,
+    }));
+    return [...imageMatches, ...videoMatches];
+  });
+}
+
 const Feed = (props: FeedProps) => {
   const { showDisplayAs, filterOptions, emptyMessage } = props;
   if (!filterOptions || filterOptions.length === 0) {
@@ -22,8 +38,8 @@ const Feed = (props: FeedProps) => {
   }
   const [filterOption, setFilterOption] = useState(filterOptions[0]);
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
-  const [displayAs, setDisplayAs] = useState('feed' as DisplayAs);
-  const [modalItemIndex, setModalImageIndex] = useState(null as number | null);
+  const [displayAs, setDisplayAs] = useState<DisplayAs>('feed');
+  const [modalItemIndex, setModalImageIndex] = useState<number | null>(null);
   const lastElementRef = useRef(null);
   const [mutedUsers] = useLocalState('muted', {});
 
@@ -58,22 +74,6 @@ const Feed = (props: FeedProps) => {
     }
   }
 
-  function mapEventsToMedia(events) {
-    return events.flatMap((event) => {
-      const imageMatches = (event.content.match(Image.regex) || []).map((url: string) => ({
-        type: 'image',
-        url,
-        created_at: event.created_at,
-      }));
-      const videoMatches = (event.content.match(Video.regex) || []).map((url: string) => ({
-        type: 'video',
-        url,
-        created_at: event.created_at,
-      }));
-      return [...imageMatches, ...videoMatches];
-    });
-  }
-
   const imagesAndVideos = useMemo(() => {
     if (displayAs === 'feed') {
       return [];
@@ -93,7 +93,7 @@ const Feed = (props: FeedProps) => {
           }}
         />
       </Show>
-      <Show when={showDisplayAs}>
+      <Show when={showDisplayAs !== false}>
         <DisplaySelector
           onDisplayChange={(displayAs) => {
             setDisplayCount(PAGE_SIZE);
