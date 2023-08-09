@@ -12,6 +12,7 @@ const NostrNpub: Embed = {
     const pub = match.replace('@', '');
     return (
       <Link href={`/${pub}`} className="link">
+        {' '}
         <Name pub={pub} hideBadge={true} />
       </Link>
     );

@@ -16,6 +16,7 @@ const NostrUser: Embed = {
         return (
           <>
             <Link className="link" href={`/${data.pubkey}`}>
+              {' '}
               <Name pub={data.pubkey} />
             </Link>
           </>
