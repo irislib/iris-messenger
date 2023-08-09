@@ -1,20 +1,22 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { Bars3Icon, Squares2X2Icon } from '@heroicons/react/24/outline';
+import { memo, useMemo, useRef, useState } from 'react';
 
 import Image from '@/components/embed/Image';
 import Video from '@/components/embed/Video';
 import EventComponent from '@/components/events/EventComponent';
+import DisplaySelector from '@/components/feed/DisplaySelector';
+import FilterOptionsSelector from '@/components/feed/FilterOptionsSelector';
 import ImageGridItem from '@/components/feed/ImageGridItem';
 import ImageModal from '@/components/feed/ImageModal';
 import { DisplayAs, FeedProps, ImageOrVideo } from '@/components/feed/types';
+import useInfiniteScroll from '@/components/feed/useInfiniteScroll';
 import Show from '@/components/helpers/Show';
 import useSubscribe from '@/hooks/useSubscribe';
 import { useLocalState } from '@/LocalState';
 
 const PAGE_SIZE = 6;
-const LOAD_MORE_MARGIN = '0px 0px 2000px 0px';
 
-const Feed = ({ showDisplayAs, filterOptions, emptyMessage }: FeedProps) => {
+const Feed = (props: FeedProps) => {
+  const { showDisplayAs, filterOptions, emptyMessage } = props;
   if (!filterOptions || filterOptions.length === 0) {
     throw new Error('Feed requires at least one filter option');
   }
@@ -30,7 +32,6 @@ const Feed = ({ showDisplayAs, filterOptions, emptyMessage }: FeedProps) => {
     sinceLastOpened: false,
   });
 
-  // deduplicate
   const events = useMemo(() => {
     const filtered = allEvents.filter((event) => {
       if (mutedUsers[event.pubkey]) {
@@ -46,148 +47,90 @@ const Feed = ({ showDisplayAs, filterOptions, emptyMessage }: FeedProps) => {
 
   const isEmpty = events.length === 0;
 
-  useEffect(() => {
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      const entry = entries[0];
-      if (entry.isIntersecting) {
-        if (displayCount < events.length) {
-          setDisplayCount((prevCount) => prevCount + PAGE_SIZE);
-        } else {
-          loadMore?.();
-        }
-      }
-    };
+  const hasMoreItems = displayCount < events.length;
+  useInfiniteScroll(lastElementRef, loadMoreItems, hasMoreItems);
 
-    const observer = new IntersectionObserver(observerCallback, {
-      threshold: 0.0,
-      rootMargin: LOAD_MORE_MARGIN,
+  function loadMoreItems() {
+    if (displayCount < events.length) {
+      setDisplayCount((prevCount) => prevCount + PAGE_SIZE);
+    } else {
+      loadMore?.();
+    }
+  }
+
+  function mapEventsToMedia(events) {
+    return events.flatMap((event) => {
+      const imageMatches = (event.content.match(Image.regex) || []).map((url: string) => ({
+        type: 'image',
+        url,
+        created_at: event.created_at,
+      }));
+      const videoMatches = (event.content.match(Video.regex) || []).map((url: string) => ({
+        type: 'video',
+        url,
+        created_at: event.created_at,
+      }));
+      return [...imageMatches, ...videoMatches];
     });
-
-    const observeLastElement = () => {
-      if (lastElementRef.current) {
-        observer.observe(lastElementRef.current);
-      }
-    };
-
-    observeLastElement(); // Observe the new last element
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [events, displayCount, lastElementRef.current]);
+  }
 
   const imagesAndVideos = useMemo(() => {
     if (displayAs === 'feed') {
       return [];
     }
-    return events
-      .flatMap((event) => {
-        const imageMatches = (event.content.match(Image.regex) || []).map((url: string) => ({
-          type: 'image',
-          url,
-          created_at: event.created_at,
-        }));
-        const videoMatches = (event.content.match(Video.regex) || []).map((url: string) => ({
-          type: 'video',
-          url,
-          created_at: event.created_at,
-        }));
-        return [...imageMatches, ...videoMatches];
-      })
-      .slice(0, displayCount);
+    return mapEventsToMedia(events).slice(0, displayCount);
   }, [events, displayCount, displayAs]) as ImageOrVideo[];
-
-  const renderFilterOptions = () => {
-    return (
-      <div className="flex mb-4 gap-2 mx-2 md:mx-4">
-        {filterOptions.map((opt) => (
-          <button
-            key={opt.name}
-            className={`btn btn-sm ${
-              filterOption.name === opt.name ? 'btn-primary' : 'btn-neutral'
-            }`}
-            onClick={() => {
-              setFilterOption(opt);
-              setDisplayCount(PAGE_SIZE);
-            }}
-          >
-            {opt.name}
-          </button>
-        ))}
-      </div>
-    );
-  };
-
-  const renderDisplayAsSelector = () => {
-    if (showDisplayAs === false) return null;
-    return (
-      <div className="flex mb-px">
-        <button
-          className={`rounded-sm flex justify-center flex-1 p-3 ${
-            displayAs === 'feed' ? 'bg-neutral-800' : 'hover:bg-neutral-900'
-          }`}
-          onClick={() => {
-            setDisplayCount(PAGE_SIZE);
-            setDisplayAs('feed');
-          }}
-        >
-          <Bars3Icon width={24} height={24} />
-        </button>
-        <button
-          className={`rounded-sm flex justify-center flex-1 p-3 ${
-            displayAs === 'grid' ? 'bg-neutral-800' : 'hover:bg-neutral-900'
-          }`}
-          onClick={() => {
-            setDisplayCount(PAGE_SIZE);
-            setDisplayAs('grid');
-          }}
-        >
-          <Squares2X2Icon width={24} height={24} />
-        </button>
-      </div>
-    );
-  };
-
-  const renderGrid = () => {
-    return (
-      <div className="grid grid-cols-3 gap-px">
-        {imagesAndVideos.map((item, index) => (
-          <ImageGridItem
-            item={item}
-            index={index}
-            setModalImageIndex={setModalImageIndex}
-            lastElementRef={lastElementRef}
-            imagesAndVideosLength={imagesAndVideos.length}
-          />
-        ))}
-      </div>
-    );
-  };
 
   return (
     <>
-      <Show when={filterOptions.length > 1}>{renderFilterOptions()}</Show>
-      {renderDisplayAsSelector()}
+      <Show when={filterOptions.length > 1}>
+        <FilterOptionsSelector
+          filterOptions={filterOptions}
+          activeOption={filterOption}
+          onOptionClick={(opt) => {
+            setFilterOption(opt);
+            setDisplayCount(PAGE_SIZE);
+          }}
+        />
+      </Show>
+      <Show when={showDisplayAs}>
+        <DisplaySelector
+          onDisplayChange={(displayAs) => {
+            setDisplayCount(PAGE_SIZE);
+            setDisplayAs(displayAs);
+          }}
+          activeDisplay={displayAs}
+        />
+      </Show>
       <ImageModal
         setModalImageIndex={setModalImageIndex}
         modalItemIndex={modalItemIndex}
         imagesAndVideos={imagesAndVideos}
       />
-      <Show when={isEmpty}>
-        <div>{emptyMessage || 'No Posts'}</div>
+      <Show when={isEmpty}>{emptyMessage || 'No Posts'}</Show>
+      <Show when={displayAs === 'grid'}>
+        <div className="grid grid-cols-3 gap-px">
+          {imagesAndVideos.map((item, index) => (
+            <ImageGridItem
+              item={item}
+              index={index}
+              setModalImageIndex={setModalImageIndex}
+              lastElementRef={lastElementRef}
+              imagesAndVideosLength={imagesAndVideos.length}
+            />
+          ))}
+        </div>
       </Show>
-      <div ref={lastElementRef}>
-        {displayAs === 'grid'
-          ? renderGrid()
-          : events.slice(0, displayCount).map((event, index, self) => {
-              const isLastElement = index === self.length - 1;
-              return (
-                <div key={`feed${event.id}${index}`} ref={isLastElement ? lastElementRef : null}>
-                  <EventComponent id={event.id} {...filterOption.eventProps} />
-                </div>
-              );
-            })}
-      </div>
+      <Show when={displayAs === 'feed'}>
+        {events.slice(0, displayCount).map((event, index, self) => {
+          const isLastElement = index === self.length - 1;
+          return (
+            <div key={`feed${event.id}${index}`} ref={isLastElement ? lastElementRef : null}>
+              <EventComponent id={event.id} {...filterOption.eventProps} />
+            </div>
+          );
+        })}
+      </Show>
     </>
   );
 };
