@@ -32,10 +32,12 @@ class Feed extends View {
                 name: t('posts'),
                 filter: { kinds: [1] },
                 filterFn: (event) => !Events.getEventReplyingTo(event),
+                eventProps: { showRepliedMsg: true },
               },
               {
                 name: t('posts_and_replies'),
                 filter: { kinds: [1], authors: this.state.followedUsers },
+                eventProps: { showRepliedMsg: true, fullWidth: false },
               },
             ]}
           />

@@ -28,7 +28,7 @@ import Relays from './Relays';
 import Session from './Session';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
-import { ID, PUB, UserId, UserIds } from './UserIds';
+import { ID, PUB, UserIds } from './UserIds';
 import profileManager from '../dwotr/ProfileManager';
 
 const startTime = Date.now() / 1000;
