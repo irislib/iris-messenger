@@ -5,7 +5,7 @@ import { Filter } from 'nostr-tools';
 
 import Image from '@/components/embed/Image';
 import Video from '@/components/embed/Video';
-import EventComponent from '@/components/events/EventComponent';
+import EventComponent, { EventComponentProps } from '@/components/events/EventComponent';
 import Modal from '@/components/modal/Modal';
 import ProxyImg from '@/components/SafeImg';
 import useSubscribe from '@/hooks/useSubscribe';
@@ -38,6 +38,7 @@ export type FilterOption = {
   name: string;
   filter: Filter;
   filterFn?: (event: any) => boolean;
+  eventProps?: Partial<EventComponentProps>;
 };
 
 const Feed = ({ showDisplayAs, filterOptions, emptyMessage }: Props) => {
@@ -305,7 +306,7 @@ const Feed = ({ showDisplayAs, filterOptions, emptyMessage }: Props) => {
               const isLastElement = index === self.length - 1;
               return (
                 <div key={`feed${event.id}${index}`} ref={isLastElement ? lastElementRef : null}>
-                  <EventComponent id={event.id} />
+                  <EventComponent id={event.id} {...filterOption.eventProps} />
                 </div>
               );
             })}
