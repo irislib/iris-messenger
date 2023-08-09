@@ -3,6 +3,8 @@ import $ from 'jquery';
 import { Event } from 'nostr-tools';
 import { createRef } from 'preact';
 
+import { uploadFile } from '@/utils/uploadFile';
+
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
@@ -95,12 +97,39 @@ class PublicMessageForm extends Component<IProps, IState> {
   }
 
   onMsgTextPaste(event) {
-    const pasted = (event.clipboardData || window.clipboardData).getData('text');
+    const clipboardData = event.clipboardData || window.clipboardData;
+
+    // Handling magnet links
+    const pasted = clipboardData.getData('text');
     const magnetRegex = /(magnet:\?xt=urn:btih:.*)/gi;
     const match = magnetRegex.exec(pasted);
     console.log('magnet match', match);
     if (match) {
       this.setState({ torrentId: match[0] });
+    }
+
+    if (clipboardData.items) {
+      const items = clipboardData.items;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          const blob = items[i].getAsFile();
+          uploadFile(
+            blob,
+            (url) => {
+              const textEl = $(this.newMsgRef.current);
+              const currentVal = textEl.val();
+              if (currentVal) {
+                textEl.val(currentVal + '\n\n' + url);
+              } else {
+                textEl.val(url);
+              }
+            },
+            (errorMsg) => {
+              console.error(errorMsg);
+            },
+          );
+        }
+      }
     }
   }
 
@@ -142,6 +171,7 @@ class PublicMessageForm extends Component<IProps, IState> {
   }
 
   attachmentsChanged(event) {
+    // TODO use Upload btn
     const files = event.target.files || event.dataTransfer.files;
     if (files) {
       for (let i = 0; i < files.length; i++) {
