@@ -163,7 +163,7 @@ class ProfileManager {
   }
 
   saveProfile(profile: ProfileRecord) {
-    if (!profile?.isDefault) return; // don't save default profiles
+    if (profile?.isDefault || profile?.isDefault == undefined) return; // don't save default profiles
     this.#saveQueue.push(profile);
     this.saveBulk();
   }
@@ -190,11 +190,11 @@ class ProfileManager {
     name = p.name?.trim().slice(0, 100) || ''; // Trim and limit to 100 chars
 
     // Make sure we have a display name
-    let display_name = p.display_name || p.displayName;
+    let display_name = (p.display_name || p.displayName)?.trim().slice(0, 200);
 
     // Make sure that we don't store large values
     display_name = p.display_name?.trim().slice(0, 200);
-    let about = p.about.trim().slice(0, 10000);
+    let about = p.about?.trim().slice(0, 10000);
     let picture = p.picture?.trim().slice(0, 4096);
     let banner = p.banner?.trim().slice(0, 4096);
     let website = p.website?.trim().slice(0, 4096);
@@ -214,6 +214,7 @@ class ProfileManager {
       nip05,
       lud06,
       lud16,
+      isDefault: false,
     } as ProfileRecord;
 
     return profile;

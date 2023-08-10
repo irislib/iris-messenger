@@ -1,3 +1,4 @@
+import * as bech32 from 'bech32-buffer'; /* eslint-disable-line @typescript-eslint/no-var-requires */
 import { Event } from 'nostr-tools';
 import Graph, { Edge, EdgeRecord, EntityType, Vertice } from './model/Graph';
 import WOTPubSub from './network/WOTPubSub';
@@ -6,8 +7,9 @@ import { MAX_DEGREE } from './model/TrustScore';
 import dwotrDB from './network/DWoTRDexie';
 import { debounce } from 'lodash';
 import { MonitorItem } from './model/MonitorItem';
-import { BECH32, ID } from '../nostr/UserIds';
+import { BECH32, ID, PUB } from '../nostr/UserIds';
 import { TrustScoreEvent } from './network/TrustScoreEvent';
+import Helpers from '@/Helpers';
 
 export type ResolveTrustCallback = (result: any) => any;
 
@@ -101,14 +103,15 @@ class GraphNetwork {
     entityType: EntityType = EntityType.Key,
     comment?: string,
     context: string = 'nostr',
-  ) {
+  ) : Promise<void> {
     // console.time("GraphNetwork.publishTrust");
     // Add the trust to the local graph, and update the score
     const timestamp = this.wotPubSub?.getTimestamp();
     const props = { from: this.sourceKey, to, val, entityType, context, note: comment, timestamp };
 
-    const { outV, inV, preVal } = await this.setTrust(props, false);
+    const { outV, inV, preVal, change } = await this.setTrust(props, false);
 
+    if(!change) return;
     // Update the vertice monitors
     // graphNetwork.updateVerticeMonitor(outV); // Update the monitor for the source vertice before recalculating the score
     // graphNetwork.updateVerticeMonitor(inV);
@@ -129,7 +132,7 @@ class GraphNetwork {
         if (preVal == currentVal) return; // In the end, if trust value has not changed, then don't publish the trust to the network
 
         // Publish the trust to the network is pretty slow, may be web workers can be used to speed it up UI
-        await graphNetwork.wotPubSub?.publishTrust(
+        graphNetwork.wotPubSub?.publishTrust(
           to,
           currentVal,
           comment,
@@ -239,8 +242,8 @@ class GraphNetwork {
 
   async setTrust(props: any, isExternal: boolean): Promise<any> {
     let { edge, preVal, change } = await this.putEdge(props, isExternal);
-    let outV = edge.out;
-    let inV = edge.in;
+    let outV = edge?.out;
+    let inV = edge?.in;
 
     return { outV, inV, edge, preVal, change };
   }
@@ -315,17 +318,12 @@ class GraphNetwork {
 
     for (let v of vertices) {
       if (since < v.timestamp) since = v.timestamp;
-      authors.push(BECH32(v.id));
+      authors.push(PUB(v.id));
     }
 
     vertices.forEach((v) => (v.subscribed = id)); // Mark the vertices as subscribed with the current subscription counter
 
-    // wait a little to the UI is done.
-    setTimeout(() => {
-      console.time('Subscribing to trust events');
-      self.unsubs[id] = self.wotPubSub?.subscribeTrust(authors, since, self.trustEvent); // Subscribe to trust events
-      console.timeEnd('Subscribing to trust events');
-    }, 1);
+    self.unsubs[id] = self.wotPubSub?.subscribeTrust(authors, since, self.trustEvent); // Subscribe to trust events
   }
 
   unsubscribeAll() {
@@ -335,53 +333,35 @@ class GraphNetwork {
   }
 
   async trustEvent(event: Event) {
-    let p, context, d, v, t, note: string;
-    let author = event.pubkey;
-    if (event.tags) {
-      for (const tag of event.tags) {
-        switch (tag[0]) {
-          case 'p':
-            p = tag[1];
-            break;
-          case 'c':
-            context = tag[1];
-            break;
-          case 'd':
-            d = tag[1];
-            break;
-          case 'v':
-            v = tag[1];
-            break;
-          case 't':
-            t = tag[1];
-            break;
-        }
+    let {pTags, eTags, val, authorPubkey, note, context, timestamp } = WOTPubSub.parseTrustEvent(event);
+
+      console.info(`Trust Event (p): ${authorPubkey} -> ${pTags.map( v=> v).join(',')} = ${val} (${note})`);
+      //console.info(`Trust Event (e): ${authorPubkey} -> ${eTags.map( v=> v).join(',')} = ${val} (${note})`);
+
+      for(const p of pTags ) {
+        await graphNetwork.setTrustAndProcess(p, authorPubkey, EntityType.Key, val, note, context, timestamp);
       }
-    }
-    note = event.content;
 
-    if (p && d && v) {
-      let val = parseInt(v);
-      if (isNaN(val) || val < -1 || val > 1) return; // Invalid value
-
-      console.info(`Trust Event: ${author} -> ${p} = ${val} (${note})`);
-
-      let entityType = t ? (parseInt(t) as EntityType) : EntityType.Item; // entityType be of value 1 or 2 (key or item)
-
-      let from = Key.toNostrHexAddress(author) as string;
-      let to = Key.toNostrHexAddress(p) as string;
-
-      // Add the Trust Event to the memory Graph and IndexedDB
-      let { outV, inV, change } = await graphNetwork.setTrust(
-        { from, to, val, note, context, entityType, timestamp: event.created_at },
-        true,
-      );
-
-      if (change) {
-        graphNetwork.addToProcessScoreQueue(outV, inV);
-        graphNetwork.processScoreDebounce(); // Wait a little before processing the score, to allow for multiple updates to be made at once
+      for(const e of eTags ) {
+        await graphNetwork.setTrustAndProcess(e, authorPubkey, EntityType.Item, val, note, context, timestamp);
       }
+  }
+
+  async setTrustAndProcess(to: string, from:string, entityType: EntityType, val: number, note: string, context: string, timestamp: number) {
+    if(!to || to.length < 2) return;
+    to = graphNetwork.getHexKey(to);
+
+    // Add the Trust Event to the memory Graph and IndexedDB
+    let { outV, inV, change } = await graphNetwork.setTrust(
+      { from, to, val, note, context, entityType, timestamp },
+      true,
+    );
+
+    if (change) {
+      graphNetwork.addToProcessScoreQueue(outV, inV);
+      graphNetwork.processScoreDebounce(); // Wait a little before processing the score, to allow for multiple updates to be made at once
     }
+
   }
 
   findOption(vertice: Vertice, options: Array<any> | undefined): any {
@@ -426,6 +406,18 @@ class GraphNetwork {
       }
     }
     return result;
+  }
+
+  // Should be a little faster than Key.toNostrHexAddress, but less secure
+  getHexKey(key: string): string {
+    let address = key?.slice(0, 4).toLocaleLowerCase();
+    if (address === 'npub' || address === 'nsec' || address === 'note') {
+      const { prefix, data } = bech32.decode(key);
+      const addr = Helpers.arrayToHex(data);
+      return addr;
+    }
+
+    return key;
   }
 }
 

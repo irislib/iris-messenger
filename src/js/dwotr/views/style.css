@@ -136,13 +136,13 @@ html {
   }
 
   .graphlink {
-    @apply hover:underline;
+    @apply font-normal hover:underline;
     text-decoration: none;
   }
 
   .graphlink.active {
-    @apply text-iris-blue;
-    text-decoration: none;
+    @apply text-iris-blue font-bold;
+    text-decoration: none;    
   }
   
   
