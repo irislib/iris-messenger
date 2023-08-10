@@ -258,6 +258,7 @@ export default {
   getFollowedByUser: function (
     user: string,
     cb?: (followedUsers: Set<string>) => void,
+    includeSelf = false,
   ): Unsubscribe {
     const userId = ID(user);
     const callback = () => {
@@ -266,10 +267,15 @@ export default {
         for (const id of this.followedByUser.get(userId) || []) {
           set.add(PUB(id));
         }
+        if (includeSelf) {
+          set.add(user);
+        }
         cb(set);
       }
     };
-    this.followedByUser.has(userId) && callback();
+    if (this.followedByUser.has(userId) || includeSelf) {
+      callback();
+    }
     return PubSub.subscribe({ kinds: [3], authors: [user] }, callback);
   },
   getFollowersByUser: function (
