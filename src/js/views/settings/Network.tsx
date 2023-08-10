@@ -72,7 +72,7 @@ const Network = () => {
       <div className="flex flex-col gap-2">
         {relays.map((relay) => (
           <div className="flex gap-2 flex-row peer">
-            <div className="flex-1" key={relay.url}>
+            <div className="flex-1 truncate" key={relay.url}>
               <span className={getClassName(relay)}>&#x2B24; </span>
               {relay.url}
             </div>
