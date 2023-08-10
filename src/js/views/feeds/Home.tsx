@@ -1,7 +1,7 @@
+import CreateNoteForm from '@/components/create/CreateNoteForm';
 import FeedComponent from '@/components/feed/Feed';
 import Show from '@/components/helpers/Show';
 import OnboardingNotification from '@/components/OnboardingNotification';
-import PublicMessageForm from '@/components/PublicMessageForm';
 import Events from '@/nostr/Events';
 import Key from '@/nostr/Key';
 import { Unsubscribe } from '@/nostr/PubSub';
@@ -28,9 +28,14 @@ class Feed extends View {
 
   componentDidMount() {
     this.restoreScrollPosition();
-    this.unsub = SocialNetwork.getFollowedByUser(Key.getPubKey(), (followedUsers) => {
-      this.setState({ followedUsers: Array.from(followedUsers) });
-    });
+    this.unsub = SocialNetwork.getFollowedByUser(
+      Key.getPubKey(),
+      (followedUsers) => {
+        console.log('followedUsers', followedUsers);
+        this.setState({ followedUsers: Array.from(followedUsers) });
+      },
+      true,
+    );
   }
 
   componentWillUnmount() {
@@ -44,7 +49,7 @@ class Feed extends View {
         <div className="flex flex-col w-full">
           <OnboardingNotification />
           <div className="hidden md:block px-4">
-            <PublicMessageForm autofocus={false} placeholder={t('whats_on_your_mind')} />
+            <CreateNoteForm autofocus={false} placeholder={t('whats_on_your_mind')} />
           </div>
           <Show when={this.state.followedUsers.length}>
             <FeedComponent

@@ -1,15 +1,15 @@
 import { memo } from 'react';
 import { useEffect, useState } from 'preact/hooks';
 
-import Helpers from '../../../Helpers';
-import localState from '../../../LocalState';
-import SocialNetwork from '../../../nostr/SocialNetwork';
-import { translate as t } from '../../../translations/Translation.mjs';
-import Show from '../../helpers/Show';
-import HyperText from '../../HyperText';
-import PublicMessageForm from '../../PublicMessageForm';
-import Torrent from '../../Torrent';
-import Reactions from '../buttons/ReactionButtons';
+import CreateNoteForm from '@/components/create/CreateNoteForm';
+import Reactions from '@/components/events/buttons/ReactionButtons';
+import Show from '@/components/helpers/Show';
+import HyperText from '@/components/HyperText';
+import Torrent from '@/components/Torrent';
+import Helpers from '@/Helpers';
+import localState from '@/LocalState';
+import SocialNetwork from '@/nostr/SocialNetwork';
+import { translate as t } from '@/translations/Translation.mjs';
 
 import Author from './Author';
 import Helmet from './Helmet';
@@ -134,7 +134,7 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta })
       </Show>
       <Show when={standalone}>
         <hr className="-mx-2 opacity-10 my-2" />
-        <PublicMessageForm
+        <CreateNoteForm
           waitForFocus={true}
           autofocus={!standalone}
           replyingTo={event.id}
