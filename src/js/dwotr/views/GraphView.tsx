@@ -55,6 +55,9 @@ function getEntityType(npub: string | undefined) {
   return npub?.toLocaleLowerCase().startsWith('note') ? 'item' : 'key';
 }
 
+//*************************************************************************
+// GraphView - The main view for the graph
+//*************************************************************************
 const GraphView = (props: GraphViewProps) => {
   // Create a ref to provide DOM access
   const [state, setState] = useState<any>({ ready: false });
@@ -80,6 +83,9 @@ const GraphView = (props: GraphViewProps) => {
 
   const callFilter = debounce((filter: string) => setFilter(filter), 500, { trailing: true }); // 'maxWait':
 
+  //-------------------------------------------------------------------------
+  // Initial load of the graph data
+  //-------------------------------------------------------------------------
   useEffect(() => {
     graphNetwork.whenReady(() => {
       setVertice(graphNetwork.g.vertices[ID(npub)]);
@@ -94,14 +100,19 @@ const GraphView = (props: GraphViewProps) => {
     };
   }, []); // Load once
 
+  //-------------------------------------------------------------------------
+  // Set the npub and vertice when the npub changes
+  //-------------------------------------------------------------------------
   const setNpub = useCallback((npub: string) => {
     setVertice(graphNetwork.g.vertices[ID(npub)]);
     setNpubPrivate(npub);
     setEntityType(getEntityType(npub));
   }, []);
 
+  //-------------------------------------------------------------------------
   // Update the state when the props change
   // Check if the props have changed
+  //-------------------------------------------------------------------------
   useEffect(() => {
 
     if (props.npub != npub) { 
@@ -116,6 +127,10 @@ const GraphView = (props: GraphViewProps) => {
     if (props.filter != filter) setFilter(props.filter || '');
   }, [props.npub, props.trusttype, props.dir, props.view, props.filter]);
 
+
+  //-------------------------------------------------------------------------
+  // Set the search parameters
+  //-------------------------------------------------------------------------
   function setSearch(params: any) {
     const p = {
       npub,
@@ -130,8 +145,10 @@ const GraphView = (props: GraphViewProps) => {
     }`;
   }
 
+  //-------------------------------------------------------------------------
   // Render the view from 3 different components, graph, path, and list
   // selected by the name of the view useState property
+  //-------------------------------------------------------------------------
   const renderView = () => {
     let props = {
       npub,
@@ -150,6 +167,9 @@ const GraphView = (props: GraphViewProps) => {
     return <VisGraph props={props} />;
   };
 
+  //-------------------------------------------------------------------------
+  // Render 
+  //-------------------------------------------------------------------------
   if (!state.ready) return null; // TODO: loading
   return (
     <>
