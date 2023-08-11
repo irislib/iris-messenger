@@ -114,11 +114,14 @@ export default class OnboardingNotification extends Component {
         <p>{t('no_followers_yet')}</p>
         <div className="flex gap-2 my-2">
           <Copy
-            className="btn btn-neutral"
+            className="btn btn-sm btn-neutral"
             text={t('copy_link')}
             copyStr={Helpers.getMyProfileLink()}
           />
-          <button className="btn btn-neutral" onClick={() => this.setState({ showQrModal: true })}>
+          <button
+            className="btn btn-sm btn-neutral"
+            onClick={() => this.setState({ showQrModal: true })}
+          >
             {t('show_qr_code')}
           </button>
         </div>
