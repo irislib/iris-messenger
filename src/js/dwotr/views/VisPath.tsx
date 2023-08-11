@@ -15,7 +15,6 @@ import Key from '../../nostr/Key';
 import { filterNodes } from './VisGraph';
 import Events from '../../nostr/Events';
 import eventManager from '../EventManager';
-import { Event } from 'nostr-tools';
 import ProfileRecord from '../model/ProfileRecord';
 
 const defaultOptions = {
@@ -63,7 +62,7 @@ const defaultOptions = {
 };
 
 export function loadKeyVertice(vertice: Vertice, nodes: DataSetNodes) {
-  let profile = profileManager.getDefaultProfile(vertice.id);
+  let profile = profileManager.getDefaultProfile(vertice.id) as ProfileRecord;
   let image = profileManager.ensurePicture(profile);
 
   let node = nodes.get(vertice.id);

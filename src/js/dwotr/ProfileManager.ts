@@ -33,7 +33,7 @@ class ProfileManager {
 
     const queue = this.#saveQueue;
     this.#saveQueue = [];
-
+        
     storage.profiles.bulkPut(queue).finally(() => {
       this.#saving = false;
     });
@@ -270,7 +270,7 @@ class ProfileManager {
     return profile;
   }
 
-  getDefaultProfile(id: number | undefined) {
+  getDefaultProfile(id: number | undefined) : ProfileRecord | undefined {
     if (!id) return undefined;
     const profile = SocialNetwork.profiles.get(id);
     if (profile) return profile;
@@ -280,6 +280,13 @@ class ProfileManager {
   quickProfile(address: string) {
     const id = ID(address);
     const profile = SocialNetwork.profiles.get(id);
+    if (profile) return profile;
+    return this.createDefaultProfile(PUB(id));
+  }
+
+  getMemoryProfile(id: number): ProfileRecord {
+    const profile = SocialNetwork.profiles.get(id);
+
     if (profile) return profile;
     return this.createDefaultProfile(PUB(id));
   }
@@ -414,12 +421,7 @@ class ProfileManager {
   //     callback();
   //   });
   // }
-  getMemoryProfile(id: number): ProfileRecord {
-    const profile = SocialNetwork.profiles.get(id);
 
-    if (profile) return profile;
-    return this.createDefaultProfile(PUB(id));
-  }
 }
 
 const profileManager = new ProfileManager();

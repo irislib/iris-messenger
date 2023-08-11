@@ -39,6 +39,7 @@ import DWoTRSetup from './dwotr/components/DWoTRSetup';
 import Diagnostics from './dwotr/views/Diagnostics';
 import GraphView from './dwotr/views/GraphView';
 import ProfileHistory from './dwotr/views/ProfileHistory';
+import Demo from './dwotr/views/Demo';
 
 type Props = Record<string, unknown>;
 
@@ -151,7 +152,7 @@ class Main extends Component<Props, ReactState> {
               <Follows followers={true} path="/followers/:id" />
 
               <GraphView path="/graph/:npub?/:dir?/:trusttype?/:view?/:filter?" />
-              {/* <Diagnostics path="/diagnostics/:id/:entitytype?/:dir?/:trust1?/:view?/:filter?" /> */}
+              <Demo path="/demo/:id?" />
               {/* <ProfileHistory path="/history/:id?" /> */}
 
               <NoteOrProfile path="/:id" />

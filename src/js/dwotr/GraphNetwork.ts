@@ -51,20 +51,22 @@ class GraphNetwork {
     this.sourceKey = source;
     if (this.localDataLoaded) return;
 
-    // let v = await this.db.vertices.where({ key: source }).first();
-    // if (!v) {
-    //   // Create source vertice
-    //   v = await this.loadVertice(source, { degree: 0, entityType: EntityType.Key, timestamp: 0 });
-    // }
-
     this.sourceId = ID(this.sourceKey);
     this.g.addVertice(this.sourceId); // Add the source vertice to the graph
 
+    let count = 0;
     //let list = await this.db.edges.toArray();
     // Load edges from DB
+    console.time('Loading edges from the DB');
+
     await this.db.edges.each((record) => { // Load one record at a time, to avoid memory issues (check that this is indeed the case with each())
       this.g.addEdge(record, false); // Load all edges from the DB into the graph with partial data
+      count++;
     });
+
+    console.timeEnd('Loading edges from the DB');
+
+    console.log('Loaded ' + count + ' edges from the DB');
 
     console.info(
       'Graph: ' +
@@ -75,8 +77,10 @@ class GraphNetwork {
       //'List: ' + list.length + ' edges'
     );
 
+    console.time('Processing graph');
     this.processGraph = true; // Process the whole graph
     this.processScore(); // Process score for all vertices within degree of maxDegree and subscribe to trust events
+    console.timeEnd('Processing graph');
 
     this.localDataLoaded = true;
 
