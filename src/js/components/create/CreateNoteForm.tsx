@@ -124,15 +124,10 @@ function CreateNoteForm({
   );
 
   return (
-    <form
-      autoComplete="off"
-      className={`message-form ${className || ''} public`}
-      onSubmit={(e) => onMsgFormSubmit(e)}
-    >
+    <form autoComplete="off" className={className || ''} onSubmit={(e) => onMsgFormSubmit(e)}>
       <input
-        name="attachment-input"
         type="file"
-        className="hidden attachment-input"
+        className="hidden"
         accept="image/*, video/*, audio/*"
         multiple
         onChange={attachmentsChanged}
@@ -151,7 +146,7 @@ function CreateNoteForm({
       />
       <Show when={!waitForFocus || focused}>
         <div className="flex items-center justify-between mt-4">
-          <button type="button" className="attach-file-btn btn" onClick={attachFileClicked}>
+          <button type="button" className="btn" onClick={attachFileClicked}>
             {Icons.attach}
           </button>
           <button type="submit" className="btn btn-primary">
