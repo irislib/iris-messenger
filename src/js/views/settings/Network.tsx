@@ -72,7 +72,7 @@ const Network = () => {
       <div className="flex flex-col gap-2">
         {relays.map((relay) => (
           <div className="flex gap-2 flex-row peer">
-            <div className="flex-1" key={relay.url}>
+            <div className="flex-1 truncate max-w-[60vw]" key={relay.url}>
               <span className={getClassName(relay)}>&#x2B24; </span>
               {relay.url}
             </div>
@@ -125,7 +125,7 @@ const Network = () => {
         {popularRelays.map((relay) => (
           <div className="flex peer gap-2" key={relay.url}>
             <div className="flex-initial">{relay.users}</div>
-            <div className="flex-grow truncate">{relay.url}</div>
+            <div className="flex-grow truncate max-w-[60vw]">{relay.url}</div>
             <div className="flex-initial">
               <button
                 className="btn btn-sm btn-neutral"
