@@ -2,12 +2,11 @@ import * as bech32 from 'bech32-buffer'; /* eslint-disable-line @typescript-esli
 import { Event } from 'nostr-tools';
 import Graph, { Edge, EdgeRecord, EntityType, Vertice } from './model/Graph';
 import WOTPubSub from './network/WOTPubSub';
-import Key from '../nostr/Key';
 import { MAX_DEGREE } from './model/TrustScore';
 import dwotrDB from './network/DWoTRDexie';
 import { debounce } from 'lodash';
 import { MonitorItem } from './model/MonitorItem';
-import { BECH32, ID, PUB } from '../nostr/UserIds';
+import { ID, PUB } from '../nostr/UserIds';
 import { TrustScoreEvent } from './network/TrustScoreEvent';
 import Helpers from '@/Helpers';
 
@@ -289,6 +288,7 @@ class GraphNetwork {
         if (edge.val != val) edge.val = updateObject['val'] = val;
         if (edge.context != context) edge.context = updateObject['context'] = context;
         if (edge.note != note) edge.note = updateObject['note'] = note;
+        if (edge.entityType != entityType) edge.entityType = updateObject['entityType'] = entityType;
 
         edge.timestamp = updateObject.timestamp = timestamp; // Update the timestamp to the latest event.
 
@@ -335,7 +335,7 @@ class GraphNetwork {
   async trustEvent(event: Event) {
     let {pTags, eTags, val, authorPubkey, note, context, timestamp } = WOTPubSub.parseTrustEvent(event);
 
-      console.info(`Trust Event (p): ${authorPubkey} -> ${pTags.map( v=> v).join(',')} = ${val} (${note})`);
+      //console.info(`Trust Event (p): ${authorPubkey} -> ${pTags.map( v=> v).join(',')} = ${val} (${note})`);
       //console.info(`Trust Event (e): ${authorPubkey} -> ${eTags.map( v=> v).join(',')} = ${val} (${note})`);
 
       for(const p of pTags ) {

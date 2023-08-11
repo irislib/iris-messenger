@@ -15,7 +15,11 @@ import { useIsMounted } from '../hooks/useIsMounted';
 import { loadItemVertice, loadKeyVertice } from './VisPath';
 import Show from '@/components/helpers/Show';
 import Key from '@/nostr/Key';
+import ProfileRecord from '../model/ProfileRecord';
 
+//*******************************
+// Vis graph settings
+//*******************************
 const defaultOptions = {
   layout: {
     improvedLayout: true,
@@ -52,6 +56,9 @@ const defaultOptions = {
   },
 };
 
+//*******************************
+// Filter nodes based on filter string
+//*******************************
 export function filterNodes(
   nodes: DataSetNodes,
   target: DataSetNodes,
@@ -91,6 +98,9 @@ export function filterNodes(
   });
 }
 
+//*******************************
+// Main: Visualize the graph component
+//*******************************
 const VisGraph = ({ props }: ViewComponentProps) => {
   const visJsRef = useRef<HTMLDivElement>(null);
   const network = useRef<Network>();
@@ -103,6 +113,9 @@ const VisGraph = ({ props }: ViewComponentProps) => {
   const [dir, setDir] = useState<string>(props.dir || 'in');
   const [entitytype, setEntityType] = useState<string>(props.entitytype);
 
+  //--------------------------------  
+  // Initialize the graph network
+  //--------------------------------
   useEffect(() => {
     if (!visJsRef.current) return;
 
@@ -139,6 +152,9 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     };
   }, [visJsRef]);
 
+  //--------------------------------
+  // Load the node and add it to the graph
+  //--------------------------------
   useEffect(() => {
     let id = ID(props.hexKey);
 
@@ -166,7 +182,9 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     };
   }, [props.npub, props.dir, props.entitytype]);
 
+  //--------------------------------
   // Implement filter on rawList using the filter property
+  //--------------------------------
   useEffect(() => {
     if (rawNodes.length == 0 && displayNodes.length == 0) return;
 
@@ -174,16 +192,19 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     filterNodes(rawNodes, displayNodes, props.filter, includes);
   }, [props.filter]);
 
-  async function loadNode(vId: number): Promise<DataSetNodes | undefined> {
-    let sourceV = graphNetwork.g.vertices[vId] as Vertice;
+  //--------------------------------
+  // Load from WOT graph to Vis graph
+  //--------------------------------
+  async function loadNode(sourceId: number): Promise<DataSetNodes | undefined> {
+    let sourceV = graphNetwork.g.vertices[sourceId] as Vertice;
     if (!sourceV) {
       // Make dummy vertice if it doesn't exist, so we can still render the source node in the graph
-      sourceV = new Vertice(vId, 0);
+      sourceV = new Vertice(sourceId, 0);
     }
 
     let distinctV = {} as { [key: number]: Vertice };
     if(sourceV.entityType == 1)
-      distinctV[vId] = sourceV; // add the source vertice if it's a user/key
+      distinctV[sourceId] = sourceV; // add the source vertice if it's a user/key
 
     // Add all the in and out edges
     if (props.dir == 'in') {
@@ -197,7 +218,7 @@ const VisGraph = ({ props }: ViewComponentProps) => {
         let dashes = edge.out.degree > MAX_DEGREE; // Dash the edge line if the out vertice has no degree or above max degree
 
         edges.get(edge.key) ||
-          edges.add({ id: edge.key, from: edge.out.id, to: vId, color, dashes });
+          edges.add({ id: edge.key, from: edge.out.id, to: sourceId, color, dashes });
       }
     }
 
@@ -214,14 +235,24 @@ const VisGraph = ({ props }: ViewComponentProps) => {
 
         let color = RenderTrust1Color(edge.val);
         edges.get(edge.key) ||
-          edges.add({ id: edge.key, from: vId, to: edge.in.id, color });
+          edges.add({ id: edge.key, from: sourceId, to: edge.in.id, color });
       }
     }
 
-    let vertices = Object.values(distinctV);
+    // Load the profiles for all the vertices
+    let vertices = Object.values(distinctV); // convert to array
     let addresses = vertices.map((v) => PUB(v.id)); // convert to pub hex format
-    await profileManager.getProfiles(addresses);
+    let profiles = await profileManager.getProfiles(addresses); // Load profiles for all the vertices 
     if (!isMounted()) return; // Check if component is still mounted
+
+    let defaults = profiles.filter(p => p.isDefault).map(p => p.key); // Filter out the default profiles
+    profileManager.fetchProfiles(defaults, (profile) => {
+      if (!isMounted()) return; // Check if component is still mounted
+
+      let v = graphNetwork.g.vertices[ID(profile.key)] as Vertice;
+      loadKeyVertice(v, rawNodes);
+    }); 
+
 
     let delta = new DataSet() as DataSetNodes; // new nodes to added to the graph and returned to the caller, enables more efficient filtering
 
@@ -245,6 +276,9 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     return delta;
   }
 
+  //--------------------------------
+  // Load key vertice
+  //--------------------------------
   const reset = (selectedId?: number) => {
     let id = selectedId || vId;
     if (!id) return;
@@ -269,6 +303,9 @@ const VisGraph = ({ props }: ViewComponentProps) => {
     //network?.selectNodes([id], true);
   };
 
+  //--------------------------------
+  // Render
+  //--------------------------------
   if (!props.npub) return null;
   return (
     <>

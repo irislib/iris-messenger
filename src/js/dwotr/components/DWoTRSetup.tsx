@@ -1,7 +1,7 @@
 import { useEffect } from "preact/hooks";
 import graphNetwork from "../GraphNetwork";
 import Key from "../../nostr/Key";
-//import "./CustomLogger";
+
 
 export default function DWoTRSetup() {
 

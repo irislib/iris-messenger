@@ -20,6 +20,9 @@ class ProfileManager {
   #saving: boolean = false;
   history: { [key: string]: any } = {};
 
+  //--------------------------------------------------------------------------------
+  // Saves profile(s) to IndexedDB
+  //--------------------------------------------------------------------------------
   saveBulk = throttle(() => {
     if (this.#saving) {
       this.saveBulk(); // try again later
@@ -36,10 +39,28 @@ class ProfileManager {
     });
   }, 500);
 
+
+
   async init() {
     this.loaded = true;
   }
 
+
+  //--------------------------------------------------------------------------------
+  // Validates a profile object
+  // TODO: Add more validation
+  // Returns true if the profile seems valid and not corrupted or empty
+  //--------------------------------------------------------------------------------
+  validateProfile(profile: any) {
+    if (!profile) return false;
+    
+    return true;
+  }
+
+
+  //--------------------------------------------------------------------------------
+  // Fetches a profile from the API
+  //--------------------------------------------------------------------------------
   async fetchProfile(hexPub: string) {
     try {
       let url = `https://api.iris.to/profile/${hexPub}`;
@@ -63,10 +84,38 @@ class ProfileManager {
     }
   }
 
+  //--------------------------------------------------------------------------------
+  // Fetches profiles from the API and saves them to IndexedDB with a callback
+  // to update the UI as they come in. Errors like 500 can hold up the whole batch, therefore
+  // we don't want to wait for the whole batch to complete before updating the UI.
+  //--------------------------------------------------------------------------------
+  fetchProfiles(hexPubs: string[], cb: (profile: any) => void) {
+    if (!hexPubs || hexPubs.length === 0) return;
+
+    const fetch = async (key: string) => {
+      const profile = await this.fetchProfile(key);
+      if (!profile) return;
+      if(profileManager.validateProfile(profile)) {
+        Events.handle(profile);
+        cb(profile);
+      }
+    };
+
+    for (const hexPub of hexPubs) {
+      fetch(hexPub);
+    }
+  }
+
+  //--------------------------------------------------------------------------------
+  // Loading profiles from IndexedDB 
+  //--------------------------------------------------------------------------------
   async loadProfiles(addresses: Set<string>): Promise<ProfileRecord[]> {
     return await storage.profiles.where('key').anyOf(Array.from(addresses)).toArray();
   }
 
+  //--------------------------------------------------------------------------------
+  // Loading a profile from IndexedDB
+  //--------------------------------------------------------------------------------
   async loadProfile(hexPub: string): Promise<ProfileRecord | undefined> {
     let profile = await OneCallQueue<ProfileRecord>(`loadProfile${hexPub}`, async () => {
       return storage.profiles.get({ key: hexPub });
@@ -79,18 +128,18 @@ class ProfileManager {
     return profile;
   }
 
-  async getProfile(
-    address: string,
-  ): Promise<ProfileRecord> {
+  //--------------------------------------------------------------------------------
+  // Loading or fetching a profile from IndexedDB or the API or memory
+  //--------------------------------------------------------------------------------
+  async getProfile(address: string): Promise<ProfileRecord> {
     let result = await this.getProfiles([address]);
     return result?.[0];
   }
 
-
-  async getProfiles(
-    addresses: string[],
-  ): Promise<Array<ProfileRecord>> {
-    //
+  //--------------------------------------------------------------------------------
+  // Loading or fetching profiles from IndexedDB or the API or memory
+  //--------------------------------------------------------------------------------
+  async getProfiles(addresses: string[]): Promise<Array<ProfileRecord>> {
     if (!addresses || addresses.length === 0) return [];
 
     let profiles: Array<any> = [];
@@ -114,6 +163,9 @@ class ProfileManager {
     if (dbLookups.length > 0) {
       let lookupSet = new Set(dbLookups);
 
+      console.timeStamp('Loading profiles from IndexedDB');
+      console.time('LoadDB');
+
       // Then load from DB
       const dbProfiles = await this.loadProfiles(lookupSet);
 
@@ -124,23 +176,13 @@ class ProfileManager {
         }
       }
 
+      console.timeEnd('LoadDB');
+
       // Then load from API
-      if (lookupSet.size > 0 && lookupSet.size <= 100) {
-        const apiProfiles = await Promise.all(
-          Array.from(lookupSet).map((address) =>
-            this.fetchProfile(Key.toNostrHexAddress(address) as string),
-          ),
-        );
-        if (apiProfiles && apiProfiles.length > 0) {
-          for (const profile of apiProfiles as Array<any>) {
-            if (profile) {
-              Events.handle(profile);
-              profiles.push(profile);
-              lookupSet.delete(profile.key);
-            }
-          }
-        }
-      }
+      // if (lookupSet.size > 0 && lookupSet.size <= 100) {
+      //   let list = Array.from(lookupSet).map((a) => a);
+
+      // }
 
       // Fill in default profile for missing profiles
       for (const hexPub of lookupSet) {
@@ -157,7 +199,7 @@ class ProfileManager {
       }
     }
 
-    // Subscriptions on relays have been removed and should be called elsewhere 
+    // Subscriptions on relays have been removed and should be called elsewhere
 
     return profiles;
   }
@@ -372,7 +414,7 @@ class ProfileManager {
   //     callback();
   //   });
   // }
-  getMemoryProfile(id: number) : ProfileRecord {
+  getMemoryProfile(id: number): ProfileRecord {
     const profile = SocialNetwork.profiles.get(id);
 
     if (profile) return profile;

@@ -5226,6 +5226,11 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.npmjs.org/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
+react-memorystats@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-memorystats/-/react-memorystats-1.1.0.tgz#9ecd9d9d57c0e4ea23d981f86035221e2004ab87"
+  integrity sha512-jCkiVUv+zfWef/7TNVfdKrxl/Yw9QaLJtbbgjk2BiaZDEL6SfDRtW3IiKfAcgZ4CSD2KDLxN9F4GJh3zTgCQSw==
+
 react-side-effect@^2.1.0:
   version "2.1.2"
   resolved "https://registry.npmjs.org/react-side-effect/-/react-side-effect-2.1.2.tgz"

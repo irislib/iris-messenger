@@ -97,6 +97,7 @@ export default class Graph {
         return this.vertices[id] as Vertice || (this.vertices[id] = new Vertice(id));
     }
 
+
     addEdge(record: EdgeRecord, fill: boolean = false) : Edge {
         let edge = this.edges[record.key] as Edge;
         if(!edge) { // Create new edge
@@ -118,6 +119,10 @@ export default class Graph {
             edge.val = record.val;
             edge.timestamp = record.timestamp;
         }
+
+        // Update the timestamp of the vertices if the edge is newer
+        if(edge?.out && edge.out.timestamp < edge.timestamp) edge.out.timestamp = edge.timestamp;
+        if(edge?.in && edge.in.timestamp < edge.timestamp) edge.in.timestamp = edge.timestamp;
 
         return edge;
     }
