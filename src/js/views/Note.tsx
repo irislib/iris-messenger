@@ -35,7 +35,7 @@ class Note extends View {
         <div className="m-2">
           <CreateNoteForm
             placeholder={t('whats_on_your_mind')}
-            forceAutofocusMobile={true}
+            forceAutoFocusMobile={true}
             autofocus={true}
             onSubmit={() => route('/')}
           />

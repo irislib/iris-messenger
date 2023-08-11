@@ -1,5 +1,4 @@
 import { LanguageIcon } from '@heroicons/react/24/solid';
-import $ from 'jquery';
 
 import {
   AVAILABLE_LANGUAGE_KEYS,
@@ -7,11 +6,10 @@ import {
   language,
 } from '../translations/Translation.mjs';
 
-function onLanguageChange(e: Event): void {
-  const target = e.target as HTMLSelectElement;
-  const l = $(target).val();
-  if (AVAILABLE_LANGUAGE_KEYS.indexOf(l as string) >= 0) {
-    localStorage.setItem('language', l as string);
+function onLanguageChange(e): void {
+  const selectedLanguage = e.target.value;
+  if (AVAILABLE_LANGUAGE_KEYS.includes(selectedLanguage)) {
+    localStorage.setItem('language', selectedLanguage);
     location.reload();
   }
 }
@@ -19,9 +17,11 @@ function onLanguageChange(e: Event): void {
 const LanguageSelector = () => (
   <div className="flex flex-row w-full justify-center items-center">
     <LanguageIcon width={24} />
-    <select className="input rounded-full" onChange={(e) => onLanguageChange(e)} value={language}>
+    <select className="input rounded-full" onChange={onLanguageChange} value={language}>
       {Object.keys(AVAILABLE_LANGUAGES).map((l) => (
-        <option value={l}>{AVAILABLE_LANGUAGES[l]}</option>
+        <option key={l} value={l}>
+          {AVAILABLE_LANGUAGES[l]}
+        </option>
       ))}
     </select>
   </div>
