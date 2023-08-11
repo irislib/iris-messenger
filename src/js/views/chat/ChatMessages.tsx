@@ -24,10 +24,9 @@ import { addGroup, sendSecretInvite } from './NewChat';
 export type DecryptedEvent = Event & { text?: string };
 
 const scrollToMessageListBottom = throttle(() => {
-  if ($('#message-view')[0]) {
-    $('#message-view').scrollTop(
-      $('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight,
-    );
+  const messageView = document.querySelector('#message-view');
+  if (messageView) {
+    messageView.scrollTo(0, messageView.scrollHeight - messageView.clientHeight);
   }
 }, 100);
 

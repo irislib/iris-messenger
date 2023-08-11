@@ -1,4 +1,4 @@
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 
 import Image from '@/components/embed/Image';
 import Video from '@/components/embed/Video';
@@ -7,6 +7,7 @@ import DisplaySelector from '@/components/feed/DisplaySelector';
 import FilterOptionsSelector from '@/components/feed/FilterOptionsSelector';
 import ImageGridItem from '@/components/feed/ImageGridItem';
 import ImageModal from '@/components/feed/ImageModal';
+import ShowNewEvents from '@/components/feed/ShowNewEvents';
 import { DisplayAs, FeedProps, ImageOrVideo } from '@/components/feed/types';
 import useInfiniteScroll from '@/components/feed/useInfiniteScroll';
 import Show from '@/components/helpers/Show';
@@ -32,6 +33,7 @@ function mapEventsToMedia(events: any[]): ImageOrVideo[] {
 }
 
 const Feed = (props: FeedProps) => {
+  const feedTopRef = useRef<HTMLDivElement>(null);
   const { showDisplayAs, filterOptions, emptyMessage } = props;
   if (!filterOptions || filterOptions.length === 0) {
     throw new Error('Feed requires at least one filter option');
@@ -42,13 +44,15 @@ const Feed = (props: FeedProps) => {
   const [modalItemIndex, setModalImageIndex] = useState<number | null>(null);
   const lastElementRef = useRef(null);
   const [mutedUsers] = useLocalState('muted', {});
+  const [hasNewEvents, setHasNewEvents] = useState(false);
+  const [listedEvents, setListedEvents] = useState<any[]>([]);
 
   const { events: allEvents, loadMore } = useSubscribe({
     filter: filterOption.filter,
     sinceLastOpened: false,
   });
 
-  const events = useMemo(() => {
+  const allEventsFiltered = useMemo(() => {
     const filtered = allEvents.filter((event) => {
       if (mutedUsers[event.pubkey]) {
         return false;
@@ -61,13 +65,26 @@ const Feed = (props: FeedProps) => {
     return filtered;
   }, [allEvents, filterOption]);
 
-  const isEmpty = events.length === 0;
+  useEffect(() => {
+    if (listedEvents.length < 10) {
+      setListedEvents(allEventsFiltered);
+    } else {
+      const lastShownEvent = listedEvents[Math.min(displayCount, listedEvents.length) - 1];
+      const oldEvents = allEventsFiltered.filter(
+        (event) => event.created_at < lastShownEvent.created_at,
+      );
+      setListedEvents((prevListedEvents) => [...prevListedEvents, ...oldEvents]);
+      setHasNewEvents(true);
+    }
+  }, [allEventsFiltered]);
 
-  const hasMoreItems = displayCount < events.length;
+  const isEmpty = listedEvents.length === 0;
+
+  const hasMoreItems = displayCount < listedEvents.length;
   useInfiniteScroll(lastElementRef, loadMoreItems, hasMoreItems);
 
   function loadMoreItems() {
-    if (displayCount < events.length) {
+    if (displayCount < listedEvents.length) {
       setDisplayCount((prevCount) => prevCount + PAGE_SIZE);
     } else {
       loadMore?.();
@@ -78,11 +95,24 @@ const Feed = (props: FeedProps) => {
     if (displayAs === 'feed') {
       return [];
     }
-    return mapEventsToMedia(events).slice(0, displayCount);
-  }, [events, displayCount, displayAs]) as ImageOrVideo[];
+    return mapEventsToMedia(listedEvents).slice(0, displayCount);
+  }, [listedEvents, displayCount, displayAs]) as ImageOrVideo[];
 
   return (
     <>
+      <Show when={hasNewEvents}>
+        <ShowNewEvents
+          onClick={() => {
+            setHasNewEvents(false);
+            setDisplayCount(PAGE_SIZE);
+            setListedEvents(allEventsFiltered);
+            if (feedTopRef.current) {
+              feedTopRef.current.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        />
+      </Show>
+      <div ref={feedTopRef} />
       <Show when={filterOptions.length > 1}>
         <FilterOptionsSelector
           filterOptions={filterOptions}
@@ -122,7 +152,7 @@ const Feed = (props: FeedProps) => {
         </div>
       </Show>
       <Show when={displayAs === 'feed'}>
-        {events.slice(0, displayCount).map((event, index, self) => {
+        {listedEvents.slice(0, displayCount).map((event, index, self) => {
           const isLastElement = index === self.length - 1;
           return (
             <div key={`feed${event.id}${index}`} ref={isLastElement ? lastElementRef : null}>
