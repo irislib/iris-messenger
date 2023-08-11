@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { bech32 } from 'bech32';
-import $ from 'jquery';
 import _ from 'lodash';
-import throttle from 'lodash/throttle';
 
 import Key from './nostr/Key';
 import { language } from './translations/Translation.mjs';
@@ -270,14 +268,6 @@ export default {
       };
     });
   },
-
-  scrollToMessageListBottom: throttle(() => {
-    if ($('#message-view')[0]) {
-      $('#message-view').scrollTop(
-        $('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight,
-      );
-    }
-  }, 100),
 
   getMyProfileLink(): string {
     const user = existingIrisToAddress.name || Key.toNostrBech32Address(Key.getPubKey(), 'npub');
