@@ -30,13 +30,13 @@ class Feed extends View {
             filterOptions={[
               {
                 name: t('posts'),
-                filter: { kinds: [1] },
+                filter: { kinds: [1], limit: 100 },
                 filterFn: (event) => !Events.getEventReplyingTo(event),
                 eventProps: { showRepliedMsg: true },
               },
               {
                 name: t('posts_and_replies'),
-                filter: { kinds: [1] },
+                filter: { kinds: [1], limit: 100 },
                 eventProps: { showRepliedMsg: true, fullWidth: false },
               },
             ]}

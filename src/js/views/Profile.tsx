@@ -117,18 +117,18 @@ class Profile extends View {
               filterOptions={[
                 {
                   name: t('posts'),
-                  filter: { authors: [this.state.hexPub], kinds: [1], limit: 5 },
+                  filter: { authors: [this.state.hexPub], kinds: [1], limit: 100 },
                   filterFn: (event) => !Events.getEventReplyingTo(event),
                   eventProps: { showRepliedMsg: true },
                 },
                 {
                   name: t('posts_and_replies'),
-                  filter: { authors: [this.state.hexPub], kinds: [1], limit: 5 },
+                  filter: { authors: [this.state.hexPub], kinds: [1], limit: 100 },
                   eventProps: { showRepliedMsg: true, fullWidth: false },
                 },
                 {
                   name: t('likes'),
-                  filter: { authors: [this.state.hexPub], kinds: [7], limit: 5 },
+                  filter: { authors: [this.state.hexPub], kinds: [7], limit: 100 },
                 },
               ]}
             />

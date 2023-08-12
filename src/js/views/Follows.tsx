@@ -2,6 +2,8 @@ import { memo } from 'react';
 import throttle from 'lodash/throttle';
 import { Link } from 'preact-router';
 
+import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
+
 import Follow from '../components/buttons/Follow';
 import Show from '../components/helpers/Show';
 import Avatar from '../components/user/Avatar';
@@ -123,10 +125,6 @@ class Follows extends View {
       SocialNetwork.setFollowed(this.state.follows);
   }
 
-  renderFollows() {
-    return this.state.follows.map((hexKey) => <FollowedUser hexKey={hexKey} />);
-  }
-
   renderView() {
     const showFollowAll =
       this.state.follows.length > 1 && !(this.props.id === this.myPub && !this.props.followers);
@@ -158,7 +156,11 @@ class Follows extends View {
           </p>
         </Show>
         <div className="flex flex-col w-full gap-4">
-          {this.renderFollows() /* TODO limit if lots of follows */}
+          <InfiniteScroll>
+            {this.state.follows.map((hexKey) => (
+              <FollowedUser hexKey={hexKey} />
+            ))}
+          </InfiniteScroll>
           {this.state.follows.length === 0 ? '—' : ''}
         </div>
       </div>
