@@ -41,7 +41,7 @@ export default class Notifications extends View {
         filterOptions={[
           {
             name: 'notifications',
-            filter: { kinds: [1, 6, 7, 9735], '#p': [Key.getPubKey()] },
+            filter: { kinds: [1, 6, 7, 9735], '#p': [Key.getPubKey()], limit: 20 },
             eventProps: { fullWidth: false },
           },
         ]}

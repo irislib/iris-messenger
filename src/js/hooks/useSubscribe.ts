@@ -11,12 +11,11 @@ const useSubscribe = (ops: {
   enabled?: boolean;
 }) => {
   const sortedEvents = useRef(new SortedEventMap());
-  const [loadMoreUnsubscribe, setLoadMoreUnsubscribe] = useState<Unsubscribe | null>(null);
-
-  const { filter, enabled = true, sinceLastOpened = false, mergeSubscriptions = true } = ops;
-
+  const [loadMoreFilter, setLoadMoreFilter] = useState<Filter | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const lastUntilRef = useRef<number | null>(null);
+
+  const { filter, enabled = true, sinceLastOpened = false, mergeSubscriptions = true } = ops;
 
   const handleEvent = (event: Event) => {
     if (sortedEvents.current.has(event.id)) return;
@@ -36,25 +35,22 @@ const useSubscribe = (ops: {
     return PubSub.subscribe(newFilter, handleEvent, sinceLastOpened, mergeSubscriptions);
   }, [filter, enabled, sinceLastOpened, mergeSubscriptions]);
 
+  useEffect(() => {
+    if (!loadMoreFilter) return;
+
+    console.log('loadMoreFilter', loadMoreFilter, loadMoreFilter.until && new Date(loadMoreFilter.until * 1000).toISOString());
+    return PubSub.subscribe(loadMoreFilter, handleEvent, false, false);
+  }, [loadMoreFilter]);
+
   const loadMore = useCallback(() => {
     const until = sortedEvents.current.last()?.created_at;
-    console.log('loadMore', until && new Date(until * 1000).toISOString());
 
     if (!until || lastUntilRef.current === until) return;
 
     lastUntilRef.current = until;
-
-    if (loadMoreUnsubscribe) {
-      loadMoreUnsubscribe();
-      setLoadMoreUnsubscribe(null);
-    }
-
     const newFilter = { ...filter, until, limit: 100 };
-    console.log('load more until', new Date(until * 1000), 'filter', newFilter);
-
-    const unsubscribe = PubSub.subscribe(newFilter, handleEvent, false, false);
-    setLoadMoreUnsubscribe(unsubscribe);
-  }, [sortedEvents, filter, loadMoreUnsubscribe]);
+    setLoadMoreFilter(newFilter);
+  }, [filter]);
 
   return { events, loadMore };
 };
