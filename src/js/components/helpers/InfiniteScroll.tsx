@@ -9,6 +9,15 @@ function InfiniteScroll({ children, margin = '2000px', loadMore }: Props) {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
+  const checkSentinelInViewport = () => {
+    if (sentinelRef.current) {
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      if (sentinelRef.current.getBoundingClientRect().top <= viewportHeight) {
+        setVisibleCount((prev) => prev + INCREASE_BY);
+      }
+    }
+  };
+
   useEffect(() => {
     if (sentinelRef.current && !observerRef.current) {
       const options = {
@@ -28,6 +37,9 @@ function InfiniteScroll({ children, margin = '2000px', loadMore }: Props) {
       observerRef.current.observe(sentinelRef.current);
     }
 
+    // Check if the sentinel is within the viewport on mount
+    checkSentinelInViewport();
+
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
@@ -35,16 +47,6 @@ function InfiniteScroll({ children, margin = '2000px', loadMore }: Props) {
       }
     };
   }, [margin, loadMore, children.length]);
-
-  useEffect(() => {
-    if (sentinelRef.current) {
-      // Check if the sentinel is within the viewport
-      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-      if (sentinelRef.current.offsetTop <= viewportHeight) {
-        setVisibleCount((prev) => prev + INCREASE_BY);
-      }
-    }
-  }, [visibleCount]);
 
   useEffect(() => {
     if (loadMore && visibleCount >= children.length) {

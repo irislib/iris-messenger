@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { throttle } from 'lodash';
 import { Event, Filter } from 'nostr-tools';
 
 import PubSub from '@/nostr/PubSub';
@@ -41,7 +42,7 @@ const useSubscribe = (ops: {
     return PubSub.subscribe(loadMoreFilter, handleEvent, false, false);
   }, [loadMoreFilter]);
 
-  const loadMore = useCallback(() => {
+  const loadMore = throttle(() => {
     const until = sortedEvents.current.last()?.created_at;
 
     if (!until || lastUntilRef.current === until) return;
@@ -49,7 +50,7 @@ const useSubscribe = (ops: {
     lastUntilRef.current = until;
     const newFilter = { ...filter, until, limit: 100 };
     setLoadMoreFilter(newFilter);
-  }, [filter]);
+  }, 500);
 
   return { events, loadMore };
 };
