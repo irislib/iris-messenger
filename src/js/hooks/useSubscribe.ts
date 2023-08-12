@@ -20,6 +20,11 @@ const useSubscribe = (ops: {
 
   const handleEvent = (event: Event) => {
     if (sortedEvents.current.has(event.id)) return;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (filter.keywords && !filter.keywords.some((keyword) => event.content?.includes(keyword))) {
+      return;
+    }
     sortedEvents.current.add(event);
     setEvents(sortedEvents.current.events());
   };
