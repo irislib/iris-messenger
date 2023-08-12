@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Event, Filter } from 'nostr-tools';
 
-import PubSub, { Unsubscribe } from '@/nostr/PubSub';
+import PubSub from '@/nostr/PubSub';
 import SortedEventMap from '@/utils/SortedEventMap';
 
 const useSubscribe = (ops: {
@@ -38,7 +38,6 @@ const useSubscribe = (ops: {
   useEffect(() => {
     if (!loadMoreFilter) return;
 
-    console.log('loadMoreFilter', loadMoreFilter, loadMoreFilter.until && new Date(loadMoreFilter.until * 1000).toISOString());
     return PubSub.subscribe(loadMoreFilter, handleEvent, false, false);
   }, [loadMoreFilter]);
 

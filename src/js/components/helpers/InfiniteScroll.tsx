@@ -7,7 +7,7 @@ type Props = { children: any; margin?: string; loadMore?: () => void };
 function InfiniteScroll({ children, margin = '2000px', loadMore }: Props) {
   const [visibleCount, setVisibleCount] = useState(INCREASE_BY);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const sentinelRef = useRef(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (sentinelRef.current && !observerRef.current) {
@@ -35,6 +35,16 @@ function InfiniteScroll({ children, margin = '2000px', loadMore }: Props) {
       }
     };
   }, [margin, loadMore, children.length]);
+
+  useEffect(() => {
+    if (sentinelRef.current) {
+      // Check if the sentinel is within the viewport
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      if (sentinelRef.current.offsetTop <= viewportHeight) {
+        setVisibleCount((prev) => prev + INCREASE_BY);
+      }
+    }
+  }, [visibleCount]);
 
   useEffect(() => {
     if (loadMore && visibleCount >= children.length) {
