@@ -158,7 +158,7 @@ class Follows extends View {
         <div className="flex flex-col w-full gap-4">
           <InfiniteScroll>
             {this.state.follows.map((hexKey) => (
-              <FollowedUser hexKey={hexKey} />
+              <FollowedUser key={hexKey} hexKey={hexKey} />
             ))}
           </InfiniteScroll>
           {this.state.follows.length === 0 ? '—' : ''}

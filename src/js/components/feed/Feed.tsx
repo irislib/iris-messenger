@@ -109,7 +109,12 @@ const Feed = (props: FeedProps) => {
         <div className="grid grid-cols-3 gap-px">
           <InfiniteScroll loadMore={loadMore}>
             {imagesAndVideos.map((item, index) => (
-              <ImageGridItem item={item} index={index} setModalImageIndex={setModalImageIndex} />
+              <ImageGridItem
+                key={`grid-${index}`}
+                item={item}
+                index={index}
+                setModalImageIndex={setModalImageIndex}
+              />
             ))}
           </InfiniteScroll>
         </div>
@@ -117,7 +122,9 @@ const Feed = (props: FeedProps) => {
       <Show when={displayAs === 'feed'}>
         <InfiniteScroll loadMore={loadMore}>
           {allEventsFiltered.map((event) => {
-            return <EventComponent id={event.id} {...filterOption.eventProps} />;
+            return (
+              <EventComponent key={`${event.id}EC`} id={event.id} {...filterOption.eventProps} />
+            );
           })}
         </InfiniteScroll>
       </Show>
