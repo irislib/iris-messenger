@@ -16,10 +16,10 @@ const Image: Embed = {
       setShowModal(true);
     };
     return (
-      <div className="flex justify-center md:justify-start">
+      <div className="flex justify-center items-center md:justify-start h-96 my-2">
         <SafeImg
           onClick={onClick}
-          className="my-2 rounded max-h-[70vh] md:max-h-96 max-w-full cursor-pointer"
+          className="my-2 rounded md:max-h-96 max-w-full cursor-pointer"
           src={match}
         />
         <Show when={showModal}>
