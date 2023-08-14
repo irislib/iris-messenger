@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 
 import Image from '@/components/embed/Image';
 import Video from '@/components/embed/Video';
@@ -9,12 +9,10 @@ import ImageGridItem from '@/components/feed/ImageGridItem';
 import ImageModal from '@/components/feed/ImageModal';
 import ShowNewEvents from '@/components/feed/ShowNewEvents';
 import { DisplayAs, FeedProps, ImageOrVideo } from '@/components/feed/types';
-import useInfiniteScroll from '@/components/feed/useInfiniteScroll';
+import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
 import Show from '@/components/helpers/Show';
 import useSubscribe from '@/hooks/useSubscribe';
 import { useLocalState } from '@/LocalState';
-
-const PAGE_SIZE = 6;
 
 function mapEventsToMedia(events: any[]): ImageOrVideo[] {
   return events.flatMap((event) => {
@@ -39,64 +37,52 @@ const Feed = (props: FeedProps) => {
     throw new Error('Feed requires at least one filter option');
   }
   const [filterOption, setFilterOption] = useState(filterOptions[0]);
-  const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
   const [displayAs, setDisplayAs] = useState<DisplayAs>('feed');
   const [modalItemIndex, setModalImageIndex] = useState<number | null>(null);
-  const lastElementRef = useRef(null);
   const [mutedUsers] = useLocalState('muted', {});
   const [hasNewEvents, setHasNewEvents] = useState(false);
-  const [listedEvents, setListedEvents] = useState<any[]>([]);
+  const [showUntil, setShowUntil] = useState(Math.floor(Date.now() / 1000));
 
   const { events: allEvents, loadMore } = useSubscribe({
     filter: filterOption.filter,
     sinceLastOpened: false,
   });
 
-  const allEventsFiltered = useMemo(() => {
-    const filtered = allEvents.filter((event) => {
-      if (mutedUsers[event.pubkey]) {
-        return false;
-      }
-      if (filterOption.filterFn) {
-        return filterOption.filterFn(event);
-      }
-      return true;
-    });
-    return filtered;
-  }, [allEvents, filterOption]);
+  const filteredEvents = useMemo(() => {
+    let hasNewEventsTemp = false;
 
-  useEffect(() => {
-    if (listedEvents.length < 10) {
-      setListedEvents(allEventsFiltered);
-    } else {
-      const lastShownEvent = listedEvents[Math.min(displayCount, listedEvents.length) - 1];
-      const oldEvents = allEventsFiltered.filter(
-        (event) => event.created_at < lastShownEvent.created_at,
-      );
-      setListedEvents((prevListedEvents) => [...prevListedEvents, ...oldEvents]);
+    const filtered = allEvents.filter((event) => {
+      let pass = true;
+
+      if (mutedUsers[event.pubkey]) {
+        pass = false;
+      } else if (filterOption.filterFn) {
+        pass = filterOption.filterFn(event);
+      }
+
+      if (pass && event.created_at > showUntil) {
+        hasNewEventsTemp = true;
+        pass = false;
+      }
+
+      return pass;
+    });
+
+    if (hasNewEventsTemp) {
       setHasNewEvents(true);
     }
-  }, [allEventsFiltered]);
 
-  const isEmpty = listedEvents.length === 0;
+    return filtered;
+  }, [allEvents, filterOption, showUntil]);
 
-  const hasMoreItems = displayCount < listedEvents.length;
-  useInfiniteScroll(lastElementRef, loadMoreItems, hasMoreItems);
-
-  function loadMoreItems() {
-    if (displayCount < listedEvents.length) {
-      setDisplayCount((prevCount) => prevCount + PAGE_SIZE);
-    } else {
-      loadMore?.();
-    }
-  }
+  const isEmpty = filteredEvents.length === 0;
 
   const imagesAndVideos = useMemo(() => {
     if (displayAs === 'feed') {
       return [];
     }
-    return mapEventsToMedia(listedEvents).slice(0, displayCount);
-  }, [listedEvents, displayCount, displayAs]) as ImageOrVideo[];
+    return mapEventsToMedia(filteredEvents);
+  }, [filteredEvents, displayAs]) as ImageOrVideo[];
 
   return (
     <>
@@ -104,8 +90,7 @@ const Feed = (props: FeedProps) => {
         <ShowNewEvents
           onClick={() => {
             setHasNewEvents(false);
-            setDisplayCount(PAGE_SIZE);
-            setListedEvents(allEventsFiltered);
+            setShowUntil(Math.floor(Date.now() / 1000));
             if (feedTopRef.current) {
               feedTopRef.current.scrollIntoView({ behavior: 'smooth' });
             }
@@ -119,14 +104,12 @@ const Feed = (props: FeedProps) => {
           activeOption={filterOption}
           onOptionClick={(opt) => {
             setFilterOption(opt);
-            setDisplayCount(PAGE_SIZE);
           }}
         />
       </Show>
       <Show when={showDisplayAs !== false}>
         <DisplaySelector
           onDisplayChange={(displayAs) => {
-            setDisplayCount(PAGE_SIZE);
             setDisplayAs(displayAs);
           }}
           activeDisplay={displayAs}
@@ -140,26 +123,26 @@ const Feed = (props: FeedProps) => {
       <Show when={isEmpty}>{emptyMessage || 'No Posts'}</Show>
       <Show when={displayAs === 'grid'}>
         <div className="grid grid-cols-3 gap-px">
-          {imagesAndVideos.map((item, index) => (
-            <ImageGridItem
-              item={item}
-              index={index}
-              setModalImageIndex={setModalImageIndex}
-              lastElementRef={lastElementRef}
-              imagesAndVideosLength={imagesAndVideos.length}
-            />
-          ))}
+          <InfiniteScroll loadMore={loadMore}>
+            {imagesAndVideos.map((item, index) => (
+              <ImageGridItem
+                key={`grid-${index}`}
+                item={item}
+                index={index}
+                setModalImageIndex={setModalImageIndex}
+              />
+            ))}
+          </InfiniteScroll>
         </div>
       </Show>
       <Show when={displayAs === 'feed'}>
-        {listedEvents.slice(0, displayCount).map((event, index, self) => {
-          const isLastElement = index === self.length - 1;
-          return (
-            <div key={`feed${event.id}${index}`} ref={isLastElement ? lastElementRef : null}>
-              <EventComponent id={event.id} {...filterOption.eventProps} />
-            </div>
-          );
-        })}
+        <InfiniteScroll loadMore={loadMore}>
+          {filteredEvents.map((event) => {
+            return (
+              <EventComponent key={`${event.id}EC`} id={event.id} {...filterOption.eventProps} />
+            );
+          })}
+        </InfiniteScroll>
       </Show>
     </>
   );
