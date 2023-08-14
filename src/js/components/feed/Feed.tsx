@@ -41,14 +41,19 @@ const Feed = (props: FeedProps) => {
   const [modalItemIndex, setModalImageIndex] = useState<number | null>(null);
   const [mutedUsers] = useLocalState('muted', {});
   const [hasNewEvents, setHasNewEvents] = useState(false);
+  const [showUntil, setShowUntil] = useState(Math.floor(Date.now() / 1000));
 
   const { events: allEvents, loadMore } = useSubscribe({
     filter: filterOption.filter,
     sinceLastOpened: false,
   });
 
-  const allEventsFiltered = useMemo(() => {
+  const filteredEvents = useMemo(() => {
     const filtered = allEvents.filter((event) => {
+      if (event.created_at > showUntil) {
+        setHasNewEvents(true);
+        return false;
+      }
       if (mutedUsers[event.pubkey]) {
         return false;
       }
@@ -58,16 +63,16 @@ const Feed = (props: FeedProps) => {
       return true;
     });
     return filtered;
-  }, [allEvents, filterOption]);
+  }, [allEvents, filterOption, showUntil]);
 
-  const isEmpty = allEventsFiltered.length === 0;
+  const isEmpty = filteredEvents.length === 0;
 
   const imagesAndVideos = useMemo(() => {
     if (displayAs === 'feed') {
       return [];
     }
-    return mapEventsToMedia(allEventsFiltered);
-  }, [allEventsFiltered, displayAs]) as ImageOrVideo[];
+    return mapEventsToMedia(filteredEvents);
+  }, [filteredEvents, displayAs]) as ImageOrVideo[];
 
   return (
     <>
@@ -75,6 +80,7 @@ const Feed = (props: FeedProps) => {
         <ShowNewEvents
           onClick={() => {
             setHasNewEvents(false);
+            setShowUntil(Math.floor(Date.now() / 1000));
             if (feedTopRef.current) {
               feedTopRef.current.scrollIntoView({ behavior: 'smooth' });
             }
@@ -121,7 +127,7 @@ const Feed = (props: FeedProps) => {
       </Show>
       <Show when={displayAs === 'feed'}>
         <InfiniteScroll loadMore={loadMore}>
-          {allEventsFiltered.map((event) => {
+          {filteredEvents.map((event) => {
             return (
               <EventComponent key={`${event.id}EC`} id={event.id} {...filterOption.eventProps} />
             );
