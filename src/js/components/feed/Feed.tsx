@@ -1,4 +1,4 @@
-import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import Image from '@/components/embed/Image';
 import Video from '@/components/embed/Video';

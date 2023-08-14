@@ -27,9 +27,9 @@ const useSubscribe = (ops: {
 
   const handleEvent = (event: Event) => {
     if (sortedEvents.current.has(event.id)) return;
+    if (filterFn && !filterFn(event)) return;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    if (filterFn && !filterFn(event)) return;
     if (filter.keywords && !filter.keywords.some((keyword) => event.content?.includes(keyword))) {
       return;
     }
