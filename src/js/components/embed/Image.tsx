@@ -7,7 +7,7 @@ import SafeImg from '../SafeImg';
 import Embed from './index';
 
 const Image: Embed = {
-  regex: /(https?:\/\/.*?\.(?:png|jpg|jpeg|gif|svg|webp)(?:\?\S*?)?)/gi,
+  regex: /(https?:\/\/\S+?\.(?:png|jpg|jpeg|gif|svg|webp)(?:\?\S*?)?)/gi,
   settingsKey: 'enableImages',
   component: ({ match }) => {
     const [showModal, setShowModal] = useState(false);
