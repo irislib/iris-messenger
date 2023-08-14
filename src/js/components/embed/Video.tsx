@@ -1,5 +1,3 @@
-import Helpers from '@/Helpers.tsx';
-
 import Embed from './index';
 
 const Video: Embed = {
@@ -12,7 +10,8 @@ const Video: Embed = {
         src={match}
         controls
         muted
-        autoPlay={!Helpers.isMobile}
+        autoPlay
+        playsInline
         loop
         poster={`https://imgproxy.iris.to/thumbnail/638/${match}`}
       ></video>
