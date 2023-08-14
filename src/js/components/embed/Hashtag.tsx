@@ -7,8 +7,7 @@ const Hashtag: Embed = {
   component: ({ match }) => {
     return (
       <Link href={`/search/${encodeURIComponent(match)}`} className="link">
-        {' '}
-        {match}{' '}
+        {match}
       </Link>
     );
   },

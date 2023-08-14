@@ -1,24 +1,24 @@
-export interface FeedProps {
-  index?: string;
-  scrollElement?: HTMLElement;
-  filter?: any;
-  keyword?: any;
-  emptyMessage?: string;
-  nostrUser?: string;
-}
+import { Filter } from 'nostr-tools';
 
-export interface FeedState {
-  events: string[];
-  queuedEvents: string[];
-  displayCount: number;
-  settings: {
-    display: string;
-    realtime: boolean;
-    showReplies: boolean;
-    sortBy: string;
-    sortDirection: string;
-    timespan: string;
-  };
-  settingsOpen?: boolean;
-  showNewMsgsFixedTop?: boolean;
-}
+import { EventComponentProps } from '@/components/events/EventComponent';
+
+export type FeedProps = {
+  filterOptions: FilterOption[];
+  showDisplayAs?: boolean;
+  filterFn?: (event: any) => boolean;
+  emptyMessage?: string;
+};
+
+export type DisplayAs = 'feed' | 'grid';
+
+export type ImageOrVideo = {
+  type: 'image' | 'video';
+  url: string;
+};
+
+export type FilterOption = {
+  name: string;
+  filter: Filter;
+  filterFn?: (event: any) => boolean;
+  eventProps?: Partial<EventComponentProps>;
+};

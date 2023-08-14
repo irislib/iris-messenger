@@ -1,7 +1,7 @@
 import { route } from 'preact-router';
 
+import CreateNoteForm from '../components/create/CreateNoteForm';
 import EventComponent from '../components/events/EventComponent';
-import PublicMessageForm from '../components/PublicMessageForm';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
@@ -33,9 +33,9 @@ class Note extends View {
     if (this.props.id === 'new') {
       content = (
         <div className="m-2">
-          <PublicMessageForm
+          <CreateNoteForm
             placeholder={t('whats_on_your_mind')}
-            forceAutofocusMobile={true}
+            forceAutoFocusMobile={true}
             autofocus={true}
             onSubmit={() => route('/')}
           />

@@ -23,6 +23,13 @@ import { addGroup, sendSecretInvite } from './NewChat';
 
 export type DecryptedEvent = Event & { text?: string };
 
+const scrollToMessageListBottom = throttle(() => {
+  const messageView = document.querySelector('#message-view');
+  if (messageView) {
+    messageView.scrollTo(0, messageView.scrollHeight - messageView.clientHeight);
+  }
+}, 100);
+
 function ChatMessages({ id }) {
   const ref = useRef(null as any);
   const messages = useRef(new SortedMap<string, DecryptedEvent>('created_at'));
@@ -295,12 +302,12 @@ function ChatMessages({ id }) {
 
   useEffect(() => {
     if (stickToBottom) {
-      Helpers.scrollToMessageListBottom();
+      scrollToMessageListBottom();
     }
 
     $('.msg-content img')
       .off('load')
-      .on('load', () => stickToBottom && Helpers.scrollToMessageListBottom());
+      .on('load', () => stickToBottom && scrollToMessageListBottom());
   }, [stickToBottom]);
 
   return (

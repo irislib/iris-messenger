@@ -1,11 +1,12 @@
 import { debounce } from 'lodash';
 
-import Feed from '../components/feed/Feed';
-import localState from '../LocalState';
-import Session from '../nostr/Session';
-import { translate as t } from '../translations/Translation.mjs';
+import Key from '@/nostr/Key';
 
-import View from './View';
+import Feed from '../../components/feed/Feed';
+import localState from '../../LocalState';
+import Session from '../../nostr/Session';
+import { translate as t } from '../../translations/Translation.mjs';
+import View from '../View';
 
 export default class Notifications extends View {
   class = 'public-messages-view';
@@ -33,9 +34,18 @@ export default class Notifications extends View {
 
   renderView() {
     return (
-      <div class="centered-container">
-        <Feed key="notifications" index="notifications" emptyMessage={t('no_notifications_yet')} />
-      </div>
+      <Feed
+        key="notifications"
+        showDisplayAs={false}
+        emptyMessage={t('no_notifications_yet')}
+        filterOptions={[
+          {
+            name: 'notifications',
+            filter: { kinds: [1, 6, 7, 9735], '#p': [Key.getPubKey()], limit: 20 },
+            eventProps: { fullWidth: false },
+          },
+        ]}
+      />
     );
   }
 }

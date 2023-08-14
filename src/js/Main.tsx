@@ -13,13 +13,15 @@ import About from './views/About';
 import Chat from './views/chat/Chat';
 import EditProfile from './views/EditProfile';
 import Explorer from './views/explorer/Explorer';
-import Feed from './views/Feed';
+import Global from './views/feeds/Global';
+import Home from './views/feeds/Home';
+import Notifications from './views/feeds/Notifications';
+import SearchFeed from './views/feeds/Search';
 import Follows from './views/Follows';
 import KeyConverter from './views/KeyConverter';
 import Login from './views/Login';
 import LogoutConfirmation from './views/LogoutConfirmation';
 import Note from './views/Note';
-import Notifications from './views/Notifications';
 import Profile from './views/Profile';
 import Search from './views/Search';
 import Settings from './views/settings/Settings';
@@ -119,11 +121,11 @@ class Main extends Component<Props, ReactState> {
           <div className="overlay" onClick={() => this.onClickOverlay()}></div>
           <div className="pb-16 md:pb-0 relative flex h-full flex-grow flex-col w-1/2">
             <Router onChange={(e) => this.handleRoute(e)}>
-              <Feed path="/" index="follows" />
+              <Home path="/" />
               <Search path="/search" focus={true} />
               <KeyConverter path="/key" />
-              <Feed path="/global" index="global" />
-              <Feed path="/search/:keyword" />
+              <Global path="/global" />
+              <SearchFeed path="/search/:keyword" />
               <Login path="/login" fullScreen={true} />
               <Notifications path="/notifications" />
               <Chat path="/chat/hashtag/:hashtag?" />

@@ -15,6 +15,8 @@ import {
 } from '@heroicons/react/24/solid';
 import { Link } from 'preact-router';
 
+import CreateNoteForm from '@/components/create/CreateNoteForm';
+
 import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
@@ -24,7 +26,6 @@ import Show from './helpers/Show';
 import Modal from './modal/Modal';
 import Avatar from './user/Avatar';
 import Name from './user/Name';
-import PublicMessageForm from './PublicMessageForm';
 
 const MENU_ITEMS = [
   { url: '/', text: 'home', icon: HomeIcon, activeIcon: HomeIconFull },
@@ -80,7 +81,7 @@ export default function Menu() {
 
   const renderNewPostModal = () => (
     <Modal centerVertically={true} showContainer={true} onClose={() => setShowNewPostModal(false)}>
-      <PublicMessageForm
+      <CreateNoteForm
         onSubmit={() => setShowNewPostModal(false)}
         placeholder={t('whats_on_your_mind')}
         autofocus={true}

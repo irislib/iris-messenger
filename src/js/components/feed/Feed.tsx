@@ -1,133 +1,141 @@
-import Events from '../../nostr/Events';
-import Key from '../../nostr/Key';
-import PubSub from '../../nostr/PubSub';
-import SocialNetwork from '../../nostr/SocialNetwork';
-import { ID, PUB } from '../../nostr/UserIds';
+import { memo, useMemo, useRef, useState } from 'react';
 
-import BaseFeed from './BaseFeed';
+import Image from '@/components/embed/Image';
+import Video from '@/components/embed/Video';
+import EventComponent from '@/components/events/EventComponent';
+import DisplaySelector from '@/components/feed/DisplaySelector';
+import FilterOptionsSelector from '@/components/feed/FilterOptionsSelector';
+import ImageGridItem from '@/components/feed/ImageGridItem';
+import ImageModal from '@/components/feed/ImageModal';
+import ShowNewEvents from '@/components/feed/ShowNewEvents';
+import { DisplayAs, FeedProps, ImageOrVideo } from '@/components/feed/types';
+import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
+import Show from '@/components/helpers/Show';
+import useSubscribe from '@/hooks/useSubscribe';
+import { useLocalState } from '@/LocalState';
 
-const TIMESPANS = {
-  all: 0,
-  day: 24 * 60 * 60,
-  week: 7 * 24 * 60 * 60,
-  month: 30 * 24 * 60 * 60,
-  year: 365 * 24 * 60 * 60,
-};
-
-class Feed extends BaseFeed {
-  addSinceUntil(filter) {
-    const since = this.getSince();
-    const until = this.oldestEventCreatedAt();
-    if (since) {
-      filter.since = since;
-    }
-    if (until) {
-      // problem: there might be events newer than this that we don't have yet
-      // filters.not.ids = bloomFilter would be cool
-      filter.until = until;
-    }
-    return filter;
-  }
-
-  getSince() {
-    if (this.state.settings.timespan !== 'all') {
-      return Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
-    }
-  }
-
-  getCallbackForPostsIndex(callback) {
-    return (event) => {
-      if (
-        this.props.index === 'posts' &&
-        Events.getEventReplyingTo(event) &&
-        !Events.isRepost(event)
-      ) {
-        return;
-      }
-      callback(event);
-    };
-  }
-
-  subscribeToNostrUser(callback) {
-    let filter = {
-      authors: [this.props.nostrUser || ''],
-      kinds: [1, 6],
-    };
-    filter = this.addSinceUntil(filter);
-
-    console.log('subscribing to nostr user', this.props.nostrUser, filter);
-
-    if (this.props.index === 'likes') {
-      filter.kinds = [7];
-      return PubSub.subscribe(filter, callback, false, false);
-    } else {
-      return PubSub.subscribe(filter, this.getCallbackForPostsIndex(callback), false, false);
-    }
-  }
-
-  subscribeToKeyword(callback) {
-    let filter = {
-      // Filter type doesn't have "keywords"...
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      keywords: [this.props.keyword.toLowerCase()],
-      kinds: [1],
-      limit: 1000,
-    };
-    filter = this.addSinceUntil(filter);
-
-    return PubSub.subscribe(
-      filter,
-      (e) => e.content?.toLowerCase().includes(this.props.keyword.toLowerCase()) && callback(e),
-      false,
-    );
-  }
-
-  subscribeToFollows(callback) {
-    const myPub = Key.getPubKey();
-    const followedUsers = Array.from(SocialNetwork.followedByUser.get(ID(myPub)) || []).map(
-      (user) => PUB(user),
-    );
-    followedUsers.push(myPub);
-
-    let filter = {
-      kinds: [1, 6],
-      limit: 300,
-    } as any;
-
-    if (followedUsers.length < 1000) {
-      filter.authors = followedUsers;
-    }
-    filter = this.addSinceUntil(filter);
-
-    return PubSub.subscribe(
-      filter,
-      (e) => {
-        if (e.pubkey === myPub || SocialNetwork.isFollowing(myPub, e.pubkey)) {
-          callback(e);
-        }
-      },
-      true,
-    );
-  }
-
-  subscribeToGlobalFeed(callback) {
-    let filter = { kinds: [1, 6], limit: 300 };
-    filter = this.addSinceUntil(filter);
-    return PubSub.subscribe(filter, callback, true);
-  }
-
-  getEvents(callback) {
-    if (this.props.nostrUser) {
-      return this.subscribeToNostrUser(callback);
-    } else if (this.props.keyword) {
-      return this.subscribeToKeyword(callback);
-    } else if (this.props.index === 'follows') {
-      return this.subscribeToFollows(callback);
-    } else {
-      return this.subscribeToGlobalFeed(callback);
-    }
-  }
+function mapEventsToMedia(events: any[]): ImageOrVideo[] {
+  return events.flatMap((event) => {
+    const imageMatches = (event.content.match(Image.regex) || []).map((url: string) => ({
+      type: 'image',
+      url,
+      created_at: event.created_at,
+    }));
+    const videoMatches = (event.content.match(Video.regex) || []).map((url: string) => ({
+      type: 'video',
+      url,
+      created_at: event.created_at,
+    }));
+    return [...imageMatches, ...videoMatches];
+  });
 }
 
-export default Feed;
+const Feed = (props: FeedProps) => {
+  const feedTopRef = useRef<HTMLDivElement>(null);
+  const { showDisplayAs, filterOptions, emptyMessage } = props;
+  if (!filterOptions || filterOptions.length === 0) {
+    throw new Error('Feed requires at least one filter option');
+  }
+  const [filterOption, setFilterOption] = useState(filterOptions[0]);
+  const [displayAs, setDisplayAs] = useState<DisplayAs>('feed');
+  const [modalItemIndex, setModalImageIndex] = useState<number | null>(null);
+  const [mutedUsers] = useLocalState('muted', {});
+  const [hasNewEvents, setHasNewEvents] = useState(false);
+  const [showUntil, setShowUntil] = useState(Math.floor(Date.now() / 1000));
+
+  const { events: allEvents, loadMore } = useSubscribe({
+    filter: filterOption.filter,
+    sinceLastOpened: false,
+  });
+
+  const filteredEvents = useMemo(() => {
+    const filtered = allEvents.filter((event) => {
+      if (event.created_at > showUntil) {
+        setHasNewEvents(true);
+        return false;
+      }
+      if (mutedUsers[event.pubkey]) {
+        return false;
+      }
+      if (filterOption.filterFn) {
+        return filterOption.filterFn(event);
+      }
+      return true;
+    });
+    return filtered;
+  }, [allEvents, filterOption, showUntil]);
+
+  const isEmpty = filteredEvents.length === 0;
+
+  const imagesAndVideos = useMemo(() => {
+    if (displayAs === 'feed') {
+      return [];
+    }
+    return mapEventsToMedia(filteredEvents);
+  }, [filteredEvents, displayAs]) as ImageOrVideo[];
+
+  return (
+    <>
+      <Show when={hasNewEvents}>
+        <ShowNewEvents
+          onClick={() => {
+            setHasNewEvents(false);
+            setShowUntil(Math.floor(Date.now() / 1000));
+            if (feedTopRef.current) {
+              feedTopRef.current.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        />
+      </Show>
+      <div ref={feedTopRef} />
+      <Show when={filterOptions.length > 1}>
+        <FilterOptionsSelector
+          filterOptions={filterOptions}
+          activeOption={filterOption}
+          onOptionClick={(opt) => {
+            setFilterOption(opt);
+          }}
+        />
+      </Show>
+      <Show when={showDisplayAs !== false}>
+        <DisplaySelector
+          onDisplayChange={(displayAs) => {
+            setDisplayAs(displayAs);
+          }}
+          activeDisplay={displayAs}
+        />
+      </Show>
+      <ImageModal
+        setModalImageIndex={setModalImageIndex}
+        modalItemIndex={modalItemIndex}
+        imagesAndVideos={imagesAndVideos}
+      />
+      <Show when={isEmpty}>{emptyMessage || 'No Posts'}</Show>
+      <Show when={displayAs === 'grid'}>
+        <div className="grid grid-cols-3 gap-px">
+          <InfiniteScroll loadMore={loadMore}>
+            {imagesAndVideos.map((item, index) => (
+              <ImageGridItem
+                key={`grid-${index}`}
+                item={item}
+                index={index}
+                setModalImageIndex={setModalImageIndex}
+              />
+            ))}
+          </InfiniteScroll>
+        </div>
+      </Show>
+      <Show when={displayAs === 'feed'}>
+        <InfiniteScroll loadMore={loadMore}>
+          {filteredEvents.map((event) => {
+            return (
+              <EventComponent key={`${event.id}EC`} id={event.id} {...filterOption.eventProps} />
+            );
+          })}
+        </InfiniteScroll>
+      </Show>
+    </>
+  );
+};
+
+export default memo(Feed);

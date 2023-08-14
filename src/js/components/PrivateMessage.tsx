@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import $ from 'jquery';
 import { validateEvent, verifySignature } from 'nostr-tools';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
@@ -26,14 +25,6 @@ const PrivateMessage = ({ event, selfAuthored, showName, torrentId }: Props) => 
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    $('a').click((e) => {
-      const href = $(e.target).attr('href');
-      if (href && href.indexOf('https://iris.to/') === 0) {
-        e.preventDefault();
-        route(href.replace('https://iris.to/', ''));
-      }
-    });
-
     let initialText = text;
     if (!initialText) {
       Key.decryptMessage(event, (decryptedText) => {

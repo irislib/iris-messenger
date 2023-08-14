@@ -124,7 +124,7 @@ export default class EditProfile extends Component {
                         </p>
                         {val && (
                           <p>
-                            <SafeImg src={val} />
+                            <SafeImg key={val} src={val} />
                           </p>
                         )}
                       </>

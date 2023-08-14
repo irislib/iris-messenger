@@ -21,7 +21,7 @@ declare global {
   }
 }
 
-interface EventComponentProps {
+export interface EventComponentProps {
   id: string;
   standalone?: boolean;
   asInlineQuote?: boolean;
