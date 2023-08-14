@@ -11,6 +11,7 @@ const Video: Embed = {
         controls
         muted
         autoPlay
+        playsInline
         loop
         poster={`https://imgproxy.iris.to/thumbnail/638/${match}`}
       ></video>

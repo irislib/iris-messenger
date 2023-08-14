@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
+import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
+
 import localState from '../../LocalState';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
@@ -75,15 +77,17 @@ const ChatList = ({ activeChat, className }) => {
       </div>
       <div className="flex flex-1 flex-col overflow-y-auto">
         <NewChatButton active={activeChatHex === 'new'} />
-        {Array.from<[string, any]>(chats.entries() as any).map(([pubkey, data]) => (
-          <ChatListItem
-            active={pubkey === activeChatHex}
-            key={pubkey}
-            chat={pubkey}
-            latestMsg={data?.latest}
-            name={data?.name}
-          />
-        ))}
+        <InfiniteScroll>
+          {Array.from<[string, any]>(chats.entries() as any).map(([pubkey, data]) => (
+            <ChatListItem
+              active={pubkey === activeChatHex}
+              key={pubkey}
+              chat={pubkey}
+              latestMsg={data?.latest}
+              name={data?.name}
+            />
+          ))}
+        </InfiniteScroll>
       </div>
     </section>
   );

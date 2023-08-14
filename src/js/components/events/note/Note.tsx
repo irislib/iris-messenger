@@ -3,10 +3,11 @@ import { debounce } from 'lodash';
 import { useEffect, useState } from 'preact/hooks';
 import { Link, route } from 'preact-router';
 
+import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
+
 import Events from '../../../nostr/Events';
 import Key from '../../../nostr/Key';
 import { translate as t } from '../../../translations/Translation.mjs';
-import For from '../../helpers/For';
 import Show from '../../helpers/Show';
 import EventComponent from '../EventComponent';
 
@@ -163,11 +164,11 @@ const Note = ({
       <Show when={!(isQuote || asInlineQuote)}>
         <hr className="opacity-10" />
       </Show>
-      <For each={replies}>
-        {(r) => (
+      <InfiniteScroll>
+        {replies.map((r) => (
           <EventComponent key={r} id={r} isReply={true} isQuoting={!standalone} showReplies={1} />
-        )}
-      </For>
+        ))}
+      </InfiniteScroll>
     </>
   );
 };

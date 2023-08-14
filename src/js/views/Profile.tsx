@@ -93,7 +93,7 @@ class Profile extends View {
               filterOptions={[
                 {
                   name: t('posts'),
-                  filter: { authors: [this.state.hexPub], kinds: [1], limit: 5 },
+                  filter: { authors: [this.state.hexPub], kinds: [1], limit: 10 },
                   filterFn: (event) => !Events.getEventReplyingTo(event),
                   eventProps: { showRepliedMsg: true },
                 },

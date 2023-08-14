@@ -6,29 +6,26 @@ type ImageGridItemProps = {
   item: ImageOrVideo;
   index: number;
   setModalImageIndex: (index: number) => void;
-  imagesAndVideosLength: number;
-  lastElementRef?: React.MutableRefObject<HTMLDivElement | null>;
+  lastElementRef?: React.MutableRefObject<HTMLDivElement>;
 };
 
 export const ImageGridItem = ({
   item,
   index,
   setModalImageIndex,
-  imagesAndVideosLength,
   lastElementRef,
 }: ImageGridItemProps) => {
   const url =
     item.type === 'video' ? `https://imgproxy.iris.to/thumbnail/638/${item.url}` : item.url;
-  const isLast = index === imagesAndVideosLength - 1;
 
   return (
     <div
       key={`feed${url}${index}`}
       className="aspect-square cursor-pointer relative bg-neutral-300 hover:opacity-80"
-      ref={isLast ? lastElementRef : null}
       onClick={() => {
         setModalImageIndex(index);
       }}
+      ref={lastElementRef}
     >
       <SafeImg square={true} width={319} src={url} alt="" className="w-full h-full object-cover" />
       {item.type === 'video' && (
