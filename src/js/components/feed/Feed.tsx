@@ -49,19 +49,29 @@ const Feed = (props: FeedProps) => {
   });
 
   const filteredEvents = useMemo(() => {
+    let hasNewEventsTemp = false;
+
     const filtered = allEvents.filter((event) => {
-      if (event.created_at > showUntil) {
-        setHasNewEvents(true);
-        return false;
-      }
+      let pass = true;
+
       if (mutedUsers[event.pubkey]) {
-        return false;
+        pass = false;
+      } else if (filterOption.filterFn) {
+        pass = filterOption.filterFn(event);
       }
-      if (filterOption.filterFn) {
-        return filterOption.filterFn(event);
+
+      if (pass && event.created_at > showUntil) {
+        hasNewEventsTemp = true;
+        pass = false;
       }
-      return true;
+
+      return pass;
     });
+
+    if (hasNewEventsTemp) {
+      setHasNewEvents(true);
+    }
+
     return filtered;
   }, [allEvents, filterOption, showUntil]);
 
