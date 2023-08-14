@@ -38,7 +38,9 @@ function InfiniteScroll({ children, margin = '2000px', loadMore }: Props) {
     }
 
     // Check if the sentinel is within the viewport on mount
-    checkSentinelInViewport();
+    requestAnimationFrame(() => {
+      checkSentinelInViewport();
+    });
 
     return () => {
       if (observerRef.current) {
