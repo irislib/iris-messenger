@@ -10,20 +10,20 @@ type ImageModalProps = {
     url: string;
   }>;
   modalItemIndex: number | null;
-  setModalImageIndex: (index: number | null) => void;
+  setModalItemIndex: (index: number | null) => void;
 };
 
-const ImageModal = ({ imagesAndVideos, modalItemIndex, setModalImageIndex }: ImageModalProps) => {
+const ImageModal = ({ imagesAndVideos, modalItemIndex, setModalItemIndex }: ImageModalProps) => {
   const goToPrevImage = () => {
     if (modalItemIndex === null) return;
     const prevImageIndex = (modalItemIndex - 1 + imagesAndVideos.length) % imagesAndVideos.length;
-    setModalImageIndex(prevImageIndex);
+    setModalItemIndex(prevImageIndex);
   };
 
   const goToNextImage = () => {
     if (modalItemIndex === null) return;
     const nextImageIndex = (modalItemIndex + 1) % imagesAndVideos.length;
-    setModalImageIndex(nextImageIndex);
+    setModalItemIndex(nextImageIndex);
   };
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const ImageModal = ({ imagesAndVideos, modalItemIndex, setModalImageIndex }: Ima
   }, [modalItemIndex, imagesAndVideos]);
 
   return modalItemIndex !== null ? (
-    <Modal onClose={() => setModalImageIndex(null)}>
+    <Modal onClose={() => setModalItemIndex(null)}>
       <div className="relative w-full h-full flex justify-center">
         {imagesAndVideos[modalItemIndex].type === 'video' ? (
           <video

@@ -1,4 +1,4 @@
-import { memo, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import Image from '@/components/embed/Image';
 import Video from '@/components/embed/Video';
@@ -38,58 +38,49 @@ const Feed = (props: FeedProps) => {
   }
   const [filterOption, setFilterOption] = useState(filterOptions[0]);
   const [displayAs, setDisplayAs] = useState<DisplayAs>('feed');
-  const [modalItemIndex, setModalImageIndex] = useState<number | null>(null);
+  const [modalItemIndex, setModalItemIndex] = useState<number | null>(null);
   const [mutedUsers] = useLocalState('muted', {});
-  const [hasNewEvents, setHasNewEvents] = useState(false);
   const [showUntil, setShowUntil] = useState(Math.floor(Date.now() / 1000));
 
-  const { events: allEvents, loadMore } = useSubscribe({
+  useEffect(() => {
+    setShowUntil(Math.floor(Date.now() / 1000));
+  }, [filterOption, displayAs]);
+
+  const filterFn = useCallback(
+    (event) => {
+      if (mutedUsers[event.pubkey]) {
+        return false;
+      }
+      if (filterOption.filterFn) {
+        return filterOption.filterFn(event);
+      }
+      return true;
+    },
+    [mutedUsers, filterOption],
+  );
+
+  const { events, loadMore } = useSubscribe({
     filter: filterOption.filter,
+    filterFn,
     sinceLastOpened: false,
   });
 
-  const filteredEvents = useMemo(() => {
-    let hasNewEventsTemp = false;
+  const hasNewEvents = events.length && events[0].created_at > showUntil;
 
-    const filtered = allEvents.filter((event) => {
-      let pass = true;
+  const isEmpty = events.length === 0;
 
-      if (mutedUsers[event.pubkey]) {
-        pass = false;
-      } else if (filterOption.filterFn) {
-        pass = filterOption.filterFn(event);
-      }
-
-      if (pass && event.created_at > showUntil) {
-        hasNewEventsTemp = true;
-        pass = false;
-      }
-
-      return pass;
-    });
-
-    if (hasNewEventsTemp) {
-      setHasNewEvents(true);
-    }
-
-    return filtered;
-  }, [allEvents, filterOption, showUntil]);
-
-  const isEmpty = filteredEvents.length === 0;
-
-  const imagesAndVideos = useMemo(() => {
+  const imagesAndVideos: ImageOrVideo[] = useMemo(() => {
     if (displayAs === 'feed') {
       return [];
     }
-    return mapEventsToMedia(filteredEvents);
-  }, [filteredEvents, displayAs]) as ImageOrVideo[];
+    return mapEventsToMedia(events);
+  }, [events, displayAs]);
 
   return (
     <>
       <Show when={hasNewEvents}>
         <ShowNewEvents
           onClick={() => {
-            setHasNewEvents(false);
             setShowUntil(Math.floor(Date.now() / 1000));
             if (feedTopRef.current) {
               feedTopRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -116,7 +107,7 @@ const Feed = (props: FeedProps) => {
         />
       </Show>
       <ImageModal
-        setModalImageIndex={setModalImageIndex}
+        setModalItemIndex={setModalItemIndex}
         modalItemIndex={modalItemIndex}
         imagesAndVideos={imagesAndVideos}
       />
@@ -129,7 +120,7 @@ const Feed = (props: FeedProps) => {
                 key={`grid-${index}`}
                 item={item}
                 index={index}
-                setModalImageIndex={setModalImageIndex}
+                setModalItemIndex={setModalItemIndex}
               />
             ))}
           </InfiniteScroll>
@@ -137,7 +128,10 @@ const Feed = (props: FeedProps) => {
       </Show>
       <Show when={displayAs === 'feed'}>
         <InfiniteScroll loadMore={loadMore}>
-          {filteredEvents.map((event) => {
+          {events.map((event) => {
+            if (event.created_at > showUntil) {
+              return null;
+            }
             return (
               <EventComponent key={`${event.id}EC`} id={event.id} {...filterOption.eventProps} />
             );
@@ -148,4 +142,4 @@ const Feed = (props: FeedProps) => {
   );
 };
 
-export default memo(Feed);
+export default Feed;

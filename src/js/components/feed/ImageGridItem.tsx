@@ -5,14 +5,14 @@ import Icons from '@/Icons';
 type ImageGridItemProps = {
   item: ImageOrVideo;
   index: number;
-  setModalImageIndex: (index: number) => void;
+  setModalItemIndex: (index: number) => void;
   lastElementRef?: React.MutableRefObject<HTMLDivElement>;
 };
 
 export const ImageGridItem = ({
   item,
   index,
-  setModalImageIndex,
+  setModalItemIndex,
   lastElementRef,
 }: ImageGridItemProps) => {
   const url =
@@ -23,7 +23,7 @@ export const ImageGridItem = ({
       key={`feed${url}${index}`}
       className="aspect-square cursor-pointer relative bg-neutral-300 hover:opacity-80"
       onClick={() => {
-        setModalImageIndex(index);
+        setModalItemIndex(index);
       }}
       ref={lastElementRef}
     >
