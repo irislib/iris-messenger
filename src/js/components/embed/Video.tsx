@@ -4,7 +4,7 @@ const Video: Embed = {
   regex: /(https?:\/\/\S+?\.(?:mp4|webm|ogg|mov)(?:\?\S*)?)/gi,
   settingsKey: 'enableVideo',
   component: ({ match }) => (
-    <div className="relative w-full object-contain my-2">
+    <div className="relative w-full object-contain my-2 min-h-96">
       <video
         className="rounded max-h-[70vh] md:max-h-96"
         src={match}
