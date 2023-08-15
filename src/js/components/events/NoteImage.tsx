@@ -124,7 +124,7 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
   }
 
   const onClick = (e, i) => {
-    if (window.innerWidth > 625) {
+    if (window.innerWidth > 640) {
       e.preventDefault();
       e.stopPropagation();
       setShowImageModal(i);

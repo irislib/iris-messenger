@@ -17,19 +17,19 @@ function extractMediaFromEvent(event: any): ImageOrVideo[] {
   const imageMatches = (event.content.match(Image.regex) || []).map((url: string) => ({
     type: 'image',
     url,
-    created_at: event.created_at,
+    eventId: event.id,
   }));
   const videoMatches = (event.content.match(Video.regex) || []).map((url: string) => ({
     type: 'video',
     url,
-    created_at: event.created_at,
+    eventId: event.id,
   }));
   return [...imageMatches, ...videoMatches];
 }
 
-const ImageGrid: React.FC<ImageGridProps> = ({ events, loadMore }) => {
+const ImageGrid = ({ events, loadMore }: ImageGridProps) => {
   const [mediaItems, setMediaItems] = useState<ImageOrVideo[]>([]);
-  const [modalItemIndex, setModalItemIndex] = useState<number | null>(null);
+  const [activeItemIndex, setActiveItemIndex] = useState<number | null>(null);
 
   const updateMediaItems = useCallback(() => {
     const newMediaItems = events.flatMap((event) => {
@@ -54,9 +54,9 @@ const ImageGrid: React.FC<ImageGridProps> = ({ events, loadMore }) => {
   return (
     <div className="grid grid-cols-3 gap-px">
       <ImageModal
-        setModalItemIndex={setModalItemIndex}
-        modalItemIndex={modalItemIndex}
-        imagesAndVideos={mediaItems}
+        setActiveItemIndex={setActiveItemIndex}
+        activeItemIndex={activeItemIndex}
+        mediaItems={mediaItems}
       />
       <InfiniteScroll loadMore={loadMore}>
         {mediaItems.map((item, index) => (
@@ -64,7 +64,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({ events, loadMore }) => {
             key={`grid-${item.url}`}
             item={item}
             index={index}
-            setModalItemIndex={setModalItemIndex}
+            setActiveItemIndex={setActiveItemIndex}
           />
         ))}
       </InfiniteScroll>

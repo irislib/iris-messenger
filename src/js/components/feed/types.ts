@@ -18,6 +18,7 @@ export type DisplayAs = 'feed' | 'grid';
 export type ImageOrVideo = {
   type: 'image' | 'video';
   url: string;
+  eventId: string;
 };
 
 export type FilterOption = {
