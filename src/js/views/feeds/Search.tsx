@@ -24,6 +24,7 @@ class Feed extends View {
       <div className="flex flex-row">
         <div className="flex flex-col w-full">
           <FeedComponent
+            key={this.props.keyword}
             filterOptions={[
               {
                 name: 'Search',

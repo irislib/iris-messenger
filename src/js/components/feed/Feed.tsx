@@ -60,10 +60,10 @@ const Feed = (props: FeedProps) => {
       <Show when={hasNewEvents}>
         <ShowNewEvents
           onClick={() => {
-            setShowUntil(Math.floor(Date.now() / 1000));
             if (feedTopRef.current) {
               feedTopRef.current.scrollIntoView({ behavior: 'smooth' });
             }
+            setShowUntil(Math.floor(Date.now() / 1000));
           }}
         />
       </Show>

@@ -98,7 +98,12 @@ const ImageModal = ({ mediaItems, activeItemIndex, setActiveItemIndex }: ImageMo
 
         {/* Right side: EventComponent */}
         <div className="w-96 p-4 border-l border-neutral-900 overflow-y-auto bg-black h-full">
-          <EventComponent key={activeItem.eventId} id={activeItem.eventId} standalone={true} showReplies={Infinity} />
+          <EventComponent
+            key={activeItem.eventId}
+            id={activeItem.eventId}
+            standalone={true}
+            showReplies={Infinity}
+          />
         </div>
       </div>
     </Modal>
