@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect } from 'react';
+import { useCallback, useLayoutEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { QrCodeIcon } from '@heroicons/react/24/solid';
@@ -41,6 +41,7 @@ function ChatMessages({ id }) {
     undefined as { pubKey: string; privKey: string } | undefined,
   );
   const [isGroup, setIsGroup] = useState(false);
+  const chatId = useMemo(() => Key.toNostrHexAddress(id) || id, [id]);
   const subs = [] as any[];
   let messageViewScrollHandler;
 
@@ -63,8 +64,7 @@ function ChatMessages({ id }) {
   };
 
   const onClickSecretInvite = () => {
-    const hexId = Key.toNostrHexAddress(id);
-    sendSecretInvite(hexId);
+    sendSecretInvite(chatId);
   };
 
   const toggleScrollDownBtn = () => {
@@ -230,21 +230,20 @@ function ChatMessages({ id }) {
   });
 
   useEffect(() => {
-    const hexId = Key.toNostrHexAddress(id);
-    const subscribePrivate = (hexId) => {
+    const subscribePrivate = (chatId) => {
       const cb = (event) => {
         messages.current.set(event.id, event);
         setSortedMessages(Array.from(messages.current.values()));
       };
-      subs.push(PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()], authors: [hexId] }, cb));
-      if (hexId !== Key.getPubKey()) {
-        subs.push(PubSub.subscribe({ kinds: [4], '#p': [hexId], authors: [Key.getPubKey()] }, cb));
+      subs.push(PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()], authors: [chatId] }, cb));
+      if (chatId !== Key.getPubKey()) {
+        subs.push(PubSub.subscribe({ kinds: [4], '#p': [chatId], authors: [Key.getPubKey()] }, cb));
       }
     };
 
     localState
       .get('chatInvites')
-      .get(hexId)
+      .get(chatId)
       .once((invite) => {
         if (invite?.priv) {
           setInvitedToPriv(invite.priv);
@@ -276,8 +275,8 @@ function ChatMessages({ id }) {
       });
     };
 
-    if (hexId) {
-      subscribePrivate(hexId);
+    if (Key.toNostrHexAddress(chatId)) {
+      subscribePrivate(chatId);
     } else {
       setIsGroup(true);
       subscribeGroup();
@@ -315,9 +314,9 @@ function ChatMessages({ id }) {
       <Helmet>
         <title>{t('messages')}</title>
       </Helmet>
-      <div className={`${id ? '' : 'hidden'} flex flex-1 flex-col`}>
+      <div className={`${chatId ? '' : 'hidden'} flex flex-1 flex-col`}>
         {renderMainView()}
-        <Show when={id && id.length > 4}>
+        <Show when={chatId && chatId.length > 4}>
           <div className="relative">
             <div
               id="scroll-down-btn"
@@ -329,8 +328,8 @@ function ChatMessages({ id }) {
             </div>
           </div>
           <ChatMessageForm
-            key={id}
-            activeChat={id}
+            key={chatId}
+            activeChat={chatId}
             onSubmit={() => scrollDown()}
             keyPair={keyPair}
           />

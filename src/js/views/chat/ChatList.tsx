@@ -47,6 +47,8 @@ const ChatList = ({ activeChat, className }) => {
       setRenderCount((prevCount) => prevCount + 1);
     };
 
+    const myPub = Key.getPubKey();
+    localState.get('chats').get(myPub).put({ id: myPub });
     unsubs.push(localState.get('chats').map(addToChats));
     unsubs.push(localState.get('groups').map(addToChats));
 

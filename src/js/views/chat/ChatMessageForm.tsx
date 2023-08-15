@@ -29,7 +29,7 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
     localState
       .get('chats')
       .get(activeChat)
-      .get('msgDraft')
+      .get('draft')
       .once((text) => {
         text && setMessage(text);
       });
@@ -88,6 +88,7 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
     Events.publish(event);
 
     setMessage('');
+    localState.get('chats').get(activeChat).get('draft').put('');
 
     onSubmit?.();
   };
@@ -95,7 +96,7 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
   const handleInputChange = (e) => {
     const value = e.target.value;
     setMessage(value);
-    localState.get('chats').get(activeChat).get('msgDraft').put(value);
+    localState.get('chats').get(activeChat).get('draft').put(value);
   };
 
   const handleKeyDown = (e) => {

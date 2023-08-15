@@ -49,7 +49,7 @@ const TextArea: React.FC<TextAreaProps> = ({
     if (!replyingTo) {
       localState
         .get('public')
-        .get('msgDraft')
+        .get('draft')
         .once((text) => setValue(text));
     } else {
       const currentHistoryState = window.history.state;
@@ -101,7 +101,7 @@ const TextArea: React.FC<TextAreaProps> = ({
     setValue(val);
     checkMention(event);
     if (!replyingTo) {
-      localState.get('public').get('msgDraft').put(val);
+      localState.get('public').get('draft').put(val);
     }
   };
 
