@@ -31,7 +31,13 @@ function mapEventsToMedia(events: any[]): ImageOrVideo[] {
   });
 }
 
+const DEFAULT_FETCH_EVENTS = (options) => {
+  const { events, loadMore } = useSubscribe(options);
+  return { events, loadMore };
+};
+
 const Feed = (props: FeedProps) => {
+  const fetchEvents = props.fetchEvents || DEFAULT_FETCH_EVENTS;
   const feedTopRef = useRef<HTMLDivElement>(null);
   const { showDisplayAs, filterOptions, emptyMessage } = props;
   if (!filterOptions || filterOptions.length === 0) {
@@ -60,7 +66,7 @@ const Feed = (props: FeedProps) => {
     [mutedUsers, filterOption],
   );
 
-  const { events, loadMore } = useSubscribe({
+  const { events, loadMore } = fetchEvents({
     filter: filterOption.filter,
     filterFn,
     sinceLastOpened: false,

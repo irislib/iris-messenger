@@ -1,4 +1,4 @@
-import { Filter } from 'nostr-tools';
+import { Event, Filter } from 'nostr-tools';
 
 import { EventComponentProps } from '@/components/events/EventComponent';
 
@@ -7,6 +7,10 @@ export type FeedProps = {
   showDisplayAs?: boolean;
   filterFn?: (event: any) => boolean;
   emptyMessage?: string;
+  fetchEvents?: (opts: any) => {
+    events: Event[];
+    loadMore: () => void;
+  };
 };
 
 export type DisplayAs = 'feed' | 'grid';
@@ -19,6 +23,6 @@ export type ImageOrVideo = {
 export type FilterOption = {
   name: string;
   filter: Filter;
-  filterFn?: (event: any) => boolean;
+  filterFn?: (event: Event) => boolean;
   eventProps?: Partial<EventComponentProps>;
 };
