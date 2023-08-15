@@ -13,8 +13,8 @@ import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
 import Show from '@/components/helpers/Show';
 import useSubscribe from '@/hooks/useSubscribe';
 import { useLocalState } from '@/LocalState';
-import Key from '@/nostr/Key.ts';
 import Events from '@/nostr/Events';
+import Key from '@/nostr/Key.ts';
 
 function extractMediaFromEvent(event: any): ImageOrVideo[] {
   const imageMatches = (event.content.match(Image.regex) || []).map((url: string) => ({
@@ -34,14 +34,17 @@ function mapEventsToMedia(events: any[]): ImageOrVideo[] {
   return events.flatMap((event) => {
     if (event.kind === 7) {
       const taggedEventId = Events.getEventReplyingTo(event);
-      const taggedEvent = taggedEventId && Events.db.by('id', taggedEventId); // TODO fetch if needed
-      return taggedEvent ? extractMediaFromEvent(taggedEvent) : [];
+      if (taggedEventId) {
+        Events.getEventById(taggedEventId, true); // TODO update on callback
+        const taggedEvent = Events.db.by('id', taggedEventId);
+        return taggedEvent ? extractMediaFromEvent(taggedEvent) : [];
+      }
+      return [];
     } else {
       return extractMediaFromEvent(event);
     }
   });
 }
-
 
 const DEFAULT_FETCH_EVENTS = (options) => {
   const { events, loadMore } = useSubscribe(options);
