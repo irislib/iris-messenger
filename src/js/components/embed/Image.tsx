@@ -23,7 +23,7 @@ const Image: Embed = {
           src={match}
         />
         <Show when={showModal}>
-          <Modal onClose={() => setShowModal(false)}>
+          <Modal centerVertically={true} onClose={() => setShowModal(false)}>
             <SafeImg className="rounded max-h-[90vh] max-w-[90vw]" src={match} />
           </Modal>
         </Show>
