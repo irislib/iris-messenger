@@ -897,16 +897,23 @@ const Events = {
 
   // TODO: return Unsubscribe
   getEventById(id: string, proxyFirst = false, cb?: (event: Event) => void) {
+    let calledBack = false;
+    const callback = (event: Event) => {
+      if (!calledBack) {
+        calledBack = true;
+        cb?.(event);
+      }
+    };
     const event = this.db.by('id', id);
-    if (cb && event) {
-      cb(event);
+    if (event) {
+      callback(event);
       return;
     }
 
     if (proxyFirst) {
       // give proxy 300 ms to respond, then ask ws
       const askRelaysTimeout = setTimeout(() => {
-        PubSub.subscribe({ ids: [id] }, (event) => cb?.(event));
+        PubSub.subscribe({ ids: [id] }, (event) => callback(event));
       }, 300);
       fetch(`https://api.iris.to/event/${id}`).then((res) => {
         if (res.status === 200) {
@@ -915,13 +922,13 @@ const Events = {
             if (event && event.id === id) {
               clearTimeout(askRelaysTimeout);
               Events.handle(event, true);
-              cb?.(event);
+              callback(event);
             }
           });
         }
       });
     } else {
-      PubSub.subscribe({ ids: [id] }, cb, false);
+      PubSub.subscribe({ ids: [id] }, callback, false);
     }
   },
 };

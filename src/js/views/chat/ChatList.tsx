@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
+import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 
 import localState from '../../LocalState';
 import Key from '../../nostr/Key';
