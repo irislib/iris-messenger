@@ -48,7 +48,6 @@ const TextArea: React.FC<TextAreaProps> = ({
   useEffect(() => {
     if (!replyingTo) {
       localState
-        .get('channels')
         .get('public')
         .get('msgDraft')
         .once((text) => setValue(text));
@@ -102,7 +101,7 @@ const TextArea: React.FC<TextAreaProps> = ({
     setValue(val);
     checkMention(event);
     if (!replyingTo) {
-      localState.get('channels').get('public').get('msgDraft').put(val);
+      localState.get('public').get('msgDraft').put(val);
     }
   };
 

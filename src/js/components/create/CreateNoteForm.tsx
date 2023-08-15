@@ -46,7 +46,7 @@ function CreateNoteForm({
 
   const submit = useCallback(async () => {
     if (!replyingTo) {
-      localState.get('channels').get('public').get('msgDraft').put(null);
+      localState.get('public').get('msgDraft').put(null);
     }
     if (!text.length) return;
     const msg: any = { text };

@@ -26,6 +26,16 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    localState
+      .get('chats')
+      .get(activeChat)
+      .get('msgDraft')
+      .once((text) => {
+        text && setMessage(text);
+      });
+  }, []);
+
+  useEffect(() => {
     if (!Helpers.isMobile && autofocus !== false) {
       inputRef.current?.focus();
     }
@@ -85,7 +95,7 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
   const handleInputChange = (e) => {
     const value = e.target.value;
     setMessage(value);
-    localState.get('channels').get(activeChat).get('msgDraft').put(value);
+    localState.get('chats').get(activeChat).get('msgDraft').put(value);
   };
 
   const handleKeyDown = (e) => {

@@ -13,6 +13,7 @@ import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
 import Show from '@/components/helpers/Show';
 import useSubscribe from '@/hooks/useSubscribe';
 import { useLocalState } from '@/LocalState';
+import Key from '@/nostr/Key.ts';
 
 function mapEventsToMedia(events: any[]): ImageOrVideo[] {
   return events.flatMap((event) => {
@@ -64,6 +65,10 @@ const Feed = (props: FeedProps) => {
     filterFn,
     sinceLastOpened: false,
   });
+
+  if (events.length && events[0].pubkey === Key.getPubKey() && events[0].created_at > showUntil) {
+    setShowUntil(Math.floor(Date.now() / 1000));
+  }
 
   const hasNewEvents = events.length && events[0].created_at > showUntil;
 
