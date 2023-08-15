@@ -3,9 +3,9 @@ import { Event } from 'nostr-tools';
 import { JSX } from 'preact';
 import styled, { css, keyframes } from 'styled-components';
 
-import Icons from '../../Icons';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
+import Icons from '../../utils/Icons.tsx';
 
 import EventComponent from './EventComponent';
 import NoteImageModal from './NoteImageModal';

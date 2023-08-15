@@ -2,8 +2,8 @@ import { route } from 'preact-router';
 
 import { ImageOrVideo } from '@/components/feed/types';
 import SafeImg from '@/components/SafeImg';
-import Icons from '@/Icons';
 import Key from '@/nostr/Key.ts';
+import Icons from '@/utils/Icons.tsx';
 
 type ImageGridItemProps = {
   item: ImageOrVideo;

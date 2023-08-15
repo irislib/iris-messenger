@@ -4,11 +4,11 @@ import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
 import Copy from '../../components/buttons/Copy';
-import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation.mjs';
+import Helpers from '../../utils/Helpers.tsx';
 import { ExistingAccountLogin } from '../Login';
 
 export default class Account extends Component {

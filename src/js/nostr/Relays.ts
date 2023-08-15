@@ -2,8 +2,8 @@ import { sha256 } from '@noble/hashes/sha256';
 import { throttle } from 'lodash';
 import { Event, Filter, Sub } from 'nostr-tools';
 
-import Helpers from '../Helpers';
 import localState from '../LocalState';
+import Helpers from '../utils/Helpers.tsx';
 
 import Events from './Events';
 import Key from './Key';

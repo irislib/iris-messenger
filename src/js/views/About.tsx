@@ -5,8 +5,8 @@ import Follow from '../components/buttons/Follow';
 import Header from '../components/Header';
 import Avatar from '../components/user/Avatar';
 import Name from '../components/user/Name';
-import Helpers from '../Helpers';
 import { translate as t } from '../translations/Translation.mjs';
+import Helpers from '../utils/Helpers.tsx';
 
 const IRIS_INFO_ACCOUNT = 'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8';
 

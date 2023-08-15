@@ -12,7 +12,6 @@ import {
 } from 'nostr-tools';
 import { EventTemplate } from 'nostr-tools';
 
-import FuzzySearch from '../FuzzySearch';
 import localState from '../LocalState';
 import { Node } from '../LocalState';
 import SortedMap from '../utils/SortedMap';
@@ -20,6 +19,7 @@ import { DecryptedEvent } from '../views/chat/ChatMessages';
 import { addGroup, setGroupNameByInvite } from '../views/chat/NewChat';
 
 import EventMetaStore from './EventsMeta';
+import FuzzySearch from './FuzzySearch.ts';
 import IndexedDB from './IndexedDB';
 import Key from './Key';
 import LocalForage from './LocalForage';

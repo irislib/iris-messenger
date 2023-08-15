@@ -4,10 +4,10 @@ import { useCallback, useState } from 'preact/hooks';
 import TextArea from '@/components/create/TextArea';
 import { sendNostr } from '@/components/create/util';
 import Show from '@/components/helpers/Show';
-import Helpers from '@/Helpers';
-import Icons from '@/Icons';
 import localState from '@/LocalState';
 import { translate as t } from '@/translations/Translation.mjs';
+import Helpers from '@/utils/Helpers.tsx';
+import Icons from '@/utils/Icons.tsx';
 
 import AttachmentPreview from './AttachmentPreview';
 

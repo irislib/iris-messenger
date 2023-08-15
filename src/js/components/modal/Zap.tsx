@@ -3,12 +3,18 @@ import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Event } from 'nostr-tools';
 import styled from 'styled-components';
 
-import Helpers from '../../Helpers';
-import { LNURL, LNURLError, LNURLErrorCode, LNURLInvoice, LNURLSuccessAction } from '../../LNURL';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Relays from '../../nostr/Relays';
+import Helpers from '../../utils/Helpers.tsx';
+import {
+  LNURL,
+  LNURLError,
+  LNURLErrorCode,
+  LNURLInvoice,
+  LNURLSuccessAction,
+} from '../../utils/LNURL.ts';
 import CopyButton from '../buttons/Copy';
 import QrCode from '../QrCode';
 import Name from '../user/Name';

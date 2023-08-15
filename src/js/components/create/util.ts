@@ -1,6 +1,6 @@
 import { Event } from 'nostr-tools';
 
-import Helpers from '@/Helpers';
+import Helpers from '@/utils/Helpers.tsx';
 
 import Events from '../../nostr/Events.js';
 import Key from '../../nostr/Key.js';

@@ -1,11 +1,11 @@
 import { memo } from 'react';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
-import Icons from '../../Icons';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
+import Icons from '../../utils/Icons.tsx';
 
 import Note from './note/Note';
 import EventDropdown from './EventDropdown';

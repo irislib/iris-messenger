@@ -8,11 +8,11 @@ import Feed from '../components/feed/Feed';
 import Show from '../components/helpers/Show';
 import { isSafeOrigin } from '../components/SafeImg';
 import ProfileCard from '../components/user/ProfileCard';
-import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation.mjs';
+import Helpers from '../utils/Helpers.tsx';
 
 import View from './View';
 

@@ -11,11 +11,11 @@ import Copy from '../../components/buttons/Copy';
 import Show from '../../components/helpers/Show';
 import PrivateMessage from '../../components/PrivateMessage';
 import QrCode from '../../components/QrCode';
-import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Key from '../../nostr/Key';
 import PubSub from '../../nostr/PubSub';
 import { translate as t } from '../../translations/Translation.mjs';
+import Helpers from '../../utils/Helpers.tsx';
 import SortedMap from '../../utils/SortedMap';
 
 import ChatMessageForm from './ChatMessageForm.tsx';

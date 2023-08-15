@@ -7,13 +7,14 @@ type OwnState = {
   ogImageUrl?: any;
 };
 
+// TODO this class should be removed and functional components used everywhere instead
+
 export default abstract class BaseComponent<Props = any, State = any> extends PureComponent<
   Props,
   State & OwnState
 > {
   unmounted?: boolean;
 
-  // TODO: make this use Subscriptions instead of LocalState eventlisteners? or both?
   unsubscribes: Record<string, Unsubscribe | undefined> = {};
 
   sub(callback: CallableFunction, path?: string): Callback {

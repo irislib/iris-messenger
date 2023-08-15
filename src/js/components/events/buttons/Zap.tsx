@@ -2,9 +2,9 @@ import { BoltIcon } from '@heroicons/react/24/outline';
 import { debounce } from 'lodash';
 import { useEffect, useState } from 'preact/hooks';
 
-import { decodeInvoice, formatAmount } from '../../../Lightning';
 import Events from '../../../nostr/Events';
 import SocialNetwork from '../../../nostr/SocialNetwork';
+import { decodeInvoice, formatAmount } from '../../../utils/Lightning.ts';
 import ZapModal from '../../modal/Zap';
 
 const Zap = ({ event }) => {
