@@ -28,7 +28,25 @@ localState.get('settings').on((s) => {
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
 
-const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta }) => {
+type Props = {
+  standalone?: boolean;
+  isQuote?: boolean;
+  fullWidth?: boolean;
+  asInlineQuote?: boolean;
+  event: any;
+  meta?: any;
+  isPreview?: boolean;
+};
+
+const Content = ({
+  standalone,
+  isQuote,
+  fullWidth,
+  asInlineQuote,
+  event,
+  meta = {},
+  isPreview,
+}: Props) => {
   const [translatedText, setTranslatedText] = useState('');
   const [showMore, setShowMore] = useState(false);
   const [name, setName] = useState('');
@@ -63,13 +81,13 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta })
   }
 
   text =
-    text.length > MSG_TRUNCATE_LENGTH && !showMore && !standalone
+    text.length > MSG_TRUNCATE_LENGTH && !showMore && !standalone && !isPreview
       ? `${text.slice(0, MSG_TRUNCATE_LENGTH)}...`
       : text;
 
   const lines = text.split('\n');
   text =
-    lines.length > MSG_TRUNCATE_LINES && !showMore && !standalone
+    lines.length > MSG_TRUNCATE_LINES && !showMore && !standalone && !isPreview
       ? `${lines.slice(0, MSG_TRUNCATE_LINES).join('\n')}...`
       : text;
 
@@ -84,6 +102,7 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta })
   return (
     <div className={`flex-grow`}>
       <Author
+        isPreview={isPreview}
         standalone={standalone}
         event={event}
         isQuote={isQuote}
@@ -110,7 +129,7 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta })
           </Show>
         </div>
       </Show>
-      <Show when={!asInlineQuote && !standalone && isTooLong()}>
+      <Show when={!isPreview && !asInlineQuote && !standalone && isTooLong()}>
         <a
           className="text-sm link mb-2"
           onClick={(e) => {
@@ -121,7 +140,7 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta })
           {t(`show_${showMore ? 'less' : 'more'}`)}
         </a>
       </Show>
-      <Show when={!asInlineQuote && loadReactions}>
+      <Show when={!isPreview && !asInlineQuote && loadReactions}>
         <Reactions
           key={event.id + 'reactions'}
           settings={{ showLikes, showZaps, showReposts }}
@@ -135,7 +154,6 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta })
       <Show when={standalone}>
         <hr className="-mx-2 opacity-10 my-2" />
         <CreateNoteForm
-          waitForFocus={true}
           autofocus={!standalone}
           replyingTo={event.id}
           placeholder={t('write_your_reply')}

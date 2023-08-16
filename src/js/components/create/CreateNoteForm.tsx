@@ -3,20 +3,18 @@ import { useCallback, useState } from 'preact/hooks';
 
 import TextArea from '@/components/create/TextArea';
 import { sendNostr } from '@/components/create/util';
+import EventContent from '@/components/events/note/Content';
 import Show from '@/components/helpers/Show';
 import localState from '@/LocalState';
+import Key from '@/nostr/Key.ts';
 import { translate as t } from '@/translations/Translation.mjs';
-import Helpers from '@/utils/Helpers.tsx';
-import Icons from '@/utils/Icons.tsx';
-
-import AttachmentPreview from './AttachmentPreview';
+import Icons from '@/utils/Icons';
 
 type CreateNoteFormProps = {
   replyingTo?: string;
   onSubmit?: (text: string) => void;
   placeholder?: string;
   class?: string;
-  waitForFocus?: boolean;
   autofocus?: boolean;
   forceAutoFocusMobile?: boolean;
 };
@@ -26,13 +24,10 @@ function CreateNoteForm({
   onSubmit: onFormSubmit,
   placeholder = 'type_a_message',
   class: className,
-  waitForFocus,
   autofocus,
   forceAutoFocusMobile,
 }: CreateNoteFormProps) {
   const [text, setText] = useState('');
-  const [attachments, setAttachments] = useState<any[]>([]);
-  const [torrentId, setTorrentId] = useState('');
   const [focused, setFocused] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,25 +36,26 @@ function CreateNoteForm({
       event.preventDefault();
       submit();
     },
-    [text, attachments, torrentId],
+    [text],
   );
 
-  const submit = useCallback(async () => {
+  const resetText = () => {
     if (!replyingTo) {
       localState.get('public').get('draft').put(null);
     }
+    setText('');
+  };
+
+  const submit = useCallback(async () => {
     if (!text.length) return;
     const msg: any = { text };
     if (replyingTo) msg.replyingTo = replyingTo;
-    if (attachments.length) msg.attachments = attachments;
 
     await sendNostr(msg);
     onFormSubmit?.(msg);
 
-    setText('');
-    setAttachments([]);
-    setTorrentId('');
-  }, [text, attachments, torrentId, replyingTo, onFormSubmit]);
+    resetText();
+  }, [text, replyingTo, onFormSubmit]);
 
   const attachFileClicked = useCallback((event) => {
     event.stopPropagation();
@@ -71,48 +67,30 @@ function CreateNoteForm({
     }
   }, []);
 
-  const handleFileAttachments = useCallback(
-    (files) => {
-      if (!files) return;
+  const handleFileAttachments = useCallback((files) => {
+    if (!files) return;
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
 
-        // Initialize or use existing attachments array
-        const currentAttachments = [...attachments];
-        currentAttachments[i] = currentAttachments[i] || { type: file.type };
+      const formData = new FormData();
+      formData.append('fileToUpload', file);
 
-        // Get the base64 representation of the file
-        Helpers.getBase64(file).then((base64) => {
-          currentAttachments[i].data = base64;
-          setAttachments(currentAttachments);
-        });
-
-        const formData = new FormData();
-        formData.append('fileToUpload', file);
-
-        fetch('https://nostr.build/api/upload/iris.php', {
-          method: 'POST',
-          body: formData,
+      fetch('https://nostr.build/api/upload/iris.php', {
+        method: 'POST',
+        body: formData,
+      })
+        .then(async (response) => {
+          const url = await response.json();
+          if (url) {
+            setText((prevText) => (prevText ? `${prevText}\n\n${url}` : url));
+          }
         })
-          .then(async (response) => {
-            const url = await response.json();
-            if (url) {
-              currentAttachments[i].url = url;
-              setAttachments(currentAttachments);
-
-              setText((prevText) => (prevText ? `${prevText}\n\n${url}` : url));
-            }
-          })
-          .catch((error) => {
-            console.error('upload error', error);
-            currentAttachments[i].error = 'upload failed';
-            setAttachments(currentAttachments);
-          });
-      }
-    },
-    [attachments, text],
-  );
+        .catch((error) => {
+          console.error('upload error', error);
+        });
+    }
+  }, []);
 
   const attachmentsChanged = useCallback(
     (event) => {
@@ -121,6 +99,17 @@ function CreateNoteForm({
       handleFileAttachments(files);
     },
     [handleFileAttachments],
+  );
+
+  const onClickCancel = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (text?.split(' ').length < 10 || confirm(t('discard_changes'))) {
+        resetText();
+        setFocused(false);
+      }
+    },
+    [text],
   );
 
   return (
@@ -135,7 +124,6 @@ function CreateNoteForm({
       />
       <TextArea
         onFocus={() => setFocused(true)}
-        setTorrentId={setTorrentId}
         submit={submit}
         setValue={setText}
         value={text}
@@ -145,21 +133,35 @@ function CreateNoteForm({
         forceAutoFocusMobile={forceAutoFocusMobile}
         replyingTo={replyingTo}
       />
-      <Show when={!waitForFocus || focused}>
+      <Show when={focused}>
         <div className="flex items-center justify-between mt-4">
           <button type="button" className="btn" onClick={attachFileClicked}>
             {Icons.attach}
           </button>
-          <button type="submit" className="btn btn-primary">
-            {t('post')}
-          </button>
+          <div className="flex flex-row gap-2">
+            <button className="btn btn-sm btn-neutral" onClick={onClickCancel}>
+              {t('cancel')}
+            </button>
+            <button type="submit" className="btn btn-sm btn-primary" disabled={!text?.length}>
+              {t('post')}
+            </button>
+          </div>
         </div>
+        <Show when={text?.length}>
+          <div className="p-2 bg-neutral-900 rounded-sm my-4">
+            <div className="text-xs text-neutral-500 mb-2">{t('preview')}</div>
+            <EventContent
+              fullWidth={true}
+              isPreview={true}
+              event={{
+                content: text,
+                pubkey: Key.getPubKey(),
+                created_at: Math.floor(Date.now() / 1000),
+              }}
+            />
+          </div>
+        </Show>
       </Show>
-      <AttachmentPreview
-        attachments={attachments}
-        torrentId={torrentId}
-        removeAttachments={() => setAttachments([])}
-      />
     </form>
   );
 }

@@ -11,7 +11,6 @@ import { uploadFile } from '@/utils/uploadFile';
 const mentionRegex = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]*$/;
 
 interface TextAreaProps {
-  setTorrentId: (value: string) => void;
   submit: () => void;
   attachmentsChanged: (event) => void;
   placeholder: string;
@@ -24,7 +23,6 @@ interface TextAreaProps {
 }
 
 const TextArea: React.FC<TextAreaProps> = ({
-  setTorrentId,
   submit,
   attachmentsChanged,
   placeholder,
@@ -41,6 +39,7 @@ const TextArea: React.FC<TextAreaProps> = ({
   useEffect(() => {
     const el = ref.current;
     if (el) {
+      el.style.height = 'auto'; // Resetting the height
       el.style.height = `${el.scrollHeight}px`;
     }
   }, [value]);
@@ -67,10 +66,6 @@ const TextArea: React.FC<TextAreaProps> = ({
 
   const onPaste = useCallback((event) => {
     const clipboardData = event.clipboardData || window.clipboardData;
-    const pasted = clipboardData.getData('text');
-    const magnetRegex = /(magnet:\?xt=urn:btih:.*)/gi;
-    const match = magnetRegex.exec(pasted);
-    if (match) setTorrentId(match[0]);
 
     if (clipboardData.items) {
       const items = clipboardData.items;
