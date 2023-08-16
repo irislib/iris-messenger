@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { getEventHash, getSignature, nip04 } from 'nostr-tools';
 
-import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
+import Helpers from '../../utils/Helpers.tsx';
 
 interface ChatMessageFormProps {
   activeChat: string;
@@ -24,6 +24,16 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
 }) => {
   const [message, setMessage] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    localState
+      .get('chats')
+      .get(activeChat)
+      .get('draft')
+      .once((text) => {
+        text && setMessage(text);
+      });
+  }, []);
 
   useEffect(() => {
     if (!Helpers.isMobile && autofocus !== false) {
@@ -78,6 +88,7 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
     Events.publish(event);
 
     setMessage('');
+    localState.get('chats').get(activeChat).get('draft').put('');
 
     onSubmit?.();
   };
@@ -85,7 +96,7 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
   const handleInputChange = (e) => {
     const value = e.target.value;
     setMessage(value);
-    localState.get('channels').get(activeChat).get('msgDraft').put(value);
+    localState.get('chats').get(activeChat).get('draft').put(value);
   };
 
   const handleKeyDown = (e) => {

@@ -3,10 +3,10 @@ import { createRef } from 'preact';
 import { Link } from 'preact-router';
 
 import Component from '../BaseComponent';
-import Helpers from '../Helpers';
-import Icons from '../Icons';
 import localState from '../LocalState';
 import { translate as t } from '../translations/Translation.mjs';
+import Helpers from '../utils/Helpers.tsx';
+import Icons from '../utils/Icons.tsx';
 
 const isOfType = (f, types) => types.indexOf(f.name.slice(-4)) !== -1;
 const isVideo = (f) => isOfType(f, ['webm', '.mp4', '.ogg']);

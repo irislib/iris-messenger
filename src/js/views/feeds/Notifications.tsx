@@ -1,5 +1,6 @@
 import { debounce } from 'lodash';
 
+import Events from '@/nostr/Events';
 import Key from '@/nostr/Key';
 
 import Feed from '../../components/feed/Feed';
@@ -45,6 +46,12 @@ export default class Notifications extends View {
             eventProps: { fullWidth: false },
           },
         ]}
+        fetchEvents={() => {
+          return {
+            events: Events.notifications.eventIds.map((id) => Events.db.by('id', id)),
+            loadMore: () => {},
+          };
+        }}
       />
     );
   }

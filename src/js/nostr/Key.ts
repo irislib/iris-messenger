@@ -9,8 +9,8 @@ import {
 } from 'nostr-tools';
 import { route } from 'preact-router';
 
-import Helpers from '../Helpers';
 import localState from '../LocalState';
+import Helpers from '../utils/Helpers.tsx';
 
 import Events from './Events';
 

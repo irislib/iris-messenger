@@ -3,12 +3,19 @@ import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Event } from 'nostr-tools';
 import styled from 'styled-components';
 
-import Helpers from '../../Helpers';
-import { LNURL, LNURLError, LNURLErrorCode, LNURLInvoice, LNURLSuccessAction } from '../../LNURL';
-import localState from '../../LocalState';
+import { useLocalState } from '@/LocalState.ts';
+
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Relays from '../../nostr/Relays';
+import Helpers from '../../utils/Helpers.tsx';
+import {
+  LNURL,
+  LNURLError,
+  LNURLErrorCode,
+  LNURLInvoice,
+  LNURLSuccessAction,
+} from '../../utils/LNURL.ts';
 import CopyButton from '../buttons/Copy';
 import QrCode from '../QrCode';
 import Name from '../user/Name';
@@ -52,20 +59,6 @@ function chunks<T>(arr: T[], length: number) {
   }
   return result;
 }
-
-const SatAmount = styled.span`
-  color: var(--text-color);
-  display: inline-block;
-  cursor: pointer;
-  padding: 10px;
-  border-radius: 100px;
-  margin: 5px;
-  border: 1px solid transparent;
-  background: var(--body-bg);
-  &.active {
-    background: var(--notify);
-  }
-`;
 
 /*
 const ZapTypeBtn = styled.span`
@@ -129,19 +122,16 @@ export default function SendSats(props: ZapProps) {
     ? (canZap && zapType !== ZapType.NonZap) || handler.maxCommentLength > 0
     : false;
 
+  const [userDefaultZapAmount, setUserDefaultZapAmount] = useLocalState('defaultZapAmount', 0);
+
   useEffect(() => {
-    localState.get('defaultZapAmount').on((v) => {
-      const value = parseInt(v);
-      setAmount(value);
-      setCustomAmount(value);
-      console.log('defaultZapAmount', value);
-    });
-  });
+    setAmount(userDefaultZapAmount);
+    setCustomAmount(userDefaultZapAmount);
+  }, [userDefaultZapAmount]);
 
   useEffect(() => {
     if (props.show) {
       setError(undefined);
-      setAmount(defaultZapAmount);
       setComment(undefined);
       setZapType(ZapType.PublicZap);
       setInvoice(undefined);
@@ -277,7 +267,7 @@ export default function SendSats(props: ZapProps) {
         <button
           className="btn btn-neutral"
           type="button"
-          disabled={!customAmount}
+          disabled={!customAmount || amount === customAmount}
           onClick={() => selectAmount(customAmount ?? 0)}
         >
           Confirm
@@ -307,16 +297,16 @@ export default function SendSats(props: ZapProps) {
 
   function renderAmounts(amount: number, amounts: number[]) {
     return (
-      <div className="amounts">
+      <div className="flex gap-2 my-2">
         {amounts.map((a) => (
-          <SatAmount
-            className={amount === a ? 'active' : ''}
+          <button
+            className={`btn btn-sm ${a === amount ? 'btn-primary' : 'btn-neutral'}`}
             key={a}
             onClick={() => selectAmount(a)}
           >
             {emojis[a] && <>{emojis[a]}&nbsp;</>}
             {Helpers.formatAmount(a, 0)}
-          </SatAmount>
+          </button>
         ))}
       </div>
     );
@@ -345,7 +335,7 @@ export default function SendSats(props: ZapProps) {
         {(amount ?? 0) > 0 && (
           <div style="margin-top: 10px;">
             <button class="btn btn-primary" width="100%" onClick={() => loadInvoice()}>
-              Send {Helpers.formatAmount(amount, 0)} sats
+              Send {amount === customAmount ? customAmount : Helpers.formatAmount(amount, 0)} sats
             </button>
           </div>
         )}
@@ -397,6 +387,10 @@ export default function SendSats(props: ZapProps) {
 
   function successAction() {
     if (!success) return null;
+    if (!userDefaultZapAmount) {
+      // is this the right place for this?
+      setUserDefaultZapAmount(amount);
+    }
     return (
       <div className="success-action">
         <p className="paid">{success?.description ?? 'Paid'}</p>

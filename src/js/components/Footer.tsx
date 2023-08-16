@@ -8,9 +8,9 @@ import {
 import { useEffect, useState } from 'preact/hooks';
 import { Link } from 'preact-router';
 
-import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
+import Icons from '../utils/Icons.tsx';
 
 import Show from './helpers/Show';
 import Avatar from './user/Avatar';

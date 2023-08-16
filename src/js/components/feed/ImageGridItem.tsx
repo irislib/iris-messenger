@@ -1,18 +1,21 @@
+import { route } from 'preact-router';
+
 import { ImageOrVideo } from '@/components/feed/types';
 import SafeImg from '@/components/SafeImg';
-import Icons from '@/Icons';
+import Key from '@/nostr/Key.ts';
+import Icons from '@/utils/Icons.tsx';
 
 type ImageGridItemProps = {
   item: ImageOrVideo;
   index: number;
-  setModalImageIndex: (index: number) => void;
+  setActiveItemIndex: (index: number) => void;
   lastElementRef?: React.MutableRefObject<HTMLDivElement>;
 };
 
 export const ImageGridItem = ({
   item,
   index,
-  setModalImageIndex,
+  setActiveItemIndex,
   lastElementRef,
 }: ImageGridItemProps) => {
   const url =
@@ -23,7 +26,11 @@ export const ImageGridItem = ({
       key={`feed${url}${index}`}
       className="aspect-square cursor-pointer relative bg-neutral-300 hover:opacity-80"
       onClick={() => {
-        setModalImageIndex(index);
+        if (window.innerWidth > 640) {
+          setActiveItemIndex(index);
+        } else {
+          route(`/${Key.toNostrBech32Address(item.eventId, 'note')}`);
+        }
       }}
       ref={lastElementRef}
     >

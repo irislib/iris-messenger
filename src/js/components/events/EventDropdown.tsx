@@ -2,11 +2,11 @@ import { Event } from 'nostr-tools';
 import { useState } from 'preact/hooks';
 import styled from 'styled-components';
 
-import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
+import Helpers from '../../utils/Helpers.tsx';
 import Block from '../buttons/Block';
 import { PrimaryButton } from '../buttons/Button';
 import Copy from '../buttons/Copy';

@@ -1,8 +1,8 @@
 import { Component } from 'preact';
 import { Link } from 'preact-router';
 
-import Icons from '../Icons';
 import localState from '../LocalState';
+import Icons from '../utils/Icons.tsx';
 
 const isOfType = (f: string, types: string[]): boolean => types.indexOf(f.slice(-4)) !== -1;
 const isImage = (f: { name: string }): boolean =>

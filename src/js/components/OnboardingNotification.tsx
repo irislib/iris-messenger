@@ -3,10 +3,10 @@ import { Link, route } from 'preact-router';
 import styled from 'styled-components';
 
 import Component from '../BaseComponent';
-import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
+import Helpers from '../utils/Helpers.tsx';
 
 import Copy from './buttons/Copy';
 import Follow from './buttons/Follow';

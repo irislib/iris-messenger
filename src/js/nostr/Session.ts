@@ -2,8 +2,8 @@ import localForage from 'localforage';
 import { Event, Filter } from 'nostr-tools';
 import { route } from 'preact-router';
 
-import IrisTo from '../IrisTo';
 import localState from '../LocalState';
+import IrisTo from '../utils/IrisTo.ts';
 
 import Events from './Events';
 import IndexedDB from './IndexedDB';

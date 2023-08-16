@@ -1,36 +1,19 @@
-import { memo, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import Image from '@/components/embed/Image';
-import Video from '@/components/embed/Video';
 import EventComponent from '@/components/events/EventComponent';
 import DisplaySelector from '@/components/feed/DisplaySelector';
 import FilterOptionsSelector from '@/components/feed/FilterOptionsSelector';
-import ImageGridItem from '@/components/feed/ImageGridItem';
-import ImageModal from '@/components/feed/ImageModal';
+import ImageGrid from '@/components/feed/ImageGrid.tsx';
 import ShowNewEvents from '@/components/feed/ShowNewEvents';
-import { DisplayAs, FeedProps, ImageOrVideo } from '@/components/feed/types';
-import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
+import { DisplayAs, FeedProps } from '@/components/feed/types';
+import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 import Show from '@/components/helpers/Show';
 import useSubscribe from '@/hooks/useSubscribe';
 import { useLocalState } from '@/LocalState';
-
-function mapEventsToMedia(events: any[]): ImageOrVideo[] {
-  return events.flatMap((event) => {
-    const imageMatches = (event.content.match(Image.regex) || []).map((url: string) => ({
-      type: 'image',
-      url,
-      created_at: event.created_at,
-    }));
-    const videoMatches = (event.content.match(Video.regex) || []).map((url: string) => ({
-      type: 'video',
-      url,
-      created_at: event.created_at,
-    }));
-    return [...imageMatches, ...videoMatches];
-  });
-}
+import Key from '@/nostr/Key.ts';
 
 const Feed = (props: FeedProps) => {
+  const fetchEvents = props.fetchEvents || useSubscribe;
   const feedTopRef = useRef<HTMLDivElement>(null);
   const { showDisplayAs, filterOptions, emptyMessage } = props;
   if (!filterOptions || filterOptions.length === 0) {
@@ -38,62 +21,55 @@ const Feed = (props: FeedProps) => {
   }
   const [filterOption, setFilterOption] = useState(filterOptions[0]);
   const [displayAs, setDisplayAs] = useState<DisplayAs>('feed');
-  const [modalItemIndex, setModalImageIndex] = useState<number | null>(null);
   const [mutedUsers] = useLocalState('muted', {});
-  const [hasNewEvents, setHasNewEvents] = useState(false);
   const [showUntil, setShowUntil] = useState(Math.floor(Date.now() / 1000));
 
-  const { events: allEvents, loadMore } = useSubscribe({
+  useEffect(() => {
+    setShowUntil(Math.floor(Date.now() / 1000));
+  }, [filterOption, displayAs]);
+
+  const filterFn = useCallback(
+    (event) => {
+      if (mutedUsers[event.pubkey]) {
+        return false;
+      }
+      if (filterOption.filterFn) {
+        return filterOption.filterFn(event);
+      }
+      return true;
+    },
+    [mutedUsers, filterOption],
+  );
+
+  const { events, loadMore } = fetchEvents({
     filter: filterOption.filter,
+    filterFn,
     sinceLastOpened: false,
   });
 
-  const filteredEvents = useMemo(() => {
-    let hasNewEventsTemp = false;
+  if (events.length && events[0].pubkey === Key.getPubKey() && events[0].created_at > showUntil) {
+    setShowUntil(Math.floor(Date.now() / 1000));
+  }
 
-    const filtered = allEvents.filter((event) => {
-      let pass = true;
+  const hasNewEvents = events.length && events[0].created_at > showUntil;
 
-      if (mutedUsers[event.pubkey]) {
-        pass = false;
-      } else if (filterOption.filterFn) {
-        pass = filterOption.filterFn(event);
-      }
-
-      if (pass && event.created_at > showUntil) {
-        hasNewEventsTemp = true;
-        pass = false;
-      }
-
-      return pass;
-    });
-
-    if (hasNewEventsTemp) {
-      setHasNewEvents(true);
-    }
-
-    return filtered;
-  }, [allEvents, filterOption, showUntil]);
-
-  const isEmpty = filteredEvents.length === 0;
-
-  const imagesAndVideos = useMemo(() => {
-    if (displayAs === 'feed') {
-      return [];
-    }
-    return mapEventsToMedia(filteredEvents);
-  }, [filteredEvents, displayAs]) as ImageOrVideo[];
+  const isEmpty = events.length === 0;
 
   return (
     <>
       <Show when={hasNewEvents}>
         <ShowNewEvents
           onClick={() => {
-            setHasNewEvents(false);
-            setShowUntil(Math.floor(Date.now() / 1000));
             if (feedTopRef.current) {
-              feedTopRef.current.scrollIntoView({ behavior: 'smooth' });
+              const currentScrollTop =
+                document.documentElement.scrollTop || document.body.scrollTop;
+
+              // only scroll up
+              if (currentScrollTop > feedTopRef.current.offsetTop) {
+                feedTopRef.current.scrollIntoView({ behavior: 'smooth' });
+              }
             }
+            setShowUntil(Math.floor(Date.now() / 1000));
           }}
         />
       </Show>
@@ -115,29 +91,17 @@ const Feed = (props: FeedProps) => {
           activeDisplay={displayAs}
         />
       </Show>
-      <ImageModal
-        setModalImageIndex={setModalImageIndex}
-        modalItemIndex={modalItemIndex}
-        imagesAndVideos={imagesAndVideos}
-      />
       <Show when={isEmpty}>{emptyMessage || 'No Posts'}</Show>
       <Show when={displayAs === 'grid'}>
-        <div className="grid grid-cols-3 gap-px">
-          <InfiniteScroll loadMore={loadMore}>
-            {imagesAndVideos.map((item, index) => (
-              <ImageGridItem
-                key={`grid-${index}`}
-                item={item}
-                index={index}
-                setModalImageIndex={setModalImageIndex}
-              />
-            ))}
-          </InfiniteScroll>
-        </div>
+        <ImageGrid events={events} loadMore={loadMore} />
       </Show>
       <Show when={displayAs === 'feed'}>
         <InfiniteScroll loadMore={loadMore}>
-          {filteredEvents.map((event) => {
+          {events.map((event) => {
+            // is this inefficient? should we rather pass a component function + list of events?
+            if (event.created_at > showUntil) {
+              return null;
+            }
             return (
               <EventComponent key={`${event.id}EC`} id={event.id} {...filterOption.eventProps} />
             );
@@ -148,4 +112,4 @@ const Feed = (props: FeedProps) => {
   );
 };
 
-export default memo(Feed);
+export default Feed;

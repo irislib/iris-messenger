@@ -38,9 +38,11 @@ const ChatListItem = ({ chat, active = false, latestMsg = {} as any, name }) => 
               <Show when={chat !== Key.getPubKey()}>
                 <Name pub={chat} />
               </Show>
-              <small className="ml-2 latest-time text-neutral-500">
-                <RelativeTime date={new Date(latestMsg.created_at * 1000)} />
-              </small>
+              <Show when={latestMsg.created_at}>
+                <small className="ml-2 latest-time text-neutral-500">
+                  <RelativeTime date={new Date(latestMsg.created_at * 1000)} />
+                </small>
+              </Show>
             </Show>
           </span>
           <small className="text-neutral-500 truncate">{latestMsg.text}</small>

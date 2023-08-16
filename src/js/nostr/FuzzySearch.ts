@@ -1,7 +1,7 @@
 import Fuse from 'fuse.js';
 import _ from 'lodash';
 
-import localState from './LocalState';
+import localState from '../LocalState.ts';
 
 const options = {
   keys: ['name', 'display_name'],

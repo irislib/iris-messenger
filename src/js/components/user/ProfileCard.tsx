@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { route } from 'preact-router';
 
-import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -9,6 +8,7 @@ import PubSub from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { ID } from '../../nostr/UserIds';
 import { translate as t } from '../../translations/Translation.mjs';
+import Helpers from '../../utils/Helpers.tsx';
 import Follow from '../buttons/Follow';
 import Show from '../helpers/Show';
 import HyperText from '../HyperText';

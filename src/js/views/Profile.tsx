@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { route } from 'preact-router';
 
+import SimpleImageModal from '@/components/modal/Image.tsx';
 import Events from '@/nostr/Events';
 
 import Copy from '../components/buttons/Copy';
@@ -8,11 +9,11 @@ import Feed from '../components/feed/Feed';
 import Show from '../components/helpers/Show';
 import { isSafeOrigin } from '../components/SafeImg';
 import ProfileCard from '../components/user/ProfileCard';
-import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation.mjs';
+import Helpers from '../utils/Helpers.tsx';
 
 import View from './View';
 
@@ -25,6 +26,7 @@ class Profile extends View {
     this.state = {
       followedUserCount: 0,
       followerCount: 0,
+      bannerModalOpen: false,
     };
     this.id = 'profile';
     this.subscriptions = [];
@@ -78,7 +80,17 @@ class Profile extends View {
   }
 
   renderView() {
-    const { hexPub, display_name, name, profile, banner, picture, blocked } = this.state;
+    const {
+      hexPub,
+      display_name,
+      name,
+      profile,
+      banner,
+      picture,
+      blocked,
+      bannerModalOpen,
+      fullBanner,
+    } = this.state;
 
     if (!hexPub) {
       return <div></div>;
@@ -89,14 +101,19 @@ class Profile extends View {
     const description = `Latest posts by ${display_name || name || 'user'}. ${
       profile?.about || ''
     }`;
+    const setBannerModalOpen = (bannerModalOpen) => this.setState({ bannerModalOpen });
 
     return (
       <>
         <Show when={banner}>
           <div
-            className="mb-4 h-48 bg-cover bg-center"
+            className="mb-4 h-48 bg-cover bg-center cursor-pointer"
             style={{ backgroundImage: `url(${banner})` }}
+            onClick={() => setBannerModalOpen(true)}
           ></div>
+          <Show when={bannerModalOpen}>
+            <SimpleImageModal imageUrl={fullBanner} onClose={() => setBannerModalOpen(false)} />
+          </Show>
         </Show>
         <div>
           <Helmet>
@@ -160,17 +177,18 @@ class Profile extends View {
     localState.get('noFollowers').on(this.inject());
     this.subscriptions.push(
       SocialNetwork.getProfile(hexPub, (profile) => {
-        let banner;
+        let banner, fullBanner;
 
         try {
           banner = profile.banner && new URL(profile.banner).toString();
           if (!banner) {
             return;
           }
+          fullBanner = banner;
           banner = isSafeOrigin(banner)
             ? banner
             : `https://imgproxy.iris.to/insecure/rs:fill:948:192/plain/${banner}`;
-          this.setState({ banner });
+          this.setState({ banner, fullBanner });
         } catch (e) {
           console.log('Invalid banner URL', profile.banner);
         }

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'preact/hooks';
 
-import Helpers from '../../Helpers';
 import { translate as t } from '../../translations/Translation.mjs';
-import { OptionalGetter } from '../../types';
+import Helpers from '../../utils/Helpers.tsx';
+
+type OptionalGetter<T> = T | (() => T);
 
 type Props = {
   copyStr: OptionalGetter<string>;

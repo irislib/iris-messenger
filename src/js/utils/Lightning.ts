@@ -1,7 +1,7 @@
 import { bytesToHex } from '@noble/hashes/utils';
 import { decode as invoiceDecode } from 'light-bolt11-decoder';
 
-import localState from './LocalState';
+import localState from '../LocalState.ts';
 
 let lastBitcoinPrice;
 

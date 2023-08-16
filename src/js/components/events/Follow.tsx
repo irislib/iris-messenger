@@ -1,8 +1,8 @@
 import { Event } from 'nostr-tools';
 import { Link } from 'preact-router';
 
-import Icons from '../../Icons';
 import Key from '../../nostr/Key';
+import Icons from '../../utils/Icons.tsx';
 import Name from '../user/Name';
 
 type Props = {
