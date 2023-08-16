@@ -1,5 +1,4 @@
 import { ID } from '../../nostr/UserIds';
-import AnimalName from '../../utils/AnimalName.ts';
 
 import Badge from './Badge';
 import useVerticeMonitor from '../../dwotr/hooks/useVerticeMonitor';
