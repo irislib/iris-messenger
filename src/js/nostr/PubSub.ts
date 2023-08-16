@@ -1,4 +1,4 @@
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import { RelayPool } from 'nostr-relaypool';
 import { Event, Filter, matchFilter } from 'nostr-tools';
 import { nip42 } from 'nostr-tools';

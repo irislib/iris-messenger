@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import { Event, Filter } from 'nostr-tools';
 
 import PubSub from '@/nostr/PubSub';

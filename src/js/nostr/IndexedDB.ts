@@ -1,5 +1,5 @@
 import Dexie, { Table } from 'dexie';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import { Event, Filter } from 'nostr-tools';
 
 import Events from './Events';

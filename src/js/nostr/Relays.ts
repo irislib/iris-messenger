@@ -1,5 +1,5 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import { Event, Filter, Sub } from 'nostr-tools';
 
 import localState from '../LocalState';

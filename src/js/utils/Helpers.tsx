@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { bech32 } from 'bech32';
-import _ from 'lodash';
 
 import localState from '../LocalState.ts';
 import Key from '../nostr/Key.ts';
@@ -278,12 +277,13 @@ export default {
     const url = new URL(window.location.origin);
     url.pathname = path;
 
-    queryParams &&
-      _.forEach(queryParams, (value, key) => {
-        url.searchParams.append(key, value);
-      });
+    for (const [key, value] of Object.entries(queryParams)) {
+      url.searchParams.append(key, value);
+    }
 
-    hash && (url.hash = hash);
+    if (hash) {
+      url.hash = hash;
+    }
 
     return url.toString();
   },

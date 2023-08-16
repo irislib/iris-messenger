@@ -1,5 +1,6 @@
 import localForage from 'localforage';
-import { debounce, throttle } from 'lodash';
+import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 import { Event } from 'nostr-tools';
 
 import Events from './Events';

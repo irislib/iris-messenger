@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'preact/hooks';
 import { Link, route } from 'preact-router';
 

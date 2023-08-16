@@ -1,4 +1,4 @@
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { Event, UnsignedEvent } from 'nostr-tools';
 import { route } from 'preact-router';
 

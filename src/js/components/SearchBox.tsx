@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import { route } from 'preact-router';
 

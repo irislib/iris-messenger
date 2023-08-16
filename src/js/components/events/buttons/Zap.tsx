@@ -1,5 +1,5 @@
 import { BoltIcon } from '@heroicons/react/24/outline';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'preact/hooks';
 
 import Show from '@/components/helpers/Show.tsx';
