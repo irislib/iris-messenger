@@ -416,6 +416,10 @@ export default function SendSats(props: ZapProps) {
   const title = handler?.canZap ? 'Send zap to ' : 'Send sats to ';
   if (!(props.show ?? false)) return null;
 
+  if (quickZap && window.webln && !error) {
+    return null;
+  }
+
   return (
     <Modal showContainer={true} centerVertically={true} onClose={onClose}>
       <ZapDialog>
