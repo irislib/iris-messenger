@@ -46,6 +46,7 @@ export interface ZapProps {
   notice?: string;
   note?: string;
   recipient?: string;
+  quickZap?: boolean;
 }
 
 function chunks<T>(arr: T[], length: number) {
@@ -94,7 +95,7 @@ const Close = styled.div`
 
 export default function SendSats(props: ZapProps) {
   const onClose = props.onClose || (() => undefined);
-  const { note, recipient } = props;
+  const { note, recipient, quickZap = false } = props;
   const defaultZapAmount = 1_000;
   const amounts = [defaultZapAmount, 5_000, 10_000, 20_000, 50_000, 100_000, 1_000_000];
   const emojis: Record<number, string> = {
@@ -138,6 +139,12 @@ export default function SendSats(props: ZapProps) {
       setSuccess(undefined);
     }
   }, [props.show]);
+
+  useEffect(() => {
+    if (quickZap && canZap) {
+      loadInvoice();
+    }
+  }, [quickZap, canZap]);
 
   useEffect(() => {
     if (success && !success.url) {
@@ -222,6 +229,7 @@ export default function SendSats(props: ZapProps) {
 
     try {
       const rsp = await handler.getInvoice(amount, comment, zap);
+      console.log('loadInvoice', amount, comment, zap);
       if (rsp.pr) {
         setInvoice(rsp.pr);
         await payWithWallet(rsp);
@@ -386,7 +394,7 @@ export default function SendSats(props: ZapProps) {
   }
 
   function successAction() {
-    if (!success) return null;
+    if (!success || quickZap) return null;
     if (!userDefaultZapAmount) {
       // is this the right place for this?
       setUserDefaultZapAmount(amount);

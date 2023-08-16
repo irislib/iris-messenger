@@ -23,6 +23,34 @@ const Zap = ({ event }) => {
   });
 
   const [defaultZapAmount] = useLocalState('defaultZapAmount', 0);
+  const [longPress, setLongPress] = useState(false); // state to determine if it's a long press
+
+  let pressTimer: any = null;
+
+  const handleButtonClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!state.showZapModal) {
+      setState((prevState) => ({ ...prevState, showZapModal: true }));
+    }
+  };
+
+  const onMouseDown = (e) => {
+    pressTimer = setTimeout(() => {
+      setLongPress(true);
+      handleButtonClick(e); // Open the modal after 500ms of mouseDown
+    }, 500);
+  };
+
+  const onMouseUp = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    clearTimeout(pressTimer);
+    if (!longPress) {
+      handleButtonClick(e); // Open the modal on short press
+    }
+    setLongPress(false); // Reset the longPress state after handling
+  };
 
   useEffect(() => {
     const unsubProfile = SocialNetwork.getProfile(event.pubkey, (profile) => {
@@ -75,11 +103,8 @@ const Zap = ({ event }) => {
   return state.lightning ? (
     <>
       <a
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setState((prevState) => ({ ...prevState, showZapModal: true }));
-        }}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
         className={`btn-ghost btn-sm hover:bg-transparent btn content-center gap-2 rounded-none
           ${state.zapped ? 'text-iris-orange' : 'text-neutral-500 hover:text-iris-orange'}`}
       >
@@ -91,6 +116,7 @@ const Zap = ({ event }) => {
       </a>
       {state.showZapModal && (
         <ZapModal
+          quickZap={!!defaultZapAmount && !longPress}
           show={true}
           lnurl={state.lightning}
           note={event.id}
