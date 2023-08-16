@@ -135,7 +135,7 @@ function CreateNoteForm({
       />
       <Show when={focused}>
         <div className="flex items-center justify-between mt-4">
-          <button type="button" className="btn" onClick={attachFileClicked}>
+          <button type="button" className="btn btn-sm" onClick={attachFileClicked}>
             {Icons.attach}
           </button>
           <div className="flex flex-row gap-2">
@@ -147,7 +147,7 @@ function CreateNoteForm({
             </button>
           </div>
         </div>
-        <div className="p-2 bg-neutral-900 rounded-sm my-4">
+        <div className="p-2 md:p-4 bg-neutral-900 rounded-sm my-4">
           <div className="text-xs text-neutral-500 mb-2">{t('preview')}</div>
           <EventContent
             fullWidth={true}

@@ -187,7 +187,7 @@ export default class Header extends Component {
         </Show>
         <a
           href="/notifications"
-          className={`relative inline-block ${this.state.isMyProfile ? 'hidden md:flex' : ''}`}
+          className={`relative inline-block rounded-full ${this.state.isMyProfile ? 'hidden md:flex' : ''}`}
         >
           {this.state.activeRoute === '/notifications' ? (
             <HeartIconFull width={28} />
