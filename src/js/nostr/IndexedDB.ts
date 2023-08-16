@@ -63,7 +63,8 @@ const IndexedDB = {
         await db.tags.bulkAdd(tagsToSave);
       });
     } catch (err) {
-      console.error('Bulk save error:', err);
+      // lots of duplicate errors
+      // console.error('Bulk save error:', err);
     }
   }, 500),
 
@@ -133,11 +134,7 @@ const IndexedDB = {
 
     if (filter['#e'] && Array.isArray(filter['#e'])) {
       for (const eventId of filter['#e']) {
-        const tags = await db.tags.where('[type+value]').equals(['e', eventId]).toArray();
-
-        for (const tag of tags) {
-          this.subscribedTags.add(tag.type + '|' + tag.value);
-        }
+        this.subscribedTags.add('e|' + eventId);
       }
 
       await this.subscribeToTags();
