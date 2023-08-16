@@ -28,7 +28,7 @@ export default class DevSettings extends Component {
       {
         key: 'indexed03',
         label: 'Use central index server for kinds 0 and 3',
-        defaultValue: true,
+        defaultValue: false,
       },
       {
         key: 'indexedDbSave',

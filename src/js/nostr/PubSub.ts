@@ -208,7 +208,7 @@ const PubSub = {
     } else if (mergeSubscriptions || filter.authors?.length !== 1) {
       relays = Relays.enabledRelays();
     }
-    if (dev.indexed03 !== false && filter.kinds?.every((k) => k === 0 || k === 3)) {
+    if (dev.indexed03 && filter.kinds?.every((k) => k === 0 || k === 3)) {
       relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
     }
     if (sinceLastOpened) {
