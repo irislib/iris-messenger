@@ -27,7 +27,6 @@
     "history": "5.3.0",
     "htm": "^3.1.1",
     "identicon.js": "^2.3.3",
-    "jquery": "^3.7.0",
     "light-bolt11-decoder": "^3.0.0",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
@@ -39,7 +38,6 @@
     "preact-scroll-viewport": "^0.2.0",
     "react-helmet": "^6.1.0",
     "react-string-replace": "^1.1.1",
-    "react-virtualized": "^9.22.5",
     "styled-components": "^6.0.4"
   },
   "devDependencies": {

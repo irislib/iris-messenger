@@ -1,6 +1,6 @@
-import $ from 'jquery';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
+import { createRef } from 'preact';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
@@ -47,6 +47,8 @@ type State = {
 };
 
 class SearchBox extends Component<Props, State> {
+  inputRef = createRef();
+
   constructor() {
     super();
     this.state = {
@@ -74,9 +76,19 @@ class SearchBox extends Component<Props, State> {
   }
 
   close() {
-    $(this.base).find('input').val('');
+    this.inputRef.current.value = '';
     this.setState({ results: [], query: '' });
   }
+
+  handleKeydown = (e) => {
+    if (e.key === 'Tab' && document.activeElement?.tagName === 'BODY') {
+      e.preventDefault();
+      this.inputRef.current.focus();
+    } else if (e.key === 'Escape') {
+      this.close();
+      this.inputRef.current.blur();
+    }
+  };
 
   componentDidMount() {
     localState.get('showFollowSuggestions').on(this.inject());
@@ -88,24 +100,14 @@ class SearchBox extends Component<Props, State> {
     );
     this.adjustResultsPosition();
     this.search();
-    $(document)
-      .off('keydown')
-      .on('keydown', (e) => {
-        if (e.key === 'Tab' && document.activeElement?.tagName === 'BODY') {
-          e.preventDefault();
-          $(this.base).find('input').focus();
-        } else if (e.key === 'Escape') {
-          this.close();
-          $(this.base).find('input').blur();
-        }
-      });
-    this.props.focus && $(this.base).find('input')?.focus();
+    document.addEventListener('keydown', this.handleKeydown);
+    this.props.focus && this.inputRef.current?.focus();
   }
 
   componentDidUpdate(prevProps, prevState) {
     this.adjustResultsPosition();
     if (prevProps.focus !== this.props.focus) {
-      $(this.base).find('input:visible').focus();
+      this.inputRef.current.focus();
     }
     if (prevProps.query !== this.props.query) {
       this.search();
@@ -124,11 +126,11 @@ class SearchBox extends Component<Props, State> {
 
   // remove keyup listener on unmount
   componentWillUnmount() {
-    $(document).off('keyup');
+    document.removeEventListener('keydown', this.handleKeydown);
   }
 
   adjustResultsPosition() {
-    const input = $(this.base).find('input');
+    const input = this.inputRef.current;
     if (input.length) {
       this.setState({ offsetLeft: input[0].offsetLeft });
     }
@@ -136,13 +138,15 @@ class SearchBox extends Component<Props, State> {
 
   onSubmit(e) {
     e.preventDefault();
-    const el = $(this.base).find('input');
-    el.val('');
-    el.trigger('blur');
+    const el = this.inputRef.current;
+    el.value = '';
+    el.blur();
     // TODO go to first result
-    const selected = $(this.base).find('.result.selected');
-    if (selected.length) {
-      selected[0].click();
+    if (this.base instanceof Element) {
+      const selected = this.base.querySelector('.result.selected');
+      if (selected && selected instanceof HTMLElement) {
+        selected.click();
+      }
     }
   }
 
@@ -165,14 +169,14 @@ class SearchBox extends Component<Props, State> {
   }, 500);
 
   search() {
-    let query = this.props.query || ($(this.base).find('input').first().val() as string) || '';
+    let query = this.props.query || (this.inputRef.current.value as string) || '';
     query = query.toString().trim().toLowerCase();
     if (!query) {
       this.close();
       return;
     }
     if (query.match(/nsec1[a-zA-Z0-9]{30,65}/gi)) {
-      $(this.base).find('input').first().val('');
+      this.inputRef.current.value = '';
       return;
     }
 
@@ -181,10 +185,7 @@ class SearchBox extends Component<Props, State> {
       if (query.match(/.+@.+\..+/)) {
         Key.getPubKeyByNip05Address(query).then((pubKey) => {
           // if query hasn't changed since we started the request
-          if (
-            pubKey &&
-            query === String(this.props.query || $(this.base).find('input').first().val())
-          ) {
+          if (pubKey && query === String(this.props.query || this.inputRef.current.value)) {
             this.props.onSelect?.({ key: pubKey });
           }
         });
@@ -246,6 +247,7 @@ class SearchBox extends Component<Props, State> {
           <form onSubmit={(e) => this.onSubmit(e)}>
             <label>
               <input
+                ref={this.inputRef}
                 type="text"
                 onKeyPress={(e) => this.preventUpDownDefault(e)}
                 onKeyDown={(e) => this.preventUpDownDefault(e)}
