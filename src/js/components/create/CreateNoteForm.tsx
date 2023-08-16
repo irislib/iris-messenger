@@ -147,20 +147,18 @@ function CreateNoteForm({
             </button>
           </div>
         </div>
-        <Show when={text?.length}>
-          <div className="p-2 bg-neutral-900 rounded-sm my-4">
-            <div className="text-xs text-neutral-500 mb-2">{t('preview')}</div>
-            <EventContent
-              fullWidth={true}
-              isPreview={true}
-              event={{
-                content: text,
-                pubkey: Key.getPubKey(),
-                created_at: Math.floor(Date.now() / 1000),
-              }}
-            />
-          </div>
-        </Show>
+        <div className="p-2 bg-neutral-900 rounded-sm my-4">
+          <div className="text-xs text-neutral-500 mb-2">{t('preview')}</div>
+          <EventContent
+            fullWidth={true}
+            isPreview={true}
+            event={{
+              content: text,
+              pubkey: Key.getPubKey(),
+              created_at: Math.floor(Date.now() / 1000),
+            }}
+          />
+        </div>
       </Show>
     </form>
   );
