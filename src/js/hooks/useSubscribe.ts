@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import throttle from 'lodash/throttle';
-import { Event, Filter } from 'nostr-tools';
+import { Event } from 'nostr-tools';
 
+import Filter from '@/nostr/Filter';
 import PubSub from '@/nostr/PubSub';
 import SortedEventMap from '@/utils/SortedEventMap';
 
@@ -28,8 +29,6 @@ const useSubscribe = (ops: {
   const handleEvent = (event: Event) => {
     if (sortedEvents.current.has(event.id)) return;
     if (filterFn && !filterFn(event)) return;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     if (filter.keywords && !filter.keywords.some((keyword) => event.content?.includes(keyword))) {
       return;
     }

@@ -679,7 +679,7 @@ const Events = {
     // TODO since we're only querying relays since lastSeen, we need to store all beforeseen events and correctly query them on demand
     // otherwise feed will be incomplete
     if (saveToIdb) {
-      const followDistance = SocialNetwork.followDistanceByUser.get(ID(event.pubkey)) || Infinity;
+      const followDistance = SocialNetwork.getFollowDistance(event.pubkey);
       if (followDistance <= 1) {
         // save all our own events and events from people we follow
         if (dev.indexedDbSave !== false) {

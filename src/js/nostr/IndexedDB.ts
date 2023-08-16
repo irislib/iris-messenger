@@ -4,6 +4,7 @@ import { Event, Filter } from 'nostr-tools';
 
 import Events from './Events';
 import Key from './Key';
+
 export class MyDexie extends Dexie {
   events!: Table<Event & { id: string }>;
 
@@ -17,128 +18,97 @@ export class MyDexie extends Dexie {
 
 const db = new MyDexie();
 
+const handleEvent = (event: Event & { id: string }) => {
+  Events.handle(event, false, false);
+};
+
 const IndexedDB = {
   db,
   subscribedEventIds: new Set<string>(),
   subscribedAuthors: new Set<string>(),
   seenFilters: new Set<string>(),
   saveQueue: [] as Event[],
+
   clear() {
     return db.delete();
   },
-  save: throttle((_this) => {
-    const events = _this.saveQueue;
-    _this.saveQueue = [];
-    // TODO delete earlier events if kind in 0, 3 or >= 30000
-    db.events.bulkAdd(events).catch(() => {
-      // lots of "already exists" errors
-      // console.error('error saving events', e);
-    });
+
+  save: throttle(async function (this: typeof IndexedDB) {
+    const events = this.saveQueue;
+    this.saveQueue = [];
+    try {
+      await db.events.bulkAdd(events);
+    } catch {
+      // Handle specific error messages if necessary
+    }
   }, 500),
+
   saveEvent(event: Event & { id: string }) {
     this.saveQueue.push(event);
-    this.save(this);
+    this.save();
   },
-  init() {
-    const myPub = Key.getPubKey();
-    db.events
-      .where({ pubkey: myPub })
-      .each((event) => {
-        Events.handle(event, false, false);
-      })
-      .then(() => {
-        // other follow events
-        // are they loaded in correct order to build the WoT?
-        return db.events.where({ kind: 3 }).each((event) => {
-          Events.handle(event, false, false);
-        });
-      })
-      .then(() => {
-        // profiles
-        return db.events.where({ kind: 0 }).each((event) => {
-          Events.handle(event, false, false);
-        });
-      })
-      .then(() => {
-        // profiles
-        return db.events.where({ kind: 4 }).each((event) => {
-          Events.handle(event, false, false);
-        });
-      })
-      .then(() => {
-        // some latest global events
-        return db.events
-          .orderBy('created_at')
-          .reverse()
-          .filter((event) => event.kind === 1)
-          .limit(5000)
-          .each((event) => {
-            Events.handle(event, false, false);
-          });
-      });
 
-    // other events to be loaded on demand
+  async init() {
+    const myPub = Key.getPubKey();
+
+    await db.events.where({ pubkey: myPub }).each(handleEvent);
+    await db.events.where({ kind: 3 }).each(handleEvent);
+    await db.events.where({ kind: 0 }).each(handleEvent);
+    await db.events.where({ kind: 4 }).each(handleEvent);
+    await db.events
+      .orderBy('created_at')
+      .reverse()
+      .filter((event) => event.kind === 1)
+      .limit(5000)
+      .each(handleEvent);
   },
-  subscribeToAuthors: throttle((limit?: number) => {
-    const authors = Array.from(IndexedDB.subscribedAuthors.values());
-    IndexedDB.subscribedAuthors.clear();
-    db.events
+
+  subscribeToAuthors: throttle(async function (this: typeof IndexedDB, limit?: number) {
+    const authors = [...this.subscribedAuthors];
+    this.subscribedAuthors.clear();
+    await db.events
       .where('pubkey')
       .anyOf(authors)
       .limit(limit || 1000)
-      .each((event) => {
-        Events.handle(event, false, false);
-      });
+      .each(handleEvent);
   }, 1000),
-  subscribeToEventIds: throttle(() => {
-    const ids = Array.from(IndexedDB.subscribedEventIds.values());
-    IndexedDB.subscribedEventIds.clear();
-    db.events
-      .where('id')
-      .anyOf(ids)
-      .each((event) => {
-        Events.handle(event, false, false);
-      });
+
+  subscribeToEventIds: throttle(async function (this: typeof IndexedDB) {
+    const ids = [...this.subscribedEventIds];
+    this.subscribedEventIds.clear();
+    await db.events.where('id').anyOf(ids).each(handleEvent);
   }, 1000),
-  subscribe(filter: Filter) {
-    if (!filter) {
-      return;
-    }
-    if (filter['#e'] || filter['#p']) {
-      // currently inefficient lookups
-      return;
-    }
-    let query: any = db.events;
+
+  async subscribe(filter: Filter) {
+    if (!filter) return;
+
+    if (filter['#e'] || filter['#p']) return; // TODO save reactions & replies
+
     if (filter.ids?.length) {
-      filter.ids.forEach((id) => {
-        this.subscribedEventIds.add(id);
-      });
-      this.subscribeToEventIds();
+      filter.ids.forEach((id) => this.subscribedEventIds.add(id));
+      await this.subscribeToEventIds();
       return;
-    } else if (filter.authors?.length) {
-      filter.authors.forEach((author) => {
-        this.subscribedAuthors.add(author);
-      });
-      this.subscribeToAuthors();
-      return;
-    } else {
-      const stringifiedFilter = JSON.stringify(filter);
-      if (this.seenFilters.has(stringifiedFilter)) {
-        return;
-      }
-      this.seenFilters.add(stringifiedFilter);
-      if (filter.kinds) {
-        query = query.where
-          ? query.where('kind').anyOf(filter.kinds)
-          : query.and((event) => filter.kinds?.includes(event.kind));
-      }
-      if (filter.limit) {
-        query = query.limit(filter.limit); // TODO these are not sorted by created_at desc
-      }
     }
-    query.each((event) => {
-      Events.handle(event, false, false);
-    });
+
+    if (filter.authors?.length) {
+      filter.authors.forEach((author) => this.subscribedAuthors.add(author));
+      await this.subscribeToAuthors();
+      return;
+    }
+
+    const stringifiedFilter = JSON.stringify(filter);
+    if (this.seenFilters.has(stringifiedFilter)) return;
+    this.seenFilters.add(stringifiedFilter);
+
+
+    let query: any = db.events;
+    if (filter.kinds) {
+      query = query.where('kind').anyOf(filter.kinds);
+    }
+    if (filter.limit) {
+      query = query.limit(filter.limit);
+    }
+    await query.each(handleEvent);
   },
 };
 
