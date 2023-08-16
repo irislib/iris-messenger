@@ -9,6 +9,7 @@ import Menu from './components/Menu';
 import Modal from './components/modal/Modal';
 import Session from './nostr/Session';
 import { translationLoaded } from './translations/Translation.mjs';
+import Helpers from './utils/Helpers.tsx';
 import About from './views/About';
 import Chat from './views/chat/Chat';
 import EditProfile from './views/EditProfile';
@@ -28,7 +29,6 @@ import Settings from './views/settings/Settings';
 import Subscribe from './views/Subscribe';
 import Torrent from './views/Torrent';
 import Component from './BaseComponent';
-import Helpers from './Helpers';
 import localState from './LocalState';
 
 import '@fontsource/lato/400.css';

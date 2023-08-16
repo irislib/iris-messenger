@@ -53,6 +53,7 @@ class Feed extends View {
           </div>
           <Show when={this.state.followedUsers.length}>
             <FeedComponent
+              key={`feed-${this.state.followedUsers.length}`}
               filterOptions={[
                 {
                   name: t('posts'),

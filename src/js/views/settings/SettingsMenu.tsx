@@ -44,7 +44,7 @@ export default class SettingsMenu extends Component {
             <a
               href="#"
               className={`btn inline-flex w-auto flex items-center p-3 rounded-full transition-colors duration-200 hover:bg-neutral-900 ${
-                activePage === page && window.innerWidth > 624 ? 'active' : ''
+                activePage === page && window.innerWidth > 640 ? 'active' : ''
               }`}
               onClick={(e) => this.menuLinkClicked(page, e)}
               key={page}

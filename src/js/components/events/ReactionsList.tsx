@@ -2,8 +2,8 @@ import { memo, useEffect, useState } from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link } from 'preact-router';
 
-import { decodeInvoice, formatAmount } from '../../Lightning';
 import Events from '../../nostr/Events'; // Import Events module
+import { decodeInvoice, formatAmount } from '../../utils/Lightning.ts';
 import Modal from '../modal/Modal';
 import Avatar from '../user/Avatar';
 import Name from '../user/Name';

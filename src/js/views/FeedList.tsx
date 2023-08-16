@@ -1,7 +1,7 @@
 import { route } from 'preact-router';
 
-import Icons from '../Icons';
 import { translate as t } from '../translations/Translation.mjs';
+import Icons from '../utils/Icons.tsx';
 
 import View from './View';
 

@@ -2,9 +2,14 @@ import { BoltIcon } from '@heroicons/react/24/outline';
 import { debounce } from 'lodash';
 import { useEffect, useState } from 'preact/hooks';
 
-import { decodeInvoice, formatAmount } from '../../../Lightning';
+import Show from '@/components/helpers/Show.tsx';
+import { useLocalState } from '@/LocalState.ts';
+import Key from '@/nostr/Key.ts';
+import Icons from '@/utils/Icons.tsx';
+
 import Events from '../../../nostr/Events';
 import SocialNetwork from '../../../nostr/SocialNetwork';
+import { decodeInvoice, formatAmount } from '../../../utils/Lightning.ts';
 import ZapModal from '../../modal/Zap';
 
 const Zap = ({ event }) => {
@@ -14,7 +19,10 @@ const Zap = ({ event }) => {
     zapped: false,
     showZapModal: false,
     lightning: undefined,
+    defaultZapAmount: 0,
   });
+
+  const [defaultZapAmount] = useLocalState('defaultZapAmount', 0);
 
   useEffect(() => {
     const unsubProfile = SocialNetwork.getProfile(event.pubkey, (profile) => {
@@ -38,11 +46,15 @@ const Zap = ({ event }) => {
     (zaps) => {
       const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.by('id', eventId));
       let totalZapAmount = 0;
+      let zapped = false;
       zapEvents.forEach((event) => {
         const bolt11 = event?.tags.find((tag) => tag[0] === 'bolt11')[1];
         if (!bolt11) {
           console.log('Invalid zap, missing bolt11 tag');
           return;
+        }
+        if (Events.getZappingUser(event?.id, false) === Key.getPubKey()) {
+          zapped = true;
         }
         const decoded = decodeInvoice(bolt11);
         const amount = (decoded?.amount || 0) / 1000;
@@ -52,6 +64,7 @@ const Zap = ({ event }) => {
       setState((prevState) => ({
         ...prevState,
         totalZapAmount,
+        zapped,
         formattedZapAmount: (totalZapAmount && formatAmount(totalZapAmount)) || '',
       }));
     },
@@ -70,7 +83,10 @@ const Zap = ({ event }) => {
         className={`btn-ghost btn-sm hover:bg-transparent btn content-center gap-2 rounded-none
           ${state.zapped ? 'text-iris-orange' : 'text-neutral-500 hover:text-iris-orange'}`}
       >
-        <BoltIcon width={18} />
+        <Show when={defaultZapAmount}>{Icons.quickZap}</Show>
+        <Show when={!defaultZapAmount}>
+          <BoltIcon width={18} />
+        </Show>
         {state.formattedZapAmount}
       </a>
       {state.showZapModal && (

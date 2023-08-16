@@ -6,10 +6,10 @@ import Reactions from '@/components/events/buttons/ReactionButtons';
 import Show from '@/components/helpers/Show';
 import HyperText from '@/components/HyperText';
 import Torrent from '@/components/Torrent';
-import Helpers from '@/Helpers';
 import localState from '@/LocalState';
 import SocialNetwork from '@/nostr/SocialNetwork';
 import { translate as t } from '@/translations/Translation.mjs';
+import Helpers from '@/utils/Helpers.tsx';
 
 import Author from './Author';
 import Helmet from './Helmet';

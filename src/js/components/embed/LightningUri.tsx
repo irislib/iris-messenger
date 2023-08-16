@@ -1,4 +1,4 @@
-import Helpers from '../../Helpers';
+import Helpers from '../../utils/Helpers.tsx';
 
 import Embed from './index';
 

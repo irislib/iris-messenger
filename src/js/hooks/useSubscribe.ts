@@ -7,6 +7,7 @@ import SortedEventMap from '@/utils/SortedEventMap';
 
 const useSubscribe = (ops: {
   filter: Filter;
+  filterFn?: (event: Event) => boolean;
   sinceLastOpened?: boolean;
   mergeSubscriptions?: boolean;
   enabled?: boolean;
@@ -16,10 +17,17 @@ const useSubscribe = (ops: {
   const [events, setEvents] = useState<Event[]>([]);
   const lastUntilRef = useRef<number | null>(null);
 
-  const { filter, enabled = true, sinceLastOpened = false, mergeSubscriptions = true } = ops;
+  const {
+    filter,
+    filterFn,
+    enabled = true,
+    sinceLastOpened = false,
+    mergeSubscriptions = true,
+  } = ops;
 
   const handleEvent = (event: Event) => {
     if (sortedEvents.current.has(event.id)) return;
+    if (filterFn && !filterFn(event)) return;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (filter.keywords && !filter.keywords.some((keyword) => event.content?.includes(keyword))) {
@@ -31,7 +39,7 @@ const useSubscribe = (ops: {
 
   useEffect(() => {
     sortedEvents.current = new SortedEventMap();
-  }, [filter]);
+  }, [filter, filterFn]);
 
   useEffect(() => {
     if (!enabled || !filter) return;
@@ -39,7 +47,7 @@ const useSubscribe = (ops: {
     const newFilter = { ...filter, limit: filter.limit || 100 };
 
     return PubSub.subscribe(newFilter, handleEvent, sinceLastOpened, mergeSubscriptions);
-  }, [filter, enabled, sinceLastOpened, mergeSubscriptions]);
+  }, [filter, filterFn, enabled, sinceLastOpened, mergeSubscriptions]);
 
   useEffect(() => {
     if (!loadMoreFilter) return;

@@ -1,6 +1,6 @@
 import { Event } from 'nostr-tools';
 
-import Helpers from './Helpers';
+import Helpers from './Helpers.tsx';
 
 // Code kindly contributed by @Kieran from Snort
 

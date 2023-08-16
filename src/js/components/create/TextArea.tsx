@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Show from '@/components/helpers/Show';
 import SearchBox from '@/components/SearchBox';
-import Helpers from '@/Helpers.tsx';
 import localState from '@/LocalState';
 import Key from '@/nostr/Key';
 import { translate as t } from '@/translations/Translation.mjs';
+import Helpers from '@/utils/Helpers.tsx';
 import { uploadFile } from '@/utils/uploadFile';
 
 const mentionRegex = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]*$/;
@@ -48,9 +48,8 @@ const TextArea: React.FC<TextAreaProps> = ({
   useEffect(() => {
     if (!replyingTo) {
       localState
-        .get('channels')
         .get('public')
-        .get('msgDraft')
+        .get('draft')
         .once((text) => setValue(text));
     } else {
       const currentHistoryState = window.history.state;
@@ -102,7 +101,7 @@ const TextArea: React.FC<TextAreaProps> = ({
     setValue(val);
     checkMention(event);
     if (!replyingTo) {
-      localState.get('channels').get('public').get('msgDraft').put(val);
+      localState.get('public').get('draft').put(val);
     }
   };
 

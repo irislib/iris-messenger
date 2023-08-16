@@ -17,10 +17,10 @@ import { Link } from 'preact-router';
 
 import CreateNoteForm from '@/components/create/CreateNoteForm';
 
-import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
+import Icons from '../utils/Icons.tsx';
 
 import Show from './helpers/Show';
 import Modal from './modal/Modal';

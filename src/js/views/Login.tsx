@@ -4,12 +4,12 @@ import { Component } from 'preact';
 
 import EULA from '../components/EULA';
 import LanguageSelector from '../components/LanguageSelector';
-import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation.mjs';
+import Helpers from '../utils/Helpers.tsx';
 
 type Props = {
   fullScreen?: boolean;
