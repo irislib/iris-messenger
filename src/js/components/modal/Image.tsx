@@ -1,35 +1,19 @@
-import styled from 'styled-components';
+import Modal from '@/components/modal/Modal';
+import SafeImg from '@/components/SafeImg';
 
-import SafeImg from '../SafeImg';
+type SimpleImageModalProps = {
+  imageUrl: string;
+  onClose: () => void;
+};
 
-import Modal from './Modal';
-
-const ContentContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 20px;
-`;
-
-const ImageModal = (props) => {
+const SimpleImageModal = ({ imageUrl, onClose }: SimpleImageModalProps) => {
   return (
-    <Modal centerVertically={props.images?.length === 1} onClose={props.onClose}>
-      <ContentContainer>
-        {props.images.map((i) => {
-          return (
-            <p>
-              <SafeImg
-                className="rounded-sm"
-                style={{ maxHeight: '90vh', maxWidth: '90vw' }}
-                src={i}
-              />
-            </p>
-          );
-        })}
-      </ContentContainer>
+    <Modal width="100%" height="100%" onClose={onClose}>
+      <div className="flex h-full justify-center items-center">
+        <SafeImg className="max-h-full max-w-full object-contain" src={imageUrl} />
+      </div>
     </Modal>
   );
 };
 
-export default ImageModal;
+export default SimpleImageModal;

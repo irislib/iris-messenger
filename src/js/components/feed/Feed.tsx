@@ -61,7 +61,13 @@ const Feed = (props: FeedProps) => {
         <ShowNewEvents
           onClick={() => {
             if (feedTopRef.current) {
-              feedTopRef.current.scrollIntoView({ behavior: 'smooth' });
+              const currentScrollTop =
+                document.documentElement.scrollTop || document.body.scrollTop;
+
+              // only scroll up
+              if (currentScrollTop > feedTopRef.current.offsetTop) {
+                feedTopRef.current.scrollIntoView({ behavior: 'smooth' });
+              }
             }
             setShowUntil(Math.floor(Date.now() / 1000));
           }}
