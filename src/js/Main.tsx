@@ -4,7 +4,6 @@ import { Router, RouterOnChangeArgs } from 'preact-router';
 
 import Footer from './components/Footer';
 import Show from './components/helpers/Show';
-import MediaPlayer from './components/MediaPlayer';
 import Menu from './components/Menu';
 import Modal from './components/modal/Modal';
 import Session from './nostr/Session';
@@ -27,7 +26,6 @@ import Profile from './views/Profile';
 import Search from './views/Search';
 import Settings from './views/settings/Settings';
 import Subscribe from './views/Subscribe';
-import Torrent from './views/Torrent';
 import Component from './BaseComponent';
 import localState from './LocalState';
 
@@ -131,7 +129,6 @@ class Main extends Component<Props, ReactState> {
               <Chat path="/chat/hashtag/:hashtag?" />
               <Chat path="/chat/:id?" />
               <Note path="/post/:id+" />
-              <Torrent path="/torrent/:id+" />
               <About path="/about" />
               <Settings path="/settings/:page?" />
               <LogoutConfirmation path="/logout" />
@@ -147,7 +144,6 @@ class Main extends Component<Props, ReactState> {
               <NoteOrProfile path="/:id" />
             </Router>
           </div>
-          <MediaPlayer />
           <Footer />
         </section>
 
