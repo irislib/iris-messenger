@@ -6,6 +6,7 @@ import Events from '../../../nostr/Events';
 import SocialNetwork from '../../../nostr/SocialNetwork';
 import { decodeInvoice, formatAmount } from '../../../utils/Lightning.ts';
 import ZapModal from '../../modal/Zap';
+import Key from "@/nostr/Key.ts";
 
 const Zap = ({ event }) => {
   const [state, setState] = useState({
@@ -38,20 +39,25 @@ const Zap = ({ event }) => {
     (zaps) => {
       const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.by('id', eventId));
       let totalZapAmount = 0;
+      let zapped = false;
       zapEvents.forEach((event) => {
         const bolt11 = event?.tags.find((tag) => tag[0] === 'bolt11')[1];
         if (!bolt11) {
           console.log('Invalid zap, missing bolt11 tag');
           return;
         }
+        if (Events.getZappingUser(event?.id, false) === Key.getPubKey()) {
+          zapped = true;
+        }
         const decoded = decodeInvoice(bolt11);
         const amount = (decoded?.amount || 0) / 1000;
         totalZapAmount += amount;
       });
-
+      
       setState((prevState) => ({
         ...prevState,
         totalZapAmount,
+        zapped,
         formattedZapAmount: (totalZapAmount && formatAmount(totalZapAmount)) || '',
       }));
     },

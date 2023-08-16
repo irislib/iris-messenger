@@ -59,20 +59,6 @@ function chunks<T>(arr: T[], length: number) {
   return result;
 }
 
-const SatAmount = styled.span`
-  color: var(--text-color);
-  display: inline-block;
-  cursor: pointer;
-  padding: 10px;
-  border-radius: 100px;
-  margin: 5px;
-  border: 1px solid transparent;
-  background: var(--body-bg);
-  &.active {
-    background: var(--notify);
-  }
-`;
-
 /*
 const ZapTypeBtn = styled.span`
   color: var(--text-color);
@@ -147,7 +133,6 @@ export default function SendSats(props: ZapProps) {
   useEffect(() => {
     if (props.show) {
       setError(undefined);
-      setAmount(defaultZapAmount);
       setComment(undefined);
       setZapType(ZapType.PublicZap);
       setInvoice(undefined);
@@ -283,7 +268,7 @@ export default function SendSats(props: ZapProps) {
         <button
           className="btn btn-neutral"
           type="button"
-          disabled={!customAmount}
+          disabled={!customAmount || amount === customAmount}
           onClick={() => selectAmount(customAmount ?? 0)}
         >
           Confirm
@@ -313,16 +298,16 @@ export default function SendSats(props: ZapProps) {
 
   function renderAmounts(amount: number, amounts: number[]) {
     return (
-      <div className="amounts">
+      <div className="flex gap-2 my-2">
         {amounts.map((a) => (
-          <SatAmount
-            className={amount === a ? 'active' : ''}
+          <button
+            className={`btn btn-sm ${a === amount ? 'btn-primary' : 'btn-neutral'}`}
             key={a}
             onClick={() => selectAmount(a)}
           >
             {emojis[a] && <>{emojis[a]}&nbsp;</>}
             {Helpers.formatAmount(a, 0)}
-          </SatAmount>
+          </button>
         ))}
       </div>
     );
@@ -351,7 +336,7 @@ export default function SendSats(props: ZapProps) {
         {(amount ?? 0) > 0 && (
           <div style="margin-top: 10px;">
             <button class="btn btn-primary" width="100%" onClick={() => loadInvoice()}>
-              Send {Helpers.formatAmount(amount, 0)} sats
+              Send {amount === customAmount ? customAmount : Helpers.formatAmount(amount, 0)} sats
             </button>
           </div>
         )}

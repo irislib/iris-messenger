@@ -841,7 +841,7 @@ const Events = {
     event.sig = await Key.sign(event as Event);
     return event as Event;
   },
-  getZappingUser(eventId: string) {
+  getZappingUser(eventId: string, npub = true) {
     const description = Events.db.by('id', eventId)?.tags?.find((t) => t[0] === 'description')?.[1];
     if (!description) {
       return null;
@@ -852,8 +852,10 @@ const Events = {
     } catch (e) {
       return null;
     }
-    const npub = Key.toNostrBech32Address(obj.pubkey, 'npub');
-    return npub;
+    if (npub) {
+      Key.toNostrBech32Address(obj.pubkey, 'npub');
+    }
+    return obj.pubkey;
   },
   getReplies(id: string, cb?: (replies: Set<string>) => void): Unsubscribe {
     const callback = () => {
