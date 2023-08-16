@@ -146,7 +146,6 @@ const Note = ({
           </Show>
           <Content
             event={event}
-            meta={meta}
             standalone={standalone}
             isQuote={isQuote}
             asInlineQuote={asInlineQuote}

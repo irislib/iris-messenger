@@ -104,7 +104,7 @@ function CreateNoteForm({
   const onClickCancel = useCallback(
     (e) => {
       e.preventDefault();
-      if (text?.split(' ').length < 10 || confirm(t('discard_changes'))) {
+      if (!text || text.split(' ').length < 10 || confirm(t('discard_changes'))) {
         resetText();
         setFocused(false);
       }

@@ -5,7 +5,6 @@ import CreateNoteForm from '@/components/create/CreateNoteForm';
 import Reactions from '@/components/events/buttons/ReactionButtons';
 import Show from '@/components/helpers/Show';
 import HyperText from '@/components/HyperText';
-import Torrent from '@/components/Torrent';
 import localState from '@/LocalState';
 import SocialNetwork from '@/nostr/SocialNetwork';
 import { translate as t } from '@/translations/Translation.mjs';
@@ -34,19 +33,10 @@ type Props = {
   fullWidth?: boolean;
   asInlineQuote?: boolean;
   event: any;
-  meta?: any;
   isPreview?: boolean;
 };
 
-const Content = ({
-  standalone,
-  isQuote,
-  fullWidth,
-  asInlineQuote,
-  event,
-  meta = {},
-  isPreview,
-}: Props) => {
+const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, isPreview }: Props) => {
   const [translatedText, setTranslatedText] = useState('');
   const [showMore, setShowMore] = useState(false);
   const [name, setName] = useState('');
@@ -111,9 +101,6 @@ const Content = ({
       />
       <Show when={standalone}>
         <Helmet name={name} text={text} attachments={attachments} />
-      </Show>
-      <Show when={meta.torrentId}>
-        <Torrent torrentId={meta.torrentId} autopause={!standalone} />
       </Show>
       <Show when={text?.length > 0}>
         <div
