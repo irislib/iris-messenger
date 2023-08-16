@@ -5,13 +5,23 @@ import { Event, Filter } from 'nostr-tools';
 import Events from './Events';
 import Key from './Key';
 
+// TODO: tags should be mapped to internal event ids in order to save space
+type Tag = {
+  id: number;
+  eventId: string;
+  type: string;
+  value: string;
+};
+
 export class MyDexie extends Dexie {
   events!: Table<Event & { id: string }>;
+  tags!: Table<Tag>;
 
   constructor() {
     super('iris');
-    this.version(2).stores({
-      events: 'id, pubkey, kind, created_at', // Primary key and indexed props
+    this.version(3).stores({
+      events: 'id, pubkey, kind, created_at',
+      tags: '++id, eventId, [type+value]', // Indexed by type and value for efficient queries
     });
   }
 }
@@ -22,32 +32,58 @@ const handleEvent = (event: Event & { id: string }) => {
   Events.handle(event, false, false);
 };
 
+type SaveQueueEntry = {
+  events: Event[];
+  tags: Partial<Tag>[];
+};
+
 const IndexedDB = {
   db,
   subscribedEventIds: new Set<string>(),
   subscribedAuthors: new Set<string>(),
+  subscribedTags: new Set<string>(),
   seenFilters: new Set<string>(),
-  saveQueue: [] as Event[],
+  saveQueue: [] as SaveQueueEntry[],
 
   clear() {
     return db.delete();
   },
 
   save: throttle(async function (this: typeof IndexedDB) {
-    const events = this.saveQueue;
+    const eventsToSave: any[] = [];
+    const tagsToSave: any[] = [];
+    for (const item of this.saveQueue) {
+      eventsToSave.push(...item.events);
+      tagsToSave.push(...item.tags);
+    }
     this.saveQueue = [];
     try {
-      await db.events.bulkAdd(events);
-    } catch {
-      // Handle specific error messages if necessary
+      await db.transaction('rw', db.events, db.tags, async () => {
+        await db.events.bulkAdd(eventsToSave);
+        await db.tags.bulkAdd(tagsToSave);
+      });
+    } catch (err) {
+      console.error('Bulk save error:', err);
     }
   }, 500),
 
   saveEvent(event: Event & { id: string }) {
-    this.saveQueue.push(event);
+    const eventTags =
+      event.tags
+        ?.filter((tag) => tag[0] === 'e') // only save replies & reactions for now
+        .map((tag) => ({
+          eventId: event.id,
+          type: tag[0],
+          value: tag[1],
+        })) || [];
+
+    this.saveQueue.push({
+      events: [event],
+      tags: eventTags,
+    });
+
     this.save();
   },
-
   async init() {
     const myPub = Key.getPubKey();
 
@@ -79,10 +115,34 @@ const IndexedDB = {
     await db.events.where('id').anyOf(ids).each(handleEvent);
   }, 1000),
 
+  subscribeToTags: throttle(async function (this: typeof IndexedDB) {
+    const tagPairs = [...this.subscribedTags].map((tag) => tag.split('|')); // assuming you used '|' as delimiter
+    this.subscribedTags.clear();
+    await db.tags
+      .where('[type+value]')
+      .anyOf(tagPairs)
+      .each((tag) => this.subscribedEventIds.add(tag.eventId));
+
+    await this.subscribeToEventIds();
+  }, 1000),
+
   async subscribe(filter: Filter) {
     if (!filter) return;
 
-    if (filter['#e'] || filter['#p']) return; // TODO save reactions & replies
+    if (filter['#p']) return; // TODO save reactions & replies
+
+    if (filter['#e'] && Array.isArray(filter['#e'])) {
+      for (const eventId of filter['#e']) {
+        const tags = await db.tags.where('[type+value]').equals(['e', eventId]).toArray();
+
+        for (const tag of tags) {
+          this.subscribedTags.add(tag.type + '|' + tag.value);
+        }
+      }
+
+      await this.subscribeToTags();
+      return;
+    }
 
     if (filter.ids?.length) {
       filter.ids.forEach((id) => this.subscribedEventIds.add(id));
@@ -99,7 +159,6 @@ const IndexedDB = {
     const stringifiedFilter = JSON.stringify(filter);
     if (this.seenFilters.has(stringifiedFilter)) return;
     this.seenFilters.add(stringifiedFilter);
-
 
     let query: any = db.events;
     if (filter.kinds) {
