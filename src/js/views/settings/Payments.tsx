@@ -17,7 +17,7 @@ const Payments = () => {
     localState.get('defaultZapAmount').on((defaultZapAmount) => {
       setDefaultZapAmount(defaultZapAmount);
     });
-  });
+  }, []);
 
   const onChange = (e: Event) => {
     const target = e.target as HTMLSelectElement;
