@@ -3,7 +3,8 @@ import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Event } from 'nostr-tools';
 import styled from 'styled-components';
 
-import localState from '../../LocalState';
+import { useLocalState } from '@/LocalState.ts';
+
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Relays from '../../nostr/Relays';
@@ -121,14 +122,12 @@ export default function SendSats(props: ZapProps) {
     ? (canZap && zapType !== ZapType.NonZap) || handler.maxCommentLength > 0
     : false;
 
+  const [userDefaultZapAmount, setUserDefaultZapAmount] = useLocalState('defaultZapAmount', 0);
+
   useEffect(() => {
-    localState.get('defaultZapAmount').once((v) => {
-      const value = parseInt(v);
-      setAmount(value);
-      setCustomAmount(value);
-      console.log('defaultZapAmount', value);
-    });
-  }, []);
+    setAmount(userDefaultZapAmount);
+    setCustomAmount(userDefaultZapAmount);
+  }, [userDefaultZapAmount]);
 
   useEffect(() => {
     if (props.show) {
@@ -388,6 +387,10 @@ export default function SendSats(props: ZapProps) {
 
   function successAction() {
     if (!success) return null;
+    if (!userDefaultZapAmount) {
+      // is this the right place for this?
+      setUserDefaultZapAmount(amount);
+    }
     return (
       <div className="success-action">
         <p className="paid">{success?.description ?? 'Paid'}</p>

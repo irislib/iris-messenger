@@ -2,11 +2,15 @@ import { BoltIcon } from '@heroicons/react/24/outline';
 import { debounce } from 'lodash';
 import { useEffect, useState } from 'preact/hooks';
 
+import Show from '@/components/helpers/Show.tsx';
+import { useLocalState } from '@/LocalState.ts';
+import Key from '@/nostr/Key.ts';
+import Icons from '@/utils/Icons.tsx';
+
 import Events from '../../../nostr/Events';
 import SocialNetwork from '../../../nostr/SocialNetwork';
 import { decodeInvoice, formatAmount } from '../../../utils/Lightning.ts';
 import ZapModal from '../../modal/Zap';
-import Key from "@/nostr/Key.ts";
 
 const Zap = ({ event }) => {
   const [state, setState] = useState({
@@ -15,7 +19,10 @@ const Zap = ({ event }) => {
     zapped: false,
     showZapModal: false,
     lightning: undefined,
+    defaultZapAmount: 0,
   });
+
+  const [defaultZapAmount] = useLocalState('defaultZapAmount', 0);
 
   useEffect(() => {
     const unsubProfile = SocialNetwork.getProfile(event.pubkey, (profile) => {
@@ -53,7 +60,7 @@ const Zap = ({ event }) => {
         const amount = (decoded?.amount || 0) / 1000;
         totalZapAmount += amount;
       });
-      
+
       setState((prevState) => ({
         ...prevState,
         totalZapAmount,
@@ -76,7 +83,10 @@ const Zap = ({ event }) => {
         className={`btn-ghost btn-sm hover:bg-transparent btn content-center gap-2 rounded-none
           ${state.zapped ? 'text-iris-orange' : 'text-neutral-500 hover:text-iris-orange'}`}
       >
-        <BoltIcon width={18} />
+        <Show when={defaultZapAmount}>{Icons.quickZap}</Show>
+        <Show when={!defaultZapAmount}>
+          <BoltIcon width={18} />
+        </Show>
         {state.formattedZapAmount}
       </a>
       {state.showZapModal && (
