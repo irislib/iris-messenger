@@ -76,7 +76,8 @@ class SearchBox extends Component<Props, State> {
   }
 
   close() {
-    this.inputRef.current.value = '';
+    const el = this.inputRef.current;
+    el && (el.value = '');
     this.setState({ results: [], query: '' });
   }
 
@@ -169,7 +170,7 @@ class SearchBox extends Component<Props, State> {
   }, 500);
 
   search() {
-    let query = this.props.query || (this.inputRef.current.value as string) || '';
+    let query = this.props.query || (this.inputRef.current?.value as string) || '';
     query = query.toString().trim().toLowerCase();
     if (!query) {
       this.close();
