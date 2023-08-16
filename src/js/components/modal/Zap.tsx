@@ -209,7 +209,6 @@ export default function SendSats(props: ZapProps) {
       ev.id = id;
       const sig = (await Key.sign(ev)) as string;
       ev = { ...ev, sig };
-      console.log('loadInvoice', ev);
       if (ev) {
         // replace sig for anon-zap
         if (zapType === ZapType.AnonZap) {
@@ -229,7 +228,6 @@ export default function SendSats(props: ZapProps) {
 
     try {
       const rsp = await handler.getInvoice(amount, comment, zap);
-      console.log('loadInvoice', amount, comment, zap);
       if (rsp.pr) {
         setInvoice(rsp.pr);
         await payWithWallet(rsp);

@@ -143,6 +143,7 @@ function CreateNoteForm({
         placeholder={placeholder}
         autofocus={autofocus}
         forceAutoFocusMobile={forceAutoFocusMobile}
+        replyingTo={replyingTo}
       />
       <Show when={!waitForFocus || focused}>
         <div className="flex items-center justify-between mt-4">
