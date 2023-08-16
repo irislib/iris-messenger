@@ -20,7 +20,6 @@ let subscriptionId = 0;
 
 let dev: any = {
   logSubscriptions: false,
-  indexed03: true,
 };
 const relayPool = new RelayPool(Relays.enabledRelays(), {
   useEventCache: false,
@@ -207,9 +206,6 @@ const PubSub = {
       relays = Array.from(Relays.searchRelays.keys());
     } else if (mergeSubscriptions || filter.authors?.length !== 1) {
       relays = Relays.enabledRelays();
-    }
-    if (dev.indexed03 && filter.kinds?.every((k) => k === 0 || k === 3)) {
-      relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
     }
     if (sinceLastOpened) {
       filter.since = lastOpened;

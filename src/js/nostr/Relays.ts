@@ -30,7 +30,17 @@ const DEFAULT_RELAYS = [
   'wss://soloco.nl',
 ];
 
-const SEARCH_RELAYS = ['wss://relay.nostr.band'];
+const SEARCH_RELAYS = [
+  'wss://relay.nostr.band',
+  'wss://feeds.nostr.band/nostrhispano',
+  'wss://search.nos.today',
+  'wss://nostr-relay.app',
+  'wss://nb.relay.center',
+  'wss://nostrja-kari-nip50.heguro.com',
+  'wss://nfdn.betanet.dotalgo.io',
+  'wss://filter.stealth.wine',
+  'wss://nostr.novacisko.cz',
+];
 
 type PublicRelaySettings = {
   read: boolean;
