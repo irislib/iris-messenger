@@ -55,16 +55,11 @@ class GraphNetwork {
     this.g.addVertice(this.sourceId); // Add the source vertice to the graph
 
     let count = 0;
-    //let list = await this.db.edges.toArray();
-    // Load edges from DB
-    console.time('Loading edges from the DB');
 
     await this.db.edges.each((record) => { // Load one record at a time, to avoid memory issues (check that this is indeed the case with each())
       this.g.addEdge(record, false); // Load all edges from the DB into the graph with partial data
       count++;
     });
-
-    console.timeEnd('Loading edges from the DB');
 
     console.log('Loaded ' + count + ' edges from the DB');
 
@@ -77,10 +72,8 @@ class GraphNetwork {
       //'List: ' + list.length + ' edges'
     );
 
-    console.time('Processing graph');
     this.processGraph = true; // Process the whole graph
     this.processScore(); // Process score for all vertices within degree of maxDegree and subscribe to trust events
-    console.timeEnd('Processing graph');
 
     this.localDataLoaded = true;
 

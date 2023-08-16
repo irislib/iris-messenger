@@ -33,8 +33,8 @@ export class Vertice {
 
 export class EdgeBase  {
     key: string = ""; // The public key of the edge
-    type: number = 1; // The type of the edge, 1 is trust, 2 is distrust, 3 is neutral
-    val: any = undefined; // The value of the edge
+    type: number = 1; // The type of the edge 1 = Trust1
+    val: any = undefined; // The value of the edge, 1 is trust, 2 is distrust, 3 is neutral
     entityType: EntityType = 1; // Type 1 is Key and 2 is item. Items cannot issue Trust claims.
     context: string = ""; // The context of the edge
     note: string = ""; // A note about the edge
