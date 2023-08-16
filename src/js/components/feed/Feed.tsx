@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import EventComponent from '@/components/events/EventComponent';
 import DisplaySelector from '@/components/feed/DisplaySelector';
@@ -106,4 +106,4 @@ const Feed = (props: FeedProps) => {
   );
 };
 
-export default memo(Feed);
+export default Feed;

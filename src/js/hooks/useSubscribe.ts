@@ -39,7 +39,7 @@ const useSubscribe = (ops: {
 
   useEffect(() => {
     sortedEvents.current = new SortedEventMap();
-  }, [filter]);
+  }, [filter, filterFn]);
 
   useEffect(() => {
     if (!enabled || !filter) return;
