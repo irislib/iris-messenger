@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import localForage from 'localforage';
 import debounce from 'lodash/debounce';
-import map from 'lodash/map';
 import throttle from 'lodash/throttle';
 
 export type Unsubscribe = () => void;
@@ -128,7 +127,7 @@ export class Node {
     }
     if (typeof value === 'object' && value !== null) {
       this.value = undefined;
-      await Promise.all(map(value, (val, key) => this.get(key).put(val)));
+      await Promise.all(Object.entries(value).map(([key, val]) => this.get(key).put(val)));
     } else {
       this.children = new Map();
       this.value = value;

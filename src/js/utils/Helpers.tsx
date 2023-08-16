@@ -288,6 +288,18 @@ export default {
     return url.toString();
   },
 
+  arraysAreEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false;
+      }
+    }
+    return true;
+  },
+
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
       return ('0' + (byte & 0xff).toString(16)).slice(-2);

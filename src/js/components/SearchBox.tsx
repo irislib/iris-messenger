@@ -1,12 +1,13 @@
 import debounce from 'lodash/debounce';
-import isEqual from 'lodash/isEqual';
 import { createRef } from 'preact';
 import { route } from 'preact-router';
+
+import Helpers from '@/utils/Helpers';
 
 import Component from '../BaseComponent';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
-import FuzzySearch from '../nostr/FuzzySearch.ts';
+import FuzzySearch from '../nostr/FuzzySearch';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
@@ -116,7 +117,7 @@ class SearchBox extends Component<Props, State> {
     // if first 5 results are different, set selected = 0
     if (
       this.state.selected >= 0 &&
-      !isEqual(
+      !Helpers.arraysAreEqual(
         this.state.results.slice(0, this.state.selected + 1),
         prevState.results.slice(0, this.state.selected + 1),
       )
