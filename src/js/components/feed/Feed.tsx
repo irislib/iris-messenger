@@ -23,6 +23,7 @@ const Feed = (props: FeedProps) => {
   const [displayAs, setDisplayAs] = useState<DisplayAs>('feed');
   const [mutedUsers] = useLocalState('muted', {});
   const [showUntil, setShowUntil] = useState(Math.floor(Date.now() / 1000));
+  const [infiniteScrollKey, setInfiniteScrollKey] = useState(0);
 
   useEffect(() => {
     setShowUntil(Math.floor(Date.now() / 1000));
@@ -69,6 +70,7 @@ const Feed = (props: FeedProps) => {
                 feedTopRef.current.scrollIntoView({ behavior: 'smooth' });
               }
             }
+            setInfiniteScrollKey(infiniteScrollKey + 1);
             setShowUntil(Math.floor(Date.now() / 1000));
           }}
         />
@@ -93,10 +95,10 @@ const Feed = (props: FeedProps) => {
       </Show>
       <Show when={isEmpty}>{emptyMessage || 'No Posts'}</Show>
       <Show when={displayAs === 'grid'}>
-        <ImageGrid events={events} loadMore={loadMore} />
+        <ImageGrid key={`${infiniteScrollKey}grid`} events={events} loadMore={loadMore} />
       </Show>
       <Show when={displayAs === 'feed'}>
-        <InfiniteScroll loadMore={loadMore}>
+        <InfiniteScroll key={`${infiniteScrollKey}feed`} loadMore={loadMore}>
           {events.map((event) => {
             // is this inefficient? should we rather pass a component function + list of events?
             if (event.created_at > showUntil) {
