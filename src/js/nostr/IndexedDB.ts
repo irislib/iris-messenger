@@ -66,7 +66,7 @@ const IndexedDB = {
     } catch (err) {
       console.error('bulkPut save error:', err);
     }
-  }, 500),
+  }, 2000),
 
   saveEvent(event: Event & { id: string }) {
     const eventTags =
