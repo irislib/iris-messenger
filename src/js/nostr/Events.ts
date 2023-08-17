@@ -678,18 +678,18 @@ const Events = {
     // TODO: don't save e.g. old profile & follow events
     // TODO since we're only querying relays since lastSeen, we need to store all beforeseen events and correctly query them on demand
     // otherwise feed will be incomplete
-    if (saveToIdb) {
+    if (saveToIdb && dev.indexedDbSave !== false) {
       const followDistance = SocialNetwork.getFollowDistance(event.pubkey);
+
       if (followDistance <= 1) {
-        // save all our own events and events from people we follow
-        if (dev.indexedDbSave !== false) {
-          IndexedDB.saveEvent(event as Event & { id: string });
-        }
+        IndexedDB.saveEvent(event as Event & { id: string });
+      } else if (
+        [2, 3].includes(followDistance) &&
+        event.tags.some((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey())
+      ) {
+        IndexedDB.saveEvent(event as Event & { id: string });
       } else if (followDistance <= 4 && [0, 3, 4].includes(event.kind)) {
-        // save profiles and follow events up to follow distance 4
-        if (dev.indexedDbSave !== false) {
-          IndexedDB.saveEvent(event as Event & { id: string });
-        }
+        IndexedDB.saveEvent(event as Event & { id: string });
       }
     }
 

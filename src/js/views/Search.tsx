@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import {memo, useMemo} from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link, route } from 'preact-router';
 
@@ -46,10 +46,12 @@ const FollowSuggestionsAPI = memo(() => {
 
   if (!suggestions.length) return null;
 
-  const randomSuggestions = suggestions
-    .sort(() => 0.5 - Math.random())
-    .slice(0, 8)
-    .map((s) => s.pubkey);
+  const randomSuggestions = useMemo(() => {
+    return suggestions
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 8)
+      .map((s) => s.pubkey);
+  }, [suggestions]);
 
   return (
     <div className="card-body p-2">

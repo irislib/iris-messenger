@@ -133,6 +133,10 @@ const IndexedDB = {
 
     if (filter['#p']) return; // TODO save reactions & replies
 
+    const stringifiedFilter = JSON.stringify(filter);
+    if (this.seenFilters.has(stringifiedFilter)) return;
+    this.seenFilters.add(stringifiedFilter);
+
     if (filter['#e'] && Array.isArray(filter['#e'])) {
       for (const eventId of filter['#e']) {
         this.subscribedTags.add('e|' + eventId);
@@ -153,10 +157,6 @@ const IndexedDB = {
       await this.subscribeToAuthors();
       return;
     }
-
-    const stringifiedFilter = JSON.stringify(filter);
-    if (this.seenFilters.has(stringifiedFilter)) return;
-    this.seenFilters.add(stringifiedFilter);
 
     let query: any = db.events;
     if (filter.kinds) {
