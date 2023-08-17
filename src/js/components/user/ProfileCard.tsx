@@ -6,9 +6,9 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import PubSub from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
-import { ID } from '../../nostr/UserIds';
 import { translate as t } from '../../translations/Translation.mjs';
 import Helpers from '../../utils/Helpers.tsx';
+import { ID } from '../../utils/UniqueIds.ts';
 import Follow from '../buttons/Follow';
 import Show from '../helpers/Show';
 import HyperText from '../HyperText';
@@ -18,6 +18,8 @@ import ProfileDropdown from './Dropdown';
 import Name from './Name';
 import ProfilePicture from './ProfilePicture';
 import Stats from './Stats';
+
+import { Event } from 'nostr-tools';
 
 const ProfileCard = (props: { hexPub: string; npub: string }) => {
   const { hexPub, npub } = props;
@@ -117,12 +119,12 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
   useEffect(() => {
     const rawDataArray = [] as Event[];
     const profileEvent = Events.db.findOne({
-      kind: 0,
-      pubkey: hexPub,
+      kinds: [0],
+      authors: [hexPub],
     });
     const followEvent = Events.db.findOne({
-      kind: 3,
-      pubkey: hexPub,
+      kinds: [3],
+      authors: [hexPub],
     });
     if (profileEvent) {
       rawDataArray.push(profileEvent);

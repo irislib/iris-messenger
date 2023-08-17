@@ -7,76 +7,47 @@ import Events from './Events';
 import Key from './Key';
 import SocialNetwork from './SocialNetwork';
 
-let latestByFollows;
-const getLatestByFollows = () => {
-  if (latestByFollows) {
-    return latestByFollows;
-  }
-  latestByFollows = Events.db.addDynamicView('latest_by_follows', {
-    persist: true,
-  });
-  latestByFollows.applyFind({ kind: 1 });
-  latestByFollows.applySimpleSort('created_at', { desc: true });
-  latestByFollows.applyWhere((event: Event) => {
-    const distance = SocialNetwork.getFollowDistance(event.pubkey);
-    return distance <= 1;
-  });
-  return latestByFollows;
-};
-
-let latestByEveryone;
-const getLatestByEveryone = () => {
-  if (latestByEveryone) {
-    return latestByEveryone;
-  }
-  latestByEveryone = Events.db.addDynamicView('latest_by_everyone', {
-    persist: true,
-  });
-  latestByEveryone.applyFind({ kind: 1 });
-  latestByEveryone.applySimpleSort('created_at', { desc: true });
-  return latestByEveryone;
-};
-
 export default {
   loaded: false,
   saveEvents: throttle(() => {
-    const latestMsgs = getLatestByFollows().data().slice(0, 50);
-    const latestMsgsByEveryone = getLatestByEveryone().data().slice(0, 50);
+    //const latestMsgs = getLatestByFollows().data().slice(0, 50);
+    //const latestMsgsByEveryone = getLatestByEveryone().data().slice(0, 50);
     const notifications = Events.notifications.eventIds
       .map((eventId: any) => {
-        return Events.db.by('id', eventId);
+        return Events.db.get(eventId);
       })
       .slice(0, 50);
     let dms = [] as Event[];
     for (const set of Events.directMessagesByUser.values()) {
       set.eventIds.forEach((eventId: any) => {
-        dms.push(Events.db.by('id', eventId));
+        const dm = Events.db.get(eventId);
+        dm && dms.push(dm);
       });
     }
     dms = dms.slice(0, 100);
     const kvEvents = Array.from(Events.keyValueEvents.values()).slice(0, 50);
 
-    localForage.setItem('latestMsgs', latestMsgs);
-    localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
+    //localForage.setItem('latestMsgs', latestMsgs);
+    //localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
     localForage.setItem('notificationEvents', notifications);
     localForage.setItem('dms', dms);
     localForage.setItem('keyValueEvents', kvEvents);
     // TODO save own block and flag events
-    console.log('saved latestMsgs', latestMsgs.length);
-    console.log('saved latestMsgsByEveryone', latestMsgsByEveryone.length);
+    //console.log('saved latestMsgs', latestMsgs.length);
+    //console.log('saved latestMsgsByEveryone', latestMsgsByEveryone.length);
   }, 5000),
 
   saveProfilesAndFollows: debounce(() => {
     // TODO follow distance 1 profileEvents
     const myPub = Key.getPubKey();
     const profileEvents = [
-      Events.db.find({ kind: 0, pubkey: myPub }),
-      ...Events.db.find({ kind: 0 }),
+      Events.db.findArray({ kinds: [0], authors: [myPub] }),
+      ...Events.db.findArray({ kinds: [0] }),
     ];
-    const followEvents = Events.db.find({ kind: 3 }).filter((e: Event) => {
+    const followEvents = Events.db.findArray({ kinds: [3] }).filter((e: Event) => {
       return e.pubkey === myPub || SocialNetwork.isFollowing(myPub, e.pubkey);
     });
-    const followEvents2 = [Events.db.findOne({ kind: 3, pubkey: myPub })];
+    const followEvents2 = [Events.db.findOne({ kinds: [3], authors: [myPub] })];
     let size = 0;
     for (const le of followEvents
       .map((e: Event) => [JSON.stringify(e).length, e] as [number, Event])

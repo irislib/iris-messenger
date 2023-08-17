@@ -5,8 +5,8 @@ import OnboardingNotification from '@/components/OnboardingNotification';
 import Events from '@/nostr/Events';
 import Key from '@/nostr/Key';
 import { Unsubscribe } from '@/nostr/PubSub';
-import { ID, PUB } from '@/nostr/UserIds';
 import { translate as t } from '@/translations/Translation.mjs';
+import { ID, PUB } from '@/utils/UniqueIds.ts';
 
 import SocialNetwork from '../../nostr/SocialNetwork';
 import View from '../View';

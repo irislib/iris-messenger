@@ -1,4 +1,4 @@
-import {memo, useMemo} from 'react';
+import { memo, useMemo } from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link, route } from 'preact-router';
 

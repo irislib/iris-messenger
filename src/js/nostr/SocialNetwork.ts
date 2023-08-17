@@ -1,19 +1,19 @@
 import localState from '../LocalState';
+import { ID, PUB, UID } from '../utils/UniqueIds.ts';
 
 import Events from './Events';
 import Key from './Key';
 import LocalForage from './LocalForage';
 import PubSub, { Unsubscribe } from './PubSub';
-import { ID, PUB, UserId } from './UserIds';
 
 export default {
-  followDistanceByUser: new Map<UserId, number>(),
-  usersByFollowDistance: new Map<number, Set<UserId>>(),
-  profiles: new Map<UserId, any>(), // JSON.parsed event.content of profile events
-  followedByUser: new Map<UserId, Set<UserId>>(),
-  followersByUser: new Map<UserId, Set<UserId>>(),
-  blockedUsers: new Set<UserId>(),
-  flaggedUsers: new Set<UserId>(),
+  followDistanceByUser: new Map<UID, number>(),
+  usersByFollowDistance: new Map<number, Set<UID>>(),
+  profiles: new Map<UID, any>(), // JSON.parsed event.content of profile events
+  followedByUser: new Map<UID, Set<UID>>(),
+  followersByUser: new Map<UID, Set<UID>>(),
+  blockedUsers: new Set<UID>(),
+  flaggedUsers: new Set<UID>(),
 
   isFollowing: function (follower: string, followedUser: string): boolean {
     const followedUserId = ID(followedUser);
@@ -51,7 +51,7 @@ export default {
       }
     });
 
-    const existing = Events.db.findOne({ kind: 3, pubkey: myPub });
+    const existing = Events.db.findOne({ kinds: [3], authors: [myPub] });
 
     const event = {
       kind: 3,
@@ -78,7 +78,7 @@ export default {
     }
   },
 
-  addUserByFollowDistance(distance: number, user: UserId) {
+  addUserByFollowDistance(distance: number, user: UID) {
     if (!this.usersByFollowDistance.has(distance)) {
       this.usersByFollowDistance.set(distance, new Set());
     }
@@ -97,17 +97,17 @@ export default {
     }
   },
 
-  addFollower: function (followedUser: UserId, follower: UserId) {
+  addFollower: function (followedUser: UID, follower: UID) {
     if (typeof followedUser !== 'number' || typeof follower !== 'number') {
       throw new Error('Invalid user id');
     }
     if (!this.followersByUser.has(followedUser)) {
-      this.followersByUser.set(followedUser, new Set<UserId>());
+      this.followersByUser.set(followedUser, new Set<UID>());
     }
     this.followersByUser.get(followedUser)?.add(follower);
 
     if (!this.followedByUser.has(follower)) {
-      this.followedByUser.set(follower, new Set<UserId>());
+      this.followedByUser.set(follower, new Set<UID>());
     }
     const myId = ID(Key.getPubKey());
 
@@ -143,7 +143,7 @@ export default {
       }
     }
   },
-  removeFollower: function (unfollowedUser: UserId, follower: UserId) {
+  removeFollower: function (unfollowedUser: UID, follower: UID) {
     this.followersByUser.get(unfollowedUser)?.delete(follower);
     this.followedByUser.get(follower)?.delete(unfollowedUser);
 

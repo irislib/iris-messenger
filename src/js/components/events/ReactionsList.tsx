@@ -48,9 +48,9 @@ const ReactionsList = ({ event }) => {
     const handleZaps = (zaps) => {
       const zapData = new Map<string, number>();
       let totalZapAmount = 0;
-      const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.by('id', eventId));
+      const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.get(eventId));
       zapEvents.forEach((zapEvent) => {
-        const bolt11 = zapEvent?.tags.find((tag) => tag[0] === 'bolt11')[1];
+        const bolt11 = zapEvent?.tags.find((tag) => tag[0] === 'bolt11')?.[1];
         if (!bolt11) {
           console.log('Invalid zap, missing bolt11 tag');
           return;

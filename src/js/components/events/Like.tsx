@@ -28,7 +28,7 @@ const messageClicked = (e: MouseEvent, likedId: string) => {
 export default function Like(props: Props) {
   const [allLikes, setAllLikes] = useState<string[]>([]);
   const likedId = Events.getEventReplyingTo(props.event);
-  const likedEvent = Events.db.by('id', likedId);
+  const likedEvent = Events.db.get(likedId);
   const authorIsYou = likedEvent?.pubkey === Key.getPubKey();
   const mentioned = likedEvent?.tags?.find((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey());
   const likeText = authorIsYou

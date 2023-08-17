@@ -1,16 +1,17 @@
 import debounce from 'lodash/debounce';
-import Loki from 'lokijs';
 import {
   Event,
   Filter,
   getEventHash,
   getPublicKey,
-  matchFilter,
   nip04,
   validateEvent,
   verifySignature,
 } from 'nostr-tools';
 import { EventTemplate } from 'nostr-tools';
+
+import EventDB from '@/nostr/EventDB.ts';
+import { ID, PUB, UniqueIds } from '@/utils/UniqueIds.ts';
 
 import localState from '../LocalState';
 import { Node } from '../LocalState';
@@ -28,27 +29,11 @@ import Relays from './Relays';
 import Session from './Session';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
-import { ID, PUB, UserIds } from './UserIds';
 
 const startTime = Date.now() / 1000;
 
 const MAX_LATEST_MSGS = 500;
 const MAX_ZAPS_BY_NOTE = 1000;
-
-const db = new Loki('iris');
-const events = db.addCollection('events', {
-  indices: ['created_at', 'pubkey', 'kind'],
-  unique: ['id'],
-});
-
-// print event db size
-/*
-setInterval(() => {
-  console.log('event db size', events.count());
-}, 1000);
- */
-
-// add collections for Tags and Users?
 
 let mutedNotes;
 localState.get('mutedNotes').on((v) => {
@@ -70,8 +55,8 @@ localState.get('dev').on((d) => {
 });
 
 const sortByEventCreatedAt = (aId, bId) => {
-  const aEvent = Events.db.by('id', aId);
-  const bEvent = Events.db.by('id', bId);
+  const aEvent = Events.db.get(aId);
+  const bEvent = Events.db.get(bId);
   if (!aEvent) {
     return 1;
   }
@@ -90,7 +75,7 @@ const sortByEventCreatedAt = (aId, bId) => {
 const Events = {
   DEFAULT_GLOBAL_FILTER,
   getEventHash,
-  db: events, // TODO gb2 own indexing with Maps. easier to evict & understand what it actually does
+  db: new EventDB(), // TODO gb2 own indexing with Maps. easier to evict & understand what it actually does
   eventsMetaDb: new EventMetaStore(),
   seen: new Set<string>(),
   deletedEvents: new Set<string>(),
@@ -121,7 +106,7 @@ const Events = {
   myBlockEvent: null as Event | null,
   myFlagEvent: null as Event | null,
   handleNote(event: Event) {
-    const has = this.db.by('id', event.id);
+    const has = this.db.get(event.id);
     if (!has) {
       this.insert(event);
     }
@@ -218,12 +203,12 @@ const Events = {
     this.insert(event);
   },
   handleFollow(event: Event) {
-    const existing = Events.db.findOne({ kind: 3, pubkey: event.pubkey });
+    const existing = Events.db.findOne({ kinds: [3], authors: [event.pubkey] });
     if (existing && existing.created_at >= event.created_at) {
       return;
     }
     if (existing) {
-      this.db.findAndRemove({ kind: 3, pubkey: event.pubkey });
+      this.db.findAndRemove({ kinds: [3], authors: [event.pubkey] });
     }
     this.insert(event);
     const myPub = Key.getPubKey();
@@ -313,13 +298,7 @@ const Events = {
     }
   },
   insert(event: Event) {
-    try {
-      delete event['$loki'];
-      this.db.insert(event); // this seems to add .meta and .$loki on the object which is inconvenient
-    } catch (e) {
-      // console.log('failed to insert event', e, typeof e);
-      // suppress error on duplicate insert. lokijs should throw a different error kind?
-    }
+    this.db.add(event);
   },
   handleMetadata(event: Event) {
     if (!event.content?.length) {
@@ -331,7 +310,7 @@ const Events = {
         return false;
       }
       if (existing) {
-        this.db.findAndRemove({ pubkey: event.pubkey, kind: 0 });
+        this.db.findAndRemove({ authors: [event.pubkey], kinds: [0] });
       }
       this.insert(event);
       const profile = JSON.parse(event.content);
@@ -359,10 +338,10 @@ const Events = {
     const id = event.tags?.find((tag) => tag[0] === 'e')?.[1];
     const myPub = Key.getPubKey();
     if (id) {
-      const deletedEvent = this.db.by('id', id);
+      const deletedEvent = this.db.get(id);
       // only we or the author can delete
       if (deletedEvent && [event.pubkey, myPub].includes(deletedEvent.pubkey)) {
-        this.db.findAndRemove({ id });
+        this.db.remove(id);
       }
     }
   },
@@ -516,7 +495,7 @@ const Events = {
           console.log('what', event);
           return false;
         }
-        if (UserIds.has(event.pubkey) && SocialNetwork.getFollowDistance(event.pubkey)) {
+        if (UniqueIds.has(event.pubkey) && SocialNetwork.getFollowDistance(event.pubkey)) {
           const distance = SocialNetwork.followDistanceByUser.get(ID(event.pubkey));
           if (distance && distance > globalFilter.maxFollowDistance) {
             // follow distance too high, reject
@@ -552,23 +531,7 @@ const Events = {
     return true;
   },
   find(filter: Filter, callback: (event: Event) => void) {
-    const query = {};
-    if (filter.authors) {
-      query['pubkey'] = { $in: filter.authors };
-    }
-    if (filter.kinds) {
-      query['kind'] = { $in: filter.kinds };
-    }
-    this.db
-      .chain()
-      .find(query)
-      .where((e) => matchFilter(filter, e))
-      .simplesort('created_at', { desc: true })
-      .limit(filter.limit || Infinity)
-      .data()
-      .forEach((e) => {
-        callback(e);
-      });
+    this.db.find(filter, callback);
   },
   handle(event: Event & { id: string }, force = false, saveToIdb = true, retries = 2): boolean {
     if (!event) return false;
@@ -637,13 +600,15 @@ const Events = {
       case 5:
         this.handleDelete(event);
         break;
-      case 3:
-        if (Events.db.findOne({ kind: 3, pubkey: event.pubkey })?.created_at >= event.created_at) {
+      case 3: {
+        const foundEvent = Events.db.findOne({ kinds: [3], authors: [event.pubkey] });
+        if (foundEvent && foundEvent.created_at >= event.created_at) {
           return false;
         }
         this.maybeAddNotification(event);
         this.handleFollow(event);
         break;
+      }
       case 6:
         this.maybeAddNotification(event);
         this.handleRepost(event);
@@ -711,7 +676,7 @@ const Events = {
     }
     clearTimeout(this.futureEventTimeout);
     const nextEventId = this.futureEventIds.first();
-    const nextEvent = this.db.by('id', nextEventId);
+    const nextEvent = nextEventId && this.db.get(nextEventId);
     if (!nextEvent) {
       return;
     }
@@ -770,8 +735,8 @@ const Events = {
         const target = this.getEventRoot(event) || this.getEventReplyingTo(event) || event.id; // TODO get thread root instead
         const key = `${event.kind}-${target}`;
         const existing = this.latestNotificationByTargetAndKind.get(key); // also latestNotificationByAuthor?
-        const existingEvent = existing && this.db.by('id', existing);
-        if (!existing || existingEvent.created_at < event.created_at) {
+        const existingEvent = existing && this.db.get(existing);
+        if (!existingEvent || existingEvent.created_at < event.created_at) {
           existing && this.notifications.delete(existing);
           this.notifications.add(event);
           this.latestNotificationByTargetAndKind.set(key, event.id);
@@ -788,8 +753,8 @@ const Events = {
     }
     let count = 0;
     for (const id of Events.notifications.eventIds) {
-      const event = Events.db.by('id', id);
-      if (event?.created_at > Events.notificationsSeenTime) {
+      const event = Events.db.get(id);
+      if (event && event.created_at > Events.notificationsSeenTime) {
         count++;
       } else {
         break;
@@ -821,10 +786,8 @@ const Events = {
       .reverse()
       .slice(0, 10);
     for (const ref of referredEvents || []) {
-      const referredEvent = this.db.by('id', ref[1]);
+      const referredEvent = this.db.get(ref[1]);
       if (referredEvent) {
-        delete referredEvent.meta;
-        delete referredEvent.$loki;
         PubSub.publish(referredEvent);
       }
     }
@@ -842,7 +805,7 @@ const Events = {
     return event as Event;
   },
   getZappingUser(eventId: string, npub = true) {
-    const description = Events.db.by('id', eventId)?.tags?.find((t) => t[0] === 'description')?.[1];
+    const description = Events.db.get(eventId)?.tags?.find((t) => t[0] === 'description')?.[1];
     if (!description) {
       return null;
     }
@@ -906,7 +869,7 @@ const Events = {
         cb?.(event);
       }
     };
-    const event = this.db.by('id', id);
+    const event = this.db.get(id);
     if (event) {
       callback(event);
       return;

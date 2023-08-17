@@ -4,6 +4,7 @@ import { route } from 'preact-router';
 
 import localState from '../LocalState';
 import IrisTo from '../utils/IrisTo.ts';
+import { ID } from '../utils/UniqueIds.ts';
 
 import Events from './Events';
 import IndexedDB from './IndexedDB';
@@ -13,7 +14,6 @@ import { Path } from './path';
 import PubSub from './PubSub';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
-import { ID } from './UserIds';
 
 try {
   localStorage.setItem('gunPeers', JSON.stringify({})); // quick fix to not connect gun

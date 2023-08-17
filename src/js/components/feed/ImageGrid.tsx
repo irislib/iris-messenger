@@ -36,7 +36,7 @@ const ImageGrid = ({ events, loadMore }: ImageGridProps) => {
       if (event.kind === 7) {
         const taggedEventId = Events.getEventReplyingTo(event);
         if (taggedEventId) {
-          const taggedEvent = Events.db.by('id', taggedEventId);
+          const taggedEvent = Events.db.get(taggedEventId);
           return taggedEvent ? extractMediaFromEvent(taggedEvent) : [];
         }
         return [];

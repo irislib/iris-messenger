@@ -72,9 +72,13 @@ const Note = ({
         debounce(
           (replies) => {
             const arr = Array.from(replies).slice(0, showReplies) as string[];
+            // TODO use SortedMap
             arr.sort((a, b) => {
-              const aEvent = Events.db.by('id', a);
-              const bEvent = Events.db.by('id', b);
+              const aEvent = Events.db.get(a);
+              const bEvent = Events.db.get(b);
+              if (!aEvent && !bEvent) return 0;
+              if (!aEvent) return -1;
+              if (!bEvent) return 1;
               return aEvent.created_at - bEvent.created_at;
             });
             setReplies(arr);

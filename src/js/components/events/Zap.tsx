@@ -28,7 +28,7 @@ const messageClicked = (e: MouseEvent, zappedId: string) => {
 export default function Zap(props: Props) {
   const [allZaps, setAllZaps] = useState<string[]>([]);
   const zappedId = Events.getEventReplyingTo(props.event);
-  const zappedEvent = Events.db.by('id', zappedId);
+  const zappedEvent = Events.db.get(zappedId);
   const authorIsYou = zappedEvent?.pubkey === Key.getPubKey();
   const mentioned = zappedEvent?.tags?.find((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey());
   const zappedText = authorIsYou

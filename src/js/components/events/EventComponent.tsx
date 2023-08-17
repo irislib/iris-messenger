@@ -36,10 +36,11 @@ export interface EventComponentProps {
 }
 
 const EventComponent = (props: EventComponentProps) => {
+  const hex = Key.toNostrHexAddress(props.id);
   const [state, setState] = useState<{ [key: string]: any }>({
     sortedReplies: [],
     meta: {},
-    event: Events.db.by('id', Key.toNostrHexAddress(props.id)),
+    event: hex && Events.db.get(hex),
   });
   const retrievingTimeout = useRef<any>();
   const unmounted = useRef<boolean>(false);

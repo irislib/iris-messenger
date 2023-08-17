@@ -91,7 +91,7 @@ const EventDropdown = (props: EventDropdownProps) => {
     e.preventDefault();
     const hexId = Key.toNostrHexAddress(id);
     if (hexId) {
-      const event = Events.db.by('id', hexId);
+      const event = Events.db.get(hexId);
       if (event) {
         // TODO indicate to user somehow
         console.log('broadcasting', hexId, event);

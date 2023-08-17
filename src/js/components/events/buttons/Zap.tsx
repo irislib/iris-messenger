@@ -72,11 +72,11 @@ const Zap = ({ event }) => {
 
   const handleZaps = debounce(
     (zaps) => {
-      const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.by('id', eventId));
+      const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.get(eventId));
       let totalZapAmount = 0;
       let zapped = false;
       zapEvents.forEach((event) => {
-        const bolt11 = event?.tags.find((tag) => tag[0] === 'bolt11')[1];
+        const bolt11 = event?.tags.find((tag) => tag[0] === 'bolt11')?.[1];
         if (!bolt11) {
           console.log('Invalid zap, missing bolt11 tag');
           return;
