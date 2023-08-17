@@ -51,6 +51,9 @@ export default class EventDB {
   }
 
   find(filter: Filter, callback: (event: Event) => void): void {
+    if (filter['#e'] || filter['#p']) {
+      return; // TODO: implement
+    }
     if (filter.ids) {
       for (const id of filter.ids) {
         const event = this.byId.get(ID(id));
@@ -102,13 +105,17 @@ export default class EventDB {
     return foundEvent;
   }
 
+  private padCreatedAt(createdAt: number): string {
+    return createdAt.toString().padStart(12, '0');
+  }
+
   private getIndexKey(event: Event): string {
-    return event.created_at + event.id.slice(0, 16);
+    return this.padCreatedAt(event.created_at) + event.id.slice(0, 16);
   }
 
   private mapAdd(map: Map<UID, SortedMap<string, UID>>, key: UID, indexKey: string, id: UID): void {
     if (!map.has(key)) {
-      map.set(key, new SortedMap(undefined, 'desc'));
+      map.set(key, new SortedMap());
     }
     map.get(key)?.set(indexKey, id);
   }
@@ -128,13 +135,25 @@ export default class EventDB {
     map: Map<KeyType, SortedMap<string, UID>>,
     filter: Filter,
     callback: (event: Event) => void,
-  ): void {
+  ) {
     let count = 0;
 
     for (const key of keys) {
       const events = map.get(key);
       if (events) {
-        for (const eventId of events.values()) {
+        // Calculate range based on since and until values from the filter
+        const rangeOptions: { gte?: string; lte?: string; direction?: 'desc' | 'asc' } = {
+          direction: 'desc',
+        };
+        if (filter.since) {
+          rangeOptions.gte = this.padCreatedAt(filter.since) + '0000000000000000'; // Add padding for full indexKey
+        }
+        if (filter.until) {
+          rangeOptions.lte = this.padCreatedAt(filter.until) + 'ffffffffffffffff'; // Add padding for full indexKey
+        }
+
+        // Iterate over the events in the specified range
+        for (const { value: eventId } of events.range(rangeOptions)) {
           if (filter.limit !== undefined && count >= filter.limit) {
             return;
           }
