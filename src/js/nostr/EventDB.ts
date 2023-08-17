@@ -11,7 +11,7 @@ class EventDB {
     this.db = new loki('EventDB');
     this.eventsCollection = this.db.addCollection('events', {
       unique: ['id'],
-      indices: ['pubkey', 'kind', 'tags', 'created_at'],
+      indices: ['pubkey', 'kind', 'flatTags', 'created_at'],
     });
   }
 
@@ -24,10 +24,12 @@ class EventDB {
       throw new Error('Invalid event');
     }
 
-    if (this.get(event.id)) {
+    try {
+      const flatTags = event.tags.filter((tag) => tag[0] === 'e').map((tag) => tag.join('_'));
+      this.eventsCollection.insert({ ...event, flatTags });
+    } catch (e) {
       return false;
     }
-    this.eventsCollection.insert(event);
 
     return true;
   }
@@ -40,7 +42,9 @@ class EventDB {
   }
 
   find(filter: Filter, callback: (event: Event) => void): void {
-    this.findArray(filter).forEach(callback);
+    this.findArray(filter).forEach((event) => {
+      callback(event);
+    });
   }
 
   findArray(filter: Filter): Event[] {
@@ -56,10 +60,21 @@ class EventDB {
         query.kind = { $in: filter.kinds };
       }
       if (filter['#e']) {
-        query.tags = { $contains: ['e', filter['#e']] };
+        // hmm $contains doesn't seem to use binary indexes
+        query.flatTags = { $contains: 'e_' + filter['#e'] };
       }
       if (filter['#p']) {
-        query.tags = { $contains: ['p', filter['#p']] };
+        // not indexing for now
+        //query.flatTags = { $contains: 'p_' + filter['#p'] };
+      }
+      if (filter.since && filter.until) {
+        query.created_at = { $between: [filter.since, filter.until] };
+      }
+      if (filter.since) {
+        query.created_at = { $gte: filter.since };
+      }
+      if (filter.until) {
+        query.created_at = { $lte: filter.until };
       }
     }
 

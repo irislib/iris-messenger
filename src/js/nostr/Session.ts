@@ -20,6 +20,8 @@ try {
   // ignore
 }
 
+let loggedIn = false;
+
 const Session = {
   public: undefined as Path | undefined,
   private: undefined as Path | undefined,
@@ -52,7 +54,10 @@ const Session = {
     // wat dis
   },
   onLoggedIn() {
-    // this is not being run?
+    if (loggedIn) {
+      return;
+    }
+    loggedIn = true;
     const myPub = Key.getPubKey();
     const myId = ID(myPub);
     SocialNetwork.followDistanceByUser.set(myId, 0);
@@ -137,7 +142,6 @@ const Session = {
       Events.subscribeGroups();
     }, 200);
     setInterval(() => {
-      console.log('handled msgs per second', Math.round(Events.handledMsgsPerSecond / 5));
       Events.handledMsgsPerSecond = 0;
     }, 5000);
   },

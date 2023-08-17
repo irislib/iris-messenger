@@ -27,10 +27,14 @@ export class MyDexie extends Dexie {
   }
 }
 
+const INITIAL_EVENT_LOAD_LIMIT = 5000;
+
 const db = new MyDexie();
 
 const handleEvent = (event: Event & { id: string }) => {
-  Events.handle(event, false, false);
+  setTimeout(() => {
+    Events.handle(event, false, false);
+  });
 };
 
 type SaveQueueEntry = {
@@ -97,7 +101,7 @@ const IndexedDB = {
       .orderBy('created_at')
       .reverse()
       .filter((event) => event.kind === 1)
-      .limit(5000)
+      .limit(INITIAL_EVENT_LOAD_LIMIT)
       .each(handleEvent);
   },
 
@@ -128,7 +132,7 @@ const IndexedDB = {
     await this.subscribeToEventIds();
   }, 1000),
 
-  async subscribe(filter: Filter) {
+  async find(filter: Filter) {
     if (!filter) return;
 
     if (filter['#p']) return; // TODO save reactions & replies

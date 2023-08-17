@@ -119,7 +119,7 @@ const PubSub = {
     if (dev.indexedDbLoad !== false) {
       setTimeout(() => {
         // seems blocking. use web worker? bulk get?
-        IndexedDB.subscribe(filter);
+        IndexedDB.find(filter);
       });
     }
 
