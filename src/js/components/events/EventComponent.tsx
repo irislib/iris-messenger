@@ -11,7 +11,6 @@ import Note from './note/Note';
 import EventDropdown from './EventDropdown';
 import Follow from './Follow';
 import Like from './Like';
-import NoteImage from './NoteImage';
 import Repost from './Repost';
 import Zap from './Zap';
 
@@ -30,7 +29,6 @@ export interface EventComponentProps {
   isReply?: boolean;
   isQuote?: boolean;
   isQuoting?: boolean;
-  renderAs?: 'NoteImage';
   feedOpenedAt?: number;
   fullWidth?: boolean;
 }
@@ -124,7 +122,6 @@ const EventComponent = (props: EventComponentProps) => {
     return null;
   }
   if (!state.event) {
-    if (props.renderAs === 'NoteImage') return null;
     return (
       <div key={props.id} className={getClassName()}>
         <div
@@ -175,10 +172,6 @@ const EventComponent = (props: EventComponentProps) => {
         7: Like,
         9735: Zap,
       }[state.event.kind];
-    }
-
-    if (props.renderAs === 'NoteImage') {
-      Component = NoteImage;
     }
 
     if (!Component) {

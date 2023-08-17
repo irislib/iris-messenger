@@ -12,7 +12,6 @@ import Helpers from './utils/Helpers.tsx';
 import About from './views/About';
 import Chat from './views/chat/Chat';
 import EditProfile from './views/EditProfile';
-import Explorer from './views/explorer/Explorer';
 import Global from './views/feeds/Global';
 import Home from './views/feeds/Home';
 import Notifications from './views/feeds/Notifications';
@@ -132,8 +131,6 @@ class Main extends Component<Props, ReactState> {
               <About path="/about" />
               <Settings path="/settings/:page?" />
               <LogoutConfirmation path="/logout" />
-              <Explorer path="/explorer/:path?" />
-              <Explorer path="/explorer/:path+" />
               <EditProfile path="/profile/edit" />
               <Subscribe path="/subscribe" />
               <Profile path="/profile/:id" tab="posts" />

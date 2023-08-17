@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Event } from 'nostr-tools';
-import styled from 'styled-components';
 
 import { useLocalState } from '@/LocalState.ts';
 
@@ -60,38 +59,6 @@ function chunks<T>(arr: T[], length: number) {
   }
   return result;
 }
-
-/*
-const ZapTypeBtn = styled.span`
-  color: var(--text-color);
-  display: inline-block;
-  cursor: pointer;
-  padding: 10px;
-  border-radius: 100px;
-  margin: 5px;
-  border: 1px solid transparent;
-  background: var(--body-bg);
-  &.active {
-    background: var(--notify);
-  }
-`;
- */
-
-const ZapDialog = styled.div`
-  background-color: var(--msg-content-background);
-  border-radius: 8px;
-  padding: 30px;
-  width: 400px;
-  color: var(--text-color);
-  position: relative;
-`;
-const Close = styled.div`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-  color: var(--text-color);
-`;
 
 export default function SendSats(props: ZapProps) {
   const onClose = props.onClose || (() => undefined);
@@ -420,11 +387,11 @@ export default function SendSats(props: ZapProps) {
 
   return (
     <Modal showContainer={true} centerVertically={true} onClose={onClose}>
-      <ZapDialog>
+      <div className="bg-black rounded-lg p-8 w-[400px] relative">
         <div className="lnurl-tip" onClick={(e) => e.stopPropagation()}>
-          <Close className="close" onClick={onClose}>
+          <div className="absolute top-2.5 right-2.5 cursor-pointer">
             <XMarkIcon width={20} height={20} />
-          </Close>
+          </div>
           <div className="lnurl-header">
             <h2>
               {props.title || title}
@@ -436,7 +403,7 @@ export default function SendSats(props: ZapProps) {
           {payInvoice()}
           {successAction()}
         </div>
-      </ZapDialog>
+      </div>
     </Modal>
   );
 }

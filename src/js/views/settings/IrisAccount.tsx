@@ -3,7 +3,6 @@ import { Event, UnsignedEvent } from 'nostr-tools';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
-import { PrimaryButton as Button } from '../../components/buttons/Button';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -70,9 +69,9 @@ export default class IrisAccount extends Component {
             {this.renderAccountName(this.state.existing.name)}
           </div>
           <p>
-            <Button onClick={() => this.setAsPrimary()}>
+            <button className="btn btn-sm btn-primary" onClick={() => this.setAsPrimary()}>
               Set as primary Nostr address (nip05)
-            </Button>
+            </button>
           </p>
         </div>
       );
@@ -85,10 +84,14 @@ export default class IrisAccount extends Component {
           </p>
           {this.renderAccountName(this.state.existing.name, false)}
           <p>
-            <Button onClick={() => this.enableReserved()}>Yes please</Button>
+            <button className="btn btn-sm btn-primary" onClick={() => this.enableReserved()}>
+              Yes please
+            </button>
           </p>
           <p>
-            <Button onClick={() => this.declineReserved()}>No thanks</Button>
+            <button className="btn btn-sm btn-neutral" onClick={() => this.declineReserved()}>
+              No thanks
+            </button>
           </p>
         </div>
       );
