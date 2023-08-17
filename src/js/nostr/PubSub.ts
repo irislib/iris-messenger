@@ -112,7 +112,7 @@ const PubSub = {
       filter.authors.forEach((a) => this.subscribedAuthors.add(a));
     }
 
-    callback && Events.find(filter, callback);
+    callback && Events.db.find(filter, callback);
 
     if (dev.indexedDbLoad !== false) {
       IndexedDB.subscribe(filter);

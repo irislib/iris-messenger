@@ -5,9 +5,9 @@ import { Link, route } from 'preact-router';
 
 import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
 import PubSub from '@/nostr/PubSub.ts';
+import { getEventReplyingTo, getEventRoot } from '@/nostr/utils.ts';
 import SortedMap from '@/utils/SortedMap.tsx';
 
-import Events from '../../../nostr/Events';
 import Key from '../../../nostr/Key';
 import { translate as t } from '../../../translations/Translation.mjs';
 import Show from '../../helpers/Show';
@@ -79,8 +79,9 @@ const Note = ({
 
     const sortedRepliesMap = new SortedMap<string, Event>(comparator);
 
-    const callback = (event) => {
-      sortedRepliesMap.set(event.id, event);
+    const callback = (reply) => {
+      if (getEventReplyingTo(reply) !== event.id) return;
+      sortedRepliesMap.set(reply.id, reply);
       const sortedReplies = Array.from(sortedRepliesMap.keys()).slice(0, showReplies);
       setReplies(sortedReplies);
     };
@@ -92,7 +93,7 @@ const Note = ({
     };
   }, [event.id, showReplies]);
 
-  let rootMsg = Events.getEventRoot(event);
+  let rootMsg = getEventRoot(event);
   if (!rootMsg) {
     rootMsg = meta.replyingTo;
   }

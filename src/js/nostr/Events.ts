@@ -1,7 +1,6 @@
 import debounce from 'lodash/debounce';
 import {
   Event,
-  Filter,
   getEventHash,
   getPublicKey,
   nip04,
@@ -13,6 +12,7 @@ import { EventTemplate } from 'nostr-tools';
 import EventDB from '@/nostr/EventDB.ts';
 import {
   getEventReplyingTo,
+  getEventRoot,
   getNoteReplyingTo,
   getOriginalPostEventId,
   getRepostedEventId,
@@ -63,7 +63,7 @@ localState.get('dev').on((d) => {
 const Events = {
   DEFAULT_GLOBAL_FILTER,
   getEventHash,
-  db: new EventDB(), // TODO gb2 own indexing with Maps. easier to evict & understand what it actually does
+  db: new EventDB(),
   eventsMetaDb: new EventMetaStore(),
   seen: new Set<string>(),
   deletedEvents: new Set<string>(),
@@ -432,9 +432,6 @@ const Events = {
     }
     return true;
   },
-  find(filter: Filter, callback: (event: Event) => void) {
-    this.db.find(filter, callback);
-  },
   handle(event: Event & { id: string }, force = false, saveToIdb = true, retries = 2): boolean {
     if (!event) return false;
     if (!force && this.seen.has(event.id)) {
@@ -608,14 +605,6 @@ const Events = {
     }
     return muted;
   },
-  getEventRoot(event: Event) {
-    const rootEvent = event?.tags?.find((t) => t[0] === 'e' && t[3] === 'root')?.[1];
-    if (rootEvent) {
-      return rootEvent;
-    }
-    // first e tag
-    return event?.tags?.find((t) => t[0] === 'e')?.[1];
-  },
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
     if (event.tags?.filter((tag) => tag[0] === 'p').length > 10) {
@@ -634,7 +623,7 @@ const Events = {
       }
       if (!this.isMuted(event)) {
         this.db.insert(event);
-        const target = this.getEventRoot(event) || getEventReplyingTo(event) || event.id; // TODO get thread root instead
+        const target = getEventRoot(event) || getEventReplyingTo(event) || event.id; // TODO get thread root instead
         const key = `${event.kind}-${target}`;
         const existing = this.latestNotificationByTargetAndKind.get(key); // also latestNotificationByAuthor?
         const existingEvent = existing && this.db.get(existing);
