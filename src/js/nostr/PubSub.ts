@@ -117,7 +117,10 @@ const PubSub = {
     callback && EventDB.find(filter, callback);
 
     if (dev.indexedDbLoad !== false) {
-      IndexedDB.subscribe(filter);
+      setTimeout(() => {
+        // seems blocking. use web worker? bulk get?
+        IndexedDB.subscribe(filter);
+      });
     }
 
     const unsubRelays = this.subscribeRelayPool(filter, sinceLastOpened, mergeSubscriptions);
