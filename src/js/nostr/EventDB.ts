@@ -27,7 +27,7 @@ export default class EventDB {
     this.byId.set(id, event);
 
     const author = ID(event.pubkey);
-    const indexKey = event.created_at + event.id.slice(0, 16);
+    const indexKey = this.getIndexKey(event);
 
     this.mapAdd(this.byAuthor, author, indexKey, id);
     this.mapAdd(this.byKind, event.kind, indexKey, id);
@@ -41,7 +41,7 @@ export default class EventDB {
 
     if (event) {
       const author = ID(event.pubkey);
-      const indexKey = event.created_at + event.id.slice(0, 16);
+      const indexKey = this.getIndexKey(event);
 
       this.mapRemove(this.byAuthor, author, indexKey);
       this.mapRemove(this.byKind, event.kind, indexKey);
@@ -102,9 +102,13 @@ export default class EventDB {
     return foundEvent;
   }
 
+  private getIndexKey(event: Event): string {
+    return event.created_at + event.id.slice(0, 16);
+  }
+
   private mapAdd(map: Map<UID, SortedMap<string, UID>>, key: UID, indexKey: string, id: UID): void {
     if (!map.has(key)) {
-      map.set(key, new SortedMap());
+      map.set(key, new SortedMap(undefined, 'desc'));
     }
     map.get(key)?.set(indexKey, id);
   }
@@ -125,12 +129,21 @@ export default class EventDB {
     filter: Filter,
     callback: (event: Event) => void,
   ): void {
+    let count = 0;
+
     for (const key of keys) {
       const events = map.get(key);
       if (events) {
         for (const eventId of events.values()) {
+          if (filter.limit !== undefined && count >= filter.limit) {
+            return;
+          }
+
           const event = this.byId.get(eventId);
-          event && matchFilter(filter, event) && callback(event);
+          if (event && matchFilter(filter, event)) {
+            callback(event);
+            count++;
+          }
         }
       }
     }
