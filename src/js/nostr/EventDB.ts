@@ -40,6 +40,10 @@ export default class EventDB {
   }
 
   find(filter: Filter, callback: (event: Event) => void): void {
+    this.findArray(filter).forEach(callback);
+  }
+
+  findArray(filter: Filter): Event[] {
     const query: any = {};
 
     if (filter.ids) {
@@ -59,20 +63,17 @@ export default class EventDB {
       }
     }
 
-    const results = this.eventsCollection
+    let chain = this.eventsCollection
       .chain()
       .find(query)
       .where((e: Event) => matchFilter(filter, e))
-      .simplesort('created_at', true)
-      .data();
+      .simplesort('created_at', true);
 
-    results.forEach(callback);
-  }
+    if (filter.limit) {
+      chain = chain.limit(filter.limit);
+    }
 
-  findArray(filter: Filter): Event[] {
-    const events: Event[] = [];
-    this.find(filter, (event) => events.push(event));
-    return events;
+    return chain.data();
   }
 
   findAndRemove(filter: Filter) {
