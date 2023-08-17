@@ -2983,11 +2983,6 @@ history@5.3.0:
   dependencies:
     "@babel/runtime" "^7.7.6"
 
-htm@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/htm/-/htm-3.1.1.tgz#49266582be0dc66ed2235d5ea892307cc0c24b78"
-  integrity sha512-983Vyg8NwUE7JkZ6NmOqpCZ+sh1bKv2iYTlUkzlWmA5JD2acKoxd4KVxbMmxX/85mtfdnDmTFoNKcg5DGAvxNQ==
-
 human-signals@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-2.1.0.tgz#dc91fcba42e4d06e4abaed33b3e7a3c02f514ea0"
@@ -3906,11 +3901,6 @@ preact-router@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/preact-router/-/preact-router-4.1.2.tgz#f44b03737b670eeaec958563582eb8c4efaa87a5"
   integrity sha512-uICUaUFYh+XQ+6vZtQn1q+X6rSqwq+zorWOCLWPF5FAsQh3EJ+RsDQ9Ee+fjk545YWQHfUxhrBAaemfxEnMOUg==
-
-preact-scroll-viewport@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/preact-scroll-viewport/-/preact-scroll-viewport-0.2.0.tgz#7c5c86dd9cb02c6b23d6b37834c08620a63068dc"
-  integrity sha512-M9es49lPGg7BhDwUDQMPUhGqo8Z+eQ3FeIRZ20/QFNdDqryu7J2kDddJxZk0vmYLbHwv/LbKd2ssiCwVwUXEQg==
 
 preact@^10.17.0:
   version "10.17.0"
