@@ -9,7 +9,7 @@ export default class EventDB {
   private byAuthor = new Map<UID, SortedMap<string, UID>>();
   private byKind = new Map<number, SortedMap<string, UID>>();
   private byTag = new Map<string, SortedMap<string, UID>>();
-  // TODO byAuthorAndKind
+  private byAuthorAndKind = new Map<string, SortedMap<string, UID>>();
 
   get(id: any): Event | undefined {
     if (typeof id === 'string') {
@@ -42,6 +42,9 @@ export default class EventDB {
       }
     }
 
+    const authorKindKey = `${event.pubkey}-${event.kind}`;
+    this.mapAdd(this.byAuthorAndKind, authorKindKey, indexKey, id);
+
     return true;
   }
 
@@ -62,6 +65,9 @@ export default class EventDB {
         }
       }
 
+      const authorKindKey = `${event.pubkey}-${event.kind}`;
+      this.mapRemove(this.byAuthorAndKind, authorKindKey, indexKey);
+
       this.byId.delete(id);
     }
   }
@@ -72,6 +78,14 @@ export default class EventDB {
         const event = this.byId.get(ID(id));
         event && callback(event);
       }
+    } else if (filter.authors && filter.kinds) {
+      const authorKindKeys: string[] = [];
+      for (const author of filter.authors) {
+        for (const kind of filter.kinds) {
+          authorKindKeys.push(`${author}-${kind}`);
+        }
+      }
+      this.iterateMap(authorKindKeys, this.byAuthorAndKind, filter, callback);
     } else if (filter['#e']) {
       const tags = filter['#e'].map((eventId) => JSON.stringify(['e', eventId]));
       this.iterateMap(tags, this.byTag, filter, callback);
