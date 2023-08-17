@@ -11,13 +11,8 @@ export default class SortedMap<K, V> {
 
     if (compare) {
       if (typeof compare === 'string') {
-        this.compare = (a, b) => {
-          return a.value[compare] > b.value[compare]
-            ? 1
-            : a.value[compare] < b.value[compare]
-            ? -1
-            : 0;
-        };
+        this.compare = (a, b) =>
+          a.value[compare] > b.value[compare] ? 1 : a.value[compare] < b.value[compare] ? -1 : 0;
       } else {
         this.compare = compare;
       }
@@ -26,34 +21,36 @@ export default class SortedMap<K, V> {
     }
   }
 
+  private binarySearch(key: K, value: V): number {
+    let left = 0;
+    let right = this.sortedKeys.length;
+    while (left < right) {
+      const mid = (left + right) >> 1; // bit shift for performance
+      const midKey = this.sortedKeys[mid];
+      const midValue = this.map.get(midKey) as V;
+
+      if (this.compare({ key, value }, { key: midKey, value: midValue }) < 0) {
+        right = mid;
+      } else {
+        left = mid + 1;
+      }
+    }
+    return left;
+  }
+
   set(key: K, value: V) {
-    if (this.map.has(key)) {
+    const exists = this.map.has(key);
+    this.map.set(key, value);
+
+    if (exists) {
       const index = this.sortedKeys.indexOf(key);
       if (index !== -1) {
         this.sortedKeys.splice(index, 1);
       }
     }
 
-    // Add to map
-    this.map.set(key, value);
-
-    // Binary search and insertion
-    let left = 0;
-    let right = this.sortedKeys.length;
-    while (left < right) {
-      const mid = Math.floor((left + right) / 2);
-      if (
-        this.compare(
-          { key, value },
-          { key: this.sortedKeys[mid], value: this.map.get(this.sortedKeys[mid]) as V },
-        ) < 0
-      ) {
-        right = mid;
-      } else {
-        left = mid + 1;
-      }
-    }
-    this.sortedKeys.splice(left, 0, key);
+    const insertAt = this.binarySearch(key, value);
+    this.sortedKeys.splice(insertAt, 0, key);
   }
 
   get(key: K): V | undefined {
@@ -100,42 +97,8 @@ export default class SortedMap<K, V> {
   ): IterableIterator<{ key: K; value: V }> {
     const { gte, lte, direction = 'asc' } = options;
 
-    let startIndex = 0;
-    let endIndex = this.sortedKeys.length;
-
-    if (gte) {
-      while (startIndex < endIndex) {
-        const mid = Math.floor((startIndex + endIndex) / 2);
-        if (
-          this.compare(
-            { key: this.sortedKeys[mid], value: this.map.get(this.sortedKeys[mid]) as V },
-            { key: gte, value: this.map.get(gte) as V },
-          ) < 0
-        ) {
-          startIndex = mid + 1;
-        } else {
-          endIndex = mid;
-        }
-      }
-    }
-
-    if (lte) {
-      let tempStart = startIndex;
-      endIndex = this.sortedKeys.length;
-      while (tempStart < endIndex) {
-        const mid = Math.floor((tempStart + endIndex) / 2);
-        if (
-          this.compare(
-            { key: this.sortedKeys[mid], value: this.map.get(this.sortedKeys[mid]) as V },
-            { key: lte, value: this.map.get(lte) as V },
-          ) <= 0
-        ) {
-          tempStart = mid + 1;
-        } else {
-          endIndex = mid;
-        }
-      }
-    }
+    const startIndex = gte ? this.binarySearch(gte, this.map.get(gte) as V) : 0;
+    const endIndex = lte ? this.binarySearch(lte, this.map.get(lte) as V) : this.sortedKeys.length;
 
     if (direction === 'asc') {
       for (let i = startIndex; i < endIndex; i++) {

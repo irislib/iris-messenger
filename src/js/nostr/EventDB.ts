@@ -9,6 +9,7 @@ export default class EventDB {
   private byAuthor = new Map<UID, SortedMap<string, UID>>();
   private byKind = new Map<number, SortedMap<string, UID>>();
   private byTag = new Map<string, SortedMap<string, UID>>();
+  // TODO byAuthorAndKind
 
   get(id: any): Event | undefined {
     if (typeof id === 'string') {
