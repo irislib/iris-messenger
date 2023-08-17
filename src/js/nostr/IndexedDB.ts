@@ -7,7 +7,7 @@ import Key from './Key';
 
 // TODO: tags should be mapped to internal event ids in order to save space
 type Tag = {
-  id: number;
+  id: string;
   eventId: string;
   type: string;
   value: string;
@@ -19,9 +19,10 @@ export class MyDexie extends Dexie {
 
   constructor() {
     super('iris');
-    this.version(3).stores({
+
+    this.version(4).stores({
       events: 'id, pubkey, kind, created_at',
-      tags: '++id, eventId, [type+value]', // Indexed by type and value for efficient queries
+      tags: 'id, eventId, [type+value]',
     });
   }
 }
@@ -59,12 +60,11 @@ const IndexedDB = {
     this.saveQueue = [];
     try {
       await db.transaction('rw', db.events, db.tags, async () => {
-        await db.events.bulkAdd(eventsToSave);
-        await db.tags.bulkAdd(tagsToSave);
+        await db.events.bulkPut(eventsToSave);
+        await db.tags.bulkPut(tagsToSave);
       });
     } catch (err) {
-      // lots of duplicate errors
-      // console.error('Bulk save error:', err);
+      console.error('bulkPut save error:', err);
     }
   }, 500),
 
@@ -73,6 +73,7 @@ const IndexedDB = {
       event.tags
         ?.filter((tag) => tag[0] === 'e') // only save replies & reactions for now
         .map((tag) => ({
+          id: event.id.slice(0, 16) + '-' + tag[0].slice(0, 16) + '-' + tag[1].slice(0, 16),
           eventId: event.id,
           type: tag[0],
           value: tag[1],
