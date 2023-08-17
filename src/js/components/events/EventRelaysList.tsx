@@ -60,7 +60,7 @@ const EventRelaysList: FC<{ event: Event }> = ({ event }) => {
         </ul>
       )}
       <Codeblock>
-        <code>{JSON.stringify({ ...event, meta: undefined, $loki: undefined }, null, 2)}</code>
+        <code>{JSON.stringify({ ...event }, null, 2)}</code>
       </Codeblock>
     </Wrapper>
   );

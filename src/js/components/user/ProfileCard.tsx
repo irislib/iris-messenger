@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Event } from 'nostr-tools';
 import { route } from 'preact-router';
 
 import localState from '../../LocalState';
@@ -18,8 +19,6 @@ import ProfileDropdown from './Dropdown';
 import Name from './Name';
 import ProfilePicture from './ProfilePicture';
 import Stats from './Stats';
-
-import { Event } from 'nostr-tools';
 
 const ProfileCard = (props: { hexPub: string; npub: string }) => {
   const { hexPub, npub } = props;

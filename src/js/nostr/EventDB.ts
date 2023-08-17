@@ -8,6 +8,7 @@ export default class EventDB {
   private byId = new Map<UID, Event>();
   private byAuthor = new Map<UID, SortedMap<string, UID>>();
   private byKind = new Map<number, SortedMap<string, UID>>();
+  private byTag = new Map<string, SortedMap<string, UID>>();
 
   get(id: any): Event | undefined {
     if (typeof id === 'string') {
@@ -32,6 +33,14 @@ export default class EventDB {
     this.mapAdd(this.byAuthor, author, indexKey, id);
     this.mapAdd(this.byKind, event.kind, indexKey, id);
 
+    if (event.tags) {
+      for (const tag of event.tags) {
+        if (['e', 'p'].includes(tag[0])) {
+          this.mapAdd(this.byTag, JSON.stringify(tag), indexKey, id);
+        }
+      }
+    }
+
     return true;
   }
 
@@ -46,19 +55,28 @@ export default class EventDB {
       this.mapRemove(this.byAuthor, author, indexKey);
       this.mapRemove(this.byKind, event.kind, indexKey);
 
+      if (event.tags) {
+        for (const tag of event.tags) {
+          this.mapRemove(this.byTag, JSON.stringify(tag), indexKey);
+        }
+      }
+
       this.byId.delete(id);
     }
   }
 
   find(filter: Filter, callback: (event: Event) => void): void {
-    if (filter['#e'] || filter['#p']) {
-      return; // TODO: implement
-    }
     if (filter.ids) {
       for (const id of filter.ids) {
         const event = this.byId.get(ID(id));
         event && callback(event);
       }
+    } else if (filter['#e']) {
+      const tags = filter['#e'].map((eventId) => JSON.stringify(['e', eventId]));
+      this.iterateMap(tags, this.byTag, filter, callback);
+    } else if (filter['#p']) {
+      const tags = filter['#p'].map((pubkey) => JSON.stringify(['p', pubkey]));
+      this.iterateMap(tags, this.byTag, filter, callback);
     } else if (filter.authors) {
       this.iterateMap(filter.authors.map(ID), this.byAuthor, filter, callback);
     } else if (filter.kinds) {
@@ -113,14 +131,23 @@ export default class EventDB {
     return this.padCreatedAt(event.created_at) + event.id.slice(0, 16);
   }
 
-  private mapAdd(map: Map<UID, SortedMap<string, UID>>, key: UID, indexKey: string, id: UID): void {
+  private mapAdd<KeyType>(
+    map: Map<KeyType, SortedMap<string, UID>>,
+    key: KeyType,
+    indexKey: string,
+    id: UID,
+  ): void {
     if (!map.has(key)) {
       map.set(key, new SortedMap());
     }
     map.get(key)?.set(indexKey, id);
   }
 
-  private mapRemove(map: Map<UID, SortedMap<string, UID>>, key: UID, indexKey: string): void {
+  private mapRemove<KeyType>(
+    map: Map<KeyType, SortedMap<string, UID>>,
+    key: KeyType,
+    indexKey: string,
+  ): void {
     const sortedMap = map.get(key);
     if (sortedMap) {
       sortedMap.delete(indexKey);

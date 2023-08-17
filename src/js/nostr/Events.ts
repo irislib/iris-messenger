@@ -95,7 +95,6 @@ const Events = {
   zapsByNote: new Map<string, SortedLimitedEventSet>(),
   keyValueEvents: new Map<string, Event>(),
   threadRepliesByMessageId: new Map<string, Set<string>>(),
-  directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
   repostsByMessageId: new Map<string, Set<string>>(),
   handledMsgsPerSecond: 0,
@@ -122,11 +121,6 @@ const Events = {
      */
 
     if (replyingTo && !isRepost) {
-      if (!this.directRepliesByMessageId.has(replyingTo)) {
-        this.directRepliesByMessageId.set(replyingTo, new Set<string>());
-      }
-      this.directRepliesByMessageId.get(replyingTo)?.add(event.id);
-
       const repliedMsgs = event.tags
         .filter((tag) => tag[0] === 'e')
         .map((tag) => tag[1])
@@ -764,9 +758,6 @@ const Events = {
     localState.get('unseenNotificationCount').put(count);
   }, 1000),
   publish: async function (event: Partial<Event>): Promise<Event> {
-    // for some reason these hang around
-    delete event['$loki'];
-    delete event['meta'];
     if (!event.sig) {
       await this.sign(event as EventTemplate);
     }
@@ -820,14 +811,6 @@ const Events = {
     }
     return obj.pubkey;
   },
-  getReplies(id: string, cb?: (replies: Set<string>) => void): Unsubscribe {
-    const callback = () => {
-      cb?.(this.directRepliesByMessageId.get(id) ?? new Set());
-    };
-    callback();
-    return PubSub.subscribe({ '#e': [id], kinds: [1] }, callback, false);
-  },
-
   getLikes(id: string, cb?: (likedBy: Set<string>) => void): Unsubscribe {
     const callback = () => {
       cb?.(this.likesByMessageId.get(id) ?? new Set());
