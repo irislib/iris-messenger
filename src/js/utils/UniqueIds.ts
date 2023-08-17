@@ -6,7 +6,7 @@ export type UID = number;
 // save space by mapping strs to internal unique ids
 export class UniqueIds {
   static strToUniqueId = new Map<string, UID>();
-  static UniqueIdTostr = new Map<UID, string>();
+  static uniqueIdToStr = new Map<UID, string>();
   static currentUniqueId = 0;
 
   static id(str: string): UID {
@@ -22,12 +22,12 @@ export class UniqueIds {
     }
     const newId = UniqueIds.currentUniqueId++;
     UniqueIds.strToUniqueId.set(str, newId);
-    UniqueIds.UniqueIdTostr.set(newId, str);
+    UniqueIds.uniqueIdToStr.set(newId, str);
     return newId;
   }
 
-  static pub(id: UID): string {
-    const pub = UniqueIds.UniqueIdTostr.get(id);
+  static str(id: UID): string {
+    const pub = UniqueIds.uniqueIdToStr.get(id);
     if (!pub) {
       throw new Error('pub: invalid id ' + id);
     }
@@ -39,5 +39,5 @@ export class UniqueIds {
   }
 }
 
-export const PUB = UniqueIds.pub;
+export const STR = UniqueIds.str;
 export const ID = UniqueIds.id;

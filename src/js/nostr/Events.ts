@@ -18,7 +18,7 @@ import {
   getRepostedEventId,
   isRepost,
 } from '@/nostr/utils.ts';
-import { ID, PUB, UniqueIds } from '@/utils/UniqueIds.ts';
+import { ID, STR, UniqueIds } from '@/utils/UniqueIds.ts';
 
 import localState from '../LocalState';
 import { Node } from '../LocalState';
@@ -171,7 +171,7 @@ const Events = {
       for (const previouslyFollowed of SocialNetwork.followedByUser.get(ID(event.pubkey)) || []) {
         if (
           !event.tags ||
-          !event.tags?.find((t) => t[0] === 'p' && t[1] === PUB(previouslyFollowed))
+          !event.tags?.find((t) => t[0] === 'p' && t[1] === STR(previouslyFollowed))
         ) {
           SocialNetwork.removeFollower(previouslyFollowed, ID(event.pubkey));
         }

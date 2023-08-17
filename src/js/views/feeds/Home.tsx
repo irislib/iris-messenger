@@ -6,7 +6,7 @@ import Key from '@/nostr/Key';
 import { Unsubscribe } from '@/nostr/PubSub';
 import { getEventReplyingTo } from '@/nostr/utils.ts';
 import { translate as t } from '@/translations/Translation.mjs';
-import { ID, PUB } from '@/utils/UniqueIds.ts';
+import { ID, STR } from '@/utils/UniqueIds.ts';
 
 import SocialNetwork from '../../nostr/SocialNetwork';
 import View from '../View';
@@ -18,7 +18,7 @@ class Feed extends View {
     super();
     const followedUsers: string[] = Array.from(
       SocialNetwork.followedByUser.get(ID(Key.getPubKey())) || [],
-    ).map((n) => PUB(n));
+    ).map((n) => STR(n));
     this.state = {
       followedUsers,
     };

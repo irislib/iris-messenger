@@ -1,5 +1,5 @@
 import localState from '../LocalState';
-import { ID, PUB, UID } from '../utils/UniqueIds.ts';
+import { ID, STR, UID } from '../utils/UniqueIds.ts';
 
 import Events from './Events';
 import Key from './Key';
@@ -57,7 +57,7 @@ export default {
       kind: 3,
       content: existing?.content || '',
       tags: Array.from(this.followedByUser.get(myId) || []).map((id: number) => {
-        const pubAddress = PUB(id);
+        const pubAddress = STR(id);
         return ['p', pubAddress];
       }),
     };
@@ -86,7 +86,7 @@ export default {
       let unsub;
       // TODO subscribe once param?
       // eslint-disable-next-line prefer-const
-      unsub = PubSub.subscribe({ authors: [PUB(user)], kinds: [0] }, () => unsub?.(), true);
+      unsub = PubSub.subscribe({ authors: [STR(user)], kinds: [0] }, () => unsub?.(), true);
     }
     this.usersByFollowDistance.get(distance)?.add(user);
     // remove from higher distances
@@ -136,9 +136,9 @@ export default {
       }
     }
     if (this.followedByUser.get(myId)?.has(follower)) {
-      if (!PubSub.subscribedAuthors.has(PUB(followedUser))) {
+      if (!PubSub.subscribedAuthors.has(STR(followedUser))) {
         setTimeout(() => {
-          PubSub.subscribe({ authors: [PUB(followedUser)] }, undefined, true);
+          PubSub.subscribe({ authors: [STR(followedUser)] }, undefined, true);
         }, 0);
       }
     }
@@ -175,7 +175,7 @@ export default {
       //  if resulting followersByUser(u).size is 0, remove that user as well
       this.followDistanceByUser.delete(unfollowedUser);
       this.followersByUser.delete(unfollowedUser);
-      PubSub.subscribedAuthors.delete(PUB(unfollowedUser));
+      PubSub.subscribedAuthors.delete(STR(unfollowedUser));
     }
     LocalForage.saveEvents();
   },
@@ -228,7 +228,7 @@ export default {
       if (cb) {
         const set = new Set<string>();
         for (const id of this.blockedUsers) {
-          set.add(PUB(id));
+          set.add(STR(id));
         }
         cb(set);
       }
@@ -244,7 +244,7 @@ export default {
       if (cb) {
         const set = new Set<string>();
         for (const id of this.flaggedUsers) {
-          set.add(PUB(id));
+          set.add(STR(id));
         }
         cb(set);
       }
@@ -265,7 +265,7 @@ export default {
       if (cb) {
         const set = new Set<string>();
         for (const id of this.followedByUser.get(userId) || []) {
-          set.add(PUB(id));
+          set.add(STR(id));
         }
         if (includeSelf) {
           set.add(user);
@@ -287,7 +287,7 @@ export default {
       if (cb) {
         const set = new Set<string>();
         for (const id of this.followersByUser.get(userId) || []) {
-          set.add(PUB(id));
+          set.add(STR(id));
         }
         cb(set);
       }

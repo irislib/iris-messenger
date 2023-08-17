@@ -13,7 +13,7 @@ const useSubscribe = (ops: {
   mergeSubscriptions?: boolean;
   enabled?: boolean;
 }) => {
-  const sortedEvents = useRef(new SortedMap<string, Event>('created_at'));
+  const sortedEvents = useRef(new SortedMap<string, Event>());
   const [loadMoreFilter, setLoadMoreFilter] = useState<Filter | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const lastUntilRef = useRef<number | null>(null);
@@ -32,7 +32,7 @@ const useSubscribe = (ops: {
     if (filter.keywords && !filter.keywords.some((keyword) => event.content?.includes(keyword))) {
       return;
     }
-    sortedEvents.current.set(event.id, event);
+    sortedEvents.current.set(event.created_at + event.id, event);
     setEvents([...sortedEvents.current.values()].reverse());
   };
 
