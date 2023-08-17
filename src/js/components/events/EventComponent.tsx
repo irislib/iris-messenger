@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
+import EventDB from '@/nostr/EventDB.ts';
 import { getNoteReplyingTo } from '@/nostr/utils.ts';
 
 import Events from '../../nostr/Events';
@@ -40,7 +41,7 @@ const EventComponent = (props: EventComponentProps) => {
   const [state, setState] = useState<{ [key: string]: any }>({
     sortedReplies: [],
     meta: {},
-    event: hex && Events.db.get(hex),
+    event: hex && EventDB.get(hex),
   });
   const retrievingTimeout = useRef<any>();
   const unmounted = useRef<boolean>(false);

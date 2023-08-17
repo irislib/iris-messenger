@@ -6,7 +6,7 @@ import ImageGridItem from '@/components/feed/ImageGridItem';
 import ImageModal from '@/components/feed/ImageModal';
 import { ImageOrVideo } from '@/components/feed/types';
 import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
-import Events from '@/nostr/Events';
+import EventDB from '@/nostr/EventDB.ts';
 import { getEventReplyingTo } from '@/nostr/utils.ts';
 
 interface ImageGridProps {
@@ -37,7 +37,7 @@ const ImageGrid = ({ events, loadMore }: ImageGridProps) => {
       if (event.kind === 7) {
         const taggedEventId = getEventReplyingTo(event);
         if (taggedEventId) {
-          const taggedEvent = Events.db.get(taggedEventId);
+          const taggedEvent = EventDB.get(taggedEventId);
           return taggedEvent ? extractMediaFromEvent(taggedEvent) : [];
         }
         return [];

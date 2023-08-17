@@ -2,6 +2,7 @@ import { memo, useEffect, useState } from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link } from 'preact-router';
 
+import EventDB from '@/nostr/EventDB.ts';
 import { getZappingUser } from '@/nostr/utils.ts';
 
 import Events from '../../nostr/Events'; // Import Events module
@@ -50,7 +51,7 @@ const ReactionsList = ({ event }) => {
     const handleZaps = (zaps) => {
       const zapData = new Map<string, number>();
       let totalZapAmount = 0;
-      const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.get(eventId));
+      const zapEvents = Array.from(zaps?.values()).map((eventId) => EventDB.get(eventId));
       zapEvents.forEach((zapEvent) => {
         const bolt11 = zapEvent?.tags.find((tag) => tag[0] === 'bolt11')?.[1];
         if (!bolt11) {

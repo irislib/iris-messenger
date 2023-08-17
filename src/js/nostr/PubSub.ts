@@ -5,6 +5,8 @@ import { Event, matchFilter, nip42 } from 'nostr-tools';
 import Filter from '@/nostr/Filter';
 const { authenticate } = nip42;
 
+import EventDB from '@/nostr/EventDB.ts';
+
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 
@@ -112,7 +114,7 @@ const PubSub = {
       filter.authors.forEach((a) => this.subscribedAuthors.add(a));
     }
 
-    callback && Events.db.find(filter, callback);
+    callback && EventDB.find(filter, callback);
 
     if (dev.indexedDbLoad !== false) {
       IndexedDB.subscribe(filter);

@@ -3,7 +3,7 @@ import { Event, matchFilter } from 'nostr-tools';
 
 import Filter from '@/nostr/Filter.ts';
 
-export default class EventDB {
+class EventDB {
   private db: any;
   private eventsCollection: any;
 
@@ -85,3 +85,5 @@ export default class EventDB {
     return this.findArray(filter)[0];
   }
 }
+
+export default new EventDB();

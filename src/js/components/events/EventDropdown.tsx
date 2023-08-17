@@ -1,6 +1,8 @@
 import { Event } from 'nostr-tools';
 import { useState } from 'preact/hooks';
 
+import EventDB from '@/nostr/EventDB.ts';
+
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -83,7 +85,7 @@ const EventDropdown = (props: EventDropdownProps) => {
     e.preventDefault();
     const hexId = Key.toNostrHexAddress(id);
     if (hexId) {
-      const event = Events.db.get(hexId);
+      const event = EventDB.get(hexId);
       if (event) {
         // TODO indicate to user somehow
         console.log('broadcasting', hexId, event);

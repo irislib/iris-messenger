@@ -1,3 +1,5 @@
+import EventDB from '@/nostr/EventDB.ts';
+
 import localState from '../LocalState';
 import { ID, STR, UID } from '../utils/UniqueIds.ts';
 
@@ -50,7 +52,7 @@ export default {
       }
     });
 
-    const existing = Events.db.findOne({ kinds: [3], authors: [myPub] });
+    const existing = EventDB.findOne({ kinds: [3], authors: [myPub] });
 
     const event = {
       kind: 3,
@@ -166,7 +168,7 @@ export default {
     }
 
     const blocked = this.blockedUsers.has(unfollowedUser);
-    // TODO delete Events.db entries for this user
+    // TODO delete EventDB entries for this user
 
     if (blocked || this.followersByUser.get(unfollowedUser)?.size === 0) {
       // TODO: remove unfollowedUser from everyone's followersByUser.

@@ -64,7 +64,6 @@ localState.get('dev').on((d) => {
 const Events = {
   DEFAULT_GLOBAL_FILTER,
   getEventHash,
-  db: new EventDB(),
   eventsMetaDb: new EventMetaStore(),
   seen: new Set<string>(),
   deletedEvents: new Set<string>(),
@@ -83,9 +82,9 @@ const Events = {
   myBlockEvent: null as Event | null,
   myFlagEvent: null as Event | null,
   handleNote(event: Event) {
-    const has = this.db.get(event.id);
+    const has = EventDB.get(event.id);
     if (!has) {
-      this.db.insert(event);
+      EventDB.insert(event);
     }
 
     const eventIsRepost = isRepost(event);
@@ -131,17 +130,17 @@ const Events = {
       this.likesByMessageId.set(id, new Set());
     }
     this.likesByMessageId.get(id)?.add(event.pubkey);
-    this.db.insert(event);
+    EventDB.insert(event);
   },
   handleFollow(event: Event) {
-    const existing = Events.db.findOne({ kinds: [3], authors: [event.pubkey] });
+    const existing = EventDB.findOne({ kinds: [3], authors: [event.pubkey] });
     if (existing && existing.created_at >= event.created_at) {
       return;
     }
     if (existing) {
-      this.db.findAndRemove({ kinds: [3], authors: [event.pubkey] });
+      EventDB.findAndRemove({ kinds: [3], authors: [event.pubkey] });
     }
-    this.db.insert(event);
+    EventDB.insert(event);
     const myPub = Key.getPubKey();
 
     if (event.tags) {
@@ -234,9 +233,9 @@ const Events = {
         return false;
       }
       if (existing) {
-        this.db.findAndRemove({ authors: [event.pubkey], kinds: [0] });
+        EventDB.findAndRemove({ authors: [event.pubkey], kinds: [0] });
       }
-      this.db.insert(event);
+      EventDB.insert(event);
       const profile = JSON.parse(event.content);
       // if we have previously deleted our account, log out. appease app store.
       if (event.pubkey === Key.getPubKey() && profile.deleted) {
@@ -262,15 +261,15 @@ const Events = {
     const id = event.tags?.find((tag) => tag[0] === 'e')?.[1];
     const myPub = Key.getPubKey();
     if (id) {
-      const deletedEvent = this.db.get(id);
+      const deletedEvent = EventDB.get(id);
       // only we or the author can delete
       if (deletedEvent && [event.pubkey, myPub].includes(deletedEvent.pubkey)) {
-        this.db.remove(id);
+        EventDB.remove(id);
       }
     }
   },
   handleZap(event) {
-    this.db.insert(event);
+    EventDB.insert(event);
     const zappedNote = event.tags?.find((tag) => tag[0] === 'e')?.[1];
     if (!zappedNote) {
       return; // TODO you can also zap profiles
@@ -333,7 +332,7 @@ const Events = {
       // ignore
     }
 
-    this.db.insert(event);
+    EventDB.insert(event);
     if (!maybeSecretChat) {
       this.saveDMToLocalState(event, localState.get('chats').get(chatId));
     }
@@ -466,7 +465,7 @@ const Events = {
     if (event.created_at > Date.now() / 1000) {
       this.futureEventIds.add(event);
       if (this.futureEventIds.has(event.id)) {
-        this.db.insert(event); // TODO should limit stored future events
+        EventDB.insert(event); // TODO should limit stored future events
       }
       if (this.futureEventIds.first() === event.id) {
         this.handleNextFutureEvent();
@@ -501,7 +500,7 @@ const Events = {
         this.handleDelete(event);
         break;
       case 3: {
-        const foundEvent = Events.db.findOne({ kinds: [3], authors: [event.pubkey] });
+        const foundEvent = EventDB.findOne({ kinds: [3], authors: [event.pubkey] });
         if (foundEvent && foundEvent.created_at >= event.created_at) {
           return false;
         }
@@ -576,7 +575,7 @@ const Events = {
     }
     clearTimeout(this.futureEventTimeout);
     const nextEventId = this.futureEventIds.first();
-    const nextEvent = nextEventId && this.db.get(nextEventId);
+    const nextEvent = nextEventId && EventDB.get(nextEventId);
     if (!nextEvent) {
       return;
     }
@@ -623,11 +622,11 @@ const Events = {
         }
       }
       if (!this.isMuted(event)) {
-        this.db.insert(event);
+        EventDB.insert(event);
         const target = getEventRoot(event) || getEventReplyingTo(event) || event.id; // TODO get thread root instead
         const key = `${event.kind}-${target}`;
         const existing = this.latestNotificationByTargetAndKind.get(key); // also latestNotificationByAuthor?
-        const existingEvent = existing && this.db.get(existing);
+        const existingEvent = existing && EventDB.get(existing);
         if (!existingEvent || existingEvent.created_at < event.created_at) {
           existing && this.notifications.delete(existing);
           this.notifications.add(event);
@@ -645,7 +644,7 @@ const Events = {
     }
     let count = 0;
     for (const id of Events.notifications.eventIds) {
-      const event = Events.db.get(id);
+      const event = EventDB.get(id);
       if (event && event.created_at > Events.notificationsSeenTime) {
         count++;
       } else {
@@ -675,7 +674,7 @@ const Events = {
       .reverse()
       .slice(0, 10);
     for (const ref of referredEvents || []) {
-      const referredEvent = this.db.get(ref[1]);
+      const referredEvent = EventDB.get(ref[1]);
       if (referredEvent) {
         PubSub.publish(referredEvent);
       }
@@ -734,7 +733,7 @@ const Events = {
         cb?.(event);
       }
     };
-    const event = this.db.get(id);
+    const event = EventDB.get(id);
     if (event) {
       callback(event);
       return;

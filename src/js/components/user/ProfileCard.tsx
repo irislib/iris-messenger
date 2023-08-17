@@ -2,8 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { Event } from 'nostr-tools';
 import { route } from 'preact-router';
 
+import EventDB from '@/nostr/EventDB.ts';
+
 import localState from '../../LocalState';
-import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import PubSub from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
@@ -117,11 +118,11 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
 
   useEffect(() => {
     const rawDataArray = [] as Event[];
-    const profileEvent = Events.db.findOne({
+    const profileEvent = EventDB.findOne({
       kinds: [0],
       authors: [hexPub],
     });
-    const followEvent = Events.db.findOne({
+    const followEvent = EventDB.findOne({
       kinds: [3],
       authors: [hexPub],
     });

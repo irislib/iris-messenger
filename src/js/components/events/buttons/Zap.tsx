@@ -4,6 +4,7 @@ import { useEffect, useState } from 'preact/hooks';
 
 import Show from '@/components/helpers/Show.tsx';
 import { useLocalState } from '@/LocalState.ts';
+import EventDB from '@/nostr/EventDB.ts';
 import Key from '@/nostr/Key.ts';
 import { getZappingUser } from '@/nostr/utils.ts';
 import Icons from '@/utils/Icons.tsx';
@@ -73,7 +74,7 @@ const Zap = ({ event }) => {
 
   const handleZaps = debounce(
     (zaps) => {
-      const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.get(eventId));
+      const zapEvents = Array.from(zaps?.values()).map((eventId) => EventDB.get(eventId));
       let totalZapAmount = 0;
       let zapped = false;
       zapEvents.forEach((event) => {

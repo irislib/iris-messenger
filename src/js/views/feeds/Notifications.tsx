@@ -1,6 +1,7 @@
 import debounce from 'lodash/debounce';
 import { Event } from 'nostr-tools';
 
+import EventDB from '@/nostr/EventDB.ts';
 import Events from '@/nostr/Events';
 import Key from '@/nostr/Key';
 
@@ -49,7 +50,7 @@ export default class Notifications extends View {
         ]}
         fetchEvents={() => {
           const events = Events.notifications.eventIds
-            .map((id) => Events.db.get(id))
+            .map((id) => EventDB.get(id))
             .filter((event): event is Event => Boolean(event)) as Event[];
 
           return {

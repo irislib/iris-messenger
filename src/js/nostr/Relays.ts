@@ -2,6 +2,8 @@ import { sha256 } from '@noble/hashes/sha256';
 import throttle from 'lodash/throttle';
 import { Event, Filter, Sub } from 'nostr-tools';
 
+import EventDB from '@/nostr/EventDB.ts';
+
 import localState from '../LocalState';
 import Helpers from '../utils/Helpers.tsx';
 
@@ -103,7 +105,7 @@ const Relays = {
   getPopularRelays: function (): Array<PopularRelay> {
     console.log('getPopularRelays');
     const relays = new Map<string, number>();
-    Events.db.findArray({ kinds: [3] }).forEach((event) => {
+    EventDB.findArray({ kinds: [3] }).forEach((event) => {
       if (event.content) {
         try {
           // content is an object of relayUrl: {read:boolean, write:boolean}
@@ -144,7 +146,7 @@ const Relays = {
       console.log('getUserRelays: invalid user', user);
       return [];
     }
-    const followEvent = Events.db.findOne({ kinds: [3], authors: [user] });
+    const followEvent = EventDB.findOne({ kinds: [3], authors: [user] });
     if (followEvent) {
       relays = this.getUrlsFromFollowEvent(followEvent);
     }
@@ -233,7 +235,7 @@ const Relays = {
     for (const url of this.relays.keys()) {
       relaysObj[url] = { read: true, write: true };
     }
-    const existing = Events.db.findOne({ kinds: [3], authors: [Key.getPubKey()] });
+    const existing = EventDB.findOne({ kinds: [3], authors: [Key.getPubKey()] });
     const content = JSON.stringify(relaysObj);
 
     const event = {
