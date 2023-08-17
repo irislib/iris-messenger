@@ -9,7 +9,6 @@ import { ID } from '../utils/UniqueIds.ts';
 import Events from './Events';
 import IndexedDB from './IndexedDB';
 import Key from './Key';
-import LocalForage from './LocalForage';
 import { Path } from './path';
 import PubSub from './PubSub';
 import Relays from './Relays';
@@ -111,7 +110,6 @@ const Session = {
       document.documentElement.setAttribute('data-theme', 'dark');
     });
     Relays.init();
-    LocalForage.loadEvents();
     //IndexedDB.init();
     const timeout = setTimeout(() => {
       IrisTo.checkExistingAccount(myPub);

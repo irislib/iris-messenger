@@ -3,7 +3,6 @@ import { ID, STR, UID } from '../utils/UniqueIds.ts';
 
 import Events from './Events';
 import Key from './Key';
-import LocalForage from './LocalForage';
 import PubSub, { Unsubscribe } from './PubSub';
 
 export default {
@@ -177,7 +176,6 @@ export default {
       this.followersByUser.delete(unfollowedUser);
       PubSub.subscribedAuthors.delete(STR(unfollowedUser));
     }
-    LocalForage.saveEvents();
   },
   // TODO subscription methods for followersByUser and followedByUser. and maybe messagesByTime. and replies
   followerCount: function (address: string) {
