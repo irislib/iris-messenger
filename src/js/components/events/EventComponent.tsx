@@ -1,6 +1,8 @@
 import { memo } from 'react';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
+import { getNoteReplyingTo } from '@/nostr/utils.ts';
+
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
@@ -53,7 +55,7 @@ const EventComponent = (props: EventComponentProps) => {
       setState((prevState) => ({ ...prevState, retrieving: false }));
     }
 
-    const replyingTo = Events.getNoteReplyingTo(event);
+    const replyingTo = getNoteReplyingTo(event);
 
     const meta = {
       npub: Key.toNostrBech32Address(event.pubkey, 'npub'),

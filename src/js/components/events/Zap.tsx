@@ -3,6 +3,8 @@ import { BoltIcon } from '@heroicons/react/24/solid';
 import { Event } from 'nostr-tools';
 import { route } from 'preact-router';
 
+import { getEventReplyingTo, getZappingUser } from '@/nostr/utils.ts';
+
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Name from '../user/Name';
@@ -27,7 +29,7 @@ const messageClicked = (e: MouseEvent, zappedId: string) => {
 
 export default function Zap(props: Props) {
   const [allZaps, setAllZaps] = useState<string[]>([]);
-  const zappedId = Events.getEventReplyingTo(props.event);
+  const zappedId = getEventReplyingTo(props.event);
   const zappedEvent = Events.db.get(zappedId);
   const authorIsYou = zappedEvent?.pubkey === Key.getPubKey();
   const mentioned = zappedEvent?.tags?.find((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey());
@@ -51,7 +53,7 @@ export default function Zap(props: Props) {
 
   let zappingUser = null as string | null;
   try {
-    zappingUser = Events.getZappingUser(props.event.id);
+    zappingUser = getZappingUser(props.event);
   } catch (e) {
     console.error('no zapping user found for event', props.event.id, e);
     return '';

@@ -17,20 +17,11 @@ export default {
         return Events.db.get(eventId);
       })
       .slice(0, 50);
-    let dms = [] as Event[];
-    for (const set of Events.directMessagesByUser.values()) {
-      set.eventIds.forEach((eventId: any) => {
-        const dm = Events.db.get(eventId);
-        dm && dms.push(dm);
-      });
-    }
-    dms = dms.slice(0, 100);
     const kvEvents = Array.from(Events.keyValueEvents.values()).slice(0, 50);
 
     //localForage.setItem('latestMsgs', latestMsgs);
     //localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
     localForage.setItem('notificationEvents', notifications);
-    localForage.setItem('dms', dms);
     localForage.setItem('keyValueEvents', kvEvents);
     // TODO save own block and flag events
     //console.log('saved latestMsgs', latestMsgs.length);

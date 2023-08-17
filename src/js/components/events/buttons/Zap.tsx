@@ -5,6 +5,7 @@ import { useEffect, useState } from 'preact/hooks';
 import Show from '@/components/helpers/Show.tsx';
 import { useLocalState } from '@/LocalState.ts';
 import Key from '@/nostr/Key.ts';
+import { getZappingUser } from '@/nostr/utils.ts';
 import Icons from '@/utils/Icons.tsx';
 
 import Events from '../../../nostr/Events';
@@ -81,7 +82,7 @@ const Zap = ({ event }) => {
           console.log('Invalid zap, missing bolt11 tag');
           return;
         }
-        if (Events.getZappingUser(event?.id, false) === Key.getPubKey()) {
+        if (event && getZappingUser(event, false) === Key.getPubKey()) {
           zapped = true;
         }
         const decoded = decodeInvoice(bolt11);

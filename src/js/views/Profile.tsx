@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet';
 import { route } from 'preact-router';
 
 import SimpleImageModal from '@/components/modal/Image.tsx';
-import Events from '@/nostr/Events';
+import { getEventReplyingTo } from '@/nostr/utils.ts';
 
 import Copy from '../components/buttons/Copy';
 import Feed from '../components/feed/Feed';
@@ -135,7 +135,7 @@ class Profile extends View {
                 {
                   name: t('posts'),
                   filter: { authors: [this.state.hexPub], kinds: [1], limit: 10 },
-                  filterFn: (event) => !Events.getEventReplyingTo(event),
+                  filterFn: (event) => !getEventReplyingTo(event),
                   eventProps: { showRepliedMsg: true },
                 },
                 {

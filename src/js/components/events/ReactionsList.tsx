@@ -2,6 +2,8 @@ import { memo, useEffect, useState } from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link } from 'preact-router';
 
+import { getZappingUser } from '@/nostr/utils.ts';
+
 import Events from '../../nostr/Events'; // Import Events module
 import { decodeInvoice, formatAmount } from '../../utils/Lightning.ts';
 import Modal from '../modal/Modal';
@@ -58,7 +60,7 @@ const ReactionsList = ({ event }) => {
         const decoded = decodeInvoice(bolt11);
         const amount = (decoded?.amount || 0) / 1000;
         totalZapAmount += amount;
-        const zapper = Events.getZappingUser(zapEvent.id);
+        const zapper = getZappingUser(zapEvent);
         if (zapper) {
           const existing = zapData.get(zapper) || 0;
           zapData.set(zapper, existing + amount);

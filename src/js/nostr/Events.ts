@@ -11,11 +11,17 @@ import {
 import { EventTemplate } from 'nostr-tools';
 
 import EventDB from '@/nostr/EventDB.ts';
+import {
+  getEventReplyingTo,
+  getNoteReplyingTo,
+  getOriginalPostEventId,
+  getRepostedEventId,
+  isRepost,
+} from '@/nostr/utils.ts';
 import { ID, PUB, UniqueIds } from '@/utils/UniqueIds.ts';
 
 import localState from '../LocalState';
 import { Node } from '../LocalState';
-import SortedMap from '../utils/SortedMap';
 import { DecryptedEvent } from '../views/chat/ChatMessages';
 import { addGroup, setGroupNameByInvite } from '../views/chat/NewChat';
 
@@ -54,23 +60,6 @@ localState.get('dev').on((d) => {
   dev = d;
 });
 
-const sortByEventCreatedAt = (aId, bId) => {
-  const aEvent = Events.db.get(aId);
-  const bEvent = Events.db.get(bId);
-  if (!aEvent) {
-    return 1;
-  }
-  if (!bEvent) {
-    return -1;
-  }
-  if (aEvent.created_at > bEvent.created_at) {
-    return -1;
-  } else if (aEvent.created_at < bEvent.created_at) {
-    return 1;
-  }
-  return 0;
-};
-
 // TODO separate files for different types of events
 const Events = {
   DEFAULT_GLOBAL_FILTER,
@@ -79,17 +68,6 @@ const Events = {
   eventsMetaDb: new EventMetaStore(),
   seen: new Set<string>(),
   deletedEvents: new Set<string>(),
-  directMessagesByUser: new SortedMap<string, SortedLimitedEventSet>((a, b) => {
-    const aLatest = a.value.eventIds[0];
-    const bLatest = b.value.eventIds[0];
-    if (!aLatest) {
-      return 1;
-    }
-    if (!bLatest) {
-      return -1;
-    }
-    return sortByEventCreatedAt(aLatest, bLatest);
-  }),
   latestNotificationByTargetAndKind: new Map<string, string>(),
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   zapsByNote: new Map<string, SortedLimitedEventSet>(),
@@ -107,11 +85,11 @@ const Events = {
   handleNote(event: Event) {
     const has = this.db.get(event.id);
     if (!has) {
-      this.insert(event);
+      this.db.insert(event);
     }
 
-    const isRepost = this.isRepost(event);
-    const replyingTo = !isRepost && this.getNoteReplyingTo(event);
+    const eventIsRepost = isRepost(event);
+    const replyingTo = !eventIsRepost && getNoteReplyingTo(event);
     const myPub = Key.getPubKey();
 
     /*
@@ -120,7 +98,7 @@ const Events = {
     }
      */
 
-    if (replyingTo && !isRepost) {
+    if (replyingTo && !eventIsRepost) {
       const repliedMsgs = event.tags
         .filter((tag) => tag[0] === 'e')
         .map((tag) => tag[1])
@@ -140,43 +118,8 @@ const Events = {
       }
     }
   },
-  getRepostedEventId(event: Event) {
-    let id = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];
-    if (id) {
-      return id;
-    }
-    // last e tag is the reposted post
-    id = event.tags
-      .slice() // so we don't reverse event.tags in place
-      .reverse()
-      .find((tag: any) => tag[0] === 'e')?.[1];
-    return id;
-  },
-  getOriginalPostEventId(event: Event) {
-    return Events.isRepost(event) ? Events.getRepostedEventId(event) : event.id;
-  },
-  getNoteReplyingTo: function (event: Event) {
-    if (event.kind !== 1) {
-      return undefined;
-    }
-    return this.getEventReplyingTo(event);
-  },
-  getEventReplyingTo: function (event: Event) {
-    const replyTags = event.tags?.filter((tag) => tag[0] === 'e' && tag[3] !== 'mention');
-    if (replyTags.length === 1) {
-      return replyTags[0][1];
-    }
-    const replyTag = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'reply');
-    if (replyTag) {
-      return replyTag[1];
-    }
-    if (replyTags.length > 1) {
-      return replyTags[1][1];
-    }
-    return undefined;
-  },
   handleRepost(event: Event) {
-    const id = this.getRepostedEventId(event);
+    const id = getRepostedEventId(event);
     if (!id) return;
     if (!this.repostsByMessageId.has(id)) {
       this.repostsByMessageId.set(id, new Set());
@@ -194,7 +137,7 @@ const Events = {
       this.likesByMessageId.set(id, new Set());
     }
     this.likesByMessageId.get(id)?.add(event.pubkey);
-    this.insert(event);
+    this.db.insert(event);
   },
   handleFollow(event: Event) {
     const existing = Events.db.findOne({ kinds: [3], authors: [event.pubkey] });
@@ -204,7 +147,7 @@ const Events = {
     if (existing) {
       this.db.findAndRemove({ kinds: [3], authors: [event.pubkey] });
     }
-    this.insert(event);
+    this.db.insert(event);
     const myPub = Key.getPubKey();
 
     if (event.pubkey === myPub || SocialNetwork.isFollowing(myPub, event.pubkey)) {
@@ -291,9 +234,6 @@ const Events = {
       }
     }
   },
-  insert(event: Event) {
-    this.db.add(event);
-  },
   handleMetadata(event: Event) {
     if (!event.content?.length) {
       return;
@@ -306,7 +246,7 @@ const Events = {
       if (existing) {
         this.db.findAndRemove({ authors: [event.pubkey], kinds: [0] });
       }
-      this.insert(event);
+      this.db.insert(event);
       const profile = JSON.parse(event.content);
       // if we have previously deleted our account, log out. appease app store.
       if (event.pubkey === Key.getPubKey() && profile.deleted) {
@@ -340,7 +280,7 @@ const Events = {
     }
   },
   handleZap(event) {
-    this.insert(event);
+    this.db.insert(event);
     const zappedNote = event.tags?.find((tag) => tag[0] === 'e')?.[1];
     if (!zappedNote) {
       return; // TODO you can also zap profiles
@@ -403,18 +343,7 @@ const Events = {
       // ignore
     }
 
-    /*
-    // this would omit messages from groups
-    if (event.pubkey !== myPub && !this.directMessagesByUser.has(event.pubkey)) {
-      const distance = SocialNetwork.getFollowDistance(event.pubkey);
-      if (distance > globalFilter.maxFollowDistance) {
-        // follow distance too high, reject
-        return false;
-      }
-    }
-     */
-
-    this.insert(event);
+    this.db.insert(event);
     if (!maybeSecretChat) {
       this.saveDMToLocalState(event, localState.get('chats').get(chatId));
     }
@@ -465,16 +394,6 @@ const Events = {
       }
       this.keyValueEvents.set(key, event);
     }
-  },
-  isRepost(event: Event) {
-    if (event.kind === 6) {
-      return true;
-    }
-    const mentionIndex = event.tags?.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
-    if (event.kind === 1 && event.content === `#[${mentionIndex}]`) {
-      return true;
-    }
-    return false;
   },
   acceptEvent(event: Event) {
     // quick fix: disable follow distance filter when not logged in
@@ -560,7 +479,7 @@ const Events = {
     if (event.created_at > Date.now() / 1000) {
       this.futureEventIds.add(event);
       if (this.futureEventIds.has(event.id)) {
-        this.insert(event); // TODO should limit stored future events
+        this.db.insert(event); // TODO should limit stored future events
       }
       if (this.futureEventIds.first() === event.id) {
         this.handleNextFutureEvent();
@@ -582,7 +501,7 @@ const Events = {
         break;
       case 1:
         this.maybeAddNotification(event);
-        if (this.isRepost(event)) {
+        if (isRepost(event)) {
           this.handleRepost(event);
         } else {
           this.handleNote(event);
@@ -658,7 +577,7 @@ const Events = {
   },
   // metadata for an event: e.g. on which relays event was found on.
   handleEventMetadata({ url, event }: { url: string; event: Event }) {
-    const id = this.getOriginalPostEventId(event);
+    const id = getOriginalPostEventId(event);
     if (!id) {
       return;
     }
@@ -725,8 +644,8 @@ const Events = {
         }
       }
       if (!this.isMuted(event)) {
-        this.insert(event);
-        const target = this.getEventRoot(event) || this.getEventReplyingTo(event) || event.id; // TODO get thread root instead
+        this.db.insert(event);
+        const target = this.getEventRoot(event) || getEventReplyingTo(event) || event.id; // TODO get thread root instead
         const key = `${event.kind}-${target}`;
         const existing = this.latestNotificationByTargetAndKind.get(key); // also latestNotificationByAuthor?
         const existingEvent = existing && this.db.get(existing);
@@ -794,22 +713,6 @@ const Events = {
     event.id = getEventHash(event as Event);
     event.sig = await Key.sign(event as Event);
     return event as Event;
-  },
-  getZappingUser(eventId: string, npub = true) {
-    const description = Events.db.get(eventId)?.tags?.find((t) => t[0] === 'description')?.[1];
-    if (!description) {
-      return null;
-    }
-    let obj;
-    try {
-      obj = JSON.parse(description);
-    } catch (e) {
-      return null;
-    }
-    if (npub) {
-      Key.toNostrBech32Address(obj.pubkey, 'npub');
-    }
-    return obj.pubkey;
   },
   getLikes(id: string, cb?: (likedBy: Set<string>) => void): Unsubscribe {
     const callback = () => {

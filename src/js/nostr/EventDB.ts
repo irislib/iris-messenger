@@ -17,7 +17,7 @@ export default class EventDB {
     }
   }
 
-  add(event: Event): boolean {
+  insert(event: Event): boolean {
     if (!event || !event.id || !event.created_at) {
       throw new Error('Invalid event');
     }

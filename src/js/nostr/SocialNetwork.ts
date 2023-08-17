@@ -72,7 +72,7 @@ export default {
     if (block) {
       this.blockedUsers.add(blockedUserId);
       this.removeFollower(blockedUserId, myId);
-      Events.directMessagesByUser.delete(blockedUser);
+      // TODO delete dms by user
     } else {
       this.blockedUsers.delete(blockedUserId);
     }

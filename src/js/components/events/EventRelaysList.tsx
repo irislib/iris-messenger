@@ -1,18 +1,20 @@
-import { FC, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Event } from 'nostr-tools';
+
+import { getOriginalPostEventId } from '@/nostr/utils.ts';
 
 import Events from '../../nostr/Events';
 import { EventMetadata } from '../../nostr/EventsMeta';
 import { translate as t } from '../../translations/Translation.mjs';
 
-const EventRelaysList: FC<{ event: Event }> = ({ event }) => {
+const EventRelaysList = ({ event }: { event: Event }) => {
   const [eventMeta, setEventMeta] = useState(null as null | EventMetadata);
 
   useEffect(() => {
     if (!event?.id) {
       return;
     }
-    const id = Events.getOriginalPostEventId(event);
+    const id = getOriginalPostEventId(event);
     const val = id && Events.eventsMetaDb.get(id);
     if (val) {
       setEventMeta(val);

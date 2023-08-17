@@ -2,9 +2,9 @@ import CreateNoteForm from '@/components/create/CreateNoteForm';
 import FeedComponent from '@/components/feed/Feed';
 import Show from '@/components/helpers/Show';
 import OnboardingNotification from '@/components/OnboardingNotification';
-import Events from '@/nostr/Events';
 import Key from '@/nostr/Key';
 import { Unsubscribe } from '@/nostr/PubSub';
+import { getEventReplyingTo } from '@/nostr/utils.ts';
 import { translate as t } from '@/translations/Translation.mjs';
 import { ID, PUB } from '@/utils/UniqueIds.ts';
 
@@ -58,7 +58,7 @@ class Feed extends View {
                 {
                   name: t('posts'),
                   filter: { kinds: [1], authors: this.state.followedUsers, limit: 10 },
-                  filterFn: (event) => !Events.getEventReplyingTo(event),
+                  filterFn: (event) => !getEventReplyingTo(event),
                   eventProps: { showRepliedMsg: true },
                 },
                 {
