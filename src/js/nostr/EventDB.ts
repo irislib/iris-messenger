@@ -1,20 +1,22 @@
+import loki from 'lokijs';
 import { Event, matchFilter } from 'nostr-tools';
 
 import Filter from '@/nostr/Filter.ts';
-import SortedMap from '@/utils/SortedMap';
-import { ID, UID } from '@/utils/UniqueIds.ts';
 
 export default class EventDB {
-  private byId = new Map<UID, Event>();
-  private byAuthor = new Map<UID, SortedMap<string, UID>>();
-  private byKind = new Map<number, SortedMap<string, UID>>();
-  private byTag = new Map<string, SortedMap<string, UID>>();
-  private byAuthorAndKind = new Map<string, SortedMap<string, UID>>();
+  private db: any;
+  private eventsCollection: any;
+
+  constructor() {
+    this.db = new loki('EventDB');
+    this.eventsCollection = this.db.addCollection('events', {
+      unique: ['id'],
+      indices: ['pubkey', 'kind', 'tags', 'created_at'],
+    });
+  }
 
   get(id: any): Event | undefined {
-    if (typeof id === 'string') {
-      return this.byId.get(ID(id));
-    }
+    return this.eventsCollection.by('id', id);
   }
 
   insert(event: Event): boolean {
@@ -22,191 +24,63 @@ export default class EventDB {
       throw new Error('Invalid event');
     }
 
-    const id = ID(event.id);
-    if (this.byId.has(id)) {
+    if (this.get(event.id)) {
       return false;
     }
-    this.byId.set(id, event);
-
-    const author = ID(event.pubkey);
-    const indexKey = this.getIndexKey(event);
-
-    this.mapAdd(this.byAuthor, author, indexKey, id);
-    this.mapAdd(this.byKind, event.kind, indexKey, id);
-
-    if (event.tags) {
-      for (const tag of event.tags) {
-        if (['e', 'p'].includes(tag[0])) {
-          this.mapAdd(this.byTag, JSON.stringify(tag), indexKey, id);
-        }
-      }
-    }
-
-    const authorKindKey = `${event.pubkey}-${event.kind}`;
-    this.mapAdd(this.byAuthorAndKind, authorKindKey, indexKey, id);
+    this.eventsCollection.insert(event);
 
     return true;
   }
 
   remove(eventId: string): void {
-    const id = ID(eventId);
-    const event = this.byId.get(id);
-
-    if (event) {
-      const author = ID(event.pubkey);
-      const indexKey = this.getIndexKey(event);
-
-      this.mapRemove(this.byAuthor, author, indexKey);
-      this.mapRemove(this.byKind, event.kind, indexKey);
-
-      if (event.tags) {
-        for (const tag of event.tags) {
-          this.mapRemove(this.byTag, JSON.stringify(tag), indexKey);
-        }
-      }
-
-      const authorKindKey = `${event.pubkey}-${event.kind}`;
-      this.mapRemove(this.byAuthorAndKind, authorKindKey, indexKey);
-
-      this.byId.delete(id);
+    const doc = this.get(eventId);
+    if (doc) {
+      this.eventsCollection.remove(doc);
     }
   }
 
   find(filter: Filter, callback: (event: Event) => void): void {
+    const query: any = {};
+
     if (filter.ids) {
-      for (const id of filter.ids) {
-        const event = this.byId.get(ID(id));
-        event && callback(event);
+      query.id = { $in: filter.ids };
+    } else {
+      if (filter.authors) {
+        query.pubkey = { $in: filter.authors };
       }
-    } else if (filter.authors && filter.kinds) {
-      const authorKindKeys: string[] = [];
-      for (const author of filter.authors) {
-        for (const kind of filter.kinds) {
-          authorKindKeys.push(`${author}-${kind}`);
-        }
+      if (filter.kinds) {
+        query.kind = { $in: filter.kinds };
       }
-      this.iterateMap(authorKindKeys, this.byAuthorAndKind, filter, callback);
-    } else if (filter['#e']) {
-      const tags = filter['#e'].map((eventId) => JSON.stringify(['e', eventId]));
-      this.iterateMap(tags, this.byTag, filter, callback);
-    } else if (filter['#p']) {
-      const tags = filter['#p'].map((pubkey) => JSON.stringify(['p', pubkey]));
-      this.iterateMap(tags, this.byTag, filter, callback);
-    } else if (filter.authors) {
-      this.iterateMap(filter.authors.map(ID), this.byAuthor, filter, callback);
-    } else if (filter.kinds) {
-      this.iterateMap(filter.kinds, this.byKind, filter, callback);
+      if (filter['#e']) {
+        query.tags = { $contains: ['e', filter['#e']] };
+      }
+      if (filter['#p']) {
+        query.tags = { $contains: ['p', filter['#p']] };
+      }
     }
+
+    const results = this.eventsCollection
+      .chain()
+      .find(query)
+      .where((e: Event) => matchFilter(filter, e))
+      .simplesort('created_at', true)
+      .data();
+
+    results.forEach(callback);
   }
 
   findArray(filter: Filter): Event[] {
     const events: Event[] = [];
-    const findArrayCallback = (event: Event) => {
-      events.push(event);
-    };
-    this.find(filter, findArrayCallback);
+    this.find(filter, (event) => events.push(event));
     return events;
   }
 
   findAndRemove(filter: Filter) {
-    if (filter.ids) {
-      for (const id of filter.ids) {
-        this.remove(id);
-      }
-    } else if (filter.authors) {
-      this.iterateMap(filter.authors.map(ID), this.byAuthor, filter, (event) => {
-        this.remove(event.id);
-      });
-    } else if (filter.kinds) {
-      this.iterateMap(filter.kinds, this.byKind, filter, (event) => {
-        this.remove(event.id);
-      });
-    }
+    const eventsToRemove = this.findArray(filter);
+    eventsToRemove.forEach((event) => this.remove(event.id));
   }
 
   findOne(filter: Filter): Event | undefined {
-    let foundEvent: Event | undefined = undefined;
-
-    const findOneCallback = (event: Event) => {
-      if (!foundEvent) {
-        foundEvent = event;
-      }
-    };
-
-    this.find(filter, findOneCallback);
-
-    return foundEvent;
-  }
-
-  private padCreatedAt(createdAt: number): string {
-    return createdAt.toString().padStart(12, '0');
-  }
-
-  private getIndexKey(event: Event): string {
-    return this.padCreatedAt(event.created_at) + event.id.slice(0, 16);
-  }
-
-  private mapAdd<KeyType>(
-    map: Map<KeyType, SortedMap<string, UID>>,
-    key: KeyType,
-    indexKey: string,
-    id: UID,
-  ): void {
-    if (!map.has(key)) {
-      map.set(key, new SortedMap());
-    }
-    map.get(key)?.set(indexKey, id);
-  }
-
-  private mapRemove<KeyType>(
-    map: Map<KeyType, SortedMap<string, UID>>,
-    key: KeyType,
-    indexKey: string,
-  ): void {
-    const sortedMap = map.get(key);
-    if (sortedMap) {
-      sortedMap.delete(indexKey);
-      if (sortedMap.size === 0) {
-        map.delete(key);
-      }
-    }
-  }
-
-  private iterateMap<KeyType>(
-    keys: KeyType[],
-    map: Map<KeyType, SortedMap<string, UID>>,
-    filter: Filter,
-    callback: (event: Event) => void,
-  ) {
-    let count = 0;
-
-    for (const key of keys) {
-      const events = map.get(key);
-      if (events) {
-        // Calculate range based on since and until values from the filter
-        const rangeOptions: { gte?: string; lte?: string; direction?: 'desc' | 'asc' } = {
-          direction: 'desc',
-        };
-        if (filter.since) {
-          rangeOptions.gte = this.padCreatedAt(filter.since) + '0000000000000000'; // Add padding for full indexKey
-        }
-        if (filter.until) {
-          rangeOptions.lte = this.padCreatedAt(filter.until) + 'ffffffffffffffff'; // Add padding for full indexKey
-        }
-
-        // Iterate over the events in the specified range
-        for (const { value: eventId } of events.range(rangeOptions)) {
-          if (filter.limit !== undefined && count >= filter.limit) {
-            return;
-          }
-
-          const event = this.byId.get(eventId);
-          if (event && matchFilter(filter, event)) {
-            callback(event);
-            count++;
-          }
-        }
-      }
-    }
+    return this.findArray(filter)[0];
   }
 }

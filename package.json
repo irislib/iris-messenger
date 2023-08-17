@@ -29,6 +29,7 @@
     "light-bolt11-decoder": "^3.0.0",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
+    "lokijs": "^1.5.12",
     "nostr-relaypool": "^0.6.28",
     "nostr-tools": "^1.14.0",
     "preact": "^10.17.0",
