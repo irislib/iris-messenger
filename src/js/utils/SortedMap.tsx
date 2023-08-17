@@ -57,6 +57,22 @@ export default class SortedMap<K, V> {
     return this.map.get(key);
   }
 
+  last(): { key: K; value: V } | undefined {
+    if (this.sortedKeys.length === 0) {
+      return undefined;
+    }
+    const key = this.sortedKeys[this.sortedKeys.length - 1];
+    return { key, value: this.map.get(key) as V };
+  }
+
+  first(): { key: K; value: V } | undefined {
+    if (this.sortedKeys.length === 0) {
+      return undefined;
+    }
+    const key = this.sortedKeys[0];
+    return { key, value: this.map.get(key) as V };
+  }
+
   *[Symbol.iterator](): Iterator<{ key: K; value: V }> {
     for (const key of this.sortedKeys) {
       yield { key, value: this.map.get(key) as V };
