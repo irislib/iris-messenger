@@ -134,13 +134,13 @@ class Profile extends View {
               filterOptions={[
                 {
                   name: t('posts'),
-                  filter: { authors: [this.state.hexPub], kinds: [1], limit: 10 },
+                  filter: { authors: [this.state.hexPub], kinds: [1, 6], limit: 10 },
                   filterFn: (event) => !getEventReplyingTo(event),
                   eventProps: { showRepliedMsg: true },
                 },
                 {
                   name: t('posts_and_replies'),
-                  filter: { authors: [this.state.hexPub], kinds: [1], limit: 5 },
+                  filter: { authors: [this.state.hexPub], kinds: [1, 6], limit: 5 },
                   eventProps: { showRepliedMsg: true, fullWidth: false },
                 },
                 {

@@ -13,6 +13,7 @@ import EventDB from '@/nostr/EventDB.ts';
 import {
   getEventReplyingTo,
   getEventRoot,
+  getLikedEventId,
   getNoteReplyingTo,
   getOriginalPostEventId,
   getRepostedEventId,
@@ -124,7 +125,7 @@ const Events = {
     }
   },
   handleReaction(event: Event) {
-    const id = event.tags?.reverse().find((tag: any) => tag[0] === 'e')?.[1]; // last e tag is the liked post
+    const id = getLikedEventId(event);
     if (!id) return;
     if (!this.likesByMessageId.has(id)) {
       this.likesByMessageId.set(id, new Set());

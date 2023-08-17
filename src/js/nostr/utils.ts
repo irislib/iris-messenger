@@ -74,3 +74,13 @@ export function getEventRoot(event: Event) {
   // first e tag
   return event?.tags?.find((t) => t[0] === 'e')?.[1];
 }
+
+export function getLikedEventId(event: Event) {
+  if (!event.tags) {
+    return undefined;
+  }
+  return event.tags
+    .slice()
+    .reverse()
+    .find((tag: any) => tag[0] === 'e')?.[1];
+}
