@@ -2,6 +2,7 @@ import loki from 'lokijs';
 import { Event, matchFilter } from 'nostr-tools';
 
 import Filter from '@/nostr/Filter.ts';
+import { ID, STR } from '@/utils/UniqueIds.ts';
 
 class EventDB {
   private db: any;
@@ -16,17 +17,59 @@ class EventDB {
   }
 
   get(id: any): Event | undefined {
-    return this.eventsCollection.by('id', id);
+    const event = this.eventsCollection.by('id', id);
+    if (event) {
+      return this.unpack(event);
+    }
+  }
+
+  // map to internal UIDs to save memory
+  private pack(event: Event) {
+    const clone: any = { ...event };
+    clone.tags = event.tags.map((tag) => {
+      if (['e', 'p'].includes(tag[0])) {
+        return [tag[0], ID(tag[1])];
+      } else {
+        return tag;
+      }
+    });
+    clone.pubkey = ID(event.pubkey);
+    clone.id = ID(event.id);
+    return clone;
+  }
+
+  private unpack(packedEvent: any): Event {
+    const original: any = { ...packedEvent };
+    delete original.flatTags;
+    delete original.$loki;
+    delete original.meta;
+
+    // Convert every ID back to original tag[1], tag[2], ...
+    original.tags = packedEvent.tags.map((tag) => {
+      if (['e', 'p'].includes(tag[0])) {
+        return [tag[0], STR(tag[1])];
+      } else {
+        return tag;
+      }
+    });
+    original.pubkey = STR(packedEvent.pubkey);
+    original.id = STR(packedEvent.id);
+
+    return original as Event;
   }
 
   insert(event: Event): boolean {
+    // TODO map tags to UIDs
+
     if (!event || !event.id || !event.created_at) {
       throw new Error('Invalid event');
     }
 
+    const clone = this.pack(event);
+    const flatTags = clone.tags.filter((tag) => tag[0] === 'e').map((tag) => tag.join('_'));
+
     try {
-      const flatTags = event.tags.filter((tag) => tag[0] === 'e').map((tag) => tag.join('_'));
-      this.eventsCollection.insert({ ...event, flatTags });
+      this.eventsCollection.insert({ ...clone, flatTags });
     } catch (e) {
       return false;
     }
@@ -43,6 +86,7 @@ class EventDB {
 
   find(filter: Filter, callback: (event: Event) => void): void {
     this.findArray(filter).forEach((event) => {
+      // TODO map UID tags to STR
       callback(event);
     });
   }
@@ -90,7 +134,8 @@ class EventDB {
         }
         return true;
       })
-      .simplesort('created_at', true);
+      .simplesort('created_at', true)
+      .map((e) => this.unpack(e));
 
     if (filter.limit) {
       chain = chain.limit(filter.limit);

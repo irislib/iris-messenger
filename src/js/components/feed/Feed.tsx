@@ -58,6 +58,8 @@ const Feed = (props: FeedProps) => {
 
   const isEmpty = events.length === 0;
 
+  const infiniteScrollKeyString = `${infiniteScrollKey}-${displayAs}-${filterOption.name}`;
+
   return (
     <>
       <Show when={hasNewEvents}>
@@ -98,10 +100,10 @@ const Feed = (props: FeedProps) => {
       </Show>
       <Show when={isEmpty}>{emptyMessage || 'No Posts'}</Show>
       <Show when={displayAs === 'grid'}>
-        <ImageGrid key={`${infiniteScrollKey}grid`} events={events} loadMore={loadMore} />
+        <ImageGrid key={infiniteScrollKeyString} events={events} loadMore={loadMore} />
       </Show>
       <Show when={displayAs === 'feed'}>
-        <InfiniteScroll key={`${infiniteScrollKey}feed`} loadMore={loadMore}>
+        <InfiniteScroll key={`${infiniteScrollKeyString}feed`} loadMore={loadMore}>
           {events.map((event) => {
             // is this inefficient? should we rather pass a component function + list of events?
             if (event.created_at > showUntil) {
