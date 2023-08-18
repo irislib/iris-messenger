@@ -95,21 +95,21 @@ class EventDB {
     const query: any = {};
 
     if (filter.ids) {
-      query.id = { $in: filter.ids };
+      query.id = { $in: filter.ids.map(ID) };
     } else {
       if (filter.authors) {
-        query.pubkey = { $in: filter.authors };
+        query.pubkey = { $in: filter.authors.map(ID) };
       }
       if (filter.kinds) {
         query.kind = { $in: filter.kinds };
       }
       if (filter['#e']) {
         // hmm $contains doesn't seem to use binary indexes
-        query.flatTags = { $contains: 'e_' + filter['#e'] };
+        query.flatTags = { $contains: 'e_' + filter['#e'].map(ID) };
       }
       if (filter['#p']) {
         // not indexing for now
-        //query.flatTags = { $contains: 'p_' + filter['#p'] };
+        //query.flatTags = { $contains: 'p_' + filter['#p'].map(ID) };
       }
       if (filter.since && filter.until) {
         query.created_at = { $between: [filter.since, filter.until] };
@@ -126,9 +126,6 @@ class EventDB {
       .chain()
       .find(query)
       .where((e: Event) => {
-        if (!matchFilter(filter, e)) {
-          return false;
-        }
         if (filter.keywords && !filter.keywords.some((keyword) => e.content?.includes(keyword))) {
           return false;
         }
