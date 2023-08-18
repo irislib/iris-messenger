@@ -66,10 +66,10 @@ const InfiniteScroll: React.FC<Props> = ({ children, margin = 2000, loadMore }) 
   }, [children.length, displayCount, margin, loadMoreWithCooldown]);
 
   return (
-    <div>
-      {React.Children.toArray(children).slice(0, displayCount)}
+    <>
+      {children.slice(0, displayCount)}
       <div ref={sentinelRef}></div>
-    </div>
+    </>
   );
 };
 
