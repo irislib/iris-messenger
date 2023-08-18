@@ -81,7 +81,15 @@ class EventDB {
     let chain = this.eventsCollection
       .chain()
       .find(query)
-      .where((e: Event) => matchFilter(filter, e))
+      .where((e: Event) => {
+        if (!matchFilter(filter, e)) {
+          return false;
+        }
+        if (filter.keywords && !filter.keywords.some((keyword) => e.content?.includes(keyword))) {
+          return false;
+        }
+        return true;
+      })
       .simplesort('created_at', true);
 
     if (filter.limit) {
