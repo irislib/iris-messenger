@@ -60,5 +60,39 @@ describe('EventDB', () => {
     const foundEvent = db.findOne(filter);
     expect(foundEvent).toEqual(testEvent);
   });
+});
 
+describe('EventDB find tests', () => {
+  let eventDB: EventDB;
+
+  beforeEach(() => {
+    eventDB = new EventDB();
+    events.forEach((event) => {
+      eventDB.insert(event);
+    });
+  });
+
+  test('should find events by kind filter', () => {
+    const foundEvents = eventDB.findArray({ kinds: [4], limit: 10 });
+    expect(foundEvents.length).toEqual(10);
+    expect(foundEvents.every((event) => event.kind === 4)).toBe(true);
+  });
+
+  test('should find events by author filter', () => {
+    const author = '4523be58d395b1b196a9b8c82b038b6895cb02b683d0c253a955068dba1facd0';
+    const foundEvents = eventDB.findArray({ authors: [author], limit: 10 });
+    expect(foundEvents.length).toEqual(10);
+    expect(foundEvents.every((event) => event.pubkey === author)).toBe(true);
+  });
+
+  test('should find events by author and kind filter', () => {
+    const author = '4523be58d395b1b196a9b8c82b038b6895cb02b683d0c253a955068dba1facd0';
+    const foundEvents = eventDB.findArray({
+      authors: [author],
+      kinds: [4],
+      limit: 10,
+    });
+    expect(foundEvents.length).toEqual(10);
+    expect(foundEvents.every((event) => event.pubkey === author && event.kind === 4)).toBe(true);
+  });
 });
