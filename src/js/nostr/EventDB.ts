@@ -80,10 +80,8 @@ export class EventDB {
   }
 
   remove(eventId: string): void {
-    const doc = this.get(ID(eventId));
-    if (doc) {
-      this.eventsCollection.remove(doc);
-    }
+    const id = ID(eventId);
+    this.eventsCollection.findAndRemove({ id });
   }
 
   find(filter: Filter, callback: (event: Event) => void): void {
@@ -94,33 +92,7 @@ export class EventDB {
   }
 
   findArray(filter: Filter): Event[] {
-    const query: any = {};
-
-    if (filter.ids) {
-      query.id = { $in: filter.ids.map(ID) };
-    } else {
-      if (filter.authors) {
-        query.pubkey = { $in: filter.authors.map(ID) };
-      }
-      if (filter.kinds) {
-        query.kind = { $in: filter.kinds };
-      }
-      if (filter['#e']) {
-        // hmm $contains doesn't seem to use binary indexes
-        query.flatTags = { $contains: 'e_' + filter['#e'].map(ID) };
-      } else if (filter['#p']) {
-        query.flatTags = { $contains: 'p_' + filter['#p'].map(ID) };
-      }
-      if (filter.since && filter.until) {
-        query.created_at = { $between: [filter.since, filter.until] };
-      }
-      if (filter.since) {
-        query.created_at = { $gte: filter.since };
-      }
-      if (filter.until) {
-        query.created_at = { $lte: filter.until };
-      }
-    }
+    const query: any = this.constructQuery(filter);
 
     let chain = this.eventsCollection
       .chain()
@@ -141,8 +113,39 @@ export class EventDB {
   }
 
   findAndRemove(filter: Filter) {
-    const eventsToRemove = this.findArray(filter);
-    eventsToRemove.forEach((event) => this.remove(event.id));
+    const query: any = this.constructQuery(filter);
+    this.eventsCollection.findAndRemove(query);
+  }
+
+  private constructQuery(filter: Filter): any {
+    const query: any = {};
+
+    if (filter.ids) {
+      query.id = { $in: filter.ids.map(ID) };
+    } else {
+      if (filter.authors) {
+        query.pubkey = { $in: filter.authors.map(ID) };
+      }
+      if (filter.kinds) {
+        query.kind = { $in: filter.kinds };
+      }
+      if (filter['#e']) {
+        query.flatTags = { $contains: 'e_' + filter['#e'].map(ID) };
+      } else if (filter['#p']) {
+        query.flatTags = { $contains: 'p_' + filter['#p'].map(ID) };
+      }
+      if (filter.since && filter.until) {
+        query.created_at = { $between: [filter.since, filter.until] };
+      }
+      if (filter.since) {
+        query.created_at = { $gte: filter.since };
+      }
+      if (filter.until) {
+        query.created_at = { $lte: filter.until };
+      }
+    }
+
+    return query;
   }
 
   findOne(filter: Filter): Event | undefined {

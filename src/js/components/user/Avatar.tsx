@@ -28,6 +28,7 @@ type State = {
 class MyAvatar extends Component<Props, State> {
   activityTimeout?: ReturnType<typeof setTimeout>;
   unsub: Unsubscribe | undefined;
+  hex: string | null = null;
 
   updateAvatar() {
     const hash = sha256(this.props.str as string);
@@ -53,9 +54,9 @@ class MyAvatar extends Component<Props, State> {
 
     this.updateAvatar();
 
-    const nostrAddr = Key.toNostrHexAddress(pub);
-    if (nostrAddr) {
-      this.unsub = SocialNetwork.getProfile(nostrAddr, (profile) => {
+    this.hex = Key.toNostrHexAddress(pub);
+    if (this.hex) {
+      this.unsub = SocialNetwork.getProfile(this.hex, (profile) => {
         profile &&
           this.setState({
             // TODO why profile undefined sometimes?
@@ -84,7 +85,7 @@ class MyAvatar extends Component<Props, State> {
       this.state.picture &&
       !this.state.hasError &&
       !this.props.hidePicture &&
-      !SocialNetwork.isBlocked(this.props.str as string);
+      !SocialNetwork.isBlocked(this.hex as string);
     const hasPictureStyle = hasPicture ? 'has-picture' : '';
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
 
