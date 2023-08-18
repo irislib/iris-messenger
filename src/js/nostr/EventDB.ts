@@ -80,7 +80,7 @@ class EventDB {
   }
 
   remove(eventId: string): void {
-    const doc = this.get(eventId);
+    const doc = this.get(ID(eventId));
     if (doc) {
       this.eventsCollection.remove(doc);
     }
