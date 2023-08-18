@@ -27,8 +27,6 @@ export class MyDexie extends Dexie {
   }
 }
 
-const INITIAL_EVENT_LOAD_LIMIT = 5000;
-
 const db = new MyDexie();
 
 const handleEvent = (event: Event & { id: string }) => {

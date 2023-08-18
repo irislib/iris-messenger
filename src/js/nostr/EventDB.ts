@@ -1,5 +1,5 @@
 import loki from 'lokijs';
-import { Event, matchFilter } from 'nostr-tools';
+import { Event } from 'nostr-tools';
 
 import Filter from '@/nostr/Filter.ts';
 import { ID, STR } from '@/utils/UniqueIds.ts';
@@ -66,7 +66,9 @@ class EventDB {
     }
 
     const clone = this.pack(event);
-    const flatTags = clone.tags.filter((tag) => tag[0] === 'e').map((tag) => tag.join('_'));
+    const flatTags = clone.tags
+      .filter((tag) => ['e', 'p'].includes(tag[0]))
+      .map((tag) => tag.join('_'));
 
     try {
       this.eventsCollection.insert({ ...clone, flatTags });
@@ -106,10 +108,8 @@ class EventDB {
       if (filter['#e']) {
         // hmm $contains doesn't seem to use binary indexes
         query.flatTags = { $contains: 'e_' + filter['#e'].map(ID) };
-      }
-      if (filter['#p']) {
-        // not indexing for now
-        //query.flatTags = { $contains: 'p_' + filter['#p'].map(ID) };
+      } else if (filter['#p']) {
+        query.flatTags = { $contains: 'p_' + filter['#p'].map(ID) };
       }
       if (filter.since && filter.until) {
         query.created_at = { $between: [filter.since, filter.until] };
