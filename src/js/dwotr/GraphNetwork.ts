@@ -6,9 +6,9 @@ import { MAX_DEGREE } from './model/TrustScore';
 import dwotrDB from './network/DWoTRDexie';
 import { debounce } from 'lodash';
 import { MonitorItem } from './model/MonitorItem';
-import { ID, PUB } from '../nostr/UserIds';
 import { TrustScoreEvent } from './network/TrustScoreEvent';
 import Key from '@/nostr/Key';
+import { ID, STR } from '@/utils/UniqueIds';
 
 export type ResolveTrustCallback = (result: any) => any;
 
@@ -318,7 +318,7 @@ class GraphNetwork {
 
     for (let v of vertices) {
       if (since < v.timestamp) since = v.timestamp;
-      authors.push(PUB(v.id));
+      authors.push(STR(v.id));
     }
 
     vertices.forEach((v) => (v.subscribed = id)); // Mark the vertices as subscribed with the current subscription counter
