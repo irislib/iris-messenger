@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import localForage from 'localforage';
-import _ from 'lodash';
+import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 
 export type Unsubscribe = () => void;
 
@@ -34,7 +35,7 @@ export class Node {
     this.parent = parent;
   }
 
-  saveLocalForage = _.throttle(async () => {
+  saveLocalForage = throttle(async () => {
     if (!this.loaded) {
       await this.loadLocalForage();
     }
@@ -48,7 +49,7 @@ export class Node {
     }
   }, 500);
 
-  loadLocalForage = _.throttle(async () => {
+  loadLocalForage = throttle(async () => {
     if (notInLocalForage.has(this.id)) {
       return undefined;
     }
@@ -77,7 +78,7 @@ export class Node {
     return result;
   }, 500);
 
-  doCallbacks = _.debounce(
+  doCallbacks = debounce(
     () => {
       for (const [id, callback] of this.on_subscriptions) {
         const unsubscribe = () => this.on_subscriptions.delete(id);
@@ -126,7 +127,7 @@ export class Node {
     }
     if (typeof value === 'object' && value !== null) {
       this.value = undefined;
-      await Promise.all(_.map(value, (val, key) => this.get(key).put(val)));
+      await Promise.all(Object.entries(value).map(([key, val]) => this.get(key).put(val)));
     } else {
       this.children = new Map();
       this.value = value;

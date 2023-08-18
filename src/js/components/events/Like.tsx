@@ -3,6 +3,9 @@ import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { Event } from 'nostr-tools';
 import { route } from 'preact-router';
 
+import EventDB from '@/nostr/EventDB.ts';
+import { getEventReplyingTo } from '@/nostr/utils.ts';
+
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Name from '../user/Name';
@@ -27,8 +30,8 @@ const messageClicked = (e: MouseEvent, likedId: string) => {
 
 export default function Like(props: Props) {
   const [allLikes, setAllLikes] = useState<string[]>([]);
-  const likedId = Events.getEventReplyingTo(props.event);
-  const likedEvent = Events.db.by('id', likedId);
+  const likedId = getEventReplyingTo(props.event);
+  const likedEvent = EventDB.get(likedId);
   const authorIsYou = likedEvent?.pubkey === Key.getPubKey();
   const mentioned = likedEvent?.tags?.find((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey());
   const likeText = authorIsYou

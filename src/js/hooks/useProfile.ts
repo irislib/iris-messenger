@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { ID } from '../nostr/UserIds';
+import { ID } from '../utils/UniqueIds.ts';
 import profileManager from '../dwotr/ProfileManager';
 
 export const useProfile = (address: string) => {

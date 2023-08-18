@@ -5,7 +5,6 @@ import CreateNoteForm from '@/components/create/CreateNoteForm';
 import Reactions from '@/components/events/buttons/ReactionButtons';
 import Show from '@/components/helpers/Show';
 import HyperText from '@/components/HyperText';
-import Torrent from '@/components/Torrent';
 import localState from '@/LocalState';
 import SocialNetwork from '@/nostr/SocialNetwork';
 import { translate as t } from '@/translations/Translation.mjs';
@@ -28,7 +27,16 @@ localState.get('settings').on((s) => {
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
 
-const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta, wot }) => {
+type Props = {
+  standalone?: boolean;
+  isQuote?: boolean;
+  fullWidth?: boolean;
+  asInlineQuote?: boolean;
+  event: any;
+  isPreview?: boolean;
+};
+
+const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, isPreview }: Props) => {
   const [translatedText, setTranslatedText] = useState('');
   const [showMore, setShowMore] = useState(false);
   const [name, setName] = useState('');
@@ -63,13 +71,13 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta, w
   }
 
   text =
-    text.length > MSG_TRUNCATE_LENGTH && !showMore && !standalone
+    text.length > MSG_TRUNCATE_LENGTH && !showMore && !standalone && !isPreview
       ? `${text.slice(0, MSG_TRUNCATE_LENGTH)}...`
       : text;
 
   const lines = text.split('\n');
   text =
-    lines.length > MSG_TRUNCATE_LINES && !showMore && !standalone
+    lines.length > MSG_TRUNCATE_LINES && !showMore && !standalone && !isPreview
       ? `${lines.slice(0, MSG_TRUNCATE_LINES).join('\n')}...`
       : text;
 
@@ -84,6 +92,7 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta, w
   return (
     <div className={`flex-grow`}>
       <Author
+        isPreview={isPreview}
         standalone={standalone}
         event={event}
         isQuote={isQuote}
@@ -92,9 +101,6 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta, w
       />
       <Show when={standalone}>
         <Helmet name={name} text={text} attachments={attachments} />
-      </Show>
-      <Show when={meta.torrentId}>
-        <Torrent torrentId={meta.torrentId} autopause={!standalone} />
       </Show>
       <Show when={text?.length > 0}>
         <div
@@ -110,7 +116,7 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta, w
           </Show>
         </div>
       </Show>
-      <Show when={!asInlineQuote && !standalone && isTooLong()}>
+      <Show when={!isPreview && !asInlineQuote && !standalone && isTooLong()}>
         <a
           className="text-sm link mb-2"
           onClick={(e) => {
@@ -121,7 +127,7 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta, w
           {t(`show_${showMore ? 'less' : 'more'}`)}
         </a>
       </Show>
-      <Show when={!asInlineQuote && loadReactions}>
+      <Show when={!isPreview && !asInlineQuote && loadReactions}>
         <Reactions
           key={event.id + 'reactions'}
           settings={{ showLikes, showZaps, showReposts }}
@@ -136,7 +142,6 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, meta, w
       <Show when={standalone}>
         <hr className="-mx-2 opacity-10 my-2" />
         <CreateNoteForm
-          waitForFocus={true}
           autofocus={!standalone}
           replyingTo={event.id}
           placeholder={t('write_your_reply')}

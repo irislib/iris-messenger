@@ -1,6 +1,5 @@
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Link, route } from 'preact-router';
-import styled from 'styled-components';
 
 import Component from '../BaseComponent';
 import localState from '../LocalState';
@@ -43,20 +42,6 @@ const SUGGESTED_FOLLOWS = [
     '"Lover of memes, maker of videos"',
   ], // carla
 ];
-
-const NoFollowersWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  position: relative;
-`;
-
-const CloseIconWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  cursor: pointer;
-`;
 
 export default class OnboardingNotification extends Component {
   componentDidMount() {
@@ -107,10 +92,13 @@ export default class OnboardingNotification extends Component {
 
   renderNoFollowers() {
     return (
-      <NoFollowersWrapper>
-        <CloseIconWrapper onClick={() => localState.get('noFollowers').put(false)}>
+      <div className="flex flex-col flex-1 relative">
+        <div
+          className="absolute top-0 right-0 cursor-pointer"
+          onClick={() => localState.get('noFollowers').put(false)}
+        >
           <XMarkIcon width={24} />
-        </CloseIconWrapper>
+        </div>
         <p>{t('no_followers_yet')}</p>
         <div className="flex gap-2 my-2">
           <Copy
@@ -129,7 +117,7 @@ export default class OnboardingNotification extends Component {
         {this.state.showQrModal && (
           <QRModal onClose={() => this.setState({ showQrModal: false })} pub={Key.getPubKey()} />
         )}
-      </NoFollowersWrapper>
+      </div>
     );
   }
 

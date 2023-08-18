@@ -9,7 +9,16 @@ import EventDropdown from '../EventDropdown';
 
 import Avatar from './Avatar';
 
-const Author = ({ event, fullWidth, isQuote, standalone, setTranslatedText }) => {
+type Props = {
+  event: any;
+  fullWidth?: boolean;
+  isQuote?: boolean;
+  standalone?: boolean;
+  setTranslatedText?: any;
+  isPreview?: boolean;
+};
+
+const Author = ({ event, fullWidth, isQuote, standalone, setTranslatedText, isPreview }: Props) => {
   const { time, dateStr, timeStr } = useMemo(() => {
     const t = new Date(event.created_at * 1000);
     const dStr = t.toLocaleString(window.navigator.language, {
@@ -26,7 +35,7 @@ const Author = ({ event, fullWidth, isQuote, standalone, setTranslatedText }) =>
   }, [event.created_at]);
 
   return (
-    <div className="flex items-center gap-2 justify-between">
+    <div className="flex items-center gap-2">
       <Show when={fullWidth}>
         <Avatar event={event} isQuote={isQuote} standalone={standalone} fullWidth={fullWidth} />
       </Show>
@@ -47,7 +56,7 @@ const Author = ({ event, fullWidth, isQuote, standalone, setTranslatedText }) =>
           </small>
         </div>
       </div>
-      <Show when={!isQuote}>
+      <Show when={!isQuote && !isPreview}>
         <div className="flex-1 flex items-center justify-end">
           <EventDropdown id={event.id} event={event} onTranslate={setTranslatedText} />
         </div>

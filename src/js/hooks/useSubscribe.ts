@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { throttle } from 'lodash';
-import { Event, Filter } from 'nostr-tools';
+import throttle from 'lodash/throttle';
+import { Event } from 'nostr-tools';
 
+import Filter from '@/nostr/Filter';
 import PubSub from '@/nostr/PubSub';
-import SortedEventMap from '@/utils/SortedEventMap';
+import SortedMap from '@/utils/SortedMap.tsx';
 
 const useSubscribe = (ops: {
   filter: Filter;
@@ -12,7 +13,7 @@ const useSubscribe = (ops: {
   mergeSubscriptions?: boolean;
   enabled?: boolean;
 }) => {
-  const sortedEvents = useRef(new SortedEventMap());
+  const sortedEvents = useRef(new SortedMap<string, Event>());
   const [loadMoreFilter, setLoadMoreFilter] = useState<Filter | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const lastUntilRef = useRef<number | null>(null);
@@ -28,17 +29,15 @@ const useSubscribe = (ops: {
   const handleEvent = (event: Event) => {
     if (sortedEvents.current.has(event.id)) return;
     if (filterFn && !filterFn(event)) return;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     if (filter.keywords && !filter.keywords.some((keyword) => event.content?.includes(keyword))) {
       return;
     }
-    sortedEvents.current.add(event);
-    setEvents(sortedEvents.current.events());
+    sortedEvents.current.set(event.created_at + event.id, event);
+    setEvents([...sortedEvents.current.values()].reverse());
   };
 
   useEffect(() => {
-    sortedEvents.current = new SortedEventMap();
+    sortedEvents.current = new SortedMap<string, Event>();
   }, [filter, filterFn]);
 
   useEffect(() => {
@@ -56,7 +55,7 @@ const useSubscribe = (ops: {
   }, [loadMoreFilter]);
 
   const loadMore = throttle(() => {
-    const until = sortedEvents.current.last()?.created_at;
+    const until = sortedEvents.current.last()?.value.created_at;
 
     if (!until || lastUntilRef.current === until) return;
 

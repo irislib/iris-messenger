@@ -1,20 +1,28 @@
-import { debounce } from 'lodash';
-import Loki from 'lokijs';
+import debounce from 'lodash/debounce';
 import {
   Event,
-  Filter,
   getEventHash,
   getPublicKey,
-  matchFilter,
   nip04,
   validateEvent,
   verifySignature,
 } from 'nostr-tools';
 import { EventTemplate } from 'nostr-tools';
 
+import EventDB from '@/nostr/EventDB.ts';
+import {
+  getEventReplyingTo,
+  getEventRoot,
+  getLikedEventId,
+  getNoteReplyingTo,
+  getOriginalPostEventId,
+  getRepostedEventId,
+  isRepost,
+} from '@/nostr/utils.ts';
+import { ID, STR, UniqueIds } from '@/utils/UniqueIds.ts';
+
 import localState from '../LocalState';
 import { Node } from '../LocalState';
-import SortedMap from '../utils/SortedMap';
 import { DecryptedEvent } from '../views/chat/ChatMessages';
 import { addGroup, setGroupNameByInvite } from '../views/chat/NewChat';
 
@@ -22,34 +30,17 @@ import EventMetaStore from './EventsMeta';
 import FuzzySearch from './FuzzySearch.ts';
 import IndexedDB from './IndexedDB';
 import Key from './Key';
-import LocalForage from './LocalForage';
 import PubSub, { Unsubscribe } from './PubSub';
 import Relays from './Relays';
 import Session from './Session';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
-import { ID, PUB, UserIds } from './UserIds';
 import profileManager from '../dwotr/ProfileManager';
 
 const startTime = Date.now() / 1000;
 
 const MAX_LATEST_MSGS = 500;
 const MAX_ZAPS_BY_NOTE = 1000;
-
-const db = new Loki('iris');
-const events = db.addCollection('events', {
-  indices: ['created_at', 'pubkey', 'kind'],
-  unique: ['id'],
-});
-
-// print event db size
-/*
-setInterval(() => {
-  console.log('event db size', events.count());
-}, 1000);
- */
-
-// add collections for Tags and Users?
 
 let mutedNotes;
 localState.get('mutedNotes').on((v) => {
@@ -70,48 +61,18 @@ localState.get('dev').on((d) => {
   dev = d;
 });
 
-const sortByEventCreatedAt = (aId, bId) => {
-  const aEvent = Events.db.by('id', aId);
-  const bEvent = Events.db.by('id', bId);
-  if (!aEvent) {
-    return 1;
-  }
-  if (!bEvent) {
-    return -1;
-  }
-  if (aEvent.created_at > bEvent.created_at) {
-    return -1;
-  } else if (aEvent.created_at < bEvent.created_at) {
-    return 1;
-  }
-  return 0;
-};
-
 // TODO separate files for different types of events
 const Events = {
   DEFAULT_GLOBAL_FILTER,
   getEventHash,
-  db: events, // TODO gb2 own indexing with Maps. easier to evict & understand what it actually does
   eventsMetaDb: new EventMetaStore(),
   seen: new Set<string>(),
   deletedEvents: new Set<string>(),
-  directMessagesByUser: new SortedMap<string, SortedLimitedEventSet>((a, b) => {
-    const aLatest = a.value.eventIds[0];
-    const bLatest = b.value.eventIds[0];
-    if (!aLatest) {
-      return 1;
-    }
-    if (!bLatest) {
-      return -1;
-    }
-    return sortByEventCreatedAt(aLatest, bLatest);
-  }),
   latestNotificationByTargetAndKind: new Map<string, string>(),
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   zapsByNote: new Map<string, SortedLimitedEventSet>(),
   keyValueEvents: new Map<string, Event>(),
   threadRepliesByMessageId: new Map<string, Set<string>>(),
-  directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
   repostsByMessageId: new Map<string, Set<string>>(),
   handledMsgsPerSecond: 0,
@@ -122,27 +83,16 @@ const Events = {
   myBlockEvent: null as Event | null,
   myFlagEvent: null as Event | null,
   handleNote(event: Event) {
-    const has = this.db.by('id', event.id);
+    const has = EventDB.get(event.id);
     if (!has) {
-      this.insert(event);
+      EventDB.insert(event);
     }
 
-    const isRepost = this.isRepost(event);
-    const replyingTo = !isRepost && this.getNoteReplyingTo(event);
+    const eventIsRepost = isRepost(event);
+    const replyingTo = !eventIsRepost && getNoteReplyingTo(event);
     const myPub = Key.getPubKey();
 
-    /*
-    if (changed && LocalForage.loaded) {
-      LocalForage.saveEvents();
-    }
-     */
-
-    if (replyingTo && !isRepost) {
-      if (!this.directRepliesByMessageId.has(replyingTo)) {
-        this.directRepliesByMessageId.set(replyingTo, new Set<string>());
-      }
-      this.directRepliesByMessageId.get(replyingTo)?.add(event.id);
-
+    if (replyingTo && !eventIsRepost) {
       const repliedMsgs = event.tags
         .filter((tag) => tag[0] === 'e')
         .map((tag) => tag[1])
@@ -162,43 +112,8 @@ const Events = {
       }
     }
   },
-  getRepostedEventId(event: Event) {
-    let id = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];
-    if (id) {
-      return id;
-    }
-    // last e tag is the reposted post
-    id = event.tags
-      .slice() // so we don't reverse event.tags in place
-      .reverse()
-      .find((tag: any) => tag[0] === 'e')?.[1];
-    return id;
-  },
-  getOriginalPostEventId(event: Event) {
-    return Events.isRepost(event) ? Events.getRepostedEventId(event) : event.id;
-  },
-  getNoteReplyingTo: function (event: Event) {
-    if (event.kind !== 1) {
-      return undefined;
-    }
-    return this.getEventReplyingTo(event);
-  },
-  getEventReplyingTo: function (event: Event) {
-    const replyTags = event.tags?.filter((tag) => tag[0] === 'e' && tag[3] !== 'mention');
-    if (replyTags.length === 1) {
-      return replyTags[0][1];
-    }
-    const replyTag = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'reply');
-    if (replyTag) {
-      return replyTag[1];
-    }
-    if (replyTags.length > 1) {
-      return replyTags[1][1];
-    }
-    return undefined;
-  },
   handleRepost(event: Event) {
-    const id = this.getRepostedEventId(event);
+    const id = getRepostedEventId(event);
     if (!id) return;
     if (!this.repostsByMessageId.has(id)) {
       this.repostsByMessageId.set(id, new Set());
@@ -210,28 +125,24 @@ const Events = {
     }
   },
   handleReaction(event: Event) {
-    const id = event.tags?.reverse().find((tag: any) => tag[0] === 'e')?.[1]; // last e tag is the liked post
+    const id = getLikedEventId(event);
     if (!id) return;
     if (!this.likesByMessageId.has(id)) {
       this.likesByMessageId.set(id, new Set());
     }
     this.likesByMessageId.get(id)?.add(event.pubkey);
-    this.insert(event);
+    EventDB.insert(event);
   },
   handleFollow(event: Event) {
-    const existing = Events.db.findOne({ kind: 3, pubkey: event.pubkey });
+    const existing = EventDB.findOne({ kinds: [3], authors: [event.pubkey] });
     if (existing && existing.created_at >= event.created_at) {
       return;
     }
     if (existing) {
-      this.db.findAndRemove({ kind: 3, pubkey: event.pubkey });
+      EventDB.findAndRemove({ kinds: [3], authors: [event.pubkey] });
     }
-    this.insert(event);
+    EventDB.insert(event);
     const myPub = Key.getPubKey();
-
-    if (event.pubkey === myPub || SocialNetwork.isFollowing(myPub, event.pubkey)) {
-      LocalForage.loaded && LocalForage.saveProfilesAndFollows();
-    }
 
     if (event.tags) {
       for (const tag of event.tags) {
@@ -250,7 +161,7 @@ const Events = {
       for (const previouslyFollowed of SocialNetwork.followedByUser.get(ID(event.pubkey)) || []) {
         if (
           !event.tags ||
-          !event.tags?.find((t) => t[0] === 'p' && t[1] === PUB(previouslyFollowed))
+          !event.tags?.find((t) => t[0] === 'p' && t[1] === STR(previouslyFollowed))
         ) {
           SocialNetwork.removeFollower(previouslyFollowed, ID(event.pubkey));
         }
@@ -313,15 +224,6 @@ const Events = {
       }
     }
   },
-  insert(event: Event) {
-    try {
-      delete event['$loki'];
-      this.db.insert(event); // this seems to add .meta and .$loki on the object which is inconvenient
-    } catch (e) {
-      // console.log('failed to insert event', e, typeof e);
-      // suppress error on duplicate insert. lokijs should throw a different error kind?
-    }
-  },
   handleMetadata(event: Event) {
     if (!event.content?.length) {
       return false;
@@ -351,15 +253,15 @@ const Events = {
     const id = event.tags?.find((tag) => tag[0] === 'e')?.[1];
     const myPub = Key.getPubKey();
     if (id) {
-      const deletedEvent = this.db.by('id', id);
+      const deletedEvent = EventDB.get(id);
       // only we or the author can delete
       if (deletedEvent && [event.pubkey, myPub].includes(deletedEvent.pubkey)) {
-        this.db.findAndRemove({ id });
+        EventDB.remove(id);
       }
     }
   },
   handleZap(event) {
-    this.insert(event);
+    EventDB.insert(event);
     const zappedNote = event.tags?.find((tag) => tag[0] === 'e')?.[1];
     if (!zappedNote) {
       return; // TODO you can also zap profiles
@@ -422,18 +324,7 @@ const Events = {
       // ignore
     }
 
-    /*
-    // this would omit messages from groups
-    if (event.pubkey !== myPub && !this.directMessagesByUser.has(event.pubkey)) {
-      const distance = SocialNetwork.getFollowDistance(event.pubkey);
-      if (distance > globalFilter.maxFollowDistance) {
-        // follow distance too high, reject
-        return false;
-      }
-    }
-     */
-
-    this.insert(event);
+    EventDB.insert(event);
     if (!maybeSecretChat) {
       this.saveDMToLocalState(event, localState.get('chats').get(chatId));
     }
@@ -485,16 +376,6 @@ const Events = {
       this.keyValueEvents.set(key, event);
     }
   },
-  isRepost(event: Event) {
-    if (event.kind === 6) {
-      return true;
-    }
-    const mentionIndex = event.tags?.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
-    if (event.kind === 1 && event.content === `#[${mentionIndex}]`) {
-      return true;
-    }
-    return false;
-  },
   acceptEvent(event: Event) {
     // quick fix: disable follow distance filter when not logged in
     if (globalFilter.maxFollowDistance && !!Key.getPubKey()) {
@@ -508,7 +389,7 @@ const Events = {
           console.log('what', event);
           return false;
         }
-        if (UserIds.has(event.pubkey) && SocialNetwork.getFollowDistance(event.pubkey)) {
+        if (UniqueIds.has(event.pubkey) && SocialNetwork.getFollowDistance(event.pubkey)) {
           const distance = SocialNetwork.followDistanceByUser.get(ID(event.pubkey));
           if (distance && distance > globalFilter.maxFollowDistance) {
             // follow distance too high, reject
@@ -543,25 +424,6 @@ const Events = {
     }
     return true;
   },
-  find(filter: Filter, callback: (event: Event) => void) {
-    const query = {};
-    if (filter.authors) {
-      query['pubkey'] = { $in: filter.authors };
-    }
-    if (filter.kinds) {
-      query['kind'] = { $in: filter.kinds };
-    }
-    this.db
-      .chain()
-      .find(query)
-      .where((e) => matchFilter(filter, e))
-      .simplesort('created_at', { desc: true })
-      .limit(filter.limit || Infinity)
-      .data()
-      .forEach((e) => {
-        callback(e);
-      });
-  },
   handle(event: Event & { id: string }, force = false, saveToIdb = true, retries = 2): boolean {
     if (!event) return false;
     if (!force && this.seen.has(event.id)) {
@@ -595,7 +457,7 @@ const Events = {
     if (event.created_at > Date.now() / 1000) {
       this.futureEventIds.add(event);
       if (this.futureEventIds.has(event.id)) {
-        this.insert(event); // TODO should limit stored future events
+        EventDB.insert(event); // TODO should limit stored future events
       }
       if (this.futureEventIds.first() === event.id) {
         this.handleNextFutureEvent();
@@ -617,7 +479,7 @@ const Events = {
         break;
       case 1:
         this.maybeAddNotification(event);
-        if (this.isRepost(event)) {
+        if (isRepost(event)) {
           this.handleRepost(event);
         } else {
           this.handleNote(event);
@@ -629,13 +491,15 @@ const Events = {
       case 5:
         this.handleDelete(event);
         break;
-      case 3:
-        if (Events.db.findOne({ kind: 3, pubkey: event.pubkey })?.created_at >= event.created_at) {
+      case 3: {
+        const foundEvent = EventDB.findOne({ kinds: [3], authors: [event.pubkey] });
+        if (foundEvent && foundEvent.created_at >= event.created_at) {
           return false;
         }
         this.maybeAddNotification(event);
         this.handleFollow(event);
         break;
+      }
       case 6:
         this.maybeAddNotification(event);
         this.handleRepost(event);
@@ -670,18 +534,18 @@ const Events = {
     // TODO: don't save e.g. old profile & follow events
     // TODO since we're only querying relays since lastSeen, we need to store all beforeseen events and correctly query them on demand
     // otherwise feed will be incomplete
-    if (saveToIdb) {
-      const followDistance = SocialNetwork.followDistanceByUser.get(ID(event.pubkey)) || Infinity;
+    if (saveToIdb && dev.indexedDbSave !== false) {
+      const followDistance = SocialNetwork.getFollowDistance(event.pubkey);
+
       if (followDistance <= 1) {
-        // save all our own events and events from people we follow
-        if (dev.indexedDbSave !== false) {
-          IndexedDB.saveEvent(event as Event & { id: string });
-        }
+        IndexedDB.saveEvent(event as Event & { id: string });
+      } else if (
+        [2, 3].includes(followDistance) &&
+        event.tags.some((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey())
+      ) {
+        IndexedDB.saveEvent(event as Event & { id: string });
       } else if (followDistance <= 4 && [0, 3, 4].includes(event.kind)) {
-        // save profiles and follow events up to follow distance 4
-        if (dev.indexedDbSave !== false) {
-          IndexedDB.saveEvent(event as Event & { id: string });
-        }
+        IndexedDB.saveEvent(event as Event & { id: string });
       }
     }
 
@@ -691,7 +555,7 @@ const Events = {
   },
   // metadata for an event: e.g. on which relays event was found on.
   handleEventMetadata({ url, event }: { url: string; event: Event }) {
-    const id = this.getOriginalPostEventId(event);
+    const id = getOriginalPostEventId(event);
     if (!id) {
       return;
     }
@@ -703,7 +567,7 @@ const Events = {
     }
     clearTimeout(this.futureEventTimeout);
     const nextEventId = this.futureEventIds.first();
-    const nextEvent = this.db.by('id', nextEventId);
+    const nextEvent = nextEventId && EventDB.get(nextEventId);
     if (!nextEvent) {
       return;
     }
@@ -733,14 +597,6 @@ const Events = {
     }
     return muted;
   },
-  getEventRoot(event: Event) {
-    const rootEvent = event?.tags?.find((t) => t[0] === 'e' && t[3] === 'root')?.[1];
-    if (rootEvent) {
-      return rootEvent;
-    }
-    // first e tag
-    return event?.tags?.find((t) => t[0] === 'e')?.[1];
-  },
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
     if (event.tags?.filter((tag) => tag[0] === 'p').length > 10) {
@@ -758,12 +614,12 @@ const Events = {
         }
       }
       if (!this.isMuted(event)) {
-        this.insert(event);
-        const target = this.getEventRoot(event) || this.getEventReplyingTo(event) || event.id; // TODO get thread root instead
+        EventDB.insert(event);
+        const target = getEventRoot(event) || getEventReplyingTo(event) || event.id; // TODO get thread root instead
         const key = `${event.kind}-${target}`;
         const existing = this.latestNotificationByTargetAndKind.get(key); // also latestNotificationByAuthor?
-        const existingEvent = existing && this.db.by('id', existing);
-        if (!existing || existingEvent.created_at < event.created_at) {
+        const existingEvent = existing && EventDB.get(existing);
+        if (!existingEvent || existingEvent.created_at < event.created_at) {
           existing && this.notifications.delete(existing);
           this.notifications.add(event);
           this.latestNotificationByTargetAndKind.set(key, event.id);
@@ -780,8 +636,8 @@ const Events = {
     }
     let count = 0;
     for (const id of Events.notifications.eventIds) {
-      const event = Events.db.by('id', id);
-      if (event?.created_at > Events.notificationsSeenTime) {
+      const event = EventDB.get(id);
+      if (event && event.created_at > Events.notificationsSeenTime) {
         count++;
       } else {
         break;
@@ -791,9 +647,6 @@ const Events = {
     localState.get('unseenNotificationCount').put(count);
   }, 1000),
   publish: async function (event: Partial<Event>): Promise<Event> {
-    // for some reason these hang around
-    delete event['$loki'];
-    delete event['meta'];
     if (!event.sig) {
       await this.sign(event as EventTemplate);
     }
@@ -813,10 +666,8 @@ const Events = {
       .reverse()
       .slice(0, 10);
     for (const ref of referredEvents || []) {
-      const referredEvent = this.db.by('id', ref[1]);
+      const referredEvent = EventDB.get(ref[1]);
       if (referredEvent) {
-        delete referredEvent.meta;
-        delete referredEvent.$loki;
         PubSub.publish(referredEvent);
       }
     }
@@ -833,30 +684,6 @@ const Events = {
     event.sig = await Key.sign(event as Event);
     return event as Event;
   },
-  getZappingUser(eventId: string, npub = true) {
-    const description = Events.db.by('id', eventId)?.tags?.find((t) => t[0] === 'description')?.[1];
-    if (!description) {
-      return null;
-    }
-    let obj;
-    try {
-      obj = JSON.parse(description);
-    } catch (e) {
-      return null;
-    }
-    if (npub) {
-      Key.toNostrBech32Address(obj.pubkey, 'npub');
-    }
-    return obj.pubkey;
-  },
-  getReplies(id: string, cb?: (replies: Set<string>) => void): Unsubscribe {
-    const callback = () => {
-      cb?.(this.directRepliesByMessageId.get(id) ?? new Set());
-    };
-    callback();
-    return PubSub.subscribe({ '#e': [id], kinds: [1] }, callback, false);
-  },
-
   getLikes(id: string, cb?: (likedBy: Set<string>) => void): Unsubscribe {
     const callback = () => {
       cb?.(this.likesByMessageId.get(id) ?? new Set());
@@ -898,7 +725,7 @@ const Events = {
         cb?.(event);
       }
     };
-    const event = this.db.by('id', id);
+    const event = EventDB.get(id);
     if (event) {
       callback(event);
       return;

@@ -1,4 +1,4 @@
-import { ID } from '../../nostr/UserIds';
+import { ID } from '../../utils/UniqueIds.ts';
 
 import Badge from './Badge';
 import useVerticeMonitor from '../../dwotr/hooks/useVerticeMonitor';

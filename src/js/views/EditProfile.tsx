@@ -1,4 +1,4 @@
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';

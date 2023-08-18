@@ -2,11 +2,11 @@ import CreateNoteForm from '@/components/create/CreateNoteForm';
 import FeedComponent from '@/components/feed/Feed';
 import Show from '@/components/helpers/Show';
 import OnboardingNotification from '@/components/OnboardingNotification';
-import Events from '@/nostr/Events';
 import Key from '@/nostr/Key';
 import { Unsubscribe } from '@/nostr/PubSub';
-import { ID, PUB } from '@/nostr/UserIds';
+import { getEventReplyingTo } from '@/nostr/utils.ts';
 import { translate as t } from '@/translations/Translation.mjs';
+import { ID, STR } from '@/utils/UniqueIds.ts';
 
 import SocialNetwork from '../../nostr/SocialNetwork';
 import View from '../View';
@@ -18,7 +18,7 @@ class Feed extends View {
     super();
     const followedUsers: string[] = Array.from(
       SocialNetwork.followedByUser.get(ID(Key.getPubKey())) || [],
-    ).map((n) => PUB(n));
+    ).map((n) => STR(n));
     this.state = {
       followedUsers,
     };
@@ -57,13 +57,13 @@ class Feed extends View {
               filterOptions={[
                 {
                   name: t('posts'),
-                  filter: { kinds: [1], authors: this.state.followedUsers, limit: 10 },
-                  filterFn: (event) => !Events.getEventReplyingTo(event),
+                  filter: { kinds: [1, 6], authors: this.state.followedUsers, limit: 10 },
+                  filterFn: (event) => !getEventReplyingTo(event),
                   eventProps: { showRepliedMsg: true },
                 },
                 {
                   name: t('posts_and_replies'),
-                  filter: { kinds: [1], authors: this.state.followedUsers, limit: 5 },
+                  filter: { kinds: [1, 6], authors: this.state.followedUsers, limit: 5 },
                   eventProps: { showRepliedMsg: true, fullWidth: false },
                 },
               ]}

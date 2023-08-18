@@ -1,5 +1,4 @@
 import Component from '../BaseComponent';
-import { PrimaryButton } from '../components/buttons/Button';
 import Header from '../components/Header';
 import { translate as t } from '../translations/Translation.mjs';
 
@@ -48,7 +47,7 @@ class Subscribe extends Component {
               </label>
             </p>
             <p>
-              <PrimaryButton>Subscribe</PrimaryButton>
+              <button className="btn btn-primary">Subscribe</button>
             </p>
 
             <h3>Iris Titan</h3>
@@ -64,7 +63,7 @@ class Subscribe extends Component {
               <b>1000 €</b> one-time payment.
             </p>
             <p>
-              <PrimaryButton>Subscribe</PrimaryButton>
+              <button className="btn btn-primary">Subscribe</button>
             </p>
             <br />
             <br />

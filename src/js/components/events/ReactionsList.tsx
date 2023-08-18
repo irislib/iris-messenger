@@ -2,6 +2,9 @@ import { memo, useEffect, useState } from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link } from 'preact-router';
 
+import EventDB from '@/nostr/EventDB.ts';
+import { getZappingUser } from '@/nostr/utils.ts';
+
 import Events from '../../nostr/Events'; // Import Events module
 import { decodeInvoice, formatAmount } from '../../utils/Lightning.ts';
 import Modal from '../modal/Modal';
@@ -56,9 +59,9 @@ const ReactionsList = ({ event, wot }) => {
     const handleZaps = (zaps) => {
       const zapData = new Map<string, number>();
       let totalZapAmount = 0;
-      const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.by('id', eventId));
+      const zapEvents = Array.from(zaps?.values()).map((eventId) => EventDB.get(eventId));
       zapEvents.forEach((zapEvent) => {
-        const bolt11 = zapEvent?.tags.find((tag) => tag[0] === 'bolt11')[1];
+        const bolt11 = zapEvent?.tags.find((tag) => tag[0] === 'bolt11')?.[1];
         if (!bolt11) {
           console.log('Invalid zap, missing bolt11 tag');
           return;
@@ -66,7 +69,7 @@ const ReactionsList = ({ event, wot }) => {
         const decoded = decodeInvoice(bolt11);
         const amount = (decoded?.amount || 0) / 1000;
         totalZapAmount += amount;
-        const zapper = Events.getZappingUser(zapEvent.id);
+        const zapper = getZappingUser(zapEvent);
         if (zapper) {
           const existing = zapData.get(zapper) || 0;
           zapData.set(zapper, existing + amount);

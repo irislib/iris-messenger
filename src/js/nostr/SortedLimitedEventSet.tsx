@@ -49,7 +49,7 @@ export default class SortedLimitedEventSet {
         created_at: event.created_at,
       };
       this.eventIdSet.add(event.id);
-      // TODO evict deleted event from Events.db if not indexed anywhere else
+      // TODO evict deleted event from EventDB if not indexed anywhere else
     } else {
       // If the set is full and the new event has an older timestamp, do nothing
       return false;

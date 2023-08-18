@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet';
 import { route } from 'preact-router';
 
 import SimpleImageModal from '@/components/modal/Image.tsx';
-import Events from '@/nostr/Events';
+import { getEventReplyingTo } from '@/nostr/utils.ts';
 
 import Copy from '../components/buttons/Copy';
 import Feed from '../components/feed/Feed';
@@ -110,13 +110,13 @@ class Profile extends View {
               filterOptions={[
                 {
                   name: t('posts'),
-                  filter: { authors: [this.state.hexPub], kinds: [1], limit: 10 },
-                  filterFn: (event) => !Events.getEventReplyingTo(event),
+                  filter: { authors: [this.state.hexPub], kinds: [1, 6], limit: 10 },
+                  filterFn: (event) => !getEventReplyingTo(event),
                   eventProps: { showRepliedMsg: true },
                 },
                 {
                   name: t('posts_and_replies'),
-                  filter: { authors: [this.state.hexPub], kinds: [1], limit: 5 },
+                  filter: { authors: [this.state.hexPub], kinds: [1, 6], limit: 5 },
                   eventProps: { showRepliedMsg: true, fullWidth: false },
                 },
                 {
@@ -163,7 +163,7 @@ class Profile extends View {
           fullBanner = banner;
           banner = isSafeOrigin(banner)
             ? banner
-            : `https://imgproxy.iris.to/insecure/rs:fill:948:192/plain/${banner}`;
+            : `https://imgproxy.iris.to/insecure/rs:fit:948:948/plain/${banner}`;
           this.setState({ banner, fullBanner });
         } catch (e) {
           console.log('Invalid banner URL', profile.banner);

@@ -11,7 +11,6 @@ export interface IProps {
 
 export interface IState {
   attachments?: any[];
-  torrentId?: string;
   mentioning?: string;
   focused?: boolean;
   text: string;

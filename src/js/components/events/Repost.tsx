@@ -3,6 +3,8 @@ import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { Event } from 'nostr-tools';
 import { Link } from 'preact-router';
 
+import { getRepostedEventId } from '@/nostr/utils.ts';
+
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
@@ -18,7 +20,7 @@ interface Props {
 
 export default function Repost(props: Props) {
   const [allReposts, setAllReposts] = useState<string[]>([]);
-  const repostedEventId = Events.getRepostedEventId(props.event) || '';
+  const repostedEventId = getRepostedEventId(props.event) || '';
 
   useEffect(() => {
     if (props.notification) {

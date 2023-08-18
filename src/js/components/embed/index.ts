@@ -21,7 +21,6 @@ import LightningUri from './LightningUri';
 import SoundCloud from './SoundCloud';
 import Tidal from './Tidal';
 import TikTok from './TikTok';
-import Torrent from './Torrent';
 import Twitter from './Twitter';
 import Url from './Url';
 import Video from './Video';
@@ -60,7 +59,6 @@ export const allEmbeds = [
   Twitch,
   TwitchChannel,
   WavLake,
-  Torrent,
   LightningUri,
   NostrNpub,
   NostrEvent,

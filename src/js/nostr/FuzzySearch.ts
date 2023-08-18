@@ -1,5 +1,5 @@
 import Fuse from 'fuse.js';
-import _ from 'lodash';
+import throttle from 'lodash/throttle';
 
 import localState from '../LocalState.ts';
 
@@ -10,7 +10,7 @@ const options = {
   threshold: 0.3,
 };
 
-const notifyUpdate = _.throttle(() => {
+const notifyUpdate = throttle(() => {
   localState.get('searchIndexUpdated').put(true);
 }, 2000);
 
