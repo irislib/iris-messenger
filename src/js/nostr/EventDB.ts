@@ -4,7 +4,7 @@ import { Event } from 'nostr-tools';
 import Filter from '@/nostr/Filter.ts';
 import { ID, STR } from '@/utils/UniqueIds.ts';
 
-class EventDB {
+export class EventDB {
   private db: any;
   private eventsCollection: any;
 
@@ -131,14 +131,13 @@ class EventDB {
         }
         return true;
       })
-      .simplesort('created_at', true)
-      .map((e) => this.unpack(e));
+      .simplesort('created_at', true);
 
     if (filter.limit) {
       chain = chain.limit(filter.limit);
     }
 
-    return chain.data();
+    return chain.data().map((e) => this.unpack(e));
   }
 
   findAndRemove(filter: Filter) {
