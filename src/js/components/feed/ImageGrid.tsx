@@ -62,7 +62,7 @@ const ImageGrid = ({ events, loadMore }: ImageGridProps) => {
       <InfiniteScroll loadMore={loadMore}>
         {mediaItems.map((item, index) => (
           <ImageGridItem
-            key={`grid-${item.url}`}
+            key={`grid-${item.url}-${index}`}
             item={item}
             index={index}
             setActiveItemIndex={setActiveItemIndex}
