@@ -1,4 +1,4 @@
-import * as bech32 from 'bech32-buffer'; /* eslint-disable-line @typescript-eslint/no-var-requires */
+//import * as bech32 from 'bech32-buffer'; /* eslint-disable-line @typescript-eslint/no-var-requires */
 import { Event } from 'nostr-tools';
 import Graph, { Edge, EdgeRecord, EntityType, Vertice } from './model/Graph';
 import WOTPubSub from './network/WOTPubSub';
@@ -8,7 +8,7 @@ import { debounce } from 'lodash';
 import { MonitorItem } from './model/MonitorItem';
 import { ID, PUB } from '../nostr/UserIds';
 import { TrustScoreEvent } from './network/TrustScoreEvent';
-import Helpers from '@/Helpers';
+import Key from '@/nostr/Key';
 
 export type ResolveTrustCallback = (result: any) => any;
 
@@ -150,8 +150,11 @@ class GraphNetwork {
   }
 
   addToProcessScoreQueue(outV: Vertice, inV: Vertice) {
-    if (outV.degree > this.maxDegree) return; // No need to update the score
+    // Why is outV sometimes undefined?
+    if(!outV) console.log("addToProcessScoreQueue: outV is undefined, inV: " + inV);
 
+    if (!outV || outV.degree > this.maxDegree) return; // No need to update the score
+    
     if (outV.degree == this.maxDegree) {
       this.processItems[inV.id as number] = true; // Add the vertice to the list of items to process
     } else {
@@ -346,7 +349,9 @@ class GraphNetwork {
 
   async setTrustAndProcess(to: string, from:string, entityType: EntityType, val: number, note: string, context: string, timestamp: number) {
     if(!to || to.length < 2) return;
-    to = graphNetwork.getHexKey(to);
+    //to = graphNetwork.getHexKey(to);
+    to = Key.toNostrHexAddress(to) as string;
+
 
     // Add the Trust Event to the memory Graph and IndexedDB
     let { outV, inV, change } = await graphNetwork.setTrust(
@@ -406,16 +411,16 @@ class GraphNetwork {
   }
 
   // Should be a little faster than Key.toNostrHexAddress, but less secure
-  getHexKey(key: string): string {
-    let address = key?.slice(0, 4).toLocaleLowerCase();
-    if (address === 'npub' || address === 'nsec' || address === 'note') {
-      const { prefix, data } = bech32.decode(key);
-      const addr = Helpers.arrayToHex(data);
-      return addr;
-    }
+  // getHexKey(key: string): string {
+  //   let address = key?.slice(0, 4).toLocaleLowerCase();
+  //   if (address === 'npub' || address === 'nsec' || address === 'note') {
+  //     const { prefix, data } = bech32.decode(key);
+  //     const addr = Helpers.arrayToHex(data);
+  //     return addr;
+  //   }
 
-    return key;
-  }
+  //   return key;
+  // }
 }
 
 const graphNetwork = new GraphNetwork(WOTPubSub, dwotrDB);

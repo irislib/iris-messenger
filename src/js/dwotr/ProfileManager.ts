@@ -5,7 +5,6 @@ import PubSub, { Unsubscribe } from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { ID, PUB } from '../nostr/UserIds';
 import Key from '../nostr/Key';
-import FuzzySearch from '../FuzzySearch';
 import ProfileRecord, { ProfileMemory } from './model/ProfileRecord';
 import { throttle } from 'lodash';
 import Identicon from 'identicon.js';
@@ -13,6 +12,7 @@ import OneCallQueue from './Utils/OneCallQueue';
 import storage from './Storage';
 import { hexName } from './Utils';
 import { ProfileEvent } from './network/ProfileEvent';
+import FuzzySearch from '@/nostr/FuzzySearch';
 
 class ProfileManager {
   loaded: boolean = false;

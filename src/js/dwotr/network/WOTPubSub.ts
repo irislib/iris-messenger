@@ -16,12 +16,11 @@ export interface EntityItem {
   entityType: EntityType;
 }
 
-const WOTPubSub = {
-  PubSub,
+class WOTPubSub {
+  unsubs = new Map<string, Set<string>>();
 
-  unsubs: new Map<string, Set<string>>(),
 
-  subscribeTrust(authors: string[], since: number, cb: OnEvent): Unsubscribe {
+  subscribeTrust(authors: string[] | undefined, since: number | undefined, cb: OnEvent): Unsubscribe {
     let relays = Relays.enabledRelays();
 
     let filter = {
@@ -29,6 +28,7 @@ const WOTPubSub = {
       authors,
       since,
     };
+
 
     const unsub = PubSub.relayPool.subscribe(
       [filter],
@@ -48,13 +48,13 @@ const WOTPubSub = {
     );
 
     return unsub;
-  },
+  }
 
   createTrustEventFromEdge(edge: EdgeRecord) {
     // pubkey should be in hex format
     let event = this.createTrustEvent(edge.to, edge.type, edge.note, edge.context, edge.entityType);
     return event;
-  },
+  }
 
   createMultiEvent(
     entities: EntityItem[],
@@ -82,7 +82,7 @@ const WOTPubSub = {
       ],
     };
     return event;
-  },
+  }
 
   createTrustEvent(
     entityPubkey: string,
@@ -112,7 +112,7 @@ const WOTPubSub = {
       ],
     };
     return event;
-  },
+  }
 
   publishTrust(
     entityPubkey: string,
@@ -129,7 +129,7 @@ const WOTPubSub = {
     console.log("Publishing trust event", event);
 
     PubSub.publish(event);
-  },
+  }
 
   parseTrustEvent(event: Event) {
     let pTags: Array<string> = [];
@@ -166,7 +166,7 @@ const WOTPubSub = {
     if (isNaN(val) || val < -1 || val > 1) val = 0; // Invalid value, the default to 0
 
     return { pTags, eTags, context, d, v, val, note, authorPubkey, timestamp };
-  },
+  }
 
   sign(event: Partial<Event>) {
     if (!event.sig) {
@@ -183,29 +183,31 @@ const WOTPubSub = {
       console.error('Invalid event', event);
       throw new Error('Invalid event');
     }
-  },
+  }
 
   getTimestamp(date: number = Date.now()): number {
     return Math.floor(date / 1000);
-  },
+  }
 
-  // Load up profiles form the IndexedDB and subscribe to new ones
-  // Makes sure we have all the known profiles in memory
-  loadProfiles(addresses: string[]): Unsubscribe {
-    let missingAddresses = addresses.filter((a) => !SocialNetwork.profiles.has(ID(a)));
+  // // Load up profiles form the IndexedDB and subscribe to new ones
+  // // Makes sure we have all the known profiles in memory
+  // loadProfiles(addresses: string[]): Unsubscribe {
+  //   let missingAddresses = addresses.filter((a) => !SocialNetwork.profiles.has(ID(a)));
 
-    let callback = (event: Event) => {
-      if (!event.content) return; // no content
-      let existing = SocialNetwork.profiles.get(ID(event.pubkey));
-      if (existing) return; // already have it
+  //   let callback = (event: Event) => {
+  //     if (!event.content) return; // no content
+  //     let existing = SocialNetwork.profiles.get(ID(event.pubkey));
+  //     if (existing) return; // already have it
 
-      let profile = JSON.parse(event.content) as any;
+  //     let profile = JSON.parse(event.content) as any;
 
-      profileManager.addProfileToMemory(profile);
-    };
+  //     profileManager.addProfileToMemory(profile);
+  //   };
 
-    return PubSub.subscribe({ kinds: [0], authors: missingAddresses }, callback, false);
-  },
-};
+  //   return PubSub.subscribe({ kinds: [0], authors: missingAddresses }, callback, false);
+  // }
+}
 
-export default WOTPubSub;
+const wotPubSub = new WOTPubSub();
+
+export default wotPubSub;
