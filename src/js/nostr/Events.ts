@@ -19,7 +19,7 @@ import {
   getRepostedEventId,
   isRepost,
 } from '@/nostr/utils.ts';
-import { ID, STR, UniqueIds } from '@/utils/UniqueIds.ts';
+import { ID, STR, UID, UniqueIds } from '@/utils/UniqueIds.ts';
 
 import localState from '../LocalState';
 import { Node } from '../LocalState';
@@ -65,7 +65,7 @@ const Events = {
   DEFAULT_GLOBAL_FILTER,
   getEventHash,
   eventsMetaDb: new EventMetaStore(),
-  seen: new Set<string>(),
+  seen: new Set<UID>(),
   deletedEvents: new Set<string>(),
   latestNotificationByTargetAndKind: new Map<string, string>(),
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
@@ -437,7 +437,8 @@ const Events = {
   },
   handle(event: Event & { id: string }, force = false, saveToIdb = true, retries = 2): boolean {
     if (!event) return false;
-    if (!force && this.seen.has(event.id)) {
+    const id = ID(event.id);
+    if (!force && this.seen.has(id)) {
       return false;
     }
     if (!force && !this.acceptEvent(event)) {
@@ -476,7 +477,7 @@ const Events = {
       return false;
     }
 
-    this.seen.add(event.id);
+    this.seen.add(id);
 
     this.handledMsgsPerSecond++;
 
@@ -610,7 +611,7 @@ const Events = {
   },
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
-    if (event.tags?.filter((tag) => tag[0] === 'p').length > 10) {
+    if (event.kind !== 3 && event.tags?.filter((tag) => tag[0] === 'p').length > 10) {
       // no hellthreads please. TODO: make configurable in settings
       return;
     }
@@ -625,7 +626,6 @@ const Events = {
         }
       }
       if (!this.isMuted(event)) {
-        EventDB.insert(event);
         const target = getEventRoot(event) || getEventReplyingTo(event) || event.id; // TODO get thread root instead
         const key = `${event.kind}-${target}`;
         const existing = this.latestNotificationByTargetAndKind.get(key); // also latestNotificationByAuthor?
