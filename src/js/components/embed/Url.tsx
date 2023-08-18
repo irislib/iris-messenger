@@ -7,7 +7,7 @@ const Url: Embed = {
   component: ({ match }) => {
     const url = match.replace(/^(https:\/\/)?iris.to/, '');
     return (
-      <Link className="link" target="_blank" href={url}>
+      <Link className="link" target={url === match ? '_blank' : '_self'} href={url}>
         {match.replace(/^https?:\/\//, '').replace(/\/$/, '')}
       </Link>
     );

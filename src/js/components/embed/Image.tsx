@@ -9,14 +9,17 @@ import Embed from './index';
 const Image: Embed = {
   regex: /(https?:\/\/\S+?\.(?:png|jpg|jpeg|gif|svg|webp)(?:\?\S*?)?)/gi,
   settingsKey: 'enableImages',
-  component: ({ match }) => {
+  component: ({ match, index }) => {
     const [showModal, setShowModal] = useState(false);
     const onClick = (e) => {
       e.stopPropagation();
       setShowModal(true);
     };
     return (
-      <div className="flex justify-center items-center md:justify-start min-h-96 my-2">
+      <div
+        key={match + index}
+        className="flex justify-center items-center md:justify-start min-h-96 my-2"
+      >
         <SafeImg
           onClick={onClick}
           className="my-2 rounded md:max-h-96 max-w-full cursor-pointer"
