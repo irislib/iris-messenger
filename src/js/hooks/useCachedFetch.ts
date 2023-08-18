@@ -43,7 +43,7 @@ const useCachedFetch = (url, storageKey, dataProcessor = (data) => data) => {
     } else {
       fetchData();
     }
-  }, [url, storageKey, dataProcessor]);
+  }, [url, storageKey]);
 
   return data;
 };

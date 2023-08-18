@@ -17,7 +17,7 @@ class EventDB {
   }
 
   get(id: any): Event | undefined {
-    const event = this.eventsCollection.by('id', id);
+    const event = this.eventsCollection.by('id', ID(id));
     if (event) {
       return this.unpack(event);
     }
