@@ -140,7 +140,7 @@ const Session = {
       PubSub.subscribe({ '#p': [myPub], kinds: [4] }, undefined, false, false); // dms for us
       PubSub.subscribe({ authors: [myPub], kinds: [4] }, undefined, false, false); // dms by us
       Events.subscribeGroups();
-    }, 200);
+    }, 500);
     setInterval(() => {
       Events.handledMsgsPerSecond = 0;
     }, 5000);
