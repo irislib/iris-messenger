@@ -193,6 +193,26 @@ export default {
     return urlParams.get(name);
   },
 
+  setUrlParameter(name: string, value: string | null) {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (value) {
+      urlParams.set(name, value);
+    } else {
+      urlParams.delete(name);
+    }
+
+    // Construct the new URL.
+    let newUrl = window.location.pathname;
+
+    // Only append the ? if urlParams is not empty.
+    if (urlParams.toString()) {
+      newUrl += '?' + urlParams.toString();
+    }
+
+    window.history.replaceState({}, '', newUrl);
+  },
+
   getDaySeparatorText(date: Date, dateStr: string, now?: Date, nowStr?: string) {
     if (!now) {
       now = new Date();

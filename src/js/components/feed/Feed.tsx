@@ -11,6 +11,7 @@ import Show from '@/components/helpers/Show';
 import useSubscribe from '@/hooks/useSubscribe';
 import { useLocalState } from '@/LocalState';
 import Key from '@/nostr/Key.ts';
+import Helpers from '@/utils/Helpers.tsx';
 
 const Feed = (props: FeedProps) => {
   const fetchEvents = props.fetchEvents || useSubscribe;
@@ -19,8 +20,9 @@ const Feed = (props: FeedProps) => {
   if (!filterOptions || filterOptions.length === 0) {
     throw new Error('Feed requires at least one filter option');
   }
+  const displayAsParam = Helpers.getUrlParameter('display') === 'grid' ? 'grid' : 'feed';
   const [filterOption, setFilterOption] = useState(filterOptions[0]);
-  const [displayAs, setDisplayAs] = useState<DisplayAs>('feed');
+  const [displayAs, setDisplayAs] = useState<DisplayAs>(displayAsParam);
   const [mutedUsers] = useLocalState('muted', {});
   const [showUntil, setShowUntil] = useState(Math.floor(Date.now() / 1000));
   const [infiniteScrollKey, setInfiniteScrollKey] = useState(0);
@@ -89,6 +91,7 @@ const Feed = (props: FeedProps) => {
         <DisplaySelector
           onDisplayChange={(displayAs) => {
             setDisplayAs(displayAs);
+            Helpers.setUrlParameter('display', displayAs === 'grid' ? 'grid' : null);
           }}
           activeDisplay={displayAs}
         />
