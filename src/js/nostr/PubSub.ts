@@ -115,6 +115,8 @@ const PubSub = {
       filter.authors.forEach((a) => this.subscribedAuthors.add(a));
     }
 
+    // TODO if filter.ids & found in EventDB, don't ask others
+
     callback && EventDB.find(filter, callback);
 
     if (dev.indexedDbLoad !== false) {

@@ -1,10 +1,15 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 
 const useCachedFetch = (url, storageKey, dataProcessor = (data) => data) => {
-  const cachedData = localStorage.getItem(storageKey);
-  const initialData = cachedData ? JSON.parse(cachedData).data : [];
+  const cachedData = useMemo(() => {
+    const cached = localStorage.getItem(storageKey);
+    return cached ? JSON.parse(cached) : null;
+  }, [storageKey]);
+
+  const initialData = cachedData ? cachedData.data : [];
 
   const [data, setData] = useState(initialData);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     const fetchData = () => {
@@ -19,15 +24,17 @@ const useCachedFetch = (url, storageKey, dataProcessor = (data) => data) => {
           );
         })
         .catch(() => {
-          if (cachedData) {
-            const { data } = JSON.parse(cachedData);
-            setData(data);
+          if (!hasError) {
+            if (cachedData) {
+              setData(cachedData);
+            }
+            setHasError(true);
           }
         });
     };
 
     if (cachedData) {
-      const { timestamp } = JSON.parse(cachedData);
+      const { timestamp } = cachedData;
       const age = (new Date().getTime() - timestamp) / 1000 / 60;
 
       if (age >= 15) {
