@@ -1,6 +1,7 @@
 import { Event } from 'nostr-tools';
 import { useState } from 'preact/hooks';
-import styled from 'styled-components';
+
+import EventDB from '@/nostr/EventDB.ts';
 
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
@@ -8,7 +9,6 @@ import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
 import Helpers from '../../utils/Helpers.tsx';
 import Block from '../buttons/Block';
-import { PrimaryButton } from '../buttons/Button';
 import Copy from '../buttons/Copy';
 import FollowButton from '../buttons/Follow';
 import Dropdown from '../Dropdown';
@@ -21,12 +21,6 @@ interface EventDropdownProps {
   onTranslate?: (text: string) => void;
   id: string;
 }
-
-const EventDetail = styled.div`
-  text-align: left;
-  max-width: 100%;
-  user-select: text;
-`;
 
 const EventDropdown = (props: EventDropdownProps) => {
   const { event, id } = props;
@@ -91,7 +85,7 @@ const EventDropdown = (props: EventDropdownProps) => {
     e.preventDefault();
     const hexId = Key.toNostrHexAddress(id);
     if (hexId) {
-      const event = Events.db.by('id', hexId);
+      const event = EventDB.get(hexId);
       if (event) {
         // TODO indicate to user somehow
         console.log('broadcasting', hexId, event);
@@ -164,10 +158,10 @@ const EventDropdown = (props: EventDropdownProps) => {
       </Dropdown>
       {event && showingDetails && (
         <Modal showContainer onClose={closeModal}>
-          <EventDetail>
-            <EventRelaysList event={event} />
-            <PrimaryButton onClick={closeModal}>{t('done')}</PrimaryButton>
-          </EventDetail>
+          <EventRelaysList event={event} />
+          <button className="btn btn-sm btn-primary mt-4" onClick={closeModal}>
+            {t('done')}
+          </button>
         </Modal>
       )}
     </div>

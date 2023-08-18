@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import SocialNetwork from '../nostr/SocialNetwork';
-import { ID } from '../nostr/UserIds';
+import { ID } from '../utils/UniqueIds.ts';
 
 export const useProfile = (pub: string) => {
   const [nostrAddr] = useState(pub);

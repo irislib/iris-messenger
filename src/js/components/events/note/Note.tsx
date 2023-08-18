@@ -1,11 +1,13 @@
 import { useMemo } from 'react';
-import { debounce } from 'lodash';
+import { Event } from 'nostr-tools';
 import { useEffect, useState } from 'preact/hooks';
 import { Link, route } from 'preact-router';
 
 import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
+import PubSub from '@/nostr/PubSub.ts';
+import { getEventReplyingTo, getEventRoot } from '@/nostr/utils.ts';
+import SortedMap from '@/utils/SortedMap.tsx';
 
-import Events from '../../../nostr/Events';
 import Key from '../../../nostr/Key';
 import { translate as t } from '../../../translations/Translation.mjs';
 import Show from '../../helpers/Show';
@@ -66,27 +68,32 @@ const Note = ({
   }, [standalone, isQuote, isQuoting, asInlineQuote, fullWidth]);
 
   useEffect(() => {
-    if (showReplies) {
-      return Events.getReplies(
-        event.id,
-        debounce(
-          (replies) => {
-            const arr = Array.from(replies).slice(0, showReplies) as string[];
-            arr.sort((a, b) => {
-              const aEvent = Events.db.by('id', a);
-              const bEvent = Events.db.by('id', b);
-              return aEvent.created_at - bEvent.created_at;
-            });
-            setReplies(arr);
-          },
-          500,
-          { leading: true, trailing: true },
-        ),
-      );
-    }
+    const comparator = (a: { key: string; value: Event }, b: { key: string; value: Event }) => {
+      const aEvent = a.value;
+      const bEvent = b.value;
+      if (!aEvent && !bEvent) return 0;
+      if (!aEvent) return -1;
+      if (!bEvent) return 1;
+      return aEvent.created_at - bEvent.created_at;
+    };
+
+    const sortedRepliesMap = new SortedMap<string, Event>(comparator);
+
+    const callback = (reply) => {
+      if (getEventReplyingTo(reply) !== event.id) return;
+      sortedRepliesMap.set(reply.id, reply);
+      const sortedReplies = Array.from(sortedRepliesMap.keys()).slice(0, showReplies);
+      setReplies(sortedReplies);
+    };
+
+    const unsubscribe = PubSub.subscribe({ '#e': [event.id], kinds: [1] }, callback, false);
+
+    return () => {
+      unsubscribe();
+    };
   }, [event.id, showReplies]);
 
-  let rootMsg = Events.getEventRoot(event);
+  let rootMsg = getEventRoot(event);
   if (!rootMsg) {
     rootMsg = meta.replyingTo;
   }
@@ -146,7 +153,6 @@ const Note = ({
           </Show>
           <Content
             event={event}
-            meta={meta}
             standalone={standalone}
             isQuote={isQuote}
             asInlineQuote={asInlineQuote}

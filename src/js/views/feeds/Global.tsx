@@ -1,7 +1,7 @@
 import CreateNoteForm from '@/components/create/CreateNoteForm';
 import FeedComponent from '@/components/feed/Feed';
 import OnboardingNotification from '@/components/OnboardingNotification';
-import Events from '@/nostr/Events';
+import { getEventReplyingTo } from '@/nostr/utils.ts';
 import { translate as t } from '@/translations/Translation.mjs';
 
 import View from '../View';
@@ -30,13 +30,13 @@ class Feed extends View {
             filterOptions={[
               {
                 name: t('posts'),
-                filter: { kinds: [1], limit: 10 },
-                filterFn: (event) => !Events.getEventReplyingTo(event),
+                filter: { kinds: [1, 6], limit: 10 },
+                filterFn: (event) => !getEventReplyingTo(event),
                 eventProps: { showRepliedMsg: true },
               },
               {
                 name: t('posts_and_replies'),
-                filter: { kinds: [1], limit: 5 },
+                filter: { kinds: [1, 6], limit: 5 },
                 eventProps: { showRepliedMsg: true, fullWidth: false },
               },
             ]}

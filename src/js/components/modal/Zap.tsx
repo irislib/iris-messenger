@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Event } from 'nostr-tools';
-import styled from 'styled-components';
 
 import { useLocalState } from '@/LocalState.ts';
 
@@ -46,6 +45,7 @@ export interface ZapProps {
   notice?: string;
   note?: string;
   recipient?: string;
+  quickZap?: boolean;
 }
 
 function chunks<T>(arr: T[], length: number) {
@@ -60,41 +60,9 @@ function chunks<T>(arr: T[], length: number) {
   return result;
 }
 
-/*
-const ZapTypeBtn = styled.span`
-  color: var(--text-color);
-  display: inline-block;
-  cursor: pointer;
-  padding: 10px;
-  border-radius: 100px;
-  margin: 5px;
-  border: 1px solid transparent;
-  background: var(--body-bg);
-  &.active {
-    background: var(--notify);
-  }
-`;
- */
-
-const ZapDialog = styled.div`
-  background-color: var(--msg-content-background);
-  border-radius: 8px;
-  padding: 30px;
-  width: 400px;
-  color: var(--text-color);
-  position: relative;
-`;
-const Close = styled.div`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-  color: var(--text-color);
-`;
-
 export default function SendSats(props: ZapProps) {
   const onClose = props.onClose || (() => undefined);
-  const { note, recipient } = props;
+  const { note, recipient, quickZap = false } = props;
   const defaultZapAmount = 1_000;
   const amounts = [defaultZapAmount, 5_000, 10_000, 20_000, 50_000, 100_000, 1_000_000];
   const emojis: Record<number, string> = {
@@ -138,6 +106,12 @@ export default function SendSats(props: ZapProps) {
       setSuccess(undefined);
     }
   }, [props.show]);
+
+  useEffect(() => {
+    if (quickZap && canZap) {
+      loadInvoice();
+    }
+  }, [quickZap, canZap]);
 
   useEffect(() => {
     if (success && !success.url) {
@@ -202,7 +176,6 @@ export default function SendSats(props: ZapProps) {
       ev.id = id;
       const sig = (await Key.sign(ev)) as string;
       ev = { ...ev, sig };
-      console.log('loadInvoice', ev);
       if (ev) {
         // replace sig for anon-zap
         if (zapType === ZapType.AnonZap) {
@@ -386,7 +359,7 @@ export default function SendSats(props: ZapProps) {
   }
 
   function successAction() {
-    if (!success) return null;
+    if (!success || quickZap) return null;
     if (!userDefaultZapAmount) {
       // is this the right place for this?
       setUserDefaultZapAmount(amount);
@@ -408,13 +381,17 @@ export default function SendSats(props: ZapProps) {
   const title = handler?.canZap ? 'Send zap to ' : 'Send sats to ';
   if (!(props.show ?? false)) return null;
 
+  if (quickZap && window.webln && !error) {
+    return null;
+  }
+
   return (
     <Modal showContainer={true} centerVertically={true} onClose={onClose}>
-      <ZapDialog>
+      <div className="bg-black rounded-lg p-8 w-[400px] relative">
         <div className="lnurl-tip" onClick={(e) => e.stopPropagation()}>
-          <Close className="close" onClick={onClose}>
+          <div className="absolute top-2.5 right-2.5 cursor-pointer">
             <XMarkIcon width={20} height={20} />
-          </Close>
+          </div>
           <div className="lnurl-header">
             <h2>
               {props.title || title}
@@ -426,7 +403,7 @@ export default function SendSats(props: ZapProps) {
           {payInvoice()}
           {successAction()}
         </div>
-      </ZapDialog>
+      </div>
     </Modal>
   );
 }

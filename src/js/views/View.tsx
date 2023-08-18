@@ -1,4 +1,4 @@
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { JSX } from 'preact';
 
 import Component from '../BaseComponent';

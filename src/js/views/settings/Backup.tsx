@@ -1,5 +1,7 @@
 import { Link } from 'preact-router';
 
+import EventDB from '@/nostr/EventDB.ts';
+
 import Component from '../../BaseComponent';
 import Copy from '../../components/buttons/Copy';
 import Follow from '../../components/buttons/Follow';
@@ -15,8 +17,8 @@ export default class Backup extends Component {
   profileExportJson() {
     const myPub = Key.getPubKey();
     let rawDataJson = [] as any;
-    const profileEvent = Events.db.findOne({ kind: 0, pubkey: myPub });
-    const followEvent = Events.db.findOne({ kind: 3, pubkey: myPub });
+    const profileEvent = EventDB.findOne({ kinds: [0], authors: [myPub] });
+    const followEvent = EventDB.findOne({ kinds: [3], authors: [myPub] });
     profileEvent && rawDataJson.push(profileEvent);
     followEvent && rawDataJson.push(followEvent);
     rawDataJson = JSON.stringify(rawDataJson, null, 2);
@@ -179,7 +181,7 @@ export default class Backup extends Component {
         // even if it's an old contacts event by us, restore follows from it
         if (event.pubkey === myPub && event.kind === 3) {
           const followed = event.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
-          const currentFollows = (Events.db.findOne({ kind: 3, pubkey: myPub })?.tags || [])
+          const currentFollows = (EventDB.findOne({ kinds: [3], authors: [myPub] })?.tags || [])
             .filter((t) => t[0] === 'p')
             .map((t) => t[1]);
           const restoredFollows = followed.filter((f) => !currentFollows.includes(f));

@@ -10,16 +10,14 @@ import { DecryptedEvent } from '../views/chat/ChatMessages';
 import Name from './user/Name';
 import HyperText from './HyperText';
 import RelativeTime from './RelativeTime';
-import Torrent from './Torrent';
 
 type Props = {
   event: DecryptedEvent;
   selfAuthored?: boolean;
   showName?: boolean;
-  torrentId?: string;
 };
 
-const PrivateMessage = ({ event, selfAuthored, showName, torrentId }: Props) => {
+const PrivateMessage = ({ event, selfAuthored, showName }: Props) => {
   const [text, setText] = useState(event.text || '');
   const [innerEvent, setInnerEvent] = useState<any>(null as any);
   const [checked, setChecked] = useState(false);
@@ -95,7 +93,6 @@ const PrivateMessage = ({ event, selfAuthored, showName, torrentId }: Props) => 
             </small>
           )}
         </div>
-        {torrentId && <Torrent torrentId={torrentId} />}
         <div className={`preformatted-wrap text-base ${emojiOnly ? 'text-4xl' : ''}`}>
           <HyperText event={event}>{text}</HyperText>
         </div>

@@ -11,8 +11,8 @@ import Name from '../components/user/Name';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
-import { ID } from '../nostr/UserIds';
 import { translate as t } from '../translations/Translation.mjs';
+import { ID } from '../utils/UniqueIds.ts';
 
 import View from './View';
 

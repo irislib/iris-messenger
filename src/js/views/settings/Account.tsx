@@ -1,4 +1,3 @@
-import { html } from 'htm/preact';
 import { nip19 } from 'nostr-tools';
 import { route } from 'preact-router';
 
@@ -78,18 +77,18 @@ export default class Account extends Component {
               {t('switch_account')}
             </button>
           </div>
-          {this.state.showSwitchAccount
-            ? html`
-                <p>
-                  <${ExistingAccountLogin} />
-                </p>
-                <p>
-                  <a href="" onClick=${(e) => this.onExtensionLoginClick(e)}>
-                    ${t('nostr_extension_login')}
-                  </a>
-                </p>
-              `
-            : ''}
+          {this.state.showSwitchAccount && (
+            <>
+              <p>
+                <ExistingAccountLogin />
+              </p>
+              <p>
+                <a href="#" onClick={(e) => this.onExtensionLoginClick(e)}>
+                  {t('nostr_extension_login')}
+                </a>
+              </p>
+            </>
+          )}
 
           <h3>{t('public_key')}</h3>
           <p>

@@ -20,6 +20,9 @@ export default {
         'iris-red': '#f81780',
         'iris-purple': '#8e44ad',
       },
+      outlineColor: {
+        'iris-purple': '#8e44ad',
+      },
       spacing: {
         px: '1px',
       },

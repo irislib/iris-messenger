@@ -1,5 +1,4 @@
 import { FC, useEffect } from 'react';
-import styled from 'styled-components';
 
 type Props = {
   onClose?: () => void;
@@ -10,36 +9,10 @@ type Props = {
   height?: string;
 };
 
-const Overlay = styled.div<Props>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
-  display: flex;
-  flex-direction: column;
-  justify-content: ${(props) =>
-    props.centerVertically ? 'center' : props.justifyContent || 'flex-start'};
-  align-items: center;
-  overflow-y: auto;
-  overflow-x: hidden;
-`;
-
-const ModalContentContainer = styled.div<{ width?: string; height?: string }>`
-  width: ${(props) => props.width || 'auto'};
-  height: ${(props) => props.height || 'auto'};
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
 const Modal: FC<Props> = ({
   width,
   height,
-  centerVertically,
+  centerVertically = true,
   showContainer,
   children,
   onClose,
@@ -70,8 +43,8 @@ const Modal: FC<Props> = ({
 
   const content = showContainer ? (
     <div
-      className="p-8 border-neutral-500 border-2 bg-black rounded-lg shadow-lg"
-      style={{ width: '600px', 'max-width': 'calc(100vw - 40px)' }}
+      className="p-8 border-2 border-neutral-500 bg-black rounded-lg shadow-lg"
+      style={{ width: '600px', maxWidth: 'calc(100vw - 40px)' }}
       onClick={(e) => handleContainerClick(e)}
     >
       {children}
@@ -80,12 +53,20 @@ const Modal: FC<Props> = ({
     children
   );
 
+  const justifyContentClass = centerVertically ? 'justify-center' : 'justify-start';
+
   return (
-    <Overlay centerVertically={centerVertically} onClick={handleOverlayClick}>
-      <ModalContentContainer width={width} height={height}>
+    <div
+      className={`fixed top-0 left-0 z-50 w-full h-full bg-black bg-opacity-90 flex flex-col ${justifyContentClass} items-center overflow-y-auto overflow-x-hidden`}
+      onClick={handleOverlayClick}
+    >
+      <div
+        className="overflow-y-auto flex flex-col items-center"
+        style={{ width: width || 'auto', height: height || 'auto' }}
+      >
         {content}
-      </ModalContentContainer>
-    </Overlay>
+      </div>
+    </div>
   );
 };
 

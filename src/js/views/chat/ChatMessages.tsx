@@ -1,11 +1,9 @@
-import { useCallback, useLayoutEffect, useMemo } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { QrCodeIcon } from '@heroicons/react/24/solid';
-import $ from 'jquery';
 import throttle from 'lodash/throttle';
 import { Event, getPublicKey, nip04 } from 'nostr-tools';
-import { useEffect, useRef, useState } from 'preact/hooks';
 
 import Copy from '../../components/buttons/Copy';
 import Show from '../../components/helpers/Show';
@@ -46,21 +44,40 @@ function ChatMessages({ id }) {
   let messageViewScrollHandler;
 
   const addFloatingDaySeparator = () => {
-    let currentDaySeparator = $('.day-separator').last();
-    let pos = currentDaySeparator.position();
+    const daySeparators = document.querySelectorAll('.day-separator');
+    let currentDaySeparator: any = daySeparators[daySeparators.length - 1];
+    let pos = currentDaySeparator.getBoundingClientRect();
+
     while (currentDaySeparator && pos && pos.top - 55 > 0) {
-      currentDaySeparator = currentDaySeparator.prevAll('.day-separator').first();
-      pos = currentDaySeparator.position();
+      currentDaySeparator = currentDaySeparator.previousElementSibling;
+      while (currentDaySeparator && !currentDaySeparator.classList.contains('day-separator')) {
+        currentDaySeparator = currentDaySeparator.previousElementSibling;
+      }
+      pos = currentDaySeparator ? currentDaySeparator.getBoundingClientRect() : null;
     }
-    const s = currentDaySeparator.clone();
-    const center = $('<div>')
-      .css({ position: 'fixed', top: 70, 'text-align': 'center' })
-      .attr('id', 'floating-day-separator')
-      .width($(ref.current).width())
-      .append(s);
-    $('#floating-day-separator').remove();
-    setTimeout(() => s.fadeOut(), 2000);
-    $(ref.current).prepend(center);
+    if (!currentDaySeparator) {
+      return;
+    }
+    const s = currentDaySeparator.cloneNode(true);
+    const center = document.createElement('div');
+    center.style.position = 'fixed';
+    center.style.top = '70px';
+    center.style.textAlign = 'center';
+    center.setAttribute('id', 'floating-day-separator');
+    center.style.width = ref.current.offsetWidth + 'px';
+    center.appendChild(s);
+
+    const floatingDaySeparator = document.getElementById('floating-day-separator');
+    if (floatingDaySeparator) {
+      floatingDaySeparator.remove();
+    }
+
+    setTimeout(() => {
+      s.style.opacity = '0';
+      s.style.transition = 'opacity 2s';
+    }, 2000);
+
+    ref.current.prepend(center);
   };
 
   const onClickSecretInvite = () => {
@@ -68,13 +85,46 @@ function ChatMessages({ id }) {
   };
 
   const toggleScrollDownBtn = () => {
-    const el = $(ref.current);
-    const scrolledToBottom = el[0].scrollHeight - el.scrollTop() <= el.outerHeight() + 200;
+    const el = ref.current;
+    const scrolledToBottom = el.scrollHeight - el.scrollTop <= el.offsetHeight + 200;
+
+    const scrollDownBtn: any = document.getElementById('scroll-down-btn');
+
     if (scrolledToBottom) {
-      $('#scroll-down-btn:visible').fadeOut(150);
+      if (window.getComputedStyle(scrollDownBtn).display !== 'none') {
+        fadeOut(scrollDownBtn, 100);
+      }
     } else {
-      $('#scroll-down-btn:not(:visible)').fadeIn(150);
+      if (window.getComputedStyle(scrollDownBtn).display === 'none') {
+        fadeIn(scrollDownBtn, 100);
+      }
     }
+  };
+
+  const fadeOut = (element, duration) => {
+    let op = 1; // initial opacity
+    const timer = setInterval(() => {
+      if (op <= 0.1) {
+        clearInterval(timer);
+        element.style.display = 'none';
+      }
+      element.style.opacity = op;
+      element.style.filter = 'alpha(opacity=' + op * 100 + ')';
+      op -= op * 0.1;
+    }, duration / 10);
+  };
+
+  const fadeIn = (element, duration) => {
+    let op = 0.1; // initial opacity
+    element.style.display = 'block';
+    const timer = setInterval(() => {
+      if (op >= 1) {
+        clearInterval(timer);
+      }
+      element.style.opacity = op;
+      element.style.filter = 'alpha(opacity=' + op * 100 + ')';
+      op += op * 0.1;
+    }, duration / 10);
   };
 
   const formatPrivateKey = useCallback(() => {
@@ -86,7 +136,8 @@ function ChatMessages({ id }) {
     messageViewScrollHandler =
       messageViewScrollHandler ||
       throttle(() => {
-        if ($('#attachment-preview:visible').length) {
+        const attachmentPreview = document.getElementById('attachment-preview');
+        if (attachmentPreview && window.getComputedStyle(attachmentPreview).display !== 'none') {
           return;
         }
         addFloatingDaySeparator();
@@ -282,19 +333,21 @@ function ChatMessages({ id }) {
       subscribeGroup();
     }
 
-    const el = $(ref.current);
+    const scrollHandler = () => {
+      const scrolledToBottom = el.scrollTop + el.clientHeight >= el.scrollHeight;
+      if (stickToBottom && !scrolledToBottom) {
+        setStickToBottom(false);
+      } else if (!stickToBottom && scrolledToBottom) {
+        setStickToBottom(true);
+      }
+    };
+    const el = ref.current;
     if (el) {
-      el.off('scroll').on('scroll', () => {
-        const scrolledToBottom = el.scrollTop() + el.innerHeight() >= el[0].scrollHeight;
-        if (stickToBottom && !scrolledToBottom) {
-          setStickToBottom(false);
-        } else if (!stickToBottom && scrolledToBottom) {
-          setStickToBottom(true);
-        }
-      });
+      el.addEventListener('scroll', scrollHandler);
     }
 
     return () => {
+      ref.current.removeEventListener('scroll', scrollHandler);
       subs.forEach((unsub) => unsub());
     };
   }, [id]);
@@ -304,9 +357,16 @@ function ChatMessages({ id }) {
       scrollToMessageListBottom();
     }
 
-    $('.msg-content img')
-      .off('load')
-      .on('load', () => stickToBottom && scrollToMessageListBottom());
+    document.querySelectorAll('.msg-content img').forEach((img) => {
+      img.removeEventListener('load', imgLoadHandler);
+      img.addEventListener('load', imgLoadHandler);
+    });
+
+    const imgLoadHandler = () => {
+      if (stickToBottom) {
+        scrollToMessageListBottom();
+      }
+    };
   }, [stickToBottom]);
 
   return (

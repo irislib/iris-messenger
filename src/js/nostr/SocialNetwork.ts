@@ -1,19 +1,20 @@
+import EventDB from '@/nostr/EventDB.ts';
+
 import localState from '../LocalState';
+import { ID, STR, UID } from '../utils/UniqueIds.ts';
 
 import Events from './Events';
 import Key from './Key';
-import LocalForage from './LocalForage';
 import PubSub, { Unsubscribe } from './PubSub';
-import { ID, PUB, UserId } from './UserIds';
 
 export default {
-  followDistanceByUser: new Map<UserId, number>(),
-  usersByFollowDistance: new Map<number, Set<UserId>>(),
-  profiles: new Map<UserId, any>(), // JSON.parsed event.content of profile events
-  followedByUser: new Map<UserId, Set<UserId>>(),
-  followersByUser: new Map<UserId, Set<UserId>>(),
-  blockedUsers: new Set<UserId>(),
-  flaggedUsers: new Set<UserId>(),
+  followDistanceByUser: new Map<UID, number>(),
+  usersByFollowDistance: new Map<number, Set<UID>>(),
+  profiles: new Map<UID, any>(), // JSON.parsed event.content of profile events
+  followedByUser: new Map<UID, Set<UID>>(),
+  followersByUser: new Map<UID, Set<UID>>(),
+  blockedUsers: new Set<UID>(),
+  flaggedUsers: new Set<UID>(),
 
   isFollowing: function (follower: string, followedUser: string): boolean {
     const followedUserId = ID(followedUser);
@@ -51,13 +52,13 @@ export default {
       }
     });
 
-    const existing = Events.db.findOne({ kind: 3, pubkey: myPub });
+    const existing = EventDB.findOne({ kinds: [3], authors: [myPub] });
 
     const event = {
       kind: 3,
       content: existing?.content || '',
       tags: Array.from(this.followedByUser.get(myId) || []).map((id: number) => {
-        const pubAddress = PUB(id);
+        const pubAddress = STR(id);
         return ['p', pubAddress];
       }),
     };
@@ -72,13 +73,13 @@ export default {
     if (block) {
       this.blockedUsers.add(blockedUserId);
       this.removeFollower(blockedUserId, myId);
-      Events.directMessagesByUser.delete(blockedUser);
+      // TODO delete dms by user
     } else {
       this.blockedUsers.delete(blockedUserId);
     }
   },
 
-  addUserByFollowDistance(distance: number, user: UserId) {
+  addUserByFollowDistance(distance: number, user: UID) {
     if (!this.usersByFollowDistance.has(distance)) {
       this.usersByFollowDistance.set(distance, new Set());
     }
@@ -86,7 +87,7 @@ export default {
       let unsub;
       // TODO subscribe once param?
       // eslint-disable-next-line prefer-const
-      unsub = PubSub.subscribe({ authors: [PUB(user)], kinds: [0] }, () => unsub?.(), true);
+      unsub = PubSub.subscribe({ authors: [STR(user)], kinds: [0] }, () => unsub?.(), true);
     }
     this.usersByFollowDistance.get(distance)?.add(user);
     // remove from higher distances
@@ -97,17 +98,17 @@ export default {
     }
   },
 
-  addFollower: function (followedUser: UserId, follower: UserId) {
+  addFollower: function (followedUser: UID, follower: UID) {
     if (typeof followedUser !== 'number' || typeof follower !== 'number') {
       throw new Error('Invalid user id');
     }
     if (!this.followersByUser.has(followedUser)) {
-      this.followersByUser.set(followedUser, new Set<UserId>());
+      this.followersByUser.set(followedUser, new Set<UID>());
     }
     this.followersByUser.get(followedUser)?.add(follower);
 
     if (!this.followedByUser.has(follower)) {
-      this.followedByUser.set(follower, new Set<UserId>());
+      this.followedByUser.set(follower, new Set<UID>());
     }
     const myId = ID(Key.getPubKey());
 
@@ -136,14 +137,14 @@ export default {
       }
     }
     if (this.followedByUser.get(myId)?.has(follower)) {
-      if (!PubSub.subscribedAuthors.has(PUB(followedUser))) {
+      if (!PubSub.subscribedAuthors.has(STR(followedUser))) {
         setTimeout(() => {
-          PubSub.subscribe({ authors: [PUB(followedUser)] }, undefined, true);
+          PubSub.subscribe({ authors: [STR(followedUser)] }, undefined, true);
         }, 0);
       }
     }
   },
-  removeFollower: function (unfollowedUser: UserId, follower: UserId) {
+  removeFollower: function (unfollowedUser: UID, follower: UID) {
     this.followersByUser.get(unfollowedUser)?.delete(follower);
     this.followedByUser.get(follower)?.delete(unfollowedUser);
 
@@ -167,7 +168,7 @@ export default {
     }
 
     const blocked = this.blockedUsers.has(unfollowedUser);
-    // TODO delete Events.db entries for this user
+    // TODO delete EventDB entries for this user
 
     if (blocked || this.followersByUser.get(unfollowedUser)?.size === 0) {
       // TODO: remove unfollowedUser from everyone's followersByUser.
@@ -175,9 +176,8 @@ export default {
       //  if resulting followersByUser(u).size is 0, remove that user as well
       this.followDistanceByUser.delete(unfollowedUser);
       this.followersByUser.delete(unfollowedUser);
-      PubSub.subscribedAuthors.delete(PUB(unfollowedUser));
+      PubSub.subscribedAuthors.delete(STR(unfollowedUser));
     }
-    LocalForage.saveEvents();
   },
   // TODO subscription methods for followersByUser and followedByUser. and maybe messagesByTime. and replies
   followerCount: function (address: string) {
@@ -228,7 +228,7 @@ export default {
       if (cb) {
         const set = new Set<string>();
         for (const id of this.blockedUsers) {
-          set.add(PUB(id));
+          set.add(STR(id));
         }
         cb(set);
       }
@@ -244,7 +244,7 @@ export default {
       if (cb) {
         const set = new Set<string>();
         for (const id of this.flaggedUsers) {
-          set.add(PUB(id));
+          set.add(STR(id));
         }
         cb(set);
       }
@@ -265,7 +265,7 @@ export default {
       if (cb) {
         const set = new Set<string>();
         for (const id of this.followedByUser.get(userId) || []) {
-          set.add(PUB(id));
+          set.add(STR(id));
         }
         if (includeSelf) {
           set.add(user);
@@ -287,7 +287,7 @@ export default {
       if (cb) {
         const set = new Set<string>();
         for (const id of this.followersByUser.get(userId) || []) {
-          set.add(PUB(id));
+          set.add(STR(id));
         }
         cb(set);
       }

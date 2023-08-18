@@ -4,7 +4,6 @@ import { Router, RouterOnChangeArgs } from 'preact-router';
 
 import Footer from './components/Footer';
 import Show from './components/helpers/Show';
-import MediaPlayer from './components/MediaPlayer';
 import Menu from './components/Menu';
 import Modal from './components/modal/Modal';
 import Session from './nostr/Session';
@@ -13,7 +12,6 @@ import Helpers from './utils/Helpers.tsx';
 import About from './views/About';
 import Chat from './views/chat/Chat';
 import EditProfile from './views/EditProfile';
-import Explorer from './views/explorer/Explorer';
 import Global from './views/feeds/Global';
 import Home from './views/feeds/Home';
 import Notifications from './views/feeds/Notifications';
@@ -27,7 +25,6 @@ import Profile from './views/Profile';
 import Search from './views/Search';
 import Settings from './views/settings/Settings';
 import Subscribe from './views/Subscribe';
-import Torrent from './views/Torrent';
 import Component from './BaseComponent';
 import localState from './LocalState';
 
@@ -131,12 +128,9 @@ class Main extends Component<Props, ReactState> {
               <Chat path="/chat/hashtag/:hashtag?" />
               <Chat path="/chat/:id?" />
               <Note path="/post/:id+" />
-              <Torrent path="/torrent/:id+" />
               <About path="/about" />
               <Settings path="/settings/:page?" />
               <LogoutConfirmation path="/logout" />
-              <Explorer path="/explorer/:path?" />
-              <Explorer path="/explorer/:path+" />
               <EditProfile path="/profile/edit" />
               <Subscribe path="/subscribe" />
               <Profile path="/profile/:id" tab="posts" />
@@ -147,7 +141,6 @@ class Main extends Component<Props, ReactState> {
               <NoteOrProfile path="/:id" />
             </Router>
           </div>
-          <MediaPlayer />
           <Footer />
         </section>
 
