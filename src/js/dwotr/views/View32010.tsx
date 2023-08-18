@@ -8,12 +8,12 @@ import ScrollView from '@/components/ScrollView';
 import WOTPubSub from '../network/WOTPubSub';
 import { useIsMounted } from '../hooks/useIsMounted';
 import { Event } from 'nostr-tools';
-import { ID } from '@/nostr/UserIds';
 import { throttle } from 'lodash';
 import profileManager from '../ProfileManager';
 import MyAvatar from '@/components/user/Avatar';
 import Name from '@/components/user/Name';
 import Key from '@/nostr/Key';
+import { ID } from '@/utils/UniqueIds';
 
 type TestDataProps = {
   path?: string;

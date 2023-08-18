@@ -34,9 +34,11 @@ type Props = {
   asInlineQuote?: boolean;
   event: any;
   isPreview?: boolean;
+  wot: any;
 };
 
-const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, isPreview }: Props) => {
+
+const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, isPreview, wot }: Props) => {
   const [translatedText, setTranslatedText] = useState('');
   const [showMore, setShowMore] = useState(false);
   const [name, setName] = useState('');

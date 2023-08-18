@@ -3,7 +3,6 @@ import Events from '../nostr/Events';
 import IndexedDB from '../nostr/IndexedDB';
 import PubSub, { Unsubscribe } from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
-import { ID, PUB } from '../nostr/UserIds';
 import Key from '../nostr/Key';
 import ProfileRecord, { ProfileMemory } from './model/ProfileRecord';
 import { throttle } from 'lodash';
@@ -13,6 +12,7 @@ import storage from './Storage';
 import { hexName } from './Utils';
 import { ProfileEvent } from './network/ProfileEvent';
 import FuzzySearch from '@/nostr/FuzzySearch';
+import { ID, STR } from '@/utils/UniqueIds';
 
 class ProfileManager {
   loaded: boolean = false;
@@ -274,21 +274,21 @@ class ProfileManager {
     if (!id) return undefined;
     const profile = SocialNetwork.profiles.get(id);
     if (profile) return profile;
-    return this.createDefaultProfile(PUB(id));
+    return this.createDefaultProfile(STR(id));
   }
 
   quickProfile(address: string) {
     const id = ID(address);
     const profile = SocialNetwork.profiles.get(id);
     if (profile) return profile;
-    return this.createDefaultProfile(PUB(id));
+    return this.createDefaultProfile(STR(id));
   }
 
   getMemoryProfile(id: number): ProfileRecord {
     const profile = SocialNetwork.profiles.get(id);
 
     if (profile) return profile;
-    return this.createDefaultProfile(PUB(id));
+    return this.createDefaultProfile(STR(id));
   }
 
   isProfileNewer(profile: ProfileRecord): boolean {

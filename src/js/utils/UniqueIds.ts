@@ -10,7 +10,7 @@ export class UniqueIds {
   static currentUniqueId = 0;
 
   static id(str: string): UID {
-    if (str.startsWith('npub')) {
+    if (str.startsWith('npub') || str.startsWith('note')) {
       str = Key.toNostrHexAddress(str) || '';
       if (!str) {
         throw new Error('str->id: invalid str ' + str);
@@ -37,7 +37,14 @@ export class UniqueIds {
   static has(str: string): boolean {
     return UniqueIds.strToUniqueId.has(str);
   }
+
+  static bech32(id: number): string {
+    return Key.toNostrBech32Address(UniqueIds.str(id), 'npub') || '';
+  }
+  
 }
 
 export const STR = UniqueIds.str;
 export const ID = UniqueIds.id;
+export const PUB = UniqueIds.str;
+export const BECH32 = UniqueIds.bech32;

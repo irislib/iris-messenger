@@ -3,9 +3,6 @@ import PubSub, { Unsubscribe } from '../../nostr/PubSub';
 import Relays from '../../nostr/Relays';
 import { EdgeRecord, EntityType } from '../model/Graph';
 import Key from '../../nostr/Key';
-import SocialNetwork from '../../nostr/SocialNetwork';
-import { ID } from '../../nostr/UserIds';
-import profileManager from '../ProfileManager';
 
 export type OnEvent = (event: Event, afterEose: boolean, url: string | undefined) => void;
 
@@ -122,7 +119,7 @@ class WOTPubSub {
     entityType: EntityType,
     timestamp?: number,
   ) {
-    let event = this.createTrustEvent(entityPubkey, val, content, context, entityType, timestamp);
+    let event = this.createTrustEvent(entityPubkey, val, content, context, entityType, timestamp) as Event;
 
     this.sign(event);
 
