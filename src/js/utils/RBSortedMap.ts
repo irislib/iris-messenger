@@ -3,17 +3,16 @@ enum Color {
   Black,
 }
 
-const Red = Color.Red;
-const Black = Color.Black;
+const { Red, Black } = Color;
 
-type Comparator<K, V> = (a: { key: K; value: V }, b: { key: K; value: V }) => number;
+type Comparator<K, V> = (a: [K, V], b: [K, V]) => number;
 
 class TreeNode<K, V> {
   key: K;
   value: V;
   left: TreeNode<K, V> | null = null;
   right: TreeNode<K, V> | null = null;
-  color: Color = Red; // Nodes are red by default when inserted
+  color: Color = Color.Red; // Nodes are red by default when inserted
 
   constructor(key: K, value: V) {
     this.key = key;
@@ -21,20 +20,28 @@ class TreeNode<K, V> {
   }
 }
 
-export default class SortedMap<K, V> {
+export default class RBSortedMap<K, V> {
   private root: TreeNode<K, V> | null = null;
   private compare: Comparator<K, V>;
 
-  constructor(compare?: string | Comparator<K, V>) {
+  constructor(initialEntries?: Iterable<readonly [K, V]>, compare?: string | Comparator<K, V>) {
     if (compare) {
       if (typeof compare === 'string') {
+        // comparison by object property
         this.compare = (a, b) =>
-          a.value[compare] > b.value[compare] ? 1 : a.value[compare] < b.value[compare] ? -1 : 0;
+          a[1][compare] > b[1][compare] ? 1 : a[1][compare] < b[1][compare] ? -1 : 0;
       } else {
         this.compare = compare;
       }
     } else {
-      this.compare = (a, b) => (a.key > b.key ? 1 : a.key < b.key ? -1 : 0);
+      // comparison by key
+      this.compare = (a, b) => (a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0);
+    }
+
+    if (initialEntries) {
+      for (const [key, value] of initialEntries) {
+        this.set(key, value);
+      }
     }
   }
 
@@ -83,7 +90,7 @@ export default class SortedMap<K, V> {
       return new TreeNode(key, value);
     }
 
-    const comparison = this.compare({ key, value }, { key: node.key, value: node.value });
+    const comparison = this.compare([key, value], [node.key, node.value]);
 
     if (comparison < 0) {
       node.left = this.insertNode(node.left, key, value);
@@ -104,10 +111,7 @@ export default class SortedMap<K, V> {
   private findNode(node: TreeNode<K, V> | null, key: K): TreeNode<K, V> | null {
     if (node === null) return null;
 
-    const comparison = this.compare(
-      { key, value: node.value },
-      { key: node.key, value: node.value },
-    );
+    const comparison = this.compare([key, node.value], [node.key, node.value]);
 
     if (comparison < 0) return this.findNode(node.left, key);
     if (comparison > 0) return this.findNode(node.right, key);
@@ -120,35 +124,35 @@ export default class SortedMap<K, V> {
     return node ? node.value : undefined;
   }
 
-  first(): { key: K; value: V } | undefined {
+  first(): [K, V] | undefined {
     let node = this.root;
     while (node && node.left) {
       node = node.left;
     }
-    return node ? { key: node.key, value: node.value } : undefined;
+    return node ? [node.key, node.value] : undefined;
   }
 
-  last(): { key: K; value: V } | undefined {
+  last(): [K, V] | undefined {
     let node = this.root;
     while (node && node.right) {
       node = node.right;
     }
-    return node ? { key: node.key, value: node.value } : undefined;
+    return node ? [node.key, node.value] : undefined;
   }
 
-  private *inOrderTraversal(node: TreeNode<K, V> | null): IterableIterator<{ key: K; value: V }> {
+  private *inOrderTraversal(node: TreeNode<K, V> | null): IterableIterator<[K, V]> {
     if (node) {
       yield* this.inOrderTraversal(node.left);
-      yield { key: node.key, value: node.value };
+      yield [node.key, node.value];
       yield* this.inOrderTraversal(node.right);
     }
   }
 
-  *[Symbol.iterator](): Iterator<{ key: K; value: V }> {
+  *[Symbol.iterator](): Iterator<[K, V]> {
     yield* this.inOrderTraversal(this.root);
   }
 
-  *reverse(): Iterator<{ key: K; value: V }> {
+  *reverse(): Iterator<[K, V]> {
     // For simplicity, we use an array to reverse
     const arr = [...this.inOrderTraversal(this.root)];
     for (let i = arr.length - 1; i >= 0; i--) {
@@ -158,19 +162,19 @@ export default class SortedMap<K, V> {
 
   *keys(): IterableIterator<K> {
     for (const entry of this.inOrderTraversal(this.root)) {
-      yield entry.key;
+      yield entry[0];
     }
   }
 
   *values(): IterableIterator<V> {
     for (const entry of this.inOrderTraversal(this.root)) {
-      yield entry.value;
+      yield entry[1];
     }
   }
 
   *entries(): IterableIterator<[K, V]> {
     for (const entry of this.inOrderTraversal(this.root)) {
-      yield [entry.key, entry.value];
+      yield entry;
     }
   }
 
@@ -180,7 +184,7 @@ export default class SortedMap<K, V> {
       lte?: K;
       direction?: 'asc' | 'desc';
     } = {},
-  ): IterableIterator<{ key: K; value: V }> {
+  ): IterableIterator<[K, V]> {
     const { gte, lte, direction = 'asc' } = options;
 
     if (direction === 'asc') {
@@ -190,18 +194,11 @@ export default class SortedMap<K, V> {
     }
   }
 
-  private *inOrderRange(
-    node: TreeNode<K, V> | null,
-    gte?: K,
-    lte?: K,
-  ): Generator<{ key: K; value: V }> {
+  private *inOrderRange(node: TreeNode<K, V> | null, gte?: K, lte?: K): Generator<[K, V]> {
     if (!node) return;
 
     if (gte) {
-      const gteComparison = this.compare(
-        { key: gte, value: this.get(gte) as V },
-        { key: node.key, value: node.value },
-      );
+      const gteComparison = this.compare([gte, this.get(gte) as V], [node.key, node.value]);
       if (gteComparison > 0) {
         yield* this.inOrderRange(node.right, gte, lte);
         return;
@@ -209,10 +206,7 @@ export default class SortedMap<K, V> {
     }
 
     if (lte) {
-      const lteComparison = this.compare(
-        { key: lte, value: this.get(lte) as V },
-        { key: node.key, value: node.value },
-      );
+      const lteComparison = this.compare([lte, this.get(lte) as V], [node.key, node.value]);
       if (lteComparison < 0) {
         yield* this.inOrderRange(node.left, gte, lte);
         return;
@@ -220,22 +214,15 @@ export default class SortedMap<K, V> {
     }
 
     yield* this.inOrderRange(node.left, gte, lte);
-    yield { key: node.key, value: node.value };
+    yield [node.key, node.value];
     yield* this.inOrderRange(node.right, gte, lte);
   }
 
-  private *reverseInOrderRange(
-    node: TreeNode<K, V> | null,
-    gte?: K,
-    lte?: K,
-  ): Generator<{ key: K; value: V }> {
+  private *reverseInOrderRange(node: TreeNode<K, V> | null, gte?: K, lte?: K): Generator<[K, V]> {
     if (!node) return;
 
     if (lte) {
-      const lteComparison = this.compare(
-        { key: lte, value: this.get(lte) as V },
-        { key: node.key, value: node.value },
-      );
+      const lteComparison = this.compare([lte, this.get(lte) as V], [node.key, node.value]);
       if (lteComparison < 0) {
         yield* this.reverseInOrderRange(node.left, gte, lte);
         return;
@@ -243,17 +230,14 @@ export default class SortedMap<K, V> {
     }
 
     if (gte) {
-      const gteComparison = this.compare(
-        { key: gte, value: this.get(gte) as V },
-        { key: node.key, value: node.value },
-      );
+      const gteComparison = this.compare([gte, this.get(gte) as V], [node.key, node.value]);
       if (gteComparison > 0) {
         yield* this.reverseInOrderRange(node.right, gte, lte);
         return;
       }
     }
 
-    yield { key: node.key, value: node.value };
+    yield [node.key, node.value];
     yield* this.reverseInOrderRange(node.right, gte, lte);
     yield* this.reverseInOrderRange(node.left, gte, lte);
   }
@@ -303,7 +287,7 @@ export default class SortedMap<K, V> {
   }
 
   private deleteNode(node: TreeNode<K, V> | null, key: K): TreeNode<K, V> | null {
-    if (this.compare({ key, value: null! }, { key: node!.key, value: node!.value }) < 0) {
+    if (this.compare([key, null!], [node!.key, node!.value]) < 0) {
       if (!node!.left) return null;
       if (!this.isRed(node!.left) && !this.isRed(node!.left.left)) {
         node = this.moveRedLeft(node!);
@@ -313,16 +297,13 @@ export default class SortedMap<K, V> {
       if (this.isRed(node!.left)) {
         node = this.rotateRight(node!);
       }
-      if (
-        this.compare({ key, value: null! }, { key: node!.key, value: node!.value }) === 0 &&
-        !node!.right
-      ) {
+      if (this.compare([key, null!], [node!.key, node!.value]) === 0 && !node!.right) {
         return null;
       }
       if (!this.isRed(node!.right) && !this.isRed(node!.right!.left)) {
         node = this.moveRedRight(node!);
       }
-      if (this.compare({ key, value: null! }, { key: node!.key, value: node!.value }) === 0) {
+      if (this.compare([key, null!], [node!.key, node!.value]) === 0) {
         const x = this.minNode(node!.right!);
         node!.key = x.key;
         node!.value = x.value;

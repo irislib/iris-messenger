@@ -10,16 +10,18 @@ import SortedMap from '../../utils/SortedMap';
 import ChatListItem from './ChatListItem';
 import NewChatButton from './NewChatButton';
 
-const sortChats = (a: { key: string; value: any }, b: { key: string; value: any }) => {
-  const aLatest = a.value.latest;
-  const bLatest = b.value.latest;
+const sortChats = (a: [string, any], b: [string, any]) => {
+  const aLatest = a[1].latest;
+  const bLatest = b[1].latest;
+
   if (!aLatest) return 1;
   if (!bLatest) return -1;
+
   return bLatest.created_at - aLatest.created_at;
 };
 
 const ChatList = ({ activeChat, className }) => {
-  const [chats, setChats] = useState(new SortedMap<string, any>(sortChats) as any);
+  const [chats, setChats] = useState(new SortedMap<string, any>([], sortChats) as any);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_renderCount, setRenderCount] = useState(0); // new state variable
   const [showNotificationsPrompt, setShowNotificationsPrompt] = useState(false);

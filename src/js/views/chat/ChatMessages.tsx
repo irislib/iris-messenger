@@ -30,7 +30,7 @@ const scrollToMessageListBottom = throttle(() => {
 
 function ChatMessages({ id }) {
   const ref = useRef(null as any);
-  const messages = useRef(new SortedMap<string, DecryptedEvent>('created_at'));
+  const messages = useRef(new SortedMap<string, DecryptedEvent>([], 'created_at'));
   const [sortedMessages, setSortedMessages] = useState([] as any[]);
   const [stickToBottom, setStickToBottom] = useState(true);
   const [invitedToPriv, setInvitedToPriv] = useState('');

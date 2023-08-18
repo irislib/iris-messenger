@@ -68,16 +68,18 @@ const Note = ({
   }, [standalone, isQuote, isQuoting, asInlineQuote, fullWidth]);
 
   useEffect(() => {
-    const comparator = (a: { key: string; value: Event }, b: { key: string; value: Event }) => {
-      const aEvent = a.value;
-      const bEvent = b.value;
+    const comparator = (a: [string, Event], b: [string, Event]) => {
+      const aEvent = a[1];
+      const bEvent = b[1];
+
       if (!aEvent && !bEvent) return 0;
       if (!aEvent) return -1;
       if (!bEvent) return 1;
+
       return aEvent.created_at - bEvent.created_at;
     };
 
-    const sortedRepliesMap = new SortedMap<string, Event>(comparator);
+    const sortedRepliesMap = new SortedMap<string, Event>([], comparator);
 
     const callback = (reply) => {
       if (getEventReplyingTo(reply) !== event.id) return;

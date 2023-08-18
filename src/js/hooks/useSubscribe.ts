@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import throttle from 'lodash/throttle';
 import { Event } from 'nostr-tools';
 
@@ -6,63 +6,91 @@ import Filter from '@/nostr/Filter';
 import PubSub from '@/nostr/PubSub';
 import SortedMap from '@/utils/SortedMap.tsx';
 
-const useSubscribe = (ops: {
+interface SubscribeOptions {
   filter: Filter;
   filterFn?: (event: Event) => boolean;
   sinceLastOpened?: boolean;
   mergeSubscriptions?: boolean;
   enabled?: boolean;
-}) => {
-  const sortedEvents = useRef(new SortedMap<string, Event>());
-  const [loadMoreFilter, setLoadMoreFilter] = useState<Filter | null>(null);
-  const [events, setEvents] = useState<Event[]>([]);
-  const lastUntilRef = useRef<number | null>(null);
+}
+
+const useSubscribe = (ops: SubscribeOptions) => {
+  const defaultOps = useMemo(
+    () => ({
+      enabled: true,
+      sinceLastOpened: false,
+      mergeSubscriptions: true,
+    }),
+    [],
+  );
 
   const {
     filter,
     filterFn,
-    enabled = true,
-    sinceLastOpened = false,
-    mergeSubscriptions = true,
+    enabled = defaultOps.enabled,
+    sinceLastOpened = defaultOps.sinceLastOpened,
+    mergeSubscriptions = defaultOps.mergeSubscriptions,
   } = ops;
 
-  const handleEvent = (event: Event) => {
+  const sortedEvents = useRef(new SortedMap<string, Event>());
+  const [events, setEvents] = useState<Event[]>([]);
+  const lastUntilRef = useRef<number | null>(null);
+
+  const addEventToSortedEvents = (event: Event, shouldUpdateState = true) => {
     if (sortedEvents.current.has(event.id)) return;
+
     if (filterFn && !filterFn(event)) return;
-    if (filter.keywords && !filter.keywords.some((keyword) => event.content?.includes(keyword))) {
+
+    if (filter.keywords && !filter.keywords.some((keyword) => event.content?.includes(keyword)))
       return;
-    }
+
     sortedEvents.current.set(event.created_at + event.id, event);
-    setEvents([...sortedEvents.current.values()].reverse());
+    if (shouldUpdateState) {
+      const newEvents = [...sortedEvents.current.values()].reverse();
+      if (events.length !== newEvents.length) {
+        setEvents(newEvents);
+      }
+    }
   };
 
   useEffect(() => {
+    setEvents([]);
     sortedEvents.current = new SortedMap<string, Event>();
-  }, [filter, filterFn]);
-
-  useEffect(() => {
-    if (!enabled || !filter) return;
-
-    const newFilter = { ...filter, limit: filter.limit || 100 };
-
-    return PubSub.subscribe(newFilter, handleEvent, sinceLastOpened, mergeSubscriptions);
   }, [filter, filterFn, enabled, sinceLastOpened, mergeSubscriptions]);
 
   useEffect(() => {
-    if (!loadMoreFilter) return;
+    if (!enabled || !filter) return;
+    return PubSub.subscribe(filter, addEventToSortedEvents, sinceLastOpened, mergeSubscriptions);
+  }, [filter, filterFn, enabled, sinceLastOpened, mergeSubscriptions]);
 
-    return PubSub.subscribe(loadMoreFilter, handleEvent, false, false);
-  }, [loadMoreFilter]);
+  const loadMoreCleanupRef = useRef<null | (() => void)>(null);
 
-  const loadMore = throttle(() => {
-    const until = sortedEvents.current.last()?.value.created_at;
+  const loadMore = useCallback(
+    throttle(() => {
+      const until = sortedEvents.current.first()?.[1].created_at;
 
-    if (!until || lastUntilRef.current === until) return;
+      if (!until || lastUntilRef.current === until) return;
 
-    lastUntilRef.current = until;
-    const newFilter = { ...filter, until, limit: 100 };
-    setLoadMoreFilter(newFilter);
-  }, 500);
+      lastUntilRef.current = until;
+      const newFilter = { ...filter, until, limit: 100 };
+
+      console.log('loadMore', newFilter);
+
+      const cleanup = PubSub.subscribe(newFilter, addEventToSortedEvents, false, false);
+
+      loadMoreCleanupRef.current = cleanup;
+    }, 500),
+    [filter, filterFn, enabled, sinceLastOpened, mergeSubscriptions],
+  );
+
+  // New effect for cleaning up the loadMore subscription
+  useEffect(() => {
+    return () => {
+      if (loadMoreCleanupRef.current) {
+        loadMoreCleanupRef.current();
+      }
+    };
+  }, [loadMore]);
 
   return { events, loadMore };
 };

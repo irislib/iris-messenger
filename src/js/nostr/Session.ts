@@ -137,8 +137,8 @@ const Session = {
     setTimeout(() => {
       PubSub.subscribe({ authors: [myPub] }, undefined, true); // our stuff
       PubSub.subscribe({ '#p': [myPub], kinds: [1, 3, 6, 7, 9735] }, undefined, true); // mentions, reactions, DMs
-      PubSub.subscribe({ '#p': [myPub], kinds: [4] }, undefined, false, false); // dms for us
-      PubSub.subscribe({ authors: [myPub], kinds: [4] }, undefined, false, false); // dms by us
+      PubSub.subscribe({ '#p': [myPub], kinds: [4] }, undefined, true, false); // dms for us
+      PubSub.subscribe({ authors: [myPub], kinds: [4] }, undefined, true, false); // dms by us
       Events.subscribeGroups();
     }, 500);
     setInterval(() => {
