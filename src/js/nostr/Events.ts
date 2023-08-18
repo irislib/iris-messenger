@@ -138,9 +138,11 @@ const Events = {
       return;
     }
     if (existing) {
-      EventDB.findAndRemove({ kinds: [3], authors: [event.pubkey] });
+      //EventDB.findAndRemove({ kinds: [3], authors: [event.pubkey] });
     }
-    EventDB.insert(event);
+    // no need to store follow events in memory because they're already in SocialNetwork.
+    // when we start doing p2p, we can perhaps keep them in memory or just ask from dexie
+    //EventDB.insert(event);
     const myPub = Key.getPubKey();
 
     if (event.tags) {
@@ -233,9 +235,10 @@ const Events = {
         return false;
       }
       if (existing) {
-        EventDB.findAndRemove({ authors: [event.pubkey], kinds: [0] });
+        //EventDB.findAndRemove({ authors: [event.pubkey], kinds: [0] });
       }
-      EventDB.insert(event);
+      // same as handleFollow, no need to store in memory for now
+      //EventDB.insert(event);
       const profile = JSON.parse(event.content);
       // if we have previously deleted our account, log out. appease app store.
       if (event.pubkey === Key.getPubKey() && profile.deleted) {
