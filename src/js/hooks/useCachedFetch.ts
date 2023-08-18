@@ -25,8 +25,8 @@ const useCachedFetch = (url, storageKey, dataProcessor = (data) => data) => {
         })
         .catch(() => {
           if (!hasError) {
-            if (cachedData) {
-              setData(cachedData);
+            if (cachedData?.data) {
+              setData(cachedData.data);
             }
             setHasError(true);
           }
