@@ -74,7 +74,7 @@ const useSubscribe = (ops: SubscribeOptions) => {
       lastUntilRef.current = until;
       const newFilter = { ...filter, until, limit: 100 };
 
-      console.log('loadMore', newFilter);
+      console.log('loadMore until', until && new Date(until * 1000));
 
       const cleanup = PubSub.subscribe(newFilter, addEventToSortedEvents, false, false);
 
