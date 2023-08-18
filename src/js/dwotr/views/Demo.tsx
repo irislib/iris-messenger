@@ -3,9 +3,7 @@ import { useEffect, useState } from 'preact/hooks';
 import Key from '../../nostr/Key';
 import graphNetwork from '../GraphNetwork';
 import Header from '../../components/Header';
-import { Button } from '../../components/buttons/Button';
 import profileManager from '../ProfileManager';
-import { ID } from '../../nostr/UserIds';
 import { toTimestamp } from '../Utils';
 import Name from '../../components/user/Name';
 import InfoList from '../components/Display/InfoList';
@@ -16,6 +14,7 @@ import { resetWoTDatabase } from '../network/DWoTRDexie';
 import { bytesToHex } from '@noble/hashes/utils';
 import { mnemonicToSeedSync } from '@scure/bip39';
 import { HDKey } from '@scure/bip32';
+import { ID } from '@/utils/UniqueIds';
 
 const mnemonic = 'zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong';
 
@@ -451,15 +450,15 @@ const Demo = (props: TestDataProps) => {
       trust situations.
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-wrap gap-4">
-        <Button className="btn btn-sm" onClick={saylorGraphClick}>
+        <button className="btn btn-sm" onClick={saylorGraphClick}>
           Create Influencer Graph
-        </Button>
-        <Button className="btn btn-sm" onClick={createLargeGraphClick}>
+        </button>
+        <button className="btn btn-sm" onClick={createLargeGraphClick}>
           Create Large Graph 10k nodes
-        </Button>
-        <Button className="btn btn-sm" onClick={deleteLargeGraphClick}>
+        </button>
+        <button className="btn btn-sm" onClick={deleteLargeGraphClick}>
           Delete Large Graph 10k nodes
-        </Button>
+        </button>
 
         {/* <Button className="btn btn-primary btn-sm" onClick={jackGraphClick}>
           Create Jack Graph
@@ -476,9 +475,9 @@ const Demo = (props: TestDataProps) => {
         <Button className="btn btn-sm" onClick={loadAllClick}>
           Create All Graphs
         </Button> */}
-        <Button className="btn btn-sm" onClick={resetAll}>
+        <button className="btn btn-sm" onClick={resetAll}>
           Reset All
-        </Button>
+        </button>
       </div>
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-wrap gap-4">Status: {state?.message}</div>

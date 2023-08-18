@@ -1,4 +1,4 @@
-import { ID } from "../../nostr/UserIds";
+import { ID } from "@/utils/UniqueIds";
 import { sha256 } from "../Utils";
 import TrustScore, { MAX_DEGREE } from "./TrustScore";
 

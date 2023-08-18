@@ -4,9 +4,9 @@ import SocialNetwork from '../../nostr/SocialNetwork';
 import Show from '../helpers/Show';
 import SafeImg from '../SafeImg';
 import profileManager from '../../dwotr/ProfileManager';
-import { ID } from '../../nostr/UserIds';
-import ProfileRecord, { ProfileMemory } from '../../dwotr/model/ProfileRecord';
+import { ProfileMemory } from '../../dwotr/model/ProfileRecord';
 import { ProfileEvent } from '../../dwotr/network/ProfileEvent';
+import { ID } from '@/utils/UniqueIds';
 
 type Props = {
   str: unknown;
@@ -33,12 +33,12 @@ class MyAvatar extends Component<Props, State> {
 
 
   componentDidMount() {
-    const pub = this.props.str as string;
-    if (!pub) {
+    const str = this.props.str as string;
+    if (!str) {
       return;
     }
 
-    let id = ID(pub);
+    let id = ID(str);
 
     this.handleEvent = (e: any) => {
       let p = e.detail as ProfileMemory;
@@ -59,10 +59,10 @@ class MyAvatar extends Component<Props, State> {
     this.setState({
       picture: profile.picture,
       name: profile.name,
-      avatar: profileManager.createImageUrl(pub, this.props.width),
+      avatar: profileManager.createImageUrl(str, this.props.width),
     });
 
-    this.unsub = profileManager.subscribe(pub);
+    this.unsub = profileManager.subscribe(str);
 
     this.setState({ activity: null });
   }

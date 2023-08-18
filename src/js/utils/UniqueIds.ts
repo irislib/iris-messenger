@@ -38,8 +38,8 @@ export class UniqueIds {
     return UniqueIds.strToUniqueId.has(str);
   }
 
-  static bech32(id: number): string {
-    return Key.toNostrBech32Address(UniqueIds.str(id), 'npub') || '';
+  static bech32(id: number, prefix: string = 'npub'): string {
+    return Key.toNostrBech32Address(UniqueIds.str(id), prefix) || '';
   }
   
 }

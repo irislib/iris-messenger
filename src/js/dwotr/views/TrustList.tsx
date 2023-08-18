@@ -12,7 +12,6 @@ import {
   RenderTrust1Color,
 } from '../components/RenderGraph';
 import MyAvatar from '../../components/user/Avatar';
-import { ID, PUB } from '../../nostr/UserIds';
 import Name from '../../components/user/Name';
 import {
   ViewComponentProps,
@@ -25,6 +24,7 @@ import GraphDirectionSelect from '../components/GraphDirectionSelect';
 import GraphTrust1Select from '../components/GraphTrust1Select';
 import { translate as t } from '../../translations/Translation.mjs';
 import Show from '@/components/helpers/Show';
+import { ID, STR } from '@/utils/UniqueIds';
 
 export function filterByName(list: Vertice[], filter: string) {
   if (!filter || list.length == 0) return [...list]; // Return a copy of the list
@@ -101,7 +101,7 @@ const TrustList = ({ props }: ViewComponentProps) => {
       list = graphNetwork.g.trustedBy(id, EntityType.Key, trust1Value);
     }
 
-    let addresses = list.map((v) => PUB(v.id));
+    let addresses = list.map((v) => STR(v.id));
 
     // Make sure we have the profiles for the addresses
     await profileManager.getProfiles(addresses);
@@ -120,7 +120,7 @@ const TrustList = ({ props }: ViewComponentProps) => {
   };
 
   const renderEntityKey = (v: Vertice, id: number) => {
-    const itemKey = PUB(v.id);
+    const itemKey = STR(v.id);
     const degree = v.degree;
     const score = v.score;
     const itemNpub = Key.toNostrBech32Address(itemKey as string, 'npub') as string;

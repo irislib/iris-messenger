@@ -1,15 +1,10 @@
-import { JSX } from 'react';
 import { useEffect, useState } from 'preact/hooks';
 import Key from '../../nostr/Key';
 import graphNetwork from '../GraphNetwork';
 import Header from '../../components/Header';
-import { Button } from '../../components/buttons/Button';
 import profileManager from '../ProfileManager';
 import Name from '../../components/user/Name';
 import InfoList from '../components/Display/InfoList';
-import ProfileRecord from '../model/ProfileRecord';
-import { Edge } from '../model/Graph';
-import { ID } from '../../nostr/UserIds';
 
 
 const ProfileHistory = (props: any) => {

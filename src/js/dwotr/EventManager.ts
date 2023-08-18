@@ -1,3 +1,4 @@
+import EventDB from "@/nostr/EventDB";
 import Events from "@/nostr/Events";
 
 class EventManager {
@@ -11,7 +12,7 @@ class EventManager {
 
      // TODO: return Unsubscribe
   async getEventById(id: string) {
-    const event = Events.db.by('id', id);
+    const event = EventDB.get(id);
     if (event) return event;
 
     let res = await fetch(`https://api.iris.to/event/${id}`);

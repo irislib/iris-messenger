@@ -10,6 +10,7 @@ const useVerticeMonitor = (id: number, options?: any, option?: any) => {
     const [state, setState] = useState({id, options, option});
 
     useEffect(() => {
+        if(!id) return; // No id, no monitor. id = 0 is a non existing id cause by the use of ID("") in the code
 
         function findOption(item: MonitorItem) {
             let vertice = graphNetwork.g.vertices[item.id] as Vertice;
@@ -27,6 +28,7 @@ const useVerticeMonitor = (id: number, options?: any, option?: any) => {
             findOption(item);
         }
 
+        
         graphNetwork.addVerticeMonitor(id);
         TrustScoreEvent.add(cb);
 

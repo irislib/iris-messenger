@@ -213,7 +213,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
             </p>
             <div className="flex flex-1 flex-row align-center justify-center mt-4">
               <Show when={!isMyProfile}>
-                <TrustProfileButtons hexPub={hexPub} />
+                <TrustProfileButtons str={hexPub} />
               </Show>
               <Show when={lightning}>
                 <div className="flex-1">

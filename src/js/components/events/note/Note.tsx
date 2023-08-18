@@ -17,7 +17,7 @@ import Avatar from './Avatar';
 import Content from './Content';
 
 import useVerticeMonitor from '../../../dwotr/hooks/useVerticeMonitor';
-import { ID } from '../../../nostr/UserIds';
+import { ID } from '@/utils/UniqueIds';
 
 
 const Note = ({

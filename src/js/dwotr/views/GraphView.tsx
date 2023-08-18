@@ -9,9 +9,9 @@ import TrustList, { renderScoreLine } from './TrustList';
 import VisPath from './VisPath';
 import VisGraph from './VisGraph';
 import { Vertice } from '../model/Graph';
-import { ID } from '../../nostr/UserIds';
 import { debounce } from 'lodash';
 import ItemName from '../components/ItemName';
+import { ID } from '@/utils/UniqueIds';
 
 type GraphViewProps = {
   npub?: string;
@@ -178,7 +178,7 @@ const GraphView = (props: GraphViewProps) => {
         <span className="text-2xl font-bold">
           <a className="link" href={`/${npub}`}>
             { entitytype == 'key' && (<Name pub={npub} />)}
-            { entitytype == 'item' && (<ItemName hexPub={hexKey} />)}
+            { entitytype == 'item' && (<ItemName str={hexKey} />)}
           </a>
           <span style={{ flex: 1 }} className="ml-1">
             {view}

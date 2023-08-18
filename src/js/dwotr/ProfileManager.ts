@@ -150,7 +150,7 @@ class ProfileManager {
     for (const address of addresses) {
       if (!address) continue;
       const hexPub = Key.toNostrHexAddress(address) as string;
-      const profile = SocialNetwork.profiles.get(ID(hexPub)); // ID() makes sure to register the address with an ID in the UserIds map if it's not already there
+      const profile = SocialNetwork.profiles.get(ID(hexPub)); // ID() makes sure to register the address with an ID in the Ids map if it's not already there
       if (profile) {
         profiles.push(profile);
       } else {

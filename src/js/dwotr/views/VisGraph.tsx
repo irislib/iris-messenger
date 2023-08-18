@@ -5,7 +5,6 @@ import graphNetwork from '../GraphNetwork';
 import { Edge, Vertice } from '../model/Graph';
 import { RenderTrust1Color } from '../components/RenderGraph';
 import profileManager from '../ProfileManager';
-import { BECH32, ID, PUB, UserIds } from '../../nostr/UserIds';
 import { MAX_DEGREE } from '../model/TrustScore';
 import { translate as t } from '../../translations/Translation.mjs';
 import { ViewComponentProps, parseEntityType } from './GraphView';
@@ -16,6 +15,7 @@ import { loadItemVertice, loadKeyVertice } from './VisPath';
 import Show from '@/components/helpers/Show';
 import Key from '@/nostr/Key';
 import ProfileRecord from '../model/ProfileRecord';
+import { BECH32, ID, STR } from '@/utils/UniqueIds';
 
 //*******************************
 // Vis graph settings
@@ -135,7 +135,7 @@ const VisGraph = ({ props }: ViewComponentProps) => {
 
       if (selectedId == vId) return;
 
-      let npub = selectedV.entityType == 1 ? BECH32(selectedId) : Key.toNostrBech32Address(UserIds.pub(selectedId), 'note');
+      let npub = selectedV.entityType == 1 ? BECH32(selectedId) : Key.toNostrBech32Address(STR(selectedId), 'note');
       props.setNpub(npub as string);
       setVid(selectedId);
 
@@ -241,7 +241,7 @@ const VisGraph = ({ props }: ViewComponentProps) => {
 
     // Load the profiles for all the vertices
     let vertices = Object.values(distinctV); // convert to array
-    let addresses = vertices.map((v) => PUB(v.id)); // convert to pub hex format
+    let addresses = vertices.map((v) => STR(v.id)); // convert to pub hex format
     let profiles = await profileManager.getProfiles(addresses); // Load profiles for all the vertices 
     if (!isMounted()) return; // Check if component is still mounted
 

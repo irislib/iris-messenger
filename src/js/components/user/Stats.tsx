@@ -69,7 +69,7 @@ const ProfileStats = ({ address }) => {
         <Link href={`/followers/${address}`}>
           <b>{Math.max(followerCount, followerCountFromApi)}</b><span className="text-neutral-500"> {t('followers')}</span>
         </Link>
-        <ProfileScoreLinks hexPub={address} />
+        <ProfileScoreLinks str={address} />
       </div>
       <Show when={!isMyProfile && knownFollowers.length > 0}>
         <div className="text-neutral-500">

@@ -120,7 +120,7 @@ const View32010 = (props: TestDataProps) => {
       <div className="flex justify-between mb-4">
         <span className="text-2xl font-bold">
           <span style={{ flex: 1 }} className="ml-1">
-            List 32010 events
+            Kind 32010 events
           </span>
         </span>
       </div>

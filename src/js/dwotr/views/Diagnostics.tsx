@@ -3,9 +3,7 @@ import { useEffect, useState } from 'preact/hooks';
 import Key from '../../nostr/Key';
 import graphNetwork from '../GraphNetwork';
 import Header from '../../components/Header';
-import { Button } from '../../components/buttons/Button';
 import profileManager from '../ProfileManager';
-import { ID } from '../../nostr/UserIds';
 import { toTimestamp } from '../Utils';
 import Name from '../../components/user/Name';
 import InfoList from '../components/Display/InfoList';
@@ -13,6 +11,7 @@ import ProfileRecord from '../model/ProfileRecord';
 import { Edge } from '../model/Graph';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { resetWoTDatabase } from '../network/DWoTRDexie';
+import { ID } from '@/utils/UniqueIds';
 
 type TestDataProps = {
   id?: string;
@@ -313,24 +312,24 @@ const Diagnostics = (props: TestDataProps) => {
       trust situations.
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex flex-wrap gap-4">
-        <Button className="btn btn-sm" onClick={jackGraphClick}>
+        <button className="btn btn-sm" onClick={jackGraphClick}>
           Create Jack Graph
-        </Button>
-        <Button className="btn btn-sm" onClick={saylorGraphClick}>
+        </button>
+        <button className="btn btn-sm" onClick={saylorGraphClick}>
           Create Saylor Graph
-        </Button>
-        <Button className="btn btn-sm" onClick={siriusGraphClick}>
+        </button>
+        <button className="btn btn-sm" onClick={siriusGraphClick}>
           Create Saylor Graph
-        </Button>
-        <Button className="btn btn-sm" onClick={lynGraphClick}>
+        </button>
+        <button className="btn btn-sm" onClick={lynGraphClick}>
           Create Lyn Graph
-        </Button>
-        <Button className="btn btn-sm" onClick={loadAllClick}>
+        </button>
+        <button className="btn btn-sm" onClick={loadAllClick}>
           Create All Graphs
-        </Button>
-        <Button className="btn btn-sm" onClick={resetAll}>
+        </button>
+        <button className="btn btn-sm" onClick={resetAll}>
           Reset All
-        </Button>
+        </button>
       </div>
       <hr className="-mx-2 opacity-10 my-2" />
       <div className="flex">

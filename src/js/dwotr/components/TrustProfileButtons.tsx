@@ -4,9 +4,9 @@ import { CheckCorrect, FlagMarkSolid } from './Icons';
 import { EntityType } from '../model/Graph';
 import useVerticeMonitor from '../hooks/useVerticeMonitor';
 import TrustScore from '../model/TrustScore';
-import { ID } from '../../nostr/UserIds';
+import { ID } from '@/utils/UniqueIds';
 
-const TrustProfileButtons = ({hexPub}: any) => {
+const TrustProfileButtons = ({str}: any) => {
   const [state, setState] = useState({
     showTrustsList: false,
     trusted: false,
@@ -18,7 +18,7 @@ const TrustProfileButtons = ({hexPub}: any) => {
     processing: false,
   });
 
-  const wot = useVerticeMonitor(ID(hexPub)) as any;
+  const wot = useVerticeMonitor(ID(str)) as any;
 
   useEffect(() => {
     if (!wot) return;
@@ -53,7 +53,7 @@ const TrustProfileButtons = ({hexPub}: any) => {
 
     (async () => {
       let val = !state.trusted ? 1 : 0;
-      await graphNetwork.publishTrust(hexPub, val, EntityType.Key);
+      await graphNetwork.publishTrust(str, val, EntityType.Key);
     })();
   }
 
@@ -70,7 +70,7 @@ const TrustProfileButtons = ({hexPub}: any) => {
 
     (async () => {
       let val = !state.distrusted ? -1 : 0;
-      await graphNetwork.publishTrust(hexPub, val, EntityType.Key);
+      await graphNetwork.publishTrust(str, val, EntityType.Key);
     })();
   }
 

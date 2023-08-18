@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import profileManager from '../ProfileManager';
-import { ID } from '../../nostr/UserIds';
 import ProfileRecord, { ProfileMemory } from '../model/ProfileRecord';
 import { ProfileEvent } from '../network/ProfileEvent';
+import { ID } from '@/utils/UniqueIds';
 
 
 // Address can be of type hex of BECH32

@@ -5,7 +5,6 @@ import graphNetwork from '../GraphNetwork';
 import { Edge, Vertice } from '../model/Graph';
 import { RenderTrust1Color } from '../components/RenderGraph';
 import profileManager from '../ProfileManager';
-import { BECH32, ID, PUB, UserIds } from '../../nostr/UserIds';
 import { translate as t } from '../../translations/Translation.mjs';
 import TrustScore from '../model/TrustScore';
 import { ViewComponentProps } from './GraphView';
@@ -16,6 +15,7 @@ import { filterNodes } from './VisGraph';
 import Events from '../../nostr/Events';
 import eventManager from '../EventManager';
 import ProfileRecord from '../model/ProfileRecord';
+import { BECH32, ID, STR } from '@/utils/UniqueIds';
 
 const defaultOptions = {
   layout: {
@@ -85,12 +85,9 @@ export function loadKeyVertice(vertice: Vertice, nodes: DataSetNodes) {
 
 
 export async function loadItemVertice(vertice: Vertice, nodes: DataSetNodes) {
-  let key = PUB(vertice.id);
+  let key = STR(vertice.id);
 
-  let event = Events.db.by('id',key);
-  if (!event) {
-    event = await eventManager.getEventById(key); 
-  }
+  let event = await eventManager.getEventById(key); 
 
   let profile = await profileManager.getProfile(event?.pubkey);
 
@@ -150,7 +147,7 @@ const VisPath = ({ props }: ViewComponentProps) => {
       const selectedV = graphNetwork.g.vertices[selectedId] as Vertice;
 
       //if (vId == state.vId) return;
-      let npub = selectedV.entityType == 1 ? BECH32(selectedId) : Key.toNostrBech32Address(UserIds.pub(selectedId), 'note');
+      let npub = selectedV.entityType == 1 ? BECH32(selectedId) : Key.toNostrBech32Address(STR(selectedId), 'note');
       props.setNpub(npub as string);
     });
 
@@ -198,7 +195,7 @@ const VisPath = ({ props }: ViewComponentProps) => {
 
     let vertices = Object.values(verticeIndex) as Vertice[];
 
-    let addresses = vertices.map((v) => PUB(v.id));
+    let addresses = vertices.map((v) => STR(v.id));
 
     await profileManager.getProfiles(addresses); // Load all profiles in memory first
     if (!isMounted()) return; // Check if component is still mounted
