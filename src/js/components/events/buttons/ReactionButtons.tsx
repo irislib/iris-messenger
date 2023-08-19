@@ -3,8 +3,8 @@ import { memo } from 'preact/compat';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
-import Show from '@/components/helpers/Show.tsx';
-import localState from '@/LocalState.ts';
+import Show from '@/components/helpers/Show';
+import localState from '@/LocalState';
 
 import Events from '../../../nostr/Events';
 import Key from '../../../nostr/Key';

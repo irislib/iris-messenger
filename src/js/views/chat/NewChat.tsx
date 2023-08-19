@@ -8,7 +8,7 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
-import AnimalName from '../../utils/AnimalName.ts';
+import AnimalName from '../../utils/AnimalName';
 
 export const setGroupNameByInvite = (hexPriv, otherGuy) => {
   let name;

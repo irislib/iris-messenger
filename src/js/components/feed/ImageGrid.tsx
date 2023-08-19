@@ -5,9 +5,9 @@ import Video from '@/components/embed/Video';
 import ImageGridItem from '@/components/feed/ImageGridItem';
 import ImageModal from '@/components/feed/ImageModal';
 import { ImageOrVideo } from '@/components/feed/types';
-import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
-import EventDB from '@/nostr/EventDB.ts';
-import { getEventReplyingTo } from '@/nostr/utils.ts';
+import InfiniteScroll from '@/components/helpers/InfiniteScroll';
+import EventDB from '@/nostr/EventDB';
+import { getEventReplyingTo } from '@/nostr/utils';
 
 interface ImageGridProps {
   events: any[];

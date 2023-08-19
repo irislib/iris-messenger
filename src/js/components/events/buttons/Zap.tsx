@@ -2,16 +2,16 @@ import { BoltIcon } from '@heroicons/react/24/outline';
 import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'preact/hooks';
 
-import Show from '@/components/helpers/Show.tsx';
-import { useLocalState } from '@/LocalState.ts';
-import EventDB from '@/nostr/EventDB.ts';
-import Key from '@/nostr/Key.ts';
-import { getZappingUser } from '@/nostr/utils.ts';
-import Icons from '@/utils/Icons.tsx';
+import Show from '@/components/helpers/Show';
+import { useLocalState } from '@/LocalState';
+import EventDB from '@/nostr/EventDB';
+import Key from '@/nostr/Key';
+import { getZappingUser } from '@/nostr/utils';
+import Icons from '@/utils/Icons';
 
 import Events from '../../../nostr/Events';
 import SocialNetwork from '../../../nostr/SocialNetwork';
-import { decodeInvoice, formatAmount } from '../../../utils/Lightning.ts';
+import { decodeInvoice, formatAmount } from '../../../utils/Lightning';
 import ZapModal from '../../modal/Zap';
 
 const Zap = ({ event }) => {

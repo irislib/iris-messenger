@@ -1,14 +1,14 @@
 import { memo } from 'react';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
-import EventDB from '@/nostr/EventDB.ts';
-import { getNoteReplyingTo } from '@/nostr/utils.ts';
+import EventDB from '@/nostr/EventDB';
+import { getNoteReplyingTo } from '@/nostr/utils';
 
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
-import Icons from '../../utils/Icons.tsx';
+import Icons from '../../utils/Icons';
 
 import Note from './note/Note';
 import EventDropdown from './EventDropdown';

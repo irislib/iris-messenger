@@ -13,10 +13,10 @@ import localState from '../../LocalState';
 import Key from '../../nostr/Key';
 import PubSub from '../../nostr/PubSub';
 import { translate as t } from '../../translations/Translation.mjs';
-import Helpers from '../../utils/Helpers.tsx';
+import Helpers from '../../utils/Helpers';
 import SortedMap from '../../utils/SortedMap';
 
-import ChatMessageForm from './ChatMessageForm.tsx';
+import ChatMessageForm from './ChatMessageForm';
 import { addGroup, sendSecretInvite } from './NewChat';
 
 export type DecryptedEvent = Event & { text?: string };

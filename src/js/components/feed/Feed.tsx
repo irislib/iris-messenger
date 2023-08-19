@@ -3,15 +3,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import EventComponent from '@/components/events/EventComponent';
 import DisplaySelector from '@/components/feed/DisplaySelector';
 import FilterOptionsSelector from '@/components/feed/FilterOptionsSelector';
-import ImageGrid from '@/components/feed/ImageGrid.tsx';
+import ImageGrid from '@/components/feed/ImageGrid';
 import ShowNewEvents from '@/components/feed/ShowNewEvents';
 import { DisplayAs, FeedProps } from '@/components/feed/types';
 import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 import Show from '@/components/helpers/Show';
 import useSubscribe from '@/hooks/useSubscribe';
 import { useLocalState } from '@/LocalState';
-import Key from '@/nostr/Key.ts';
-import Helpers from '@/utils/Helpers.tsx';
+import Key from '@/nostr/Key';
+import Helpers from '@/utils/Helpers';
 
 const Feed = (props: FeedProps) => {
   const fetchEvents = props.fetchEvents || useSubscribe;

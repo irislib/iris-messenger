@@ -10,7 +10,7 @@ import { Link } from 'preact-router';
 
 import localState from '../LocalState';
 import Key from '../nostr/Key';
-import Icons from '../utils/Icons.tsx';
+import Icons from '../utils/Icons';
 
 import Show from './helpers/Show';
 import Avatar from './user/Avatar';

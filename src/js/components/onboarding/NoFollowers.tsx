@@ -1,10 +1,10 @@
 import { XMarkIcon } from '@heroicons/react/24/solid';
 
-import Copy from '@/components/buttons/Copy.tsx';
-import QRModal from '@/components/modal/QRModal.tsx';
-import Key from '@/nostr/Key.ts';
+import Copy from '@/components/buttons/Copy';
+import QRModal from '@/components/modal/QRModal';
+import Key from '@/nostr/Key';
 import { translate as t } from '@/translations/Translation.mjs';
-import Helpers from '@/utils/Helpers.tsx';
+import Helpers from '@/utils/Helpers';
 
 export default function NoFollowers({ setNoFollowers, setShowQrModal, showQrModal }) {
   return (

@@ -2,8 +2,8 @@ import { memo, useEffect, useState } from 'react';
 
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
-import AnimalName from '../../utils/AnimalName.ts';
-import { ID } from '../../utils/UniqueIds.ts';
+import AnimalName from '../../utils/AnimalName';
+import { ID } from '../../utils/UniqueIds';
 
 import Badge from './Badge';
 

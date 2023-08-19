@@ -8,7 +8,7 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
 import { translate as t } from '../translations/Translation.mjs';
-import Icons from '../utils/Icons.tsx';
+import Icons from '../utils/Icons';
 
 import Show from './helpers/Show';
 import Name from './user/Name';

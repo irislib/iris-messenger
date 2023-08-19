@@ -1,9 +1,9 @@
 import { Link } from 'preact-router';
 
-import Follow from '@/components/buttons/Follow.tsx';
-import Avatar from '@/components/user/Avatar.tsx';
-import Name from '@/components/user/Name.tsx';
-import Key from '@/nostr/Key.ts';
+import Follow from '@/components/buttons/Follow';
+import Avatar from '@/components/user/Avatar';
+import Name from '@/components/user/Name';
+import Key from '@/nostr/Key';
 import { translate as t } from '@/translations/Translation.mjs';
 
 const SUGGESTED_FOLLOWS = [

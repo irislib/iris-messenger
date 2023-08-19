@@ -4,7 +4,7 @@ import { Event } from 'nostr-tools';
 
 import Filter from '@/nostr/Filter';
 import PubSub from '@/nostr/PubSub';
-import SortedMap from '@/utils/SortedMap.tsx';
+import SortedMap from '@/utils/SortedMap';
 
 interface SubscribeOptions {
   filter: Filter;

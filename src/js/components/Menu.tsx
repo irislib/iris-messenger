@@ -20,7 +20,7 @@ import CreateNoteForm from '@/components/create/CreateNoteForm';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
-import Icons from '../utils/Icons.tsx';
+import Icons from '../utils/Icons';
 
 import Show from './helpers/Show';
 import Modal from './modal/Modal';

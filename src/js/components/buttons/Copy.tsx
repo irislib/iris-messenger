@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 
 import { translate as t } from '../../translations/Translation.mjs';
-import Helpers from '../../utils/Helpers.tsx';
+import Helpers from '../../utils/Helpers';
 
 type OptionalGetter<T> = T | (() => T);
 

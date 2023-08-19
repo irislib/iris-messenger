@@ -10,7 +10,7 @@ import {
 import { route } from 'preact-router';
 
 import localState from '../LocalState';
-import Helpers from '../utils/Helpers.tsx';
+import Helpers from '../utils/Helpers';
 
 import Events from './Events';
 

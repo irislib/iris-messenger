@@ -2,15 +2,15 @@ import { useCallback, useEffect, useState } from 'react';
 import { Event } from 'nostr-tools';
 import { route } from 'preact-router';
 
-import EventDB from '@/nostr/EventDB.ts';
+import EventDB from '@/nostr/EventDB';
 
 import localState from '../../LocalState';
 import Key from '../../nostr/Key';
 import PubSub from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
-import Helpers from '../../utils/Helpers.tsx';
-import { ID } from '../../utils/UniqueIds.ts';
+import Helpers from '../../utils/Helpers';
+import { ID } from '../../utils/UniqueIds';
 import Follow from '../buttons/Follow';
 import Show from '../helpers/Show';
 import HyperText from '../HyperText';

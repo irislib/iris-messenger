@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 import { Link } from 'preact-router';
 
-import EventDB from '@/nostr/EventDB.ts';
+import EventDB from '@/nostr/EventDB';
 
 import Copy from '../../components/buttons/Copy';
 import Follow from '../../components/buttons/Follow';

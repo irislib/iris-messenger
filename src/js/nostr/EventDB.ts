@@ -1,8 +1,8 @@
 import loki from 'lokijs';
 import { Event } from 'nostr-tools';
 
-import Filter from '@/nostr/Filter.ts';
-import { ID, STR } from '@/utils/UniqueIds.ts';
+import Filter from '@/nostr/Filter';
+import { ID, STR } from '@/utils/UniqueIds';
 
 export class EventDB {
   private db: any;

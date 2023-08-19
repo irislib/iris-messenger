@@ -1,6 +1,6 @@
 import { Event } from 'nostr-tools';
 
-import Key from '@/nostr/Key.ts';
+import Key from '@/nostr/Key';
 
 export function getRepostedEventId(event: Event) {
   let id = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];

@@ -2,14 +2,14 @@ import { nip19 } from 'nostr-tools';
 import { useCallback, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
-import Show from '@/components/helpers/Show.tsx';
+import Show from '@/components/helpers/Show';
 
 import Copy from '../../components/buttons/Copy';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation.mjs';
-import Helpers from '../../utils/Helpers.tsx';
+import Helpers from '../../utils/Helpers';
 import { ExistingAccountLogin } from '../Login';
 
 const Account = () => {

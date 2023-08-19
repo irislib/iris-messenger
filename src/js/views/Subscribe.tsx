@@ -1,4 +1,4 @@
-import { RouteProps } from '@/views/types.ts';
+import { RouteProps } from '@/views/types';
 
 import Header from '../components/Header';
 import { translate as t } from '../translations/Translation.mjs';

@@ -1,8 +1,8 @@
 import { Helmet } from 'react-helmet';
 import { route } from 'preact-router';
 
-import SimpleImageModal from '@/components/modal/Image.tsx';
-import { getEventReplyingTo } from '@/nostr/utils.ts';
+import SimpleImageModal from '@/components/modal/Image';
+import { getEventReplyingTo } from '@/nostr/utils';
 
 import Copy from '../components/buttons/Copy';
 import Feed from '../components/feed/Feed';
@@ -13,7 +13,7 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation.mjs';
-import Helpers from '../utils/Helpers.tsx';
+import Helpers from '../utils/Helpers';
 
 import View from './View';
 

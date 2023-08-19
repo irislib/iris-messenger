@@ -6,7 +6,7 @@ import { sendNostr } from '@/components/create/util';
 import EventContent from '@/components/events/note/Content';
 import Show from '@/components/helpers/Show';
 import localState from '@/LocalState';
-import Key from '@/nostr/Key.ts';
+import Key from '@/nostr/Key';
 import { translate as t } from '@/translations/Translation.mjs';
 import Icons from '@/utils/Icons';
 

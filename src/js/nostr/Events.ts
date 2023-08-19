@@ -9,7 +9,7 @@ import {
 } from 'nostr-tools';
 import { EventTemplate } from 'nostr-tools';
 
-import EventDB from '@/nostr/EventDB.ts';
+import EventDB from '@/nostr/EventDB';
 import {
   getEventReplyingTo,
   getEventRoot,
@@ -18,8 +18,8 @@ import {
   getOriginalPostEventId,
   getRepostedEventId,
   isRepost,
-} from '@/nostr/utils.ts';
-import { ID, STR, UniqueIds } from '@/utils/UniqueIds.ts';
+} from '@/nostr/utils';
+import { ID, STR, UniqueIds } from '@/utils/UniqueIds';
 
 import localState from '../LocalState';
 import { Node } from '../LocalState';
@@ -27,7 +27,7 @@ import { DecryptedEvent } from '../views/chat/ChatMessages';
 import { addGroup, setGroupNameByInvite } from '../views/chat/NewChat';
 
 import EventMetaStore from './EventsMeta';
-import FuzzySearch from './FuzzySearch.ts';
+import FuzzySearch from './FuzzySearch';
 import IndexedDB from './IndexedDB';
 import Key from './Key';
 import PubSub, { Unsubscribe } from './PubSub';

@@ -2,7 +2,7 @@ import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
-import { RouteProps } from '@/views/types.ts';
+import { RouteProps } from '@/views/types';
 
 import Upload from '../components/buttons/Upload';
 import Header from '../components/Header';

@@ -5,7 +5,7 @@ import SearchBox from '@/components/SearchBox';
 import localState from '@/LocalState';
 import Key from '@/nostr/Key';
 import { translate as t } from '@/translations/Translation.mjs';
-import Helpers from '@/utils/Helpers.tsx';
+import Helpers from '@/utils/Helpers';
 import { uploadFile } from '@/utils/uploadFile';
 
 const mentionRegex = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]*$/;

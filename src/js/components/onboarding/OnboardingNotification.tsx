@@ -1,9 +1,9 @@
 import { useState } from 'preact/hooks';
 
-import FollowSuggestions from '@/components/onboarding/FollowSuggestions.tsx';
-import GetIrisAddress from '@/components/onboarding/GetIrisAddress.tsx';
-import NoFollowers from '@/components/onboarding/NoFollowers.tsx';
-import { useLocalState } from '@/LocalState.ts';
+import FollowSuggestions from '@/components/onboarding/FollowSuggestions';
+import GetIrisAddress from '@/components/onboarding/GetIrisAddress';
+import NoFollowers from '@/components/onboarding/NoFollowers';
+import { useLocalState } from '@/LocalState';
 
 function OnboardingNotification() {
   const [noFollowers, setNoFollowers] = useLocalState('noFollowers');

@@ -1,12 +1,12 @@
 import CreateNoteForm from '@/components/create/CreateNoteForm';
 import FeedComponent from '@/components/feed/Feed';
 import Show from '@/components/helpers/Show';
-import OnboardingNotification from '@/components/onboarding/OnboardingNotification.tsx';
+import OnboardingNotification from '@/components/onboarding/OnboardingNotification';
 import Key from '@/nostr/Key';
 import { Unsubscribe } from '@/nostr/PubSub';
-import { getEventReplyingTo } from '@/nostr/utils.ts';
+import { getEventReplyingTo } from '@/nostr/utils';
 import { translate as t } from '@/translations/Translation.mjs';
-import { ID, STR } from '@/utils/UniqueIds.ts';
+import { ID, STR } from '@/utils/UniqueIds';
 
 import SocialNetwork from '../../nostr/SocialNetwork';
 import View from '../View';

@@ -5,8 +5,8 @@ import { Event, matchFilter, nip42 } from 'nostr-tools';
 import Filter from '@/nostr/Filter';
 const { authenticate } = nip42;
 
-import EventDB from '@/nostr/EventDB.ts';
-import { UniqueIds } from '@/utils/UniqueIds.ts';
+import EventDB from '@/nostr/EventDB';
+import { UniqueIds } from '@/utils/UniqueIds';
 
 import localState from '../LocalState';
 import Events from '../nostr/Events';

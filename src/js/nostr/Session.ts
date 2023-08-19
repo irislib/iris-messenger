@@ -3,8 +3,8 @@ import { Event, Filter } from 'nostr-tools';
 import { route } from 'preact-router';
 
 import localState from '../LocalState';
-import IrisTo from '../utils/IrisTo.ts';
-import { ID } from '../utils/UniqueIds.ts';
+import IrisTo from '../utils/IrisTo';
+import { ID } from '../utils/UniqueIds';
 
 import Events from './Events';
 import IndexedDB from './IndexedDB';

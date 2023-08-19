@@ -2,19 +2,19 @@ import { useEffect, useMemo, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Event } from 'nostr-tools';
 
-import { useLocalState } from '@/LocalState.ts';
+import { useLocalState } from '@/LocalState';
 
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Relays from '../../nostr/Relays';
-import Helpers from '../../utils/Helpers.tsx';
+import Helpers from '../../utils/Helpers';
 import {
   LNURL,
   LNURLError,
   LNURLErrorCode,
   LNURLInvoice,
   LNURLSuccessAction,
-} from '../../utils/LNURL.ts';
+} from '../../utils/LNURL';
 import CopyButton from '../buttons/Copy';
 import QrCode from '../QrCode';
 import Name from '../user/Name';

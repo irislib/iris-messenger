@@ -8,7 +8,7 @@ import HyperText from '@/components/HyperText';
 import localState from '@/LocalState';
 import SocialNetwork from '@/nostr/SocialNetwork';
 import { translate as t } from '@/translations/Translation.mjs';
-import Helpers from '@/utils/Helpers.tsx';
+import Helpers from '@/utils/Helpers';
 
 import Author from './Author';
 import Helmet from './Helmet';

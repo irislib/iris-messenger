@@ -3,10 +3,10 @@ import { Event } from 'nostr-tools';
 import { useEffect, useState } from 'preact/hooks';
 import { Link, route } from 'preact-router';
 
-import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
-import PubSub from '@/nostr/PubSub.ts';
-import { getEventReplyingTo, getEventRoot } from '@/nostr/utils.ts';
-import SortedMap from '@/utils/SortedMap.tsx';
+import InfiniteScroll from '@/components/helpers/InfiniteScroll';
+import PubSub from '@/nostr/PubSub';
+import { getEventReplyingTo, getEventRoot } from '@/nostr/utils';
+import SortedMap from '@/utils/SortedMap';
 
 import Key from '../../../nostr/Key';
 import { translate as t } from '../../../translations/Translation.mjs';

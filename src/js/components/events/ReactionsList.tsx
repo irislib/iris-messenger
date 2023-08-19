@@ -2,11 +2,11 @@ import { memo, useEffect, useState } from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link } from 'preact-router';
 
-import EventDB from '@/nostr/EventDB.ts';
-import { getZappingUser } from '@/nostr/utils.ts';
+import EventDB from '@/nostr/EventDB';
+import { getZappingUser } from '@/nostr/utils';
 
 import Events from '../../nostr/Events'; // Import Events module
-import { decodeInvoice, formatAmount } from '../../utils/Lightning.ts';
+import { decodeInvoice, formatAmount } from '../../utils/Lightning';
 import Modal from '../modal/Modal';
 import Avatar from '../user/Avatar';
 import Name from '../user/Name';

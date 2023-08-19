@@ -3,7 +3,7 @@ import { JSX } from 'preact';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
-import Icons from '../../utils/Icons.tsx';
+import Icons from '../../utils/Icons';
 
 export default function Badge(props): JSX.Element | null {
   const myPub = Key.getPubKey();

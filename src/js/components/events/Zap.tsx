@@ -4,7 +4,7 @@ import { Event } from 'nostr-tools';
 import { route } from 'preact-router';
 
 import EventDB from '@/nostr/EventDB';
-import { getEventReplyingTo, getZappingUser } from '@/nostr/utils.ts';
+import { getEventReplyingTo, getZappingUser } from '@/nostr/utils';
 
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';

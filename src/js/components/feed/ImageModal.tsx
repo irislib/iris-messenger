@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 
-import EventComponent from '@/components/events/EventComponent.tsx';
-import { ImageOrVideo } from '@/components/feed/types.ts';
+import EventComponent from '@/components/events/EventComponent';
+import { ImageOrVideo } from '@/components/feed/types';
 import Modal from '@/components/modal/Modal';
 import SafeImg from '@/components/SafeImg';
 

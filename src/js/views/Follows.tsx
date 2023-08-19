@@ -2,7 +2,7 @@ import { memo } from 'react';
 import throttle from 'lodash/throttle';
 import { Link } from 'preact-router';
 
-import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
+import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 
 import Follow from '../components/buttons/Follow';
 import Show from '../components/helpers/Show';
@@ -12,7 +12,7 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation.mjs';
-import { ID } from '../utils/UniqueIds.ts';
+import { ID } from '../utils/UniqueIds';
 
 import View from './View';
 

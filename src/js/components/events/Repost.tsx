@@ -3,7 +3,7 @@ import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { Event } from 'nostr-tools';
 import { Link } from 'preact-router';
 
-import { getRepostedEventId } from '@/nostr/utils.ts';
+import { getRepostedEventId } from '@/nostr/utils';
 
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';

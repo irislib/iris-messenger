@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce';
 import { Event } from 'nostr-tools';
 
-import EventDB from '@/nostr/EventDB.ts';
+import EventDB from '@/nostr/EventDB';
 import Events from '@/nostr/Events';
 import Key from '@/nostr/Key';
 

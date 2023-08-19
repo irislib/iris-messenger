@@ -4,7 +4,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
 import Key from '../nostr/Key';
-import Helpers from '../utils/Helpers.tsx';
+import Helpers from '../utils/Helpers';
 import { DecryptedEvent } from '../views/chat/ChatMessages';
 
 import Name from './user/Name';

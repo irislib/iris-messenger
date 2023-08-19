@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Event } from 'nostr-tools';
 
-import { getOriginalPostEventId } from '@/nostr/utils.ts';
+import { getOriginalPostEventId } from '@/nostr/utils';
 
 import Events from '../../nostr/Events';
 import { EventMetadata } from '../../nostr/EventsMeta';

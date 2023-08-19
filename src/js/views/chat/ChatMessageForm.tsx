@@ -5,7 +5,7 @@ import { getEventHash, getSignature, nip04 } from 'nostr-tools';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import Helpers from '../../utils/Helpers.tsx';
+import Helpers from '../../utils/Helpers';
 
 interface ChatMessageFormProps {
   activeChat: string;

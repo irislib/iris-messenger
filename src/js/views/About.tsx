@@ -1,14 +1,14 @@
 import { Link } from 'preact-router';
 
-import Show from '@/components/helpers/Show.tsx';
-import { RouteProps } from '@/views/types.ts';
+import Show from '@/components/helpers/Show';
+import { RouteProps } from '@/views/types';
 
 import Follow from '../components/buttons/Follow';
 import Header from '../components/Header';
 import Avatar from '../components/user/Avatar';
 import Name from '../components/user/Name';
 import { translate as t } from '../translations/Translation.mjs';
-import Helpers from '../utils/Helpers.tsx';
+import Helpers from '../utils/Helpers';
 
 const IRIS_INFO_ACCOUNT = 'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8';
 

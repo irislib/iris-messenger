@@ -3,8 +3,8 @@ import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { Event } from 'nostr-tools';
 import { route } from 'preact-router';
 
-import EventDB from '@/nostr/EventDB.ts';
-import { getEventReplyingTo } from '@/nostr/utils.ts';
+import EventDB from '@/nostr/EventDB';
+import { getEventReplyingTo } from '@/nostr/utils';
 
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
