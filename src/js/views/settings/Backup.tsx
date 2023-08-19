@@ -1,8 +1,8 @@
+import { useEffect, useState } from 'preact/hooks';
 import { Link } from 'preact-router';
 
 import EventDB from '@/nostr/EventDB.ts';
 
-import Component from '../../BaseComponent';
 import Copy from '../../components/buttons/Copy';
 import Follow from '../../components/buttons/Follow';
 import Avatar from '../../components/user/Avatar';
@@ -13,8 +13,36 @@ import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
 
-export default class Backup extends Component {
-  profileExportJson() {
+const Backup = () => {
+  const [eventCount, setEventCount] = useState(0);
+  const [saveMessage, setSaveMessage] = useState('');
+  const [saveError, setSaveError] = useState('');
+  const [downloadMyEventsMessage, setDownloadMyEventsMessage] = useState('');
+  const [downloadAllEventsMessage, setDownloadAllEventsMessage] = useState('');
+  const [loadError, setLoadError] = useState('');
+  const [importedEvents, setImportedEvents] = useState<any>(null);
+  const [restoredFollows, setRestoredFollows] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchEventCount = async () => {
+      try {
+        const count = await IndexedDB.db.events.count();
+        setEventCount(count);
+      } catch (error) {
+        console.error('Error fetching event count:', error);
+      }
+    };
+
+    fetchEventCount(); // Fetch the count immediately on mount
+
+    const interval = setInterval(fetchEventCount, 10000); // Update every 10 seconds
+
+    return () => {
+      clearInterval(interval); // Clear the timer on unmount
+    };
+  }, []);
+
+  const profileExportJson = () => {
     const myPub = Key.getPubKey();
     let rawDataJson = [] as any;
     const profileEvent = EventDB.findOne({ kinds: [0], authors: [myPub] });
@@ -23,109 +51,44 @@ export default class Backup extends Component {
     followEvent && rawDataJson.push(followEvent);
     rawDataJson = JSON.stringify(rawDataJson, null, 2);
     return rawDataJson;
-  }
+  };
 
-  async exportMyEvents() {
-    console.log('exporting my events');
+  const exportMyEvents = async () => {
+    setDownloadMyEventsMessage('Exporting my events...');
     const pubkey = Key.getPubKey();
-    const events = [] as any[];
-    let i = 0;
-    this.setState({ downloadMyEventsMessage: 'Fetching events...' });
-    await IndexedDB.db.events.where({ pubkey }).each((event) => {
-      events.push(event);
-      i++;
-    });
-    this.setState({
-      saveMessage: `Found ${i} events`,
-      downloadMyEventsMessage: null,
-    });
-    return JSON.stringify(events);
-  }
-
-  render() {
-    return (
-      <>
-        <div class="centered-container">
-          <h2>{t('backup')}</h2>
-          <h3>{t('save')}</h3>
-          <p>
-            {t('profile')} & {t('follows')}:
-          </p>
-          <p>
-            <button
-              className="btn btn-sm btn-neutral"
-              onClick={() =>
-                this.onClickDownload('nostr-my-profile-and-follows.json', () =>
-                  this.profileExportJson(),
-                )
-              }
-            >
-              {t('download')}
-            </button>
-            <Copy
-              key={`${this.state.hexPub}copyData`}
-              text={t('copy_raw_data')}
-              copyStr={() => this.profileExportJson()}
-            />
-          </p>
-          <p>{t('your_events')}:</p>
-          <p>
-            <button
-              className="btn btn-sm btn-neutral"
-              onClick={() =>
-                this.onClickDownload('nostr-my-events.json', () => this.exportMyEvents())
-              }
-            >
-              {this.state.downloadMyEventsMessage || t('download')}
-            </button>
-          </p>
-          {this.state.saveMessage && <p>{this.state.saveMessage}</p>}
-          {this.state.saveError && <p class="warning">{this.state.saveError}</p>}
-
-          <h3>{t('load')}</h3>
-          <p>
-            <button className="btn btn-sm btn-neutral" onClick={() => this.onUploadJsonClick()}>
-              Upload .json file
-            </button>
-          </p>
-          <p>
-            <textarea
-              className="textarea"
-              onInput={(e) => this.import((e.target as HTMLTextAreaElement).value)}
-              placeholder={t('paste_event_json')}
-            ></textarea>
-          </p>
-          {this.state.loadError && <p class="warning">{this.state.loadError}</p>}
-          {this.state.importedEvents && (
-            <p class="positive">
-              {t('loaded_and_published_{n}_events').replace('{n}', this.state.importedEvents)}
-            </p>
-          )}
-          {this.state.restoredFollows && (
-            <>
-              <p class="positive">
-                {t('restored_{n}_follows').replace('{n}', this.state.restoredFollows.length)}
-              </p>
-              {this.state.restoredFollows.map((hex) => (
-                <div className="profile-link-container">
-                  <Link href={`/${Key.toNostrBech32Address(hex, 'npub')}`} className="profile-link">
-                    <Avatar str={hex} width={40} />
-                    <Name pub={hex} />
-                  </Link>
-                  <Follow id={hex} />
-                </div>
-              ))}
-            </>
-          )}
-        </div>
-      </>
-    );
-  }
-
-  async onClickDownload(filename, textFn) {
     try {
-      this.setState({ saveMessage: null, saveError: null });
+      const events = await IndexedDB.db.events.where({ pubkey }).toArray();
+      setSaveMessage(`Exported ${events.length} events associated with the current pubkey`);
+      setDownloadMyEventsMessage('');
+      return JSON.stringify(events);
+    } catch (error) {
+      console.error('Error exporting my events:', error);
+      setDownloadMyEventsMessage('Error fetching events.');
+    }
+  };
+
+  const exportAllEvents = async () => {
+    setDownloadAllEventsMessage('Exporting all events...');
+    try {
+      const events = await IndexedDB.db.events.toArray();
+      setSaveMessage(`Exported ${events.length} total events`);
+      setDownloadAllEventsMessage('');
+      return JSON.stringify(events);
+    } catch (error) {
+      console.error('Error exporting all events:', error);
+      setDownloadAllEventsMessage('Error fetching events.');
+    }
+  };
+
+  // onClickDownload function
+  const onClickDownload = async (filename: string, textFn: () => Promise<string | void>) => {
+    try {
+      setSaveMessage('');
+      setSaveError('');
       const text = await textFn();
+      if (!text) {
+        return;
+      }
       const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(text);
       const downloadAnchorNode = document.createElement('a');
       downloadAnchorNode.setAttribute('href', dataStr);
@@ -135,11 +98,13 @@ export default class Backup extends Component {
       downloadAnchorNode.remove();
     } catch (e: any) {
       console.error(e);
-      this.setState({ saveError: e.message, downloadMyEventsMessage: null });
+      setSaveError(e.message);
+      setDownloadMyEventsMessage('');
     }
-  }
+  };
 
-  onUploadJsonClick() {
+  // onUploadJsonClick function
+  const onUploadJsonClick = () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
@@ -150,21 +115,20 @@ export default class Backup extends Component {
         const reader = new FileReader();
         reader.onload = () => {
           // 'reader.result' contains the content of the file
-          this.import(reader.result as string);
+          importJson(reader.result as string);
         };
         reader.readAsText(file);
       }
     };
     input.click();
-  }
+  };
 
-  import(text) {
+  // importJson function
+  const importJson = (text: string) => {
     if (!text || text.length === 0) {
-      this.setState({
-        loadError: null,
-        importedEvents: null,
-        restoredFollows: null,
-      });
+      setLoadError('');
+      setImportedEvents(null);
+      setRestoredFollows(null);
       return;
     }
     try {
@@ -184,14 +148,103 @@ export default class Backup extends Component {
           const currentFollows = (EventDB.findOne({ kinds: [3], authors: [myPub] })?.tags || [])
             .filter((t) => t[0] === 'p')
             .map((t) => t[1]);
-          const restoredFollows = followed.filter((f) => !currentFollows.includes(f));
-          SocialNetwork.setFollowed(restoredFollows);
-          this.setState({ restoredFollows });
+          const newRestoredFollows = followed.filter((f) => !currentFollows.includes(f));
+          SocialNetwork.setFollowed(newRestoredFollows);
+          setRestoredFollows(newRestoredFollows);
         }
       }
-      this.setState({ loadError: null, importedEvents: json.length });
+      setLoadError('');
+      setImportedEvents(json.length);
     } catch (e: any) {
-      this.setState({ loadError: e.message });
+      setLoadError(e.message);
     }
-  }
-}
+  };
+
+  return (
+    <>
+      <h2>{t('backup')}</h2>
+
+      <h3>{t('save')}</h3>
+      <p>
+        {t('profile')} & {t('follows')}:
+      </p>
+      <p>
+        <button
+          className="btn btn-sm btn-neutral"
+          onClick={() => onClickDownload('nostr-my-profile-and-follows.json', profileExportJson)}
+        >
+          {t('download')}
+        </button>
+        <Copy
+          key={`${Key.getPubKey()}copyData`}
+          text={t('copy_raw_data')}
+          copyStr={profileExportJson}
+        />
+      </p>
+      <p>{t('your_events')}:</p>
+      <p>
+        <button
+          className="btn btn-sm btn-neutral"
+          onClick={() => onClickDownload('nostr-my-events.json', exportMyEvents)}
+        >
+          {downloadMyEventsMessage || t('download')}
+        </button>
+      </p>
+      <p>
+        {t('locally_stored_events')} ({eventCount}):
+      </p>
+      <p>
+        <button
+          className="btn btn-sm btn-neutral"
+          onClick={() => onClickDownload('nostr-all-events.json', exportAllEvents)}
+        >
+          {downloadAllEventsMessage || t('download')}
+        </button>
+      </p>
+      {saveMessage && <p>{saveMessage}</p>}
+      {saveError && <p className="warning">{saveError}</p>}
+
+      <h3>{t('load')}</h3>
+      <p>
+        <button className="btn btn-sm btn-neutral" onClick={onUploadJsonClick}>
+          Upload .json file
+        </button>
+      </p>
+      <p>
+        <textarea
+          className="textarea w-96 max-w-full border-2 border-purple-900"
+          onInput={(e) => importJson((e.target as HTMLTextAreaElement).value)}
+          placeholder={t('paste_event_json')}
+        ></textarea>
+      </p>
+      {loadError && <p class="warning">{loadError}</p>}
+      {importedEvents && (
+        <p class="positive">
+          {t('loaded_and_published_{n}_events').replace('{n}', `${importedEvents}`)}
+        </p>
+      )}
+      {restoredFollows && (
+        <>
+          <p class="positive">
+            {t('restored_{n}_follows').replace('{n}', `${restoredFollows.length}`)}
+          </p>
+          {restoredFollows.map((hex) => (
+            <div className="profile-link-container">
+              <Link href={`/${Key.toNostrBech32Address(hex, 'npub')}`} className="profile-link">
+                <Avatar str={hex} width={40} />
+                <Name pub={hex} />
+              </Link>
+              <Follow id={hex} />
+            </div>
+          ))}
+        </>
+      )}
+      <hr />
+      <p>
+        Locally stored events (IndexedDB): <b>{eventCount}</b>
+      </p>
+    </>
+  );
+};
+
+export default Backup;

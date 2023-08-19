@@ -135,6 +135,10 @@ const IndexedDB = {
     await this.subscribeToEventIds();
   }, 1000),
 
+  async countEvents() {
+    return await db.events.count();
+  },
+
   async find(filter: Filter) {
     if (!filter) return;
 
