@@ -1,4 +1,5 @@
-import Component from '../../BaseComponent';
+import { useEffect, useState } from 'react';
+
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
@@ -8,82 +9,69 @@ type Props = {
   className?: string;
 };
 
-class Follow extends Component<Props> {
-  key: string;
-  cls?: string;
-  actionDone: string;
-  action: string;
-  activeClass: string;
-  hoverAction: string;
+const Follow = ({ id, className }: Props) => {
+  const key = 'follow';
+  const activeClass = 'following';
+  const action = t('follow_btn');
+  const actionDone = t('following_btn');
+  const hoverAction = t('unfollow_btn');
 
-  constructor() {
-    super();
-    this.key = 'follow';
-    this.activeClass = 'following';
-    this.action = t('follow_btn');
-    this.actionDone = t('following_btn');
-    this.hoverAction = t('unfollow_btn');
-    this.state = { ...this.state, hover: false };
-  }
+  const [hover, setHover] = useState(false);
+  const [isFollowed, setIsFollowed] = useState(false);
 
-  handleMouseEnter = () => {
-    this.setState({ hover: true });
-  };
-
-  handleMouseLeave = () => {
-    this.setState({ hover: false });
-  };
-
-  onClick(e) {
-    e.preventDefault();
-    const newValue = !this.state[this.key];
-    const hex = Key.toNostrHexAddress(this.props.id);
-    if (!hex) return;
-    if (this.key === 'follow') {
-      SocialNetwork.setFollowed(hex, newValue);
-      return;
-    }
-    if (this.key === 'block') {
-      SocialNetwork.setBlocked(hex, newValue);
-    }
-  }
-
-  componentDidMount() {
-    if (this.key === 'follow') {
+  useEffect(() => {
+    if (key === 'follow') {
       SocialNetwork.getFollowedByUser(Key.getPubKey(), (follows) => {
-        const hex = Key.toNostrHexAddress(this.props.id);
+        const hex = Key.toNostrHexAddress(id);
         const follow = hex && follows?.has(hex);
-        this.setState({ follow });
+        setIsFollowed(!!follow);
       });
+    }
+  }, [id]);
+
+  const handleMouseEnter = () => {
+    setHover(true);
+  };
+
+  const handleMouseLeave = () => {
+    setHover(false);
+  };
+
+  const onClick = (e) => {
+    e.preventDefault();
+    const newValue = !isFollowed;
+    const hex = Key.toNostrHexAddress(id);
+    if (!hex) return;
+    if (key === 'follow') {
+      SocialNetwork.setFollowed(hex, newValue);
+      setIsFollowed(newValue);
       return;
     }
-  }
-
-  render() {
-    const isFollowed = this.state[this.key];
-    const isHovering = this.state.hover;
-
-    let buttonText;
-
-    if (isFollowed && isHovering) {
-      buttonText = this.hoverAction;
-    } else if (isFollowed && !isHovering) {
-      buttonText = this.actionDone;
-    } else {
-      buttonText = this.action;
+    if (key === 'block') {
+      SocialNetwork.setBlocked(hex, newValue);
+      setIsFollowed(newValue);
     }
+  };
 
-    return (
-      <button
-        className={`btn ${this.props.className || this.key} ${isFollowed ? this.activeClass : ''}`}
-        onClick={(e) => this.onClick(e)}
-        onMouseEnter={this.handleMouseEnter} // handle hover state
-        onMouseLeave={this.handleMouseLeave} // handle hover state
-      >
-        {t(buttonText)}
-      </button>
-    );
+  let buttonText;
+  if (isFollowed && hover) {
+    buttonText = hoverAction;
+  } else if (isFollowed && !hover) {
+    buttonText = actionDone;
+  } else {
+    buttonText = action;
   }
-}
+
+  return (
+    <button
+      className={`btn ${className || key} ${isFollowed ? activeClass : ''}`}
+      onClick={onClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {t(buttonText)}
+    </button>
+  );
+};
 
 export default Follow;
