@@ -11,16 +11,23 @@ const Image: Embed = {
   settingsKey: 'enableImages',
   component: ({ match, index }) => {
     const [showModal, setShowModal] = useState(false);
+    const [hasError, setHasError] = useState(false);
     const onClick = (e) => {
       e.stopPropagation();
       setShowModal(true);
     };
+
+    if (hasError) {
+      return <div className="my-2 text-sm">{match}</div>;
+    }
+
     return (
       <div
         key={match + index}
         className="flex justify-center items-center md:justify-start min-h-96 my-2"
       >
         <SafeImg
+          onError={() => setHasError(true)}
           onClick={onClick}
           className="my-2 rounded md:max-h-96 max-w-full cursor-pointer"
           src={match}
