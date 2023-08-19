@@ -28,6 +28,9 @@ export default {
   },
 
   getFollowDistance: function (user: string): number {
+    if (user === Key.getPubKey()) {
+      return 0;
+    }
     const userId = ID(user);
     const distance = this.followDistanceByUser.get(userId);
     return distance === undefined ? 1000 : distance;

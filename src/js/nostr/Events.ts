@@ -400,9 +400,9 @@ const Events = {
           console.log('what', event);
           return false;
         }
-        if (UniqueIds.has(event.pubkey) && SocialNetwork.getFollowDistance(event.pubkey)) {
-          const distance = SocialNetwork.followDistanceByUser.get(ID(event.pubkey));
-          if (distance && distance > globalFilter.maxFollowDistance) {
+        if (UniqueIds.has(event.pubkey) && SocialNetwork.getFollowDistance(event.pubkey) < 1000) {
+          const distance = SocialNetwork.getFollowDistance(event.pubkey);
+          if (distance > globalFilter.maxFollowDistance) {
             // follow distance too high, reject
             return false;
           }
@@ -548,7 +548,6 @@ const Events = {
     // otherwise feed will be incomplete
     if (saveToIdb && dev.indexedDbSave !== false) {
       const followDistance = SocialNetwork.getFollowDistance(event.pubkey);
-
       if (followDistance <= 1) {
         IndexedDB.saveEvent(event as Event & { id: string });
       } else if (

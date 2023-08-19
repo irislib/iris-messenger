@@ -5,7 +5,6 @@ import { Event, Filter } from 'nostr-tools';
 import Events from './Events';
 import Key from './Key';
 
-// TODO: tags should be mapped to internal event ids in order to save space
 type Tag = {
   id: string;
   eventId: string;
@@ -67,14 +66,14 @@ const IndexedDB = {
         await db.tags.bulkPut(tagsToSave);
       });
     } catch (err) {
-      console.error('bulkPut save error:', err);
+      console.error('idb bulkPut save error:', err);
     }
   }, 2000),
 
   saveEvent(event: Event & { id: string }) {
     const eventTags =
       event.tags
-        ?.filter((tag) => tag[0] === 'e') // only save replies & reactions for now
+        ?.filter((tag) => ['e', 'p'].includes(tag[0]))
         .map((tag) => ({
           id: event.id.slice(0, 16) + '-' + tag[0].slice(0, 16) + '-' + tag[1].slice(0, 16),
           eventId: event.id,
@@ -128,11 +127,18 @@ const IndexedDB = {
   async find(filter: Filter) {
     if (!filter) return;
 
-    if (filter['#p']) return; // TODO save reactions & replies
-
     const stringifiedFilter = JSON.stringify(filter);
     if (this.seenFilters.has(stringifiedFilter)) return;
     this.seenFilters.add(stringifiedFilter);
+
+    if (filter['#p'] && Array.isArray(filter['#p'])) {
+      for (const eventId of filter['#p']) {
+        this.subscribedTags.add('p|' + eventId);
+      }
+
+      await this.subscribeToTags();
+      return;
+    }
 
     if (filter['#e'] && Array.isArray(filter['#e'])) {
       for (const eventId of filter['#e']) {

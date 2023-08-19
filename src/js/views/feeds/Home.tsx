@@ -31,7 +31,6 @@ class Feed extends View {
     this.unsub = SocialNetwork.getFollowedByUser(
       Key.getPubKey(),
       (followedUsers) => {
-        console.log('followedUsers', followedUsers);
         this.setState({ followedUsers: Array.from(followedUsers) });
       },
       true,
