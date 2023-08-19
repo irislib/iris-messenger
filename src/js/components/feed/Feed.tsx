@@ -48,6 +48,7 @@ const Feed = (props: FeedProps) => {
     filter: filterOption.filter,
     filterFn,
     sinceLastOpened: false,
+    mergeSubscriptions: false,
   });
 
   if (events.length && events[0].pubkey === Key.getPubKey() && events[0].created_at > showUntil) {
