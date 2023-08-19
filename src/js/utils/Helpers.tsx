@@ -14,6 +14,19 @@ const noteRegex =
 
 const hashtagRegex = /(#[^\s!@#$%^&*()=+./,[{\]};:'"?><]+)/g;
 
+export const hsl = (hue: number, {saturation = 100, lightness = 50, opacity = 1} = {}) =>
+  `hsl(${hue}, ${saturation}%, ${lightness}%, ${opacity})`
+
+// https://stackoverflow.com/a/21682946
+export const stringToHue = (value: string) => {
+  let hash = 0
+  for (let i = 0; i < value.length; i++) {
+    hash = value.charCodeAt(i) + ((hash << 5) - hash)
+    hash = hash & hash
+  }
+
+  return hash % 360
+}  
 let existingIrisToAddress: any = {};
 localState.get('existingIrisToAddress').on((a) => (existingIrisToAddress = a));
 
