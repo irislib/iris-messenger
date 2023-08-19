@@ -1,7 +1,7 @@
 import CreateNoteForm from '@/components/create/CreateNoteForm';
 import FeedComponent from '@/components/feed/Feed';
 import Show from '@/components/helpers/Show';
-import OnboardingNotification from '@/components/OnboardingNotification';
+import OnboardingNotification from '@/components/onboarding/OnboardingNotification.tsx';
 import Key from '@/nostr/Key';
 import { Unsubscribe } from '@/nostr/PubSub';
 import { getEventReplyingTo } from '@/nostr/utils.ts';

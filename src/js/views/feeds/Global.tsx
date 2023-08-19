@@ -1,6 +1,6 @@
 import CreateNoteForm from '@/components/create/CreateNoteForm';
 import FeedComponent from '@/components/feed/Feed';
-import OnboardingNotification from '@/components/OnboardingNotification';
+import OnboardingNotification from '@/components/onboarding/OnboardingNotification.tsx';
 import { getEventReplyingTo } from '@/nostr/utils.ts';
 import { translate as t } from '@/translations/Translation.mjs';
 
