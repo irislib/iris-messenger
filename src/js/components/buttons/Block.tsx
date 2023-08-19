@@ -12,14 +12,7 @@ type Props = {
   onClick?: (e) => void;
 };
 
-const Block = ({ id, showName, className, onClick }: Props) => {
-  const cls = 'block-btn';
-  const key = 'blocked';
-  const activeClass = 'blocked';
-  const action = t('block');
-  const actionDone = t('blocked');
-  const hoverAction = t('unblock');
-
+const Block = ({ id, showName = false, className, onClick }: Props) => {
   const [hover, setHover] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
 
@@ -30,14 +23,6 @@ const Block = ({ id, showName, className, onClick }: Props) => {
     });
   }, [id]);
 
-  const handleMouseEnter = () => {
-    setHover(true);
-  };
-
-  const handleMouseLeave = () => {
-    setHover(false);
-  };
-
   const onButtonClick = (e) => {
     e.preventDefault();
     const newValue = !isBlocked;
@@ -46,24 +31,17 @@ const Block = ({ id, showName, className, onClick }: Props) => {
     onClick?.(e);
   };
 
-  let buttonText;
-  if (isBlocked && hover) {
-    buttonText = hoverAction;
-  } else if (isBlocked && !hover) {
-    buttonText = actionDone;
-  } else {
-    buttonText = action;
-  }
+  const buttonText = isBlocked ? (hover ? t('unblock') : t('blocked')) : t('block');
 
   return (
     <button
-      className={`${cls || key} ${isBlocked ? activeClass : ''} ${className || ''}`}
+      className={`block-btn ${isBlocked ? 'blocked' : ''} ${className || ''}`}
       onClick={onButtonClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
       <span>
-        {t(buttonText)} {showName ? <Name pub={id} hideBadge={true} /> : ''}
+        {buttonText} {showName && <Name pub={id} hideBadge={true} />}
       </span>
     </button>
   );

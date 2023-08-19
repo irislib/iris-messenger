@@ -13,13 +13,6 @@ type Props = {
 };
 
 const Report = ({ id, showName = false, className, onClick }: Props) => {
-  const cls = 'block'; // changed this from 'block-btn' to 'block'
-  const key = 'reported'; // key updated for reporting
-  const activeClass = 'blocked'; // activeClass remains the same
-  const action = t('report_public'); // changed to report_public
-  const actionDone = t('reported'); // changed to reported
-  const hoverAction = t('unreport'); // changed to unreport
-
   const [hover, setHover] = useState(false);
   const [isReported, setIsReported] = useState(false);
 
@@ -29,14 +22,6 @@ const Report = ({ id, showName = false, className, onClick }: Props) => {
       setIsReported(!!reported);
     });
   }, [id]);
-
-  const handleMouseEnter = () => {
-    setHover(true);
-  };
-
-  const handleMouseLeave = () => {
-    setHover(false);
-  };
 
   const onButtonClick = (e) => {
     e.preventDefault();
@@ -48,24 +33,17 @@ const Report = ({ id, showName = false, className, onClick }: Props) => {
     }
   };
 
-  let buttonText;
-  if (isReported && hover) {
-    buttonText = hoverAction;
-  } else if (isReported && !hover) {
-    buttonText = actionDone;
-  } else {
-    buttonText = action;
-  }
+  const buttonText = isReported ? (hover ? t('unreport') : t('reported')) : t('report_public');
 
   return (
     <button
-      className={`${cls || key} ${isReported ? activeClass : ''} ${className || ''}`}
+      className={`block ${isReported ? 'blocked' : ''} ${className || 'reported'}`}
       onClick={onButtonClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
       <span>
-        {t(buttonText)} {showName ? <Name pub={id} hideBadge={true} /> : ''}
+        {buttonText} {showName ? <Name pub={id} hideBadge={true} /> : ''}
       </span>
     </button>
   );
