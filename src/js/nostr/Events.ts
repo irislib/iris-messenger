@@ -19,7 +19,7 @@ import {
   getRepostedEventId,
   isRepost,
 } from '@/nostr/utils.ts';
-import { ID, STR, UID, UniqueIds } from '@/utils/UniqueIds.ts';
+import { ID, STR, UniqueIds } from '@/utils/UniqueIds.ts';
 
 import localState from '../LocalState';
 import { Node } from '../LocalState';
@@ -65,7 +65,6 @@ const Events = {
   DEFAULT_GLOBAL_FILTER,
   getEventHash,
   eventsMetaDb: new EventMetaStore(),
-  seen: new Set<UID>(),
   deletedEvents: new Set<string>(),
   latestNotificationByTargetAndKind: new Map<string, string>(),
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
@@ -440,11 +439,11 @@ const Events = {
     return true;
   },
   handle(event: Event & { id: string }, force = false, saveToIdb = true, retries = 2): boolean {
-    if (!event) return false;
-    const id = ID(event.id);
-    if (!force && this.seen.has(id)) {
+    if (!event?.id) return false;
+    if (!force && UniqueIds.has(event.id)) {
       return false;
     }
+    ID(event.id); // add to UniqueIds
     if (!force && !this.acceptEvent(event)) {
       if (retries) {
         // should we retry only if iris has been opened within the last few seconds or the social graph changed?
@@ -480,8 +479,6 @@ const Events = {
       }
       return false;
     }
-
-    this.seen.add(id);
 
     this.handledMsgsPerSecond++;
 
