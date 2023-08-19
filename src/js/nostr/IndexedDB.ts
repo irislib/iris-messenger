@@ -5,6 +5,8 @@ import { Event, Filter } from 'nostr-tools';
 import Events from './Events';
 import Key from './Key';
 
+// IDB ops can be heavy, would be useful to do this in worker in order to not block the main thread
+// TODO can we somehow map event and user ids to shorter internal ids like we do in EventDB (in-memory)? would save a lot of space
 type Tag = {
   id: string;
   eventId: string;
@@ -73,7 +75,16 @@ const IndexedDB = {
   saveEvent(event: Event & { id: string }) {
     const eventTags =
       event.tags
-        ?.filter((tag) => ['e', 'p'].includes(tag[0]))
+        ?.filter((tag) => {
+          if (tag[0] === 'e') {
+            return true;
+          }
+          // we're only interested in p tags where we are mentioned
+          if (tag[0] === 'p' && tag[1] === Key.getPubKey()) {
+            return true;
+          }
+          return false;
+        })
         .map((tag) => ({
           id: event.id.slice(0, 16) + '-' + tag[0].slice(0, 16) + '-' + tag[1].slice(0, 16),
           eventId: event.id,
