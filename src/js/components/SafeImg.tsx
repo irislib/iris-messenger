@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type Props = {
   src: string;
@@ -11,7 +11,6 @@ type Props = {
   alt?: string;
 };
 
-// need to have trailing slash, otherwise you could do https://imgur.com.myevilwebsite.com/image.png
 const safeOrigins = [
   'data:image',
   'https://imgur.com/',
@@ -24,42 +23,43 @@ export const isSafeOrigin = (url: string) => {
 };
 
 const SafeImg = (props: Props) => {
-  let onError = props.onError;
-  let mySrc = props.src;
-  let proxyFailed = false;
-  if (
-    props.src &&
-    !props.src.startsWith('data:image') &&
-    (!isSafeOrigin(props.src) || props.width)
-  ) {
-    // free proxy with a 250 images per 10 min limit? https://images.weserv.nl/docs/
-    const originalSrc = props.src;
-    if (props.width) {
-      const width = props.width * 2;
-      const resizeType = props.square ? 'fill' : 'fit';
-      mySrc = `https://imgproxy.iris.to/insecure/rs:${resizeType}:${width}:${width}/plain/${originalSrc}`;
-    } else {
-      mySrc = `https://imgproxy.iris.to/insecure/plain/${originalSrc}`;
-    }
-    const originalOnError = props.onError;
-    // try without proxy if it fails
-    onError = () => {
-      if (proxyFailed) {
-        console.log('original source failed too', originalSrc);
-        originalOnError && originalOnError();
+  const [proxyFailed, setProxyFailed] = useState(false);
+  const [src, setSrc] = useState(props.src);
+
+  useEffect(() => {
+    let mySrc = props.src;
+    if (
+      props.src &&
+      !props.src.startsWith('data:image') &&
+      (!isSafeOrigin(props.src) || props.width)
+    ) {
+      const originalSrc = props.src;
+      if (props.width) {
+        const width = props.width * 2;
+        const resizeType = props.square ? 'fill' : 'fit';
+        mySrc = `https://imgproxy.iris.to/insecure/rs:${resizeType}:${width}:${width}/plain/${originalSrc}`;
       } else {
-        console.log('image proxy failed', mySrc, 'trying original source', originalSrc);
-        proxyFailed = true;
-        setSrc(originalSrc);
+        mySrc = `https://imgproxy.iris.to/insecure/plain/${originalSrc}`;
       }
-    };
-  }
-  const [src, setSrc] = useState(mySrc);
+      setSrc(mySrc);
+    }
+  }, [props.src, props.width, props.square]);
+
+  const handleError = () => {
+    if (proxyFailed) {
+      console.log('original source failed too', props.src);
+      props.onError && props.onError();
+    } else {
+      console.log('image proxy failed', src, 'trying original source', props.src);
+      setProxyFailed(true);
+      setSrc(props.src);
+    }
+  };
 
   return (
     <img
       src={src}
-      onError={onError}
+      onError={handleError}
       onClick={props.onClick}
       className={props.className}
       style={props.style}
