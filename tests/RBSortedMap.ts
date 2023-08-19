@@ -1,3 +1,5 @@
+// just for comparison with @/utils/SortedMap which is actually used in Iris
+
 enum Color {
   Red,
   Black,

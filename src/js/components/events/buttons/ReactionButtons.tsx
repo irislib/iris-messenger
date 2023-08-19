@@ -3,6 +3,9 @@ import { memo } from 'preact/compat';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
+import Show from '@/components/helpers/Show.tsx';
+import localState from '@/LocalState.ts';
+
 import Events from '../../../nostr/Events';
 import Key from '../../../nostr/Key';
 import ReactionsList from '../ReactionsList';
@@ -10,6 +13,9 @@ import ReactionsList from '../ReactionsList';
 import Like from './Like';
 import Repost from './Repost';
 import Zap from './Zap';
+
+let settings: any = {};
+localState.get('settings').on((s) => (settings = s));
 
 const ReactionButtons = (props) => {
   const [state, setState] = useState({
@@ -48,9 +54,15 @@ const ReactionButtons = (props) => {
           <ChatBubbleOvalLeftIcon width={18} />
           <span>{state.replyCount || ''}</span>
         </a>
-        <Repost event={props.event} />
-        <Like event={props.event} />
-        <Zap event={props.event} />
+        <Show when={settings.showReposts !== false}>
+          <Repost event={props.event} />
+        </Show>
+        <Show when={settings.showLikes !== false}>
+          <Like event={props.event} />
+        </Show>
+        <Show when={settings.showZaps !== false}>
+          <Zap event={props.event} />
+        </Show>
       </div>
     </>
   );

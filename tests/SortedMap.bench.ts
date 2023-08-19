@@ -1,10 +1,10 @@
 import { Event } from 'nostr-tools';
 import { bench, describe } from 'vitest';
 
-import RBSortedMap from '@/utils/RBSortedMap';
 import SortedMap from '@/utils/SortedMap';
 
 import events from './events.json';
+import RBSortedMap from './RBSortedMap.ts';
 
 describe('SortedMap Write Benchmark', () => {
   bench(

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import RBSortedMap from '../src/js/utils/RBSortedMap';
+import RBSortedMap from './RBSortedMap.ts';
 import SortedMap from '../src/js/utils/SortedMap';
 
 function runTestsForMap(MapConstructor: any, mapName: string) {

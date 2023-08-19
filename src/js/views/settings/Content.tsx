@@ -22,10 +22,11 @@ export default class Content extends Component {
       { setting: 'showZaps', label: 'Zaps' },
       { setting: 'showReposts', label: 'Reposts' },
     ];
+    // TODO get these from the embeds themselves
     const mediaSettings = [
       { setting: 'enableImages', label: 'Images' },
       { setting: 'enableAudio', label: 'Audio' },
-      { setting: 'enableVideos', label: 'Videos' },
+      { setting: 'enableVideo', label: 'Videos' },
       { setting: 'autoplayVideos', label: 'Autoplay videos' },
       { setting: 'enableAppleMusic', label: 'Apple Music' },
       { setting: 'enableInstagram', label: 'Instagram' },
@@ -37,7 +38,6 @@ export default class Content extends Component {
       { setting: 'enableTwitter', label: 'Twitter' },
       { setting: 'enableYoutube', label: 'YouTube' },
       { setting: 'enableWavlake', label: 'Wavlake' },
-      { setting: 'enableWebtorrent', label: 'Webtorrent' },
     ];
     return (
       <>
