@@ -3,7 +3,7 @@ import { route } from 'preact-router';
 export default function GetIrisAddress({ existingIrisToAddress, setShowNoIrisToAddress }) {
   if (!existingIrisToAddress) {
     return (
-      <div className="flex flex-col gap-2 mb-2">
+      <div className="flex flex-col gap-2 mb-2 m-2 md:mx-4">
         <p>Get your own iris.to/username?</p>
         <p className="flex gap-2">
           <button className="btn btn-primary" onClick={() => route('/settings/iris_account')}>

@@ -1,21 +1,20 @@
 import { Helmet } from 'react-helmet';
 import { route } from 'preact-router';
 
-import SimpleImageModal from '@/components/modal/Image';
-import { getEventReplyingTo } from '@/nostr/utils';
+import SimpleImageModal from '@/components/modal/Image.tsx';
+import { getEventReplyingTo } from '@/nostr/utils.ts';
 
-import Copy from '../components/buttons/Copy';
-import Feed from '../components/feed/Feed';
-import Show from '../components/helpers/Show';
-import { isSafeOrigin } from '../components/SafeImg';
-import ProfileCard from '../components/user/ProfileCard';
-import localState from '../LocalState';
-import Key from '../nostr/Key';
-import SocialNetwork from '../nostr/SocialNetwork';
-import { translate as t } from '../translations/Translation.mjs';
-import Helpers from '../utils/Helpers';
-
-import View from './View';
+import Copy from '../../components/buttons/Copy.tsx';
+import Feed from '../../components/feed/Feed.tsx';
+import Show from '../../components/helpers/Show.tsx';
+import { isSafeOrigin } from '../../components/SafeImg.tsx';
+import ProfileCard from '../../components/user/ProfileCard.tsx';
+import localState from '../../LocalState.ts';
+import Key from '../../nostr/Key.ts';
+import SocialNetwork from '../../nostr/SocialNetwork.ts';
+import { translate as t } from '../../translations/Translation.mjs';
+import Helpers from '../../utils/Helpers.tsx';
+import View from '../View.tsx';
 
 class Profile extends View {
   subscriptions: any[];

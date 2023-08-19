@@ -1,7 +1,7 @@
 import { route } from 'preact-router';
 
-import Session from '../nostr/Session';
-import { translate as t } from '../translations/Translation.mjs';
+import Session from '../../nostr/Session.ts';
+import { translate as t } from '../../translations/Translation.mjs';
 
 // This should perhaps be a modal instead of a page
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

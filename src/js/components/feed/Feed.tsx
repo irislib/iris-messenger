@@ -13,6 +13,8 @@ import { useLocalState } from '@/LocalState';
 import Key from '@/nostr/Key';
 import Helpers from '@/utils/Helpers';
 
+import { translate as t } from '../../translations/Translation.mjs';
+
 const Feed = (props: FeedProps) => {
   const fetchEvents = props.fetchEvents || useSubscribe;
   const feedTopRef = useRef<HTMLDivElement>(null);
@@ -99,7 +101,9 @@ const Feed = (props: FeedProps) => {
           activeDisplay={displayAs}
         />
       </Show>
-      <Show when={isEmpty}>{emptyMessage || 'No Posts'}</Show>
+      <Show when={isEmpty}>
+        <div className="m-2 md:mx-4">{emptyMessage || t('no_events_yet')}</div>
+      </Show>
       <Show when={displayAs === 'grid'}>
         <ImageGrid key={infiniteScrollKeyString} events={events} loadMore={loadMore} />
       </Show>

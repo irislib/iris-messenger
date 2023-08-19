@@ -2,14 +2,14 @@ import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
-import { RouteProps } from '@/views/types';
+import { RouteProps } from '@/views/types.ts';
 
-import Upload from '../components/buttons/Upload';
-import Header from '../components/Header';
-import SafeImg from '../components/SafeImg';
-import Key from '../nostr/Key';
-import SocialNetwork from '../nostr/SocialNetwork';
-import { translate as t } from '../translations/Translation.mjs';
+import Upload from '../../components/buttons/Upload.tsx';
+import Header from '../../components/Header.tsx';
+import SafeImg from '../../components/SafeImg.tsx';
+import Key from '../../nostr/Key.ts';
+import SocialNetwork from '../../nostr/SocialNetwork.ts';
+import { translate as t } from '../../translations/Translation.mjs';
 
 const explainers = {
   lud16: 'Bitcoin lightning address ⚡ (lud16)',

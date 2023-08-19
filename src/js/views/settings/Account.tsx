@@ -10,7 +10,7 @@ import Key from '../../nostr/Key';
 import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation.mjs';
 import Helpers from '../../utils/Helpers';
-import { ExistingAccountLogin } from '../Login';
+import ExistingAccountLogin from '../login/ExistingAccountLogin';
 
 const Account = () => {
   const [showSwitchAccount, setShowSwitchAccount] = useState(false);
@@ -75,7 +75,7 @@ const Account = () => {
       </div>
       <Show when={showSwitchAccount}>
         <p>
-          <ExistingAccountLogin />
+          <ExistingAccountLogin onBack={() => setShowSwitchAccount(false)} />
         </p>
         <p>
           <a href="#" onClick={onExtensionLoginClick}>

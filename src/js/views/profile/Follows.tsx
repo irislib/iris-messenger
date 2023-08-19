@@ -2,19 +2,18 @@ import { memo } from 'react';
 import throttle from 'lodash/throttle';
 import { Link } from 'preact-router';
 
-import InfiniteScroll from '@/components/helpers/InfiniteScroll';
+import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
 
-import Follow from '../components/buttons/Follow';
-import Show from '../components/helpers/Show';
-import Avatar from '../components/user/Avatar';
-import Name from '../components/user/Name';
-import localState from '../LocalState';
-import Key from '../nostr/Key';
-import SocialNetwork from '../nostr/SocialNetwork';
-import { translate as t } from '../translations/Translation.mjs';
-import { ID } from '../utils/UniqueIds';
-
-import View from './View';
+import Follow from '../../components/buttons/Follow.tsx';
+import Show from '../../components/helpers/Show.tsx';
+import Avatar from '../../components/user/Avatar.tsx';
+import Name from '../../components/user/Name.tsx';
+import localState from '../../LocalState.ts';
+import Key from '../../nostr/Key.ts';
+import SocialNetwork from '../../nostr/SocialNetwork.ts';
+import { translate as t } from '../../translations/Translation.mjs';
+import { ID } from '../../utils/UniqueIds.ts';
+import View from '../View.tsx';
 
 const FollowedUser = memo(({ hexKey }: { hexKey: string }) => {
   const npub = Key.toNostrBech32Address(hexKey, 'npub') || '';
