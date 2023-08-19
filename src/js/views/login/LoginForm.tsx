@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useEffect } from 'preact/hooks';
 
 import Show from '@/components/helpers/Show.tsx';
-import LanguageSelector from '@/components/LanguageSelector';
 import Key from '@/nostr/Key.ts';
 import { translate as t } from '@/translations/Translation.mjs';
+import LanguageSelector from '@/views/login/LanguageSelector.tsx';
 
 type LoginFormProps = {
   onSubmit: () => void;
