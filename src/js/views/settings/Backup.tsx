@@ -194,7 +194,7 @@ const Backup = () => {
         </button>
       </p>
       <p>
-        {t('locally_stored_events')} ({eventCount}):
+        {t('all_locally_stored_events')} ({eventCount}):
       </p>
       <p>
         <button
@@ -242,10 +242,6 @@ const Backup = () => {
           ))}
         </>
       )}
-      <hr />
-      <p>
-        Locally stored events (IndexedDB): <b>{eventCount}</b>
-      </p>
     </>
   );
 };
