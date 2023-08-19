@@ -13,6 +13,7 @@ import { Path } from './path';
 import PubSub from './PubSub';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
+import Helpers from "@/utils/Helpers.tsx";
 
 try {
   localStorage.setItem('gunPeers', JSON.stringify({})); // quick fix to not connect gun
@@ -148,6 +149,7 @@ const Session = {
   init: function (options: any) {
     Key.getOrCreate(options);
     localState.get('loggedIn').on(() => this.onLoggedIn());
+    Helpers.showConsoleWarning();
   },
 };
 

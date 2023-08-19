@@ -6,7 +6,6 @@ import Footer from './components/Footer';
 import Show from './components/helpers/Show';
 import Menu from './components/Menu';
 import Modal from './components/modal/Modal';
-import Session from './nostr/Session';
 import { translationLoaded } from './translations/Translation.mjs';
 import Helpers from './utils/Helpers';
 import About from './views/About';
@@ -43,8 +42,6 @@ type ReactState = {
   translationLoaded: boolean;
   showLoginModal: boolean;
 };
-
-Session.init({ autologin: false, autofollow: false });
 
 class Main extends Component<Props, ReactState> {
   componentDidMount() {
@@ -157,7 +154,5 @@ class Main extends Component<Props, ReactState> {
     );
   }
 }
-
-Helpers.showConsoleWarning();
 
 export default Main;
