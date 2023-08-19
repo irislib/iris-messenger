@@ -102,7 +102,7 @@ const Feed = (props: FeedProps) => {
         />
       </Show>
       <Show when={isEmpty}>
-        <div className="m-2 md:mx-4">{emptyMessage || t('no_events_yet')}</div>
+        <div className="m-2 md:mx-4">{emptyMessage || t('no_posts_yet')}</div>
       </Show>
       <Show when={displayAs === 'grid'}>
         <ImageGrid key={infiniteScrollKeyString} events={events} loadMore={loadMore} />

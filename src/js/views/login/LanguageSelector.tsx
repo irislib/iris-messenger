@@ -4,7 +4,7 @@ import {
   AVAILABLE_LANGUAGE_KEYS,
   AVAILABLE_LANGUAGES,
   language,
-} from '../translations/Translation.mjs';
+} from '../../translations/Translation.mjs';
 
 function onLanguageChange(e): void {
   const selectedLanguage = e.target.value;
