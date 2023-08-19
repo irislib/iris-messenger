@@ -2,6 +2,8 @@ import localForage from 'localforage';
 import { Event, Filter } from 'nostr-tools';
 import { route } from 'preact-router';
 
+import Helpers from '@/utils/Helpers.tsx';
+
 import localState from '../LocalState';
 import IrisTo from '../utils/IrisTo';
 import { ID } from '../utils/UniqueIds';
@@ -13,7 +15,6 @@ import { Path } from './path';
 import PubSub from './PubSub';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
-import Helpers from "@/utils/Helpers.tsx";
 
 try {
   localStorage.setItem('gunPeers', JSON.stringify({})); // quick fix to not connect gun
