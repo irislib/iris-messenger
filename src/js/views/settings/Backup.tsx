@@ -140,7 +140,10 @@ const Backup = () => {
         if (!event.sig) {
           continue; // we don't want to sign & publish unsigned events
         }
-        Events.publish(event);
+        requestAnimationFrame(() => {
+          Events.handle(event, true);
+          Events.publish(event);
+        });
         const myPub = Key.getPubKey();
         // even if it's an old contacts event by us, restore follows from it
         if (event.pubkey === myPub && event.kind === 3) {
