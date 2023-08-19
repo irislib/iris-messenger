@@ -115,7 +115,7 @@ const Session = {
       document.documentElement.setAttribute('data-theme', 'dark');
     });
     Relays.init();
-    //IndexedDB.init();
+    IndexedDB.init();
     const timeout = setTimeout(() => {
       IrisTo.checkExistingAccount(myPub);
     }, 1000);

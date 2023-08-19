@@ -389,7 +389,11 @@ const Events = {
   },
   acceptEvent(event: Event) {
     // quick fix: disable follow distance filter when not logged in
-    if (globalFilter.maxFollowDistance && !!Key.getPubKey()) {
+    const myPub = Key.getPubKey();
+    if (myPub === event.pubkey) {
+      return true;
+    }
+    if (globalFilter.maxFollowDistance && !!myPub) {
       // let dms through in case it's an anonymous chat invite. otherwise discard in handleDirectMessage.
       if (event.kind === 4) {
         return true;
