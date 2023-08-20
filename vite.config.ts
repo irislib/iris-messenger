@@ -54,12 +54,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': '/src/js',
+      react: 'preact/compat',
+      'react-dom': 'preact/compat',
     },
   },
-  /* preact/compat paths */
-  alias: {
-    react: 'preact/compat',
-    'react-dom': 'preact/compat',
-  },
   testDir: 'tests',
+  test: {
+    environment: 'jsdom',
+  },
 });
