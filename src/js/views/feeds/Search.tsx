@@ -1,42 +1,36 @@
+import { useMemo } from 'preact/hooks';
+
 import FeedComponent from '@/components/feed/Feed';
 
 import View from '../View';
 
-class Search extends View {
-  constructor() {
-    super();
-    this.state = { sortedMessages: [] };
-    this.id = 'message-view';
-    this.class = 'public-messages-view';
-  }
+const Search = ({ keyword }) => {
+  const filterOptions = useMemo(() => {
+    const filter = { kinds: [1], keywords: [keyword || ''] };
 
-  componentDidMount() {
-    this.restoreScrollPosition();
-  }
-
-  renderView() {
     const filterFn = (event) => {
       // some relays don't support filtering by keyword
-      return event.content.includes(this.props.keyword);
+      return event.content.includes(keyword);
     };
-    const filter = { kinds: [1], keywords: [this.props.keyword || ''] };
-    return (
+
+    return [
+      {
+        name: 'Search',
+        filter,
+        filterFn,
+      },
+    ];
+  }, [keyword]);
+
+  return (
+    <View>
       <div className="flex flex-row">
         <div className="flex flex-col w-full">
-          <FeedComponent
-            key={this.props.keyword}
-            filterOptions={[
-              {
-                name: 'Search',
-                filter,
-                filterFn,
-              },
-            ]}
-          />
+          <FeedComponent key={keyword} filterOptions={filterOptions} />
         </div>
       </div>
-    );
-  }
-}
+    </View>
+  );
+};
 
 export default Search;

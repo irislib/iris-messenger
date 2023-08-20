@@ -1,8 +1,10 @@
 import { memo } from 'react';
 import throttle from 'lodash/throttle';
+import { PureComponent } from 'preact/compat';
 import { Link } from 'preact-router';
 
 import InfiniteScroll from '@/components/helpers/InfiniteScroll.tsx';
+import View from '@/views/View.tsx';
 
 import Follow from '../../components/buttons/Follow.tsx';
 import Show from '../../components/helpers/Show.tsx';
@@ -12,7 +14,6 @@ import Key from '../../nostr/Key.ts';
 import SocialNetwork from '../../nostr/SocialNetwork.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 import { ID } from '../../utils/UniqueIds.ts';
-import View from '../View.tsx';
 
 const FollowedUser = memo(({ hexKey }: { hexKey: string }) => {
   const npub = Key.toNostrBech32Address(hexKey, 'npub') || '';
@@ -35,7 +36,16 @@ const FollowedUser = memo(({ hexKey }: { hexKey: string }) => {
   );
 });
 
-class Follows extends View {
+type Props = {
+  id: string;
+  followers: boolean;
+};
+
+type State = {
+  follows: string[];
+};
+
+class Follows extends PureComponent<Props, State> {
   follows: Set<string>;
   myPub: string | null;
 
@@ -43,7 +53,6 @@ class Follows extends View {
     super();
     this.myPub = null;
     this.follows = new Set();
-    this.id = 'follows-view';
     this.state = { follows: [] };
   }
 
@@ -122,45 +131,47 @@ class Follows extends View {
       SocialNetwork.setFollowed(this.state.follows);
   }
 
-  renderView() {
+  render() {
     const showFollowAll =
       this.state.follows.length > 1 && !(this.props.id === this.myPub && !this.props.followers);
     return (
-      <div className="px-4 mb-4">
-        <div className="flex justify-between mb-4">
-          <span className="text-xl font-bold">
-            <a className="link" href={`/${this.props.id}`}>
-              <Name pub={this.props.id} />
-            </a>
-            :<i> </i>
-            <span style={{ flex: 1 }} className="ml-1">
-              {this.props.followers ? t('followers') : t('following')}
+      <View>
+        <div className="px-4 mb-4">
+          <div className="flex justify-between mb-4">
+            <span className="text-xl font-bold">
+              <a className="link" href={`/${this.props.id}`}>
+                <Name pub={this.props.id} />
+              </a>
+              :<i> </i>
+              <span style={{ flex: 1 }} className="ml-1">
+                {this.props.followers ? t('followers') : t('following')}
+              </span>
             </span>
-          </span>
+            <Show when={showFollowAll}>
+              <span style="text-align: right" className="hidden md:inline">
+                <button className="btn btn-sm btn-neutral" onClick={() => this.followAll()}>
+                  {t('follow_all')} ({this.state.follows.length})
+                </button>
+              </span>
+            </Show>
+          </div>
           <Show when={showFollowAll}>
-            <span style="text-align: right" className="hidden md:inline">
+            <p style="text-align: right" className="inline md:hidden">
               <button className="btn btn-sm btn-neutral" onClick={() => this.followAll()}>
                 {t('follow_all')} ({this.state.follows.length})
               </button>
-            </span>
+            </p>
           </Show>
+          <div className="flex flex-col w-full gap-4">
+            <InfiniteScroll>
+              {this.state.follows.map((hexKey) => (
+                <FollowedUser key={hexKey} hexKey={hexKey} />
+              ))}
+            </InfiniteScroll>
+            {this.state.follows.length === 0 ? '—' : ''}
+          </div>
         </div>
-        <Show when={showFollowAll}>
-          <p style="text-align: right" className="inline md:hidden">
-            <button className="btn btn-sm btn-neutral" onClick={() => this.followAll()}>
-              {t('follow_all')} ({this.state.follows.length})
-            </button>
-          </p>
-        </Show>
-        <div className="flex flex-col w-full gap-4">
-          <InfiniteScroll>
-            {this.state.follows.map((hexKey) => (
-              <FollowedUser key={hexKey} hexKey={hexKey} />
-            ))}
-          </InfiniteScroll>
-          {this.state.follows.length === 0 ? '—' : ''}
-        </div>
-      </div>
+      </View>
     );
   }
 }

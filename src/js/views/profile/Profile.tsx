@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet';
+import { PureComponent } from 'preact/compat';
 import { route } from 'preact-router';
 
 import SimpleImageModal from '@/components/modal/Image.tsx';
@@ -16,7 +17,30 @@ import { translate as t } from '../../translations/Translation.mjs';
 import Helpers from '../../utils/Helpers.tsx';
 import View from '../View.tsx';
 
-class Profile extends View {
+type Props = {
+  id: string;
+};
+
+type State = {
+  hexPub: string;
+  npub: string;
+  name: string;
+  display_name: string;
+  profile: any;
+  banner: string;
+  fullBanner: string;
+  picture: string;
+  website: string;
+  lightning: string;
+  blocked: boolean;
+  bannerModalOpen: boolean;
+  noFollowers: boolean;
+  notFound: boolean;
+  followedUserCount: number;
+  followerCount: number;
+};
+
+class Profile extends PureComponent<Props, State> {
   subscriptions: any[];
   unsub: any;
 
@@ -27,7 +51,6 @@ class Profile extends View {
       followerCount: 0,
       bannerModalOpen: false,
     };
-    this.id = 'profile';
     this.subscriptions = [];
   }
 
@@ -78,7 +101,7 @@ class Profile extends View {
     Key.login({ rpub: this.state.hexPub });
   }
 
-  renderView() {
+  render() {
     const {
       hexPub,
       display_name,
@@ -103,7 +126,7 @@ class Profile extends View {
     const setBannerModalOpen = (bannerModalOpen) => this.setState({ bannerModalOpen });
 
     return (
-      <>
+      <View>
         <Show when={banner}>
           <div
             className="mb-4 h-48 bg-cover bg-center cursor-pointer"
@@ -150,7 +173,7 @@ class Profile extends View {
             />
           </Show>
         </div>
-      </>
+      </View>
     );
   }
 
@@ -173,7 +196,7 @@ class Profile extends View {
   loadProfile(hexPub: string) {
     const isMyProfile = hexPub === Key.getPubKey();
     localState.get('isMyProfile').put(isMyProfile);
-    localState.get('noFollowers').on(this.inject());
+    //localState.get('noFollowers').on(this.inject());
     this.subscriptions.push(
       SocialNetwork.getProfile(hexPub, (profile) => {
         let banner, fullBanner;
@@ -196,10 +219,9 @@ class Profile extends View {
   }
 
   componentDidMount() {
-    this.restoreScrollPosition();
     const pub = this.props.id;
     const npub = Key.toNostrBech32Address(pub, 'npub');
-    localState.get('loggedIn').on(this.inject());
+    //localState.get('loggedIn').on(this.inject());
     if (npub && npub !== pub) {
       route(`/${npub}`, true);
       return;

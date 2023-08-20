@@ -9,6 +9,7 @@ import { getEventReplyingTo } from '@/nostr/utils';
 import { translate as t } from '@/translations/Translation.mjs';
 import { ID, STR } from '@/utils/UniqueIds';
 import { RouteProps } from '@/views/types.ts';
+import View from '@/views/View.tsx';
 
 import SocialNetwork from '../../nostr/SocialNetwork';
 
@@ -54,7 +55,7 @@ const Home: React.FC<RouteProps> = () => {
   console.log('followedUsers.length', followedUsers.length); // TODO this keeps changing, fix
 
   return (
-    <div className="flex flex-row">
+    <View>
       <div className="flex flex-col w-full">
         <OnboardingNotification />
         <div className="hidden md:block px-4">
@@ -64,7 +65,7 @@ const Home: React.FC<RouteProps> = () => {
           <FeedComponent key={`feed-${followedUsers.length}`} filterOptions={filterOptions} />
         </Show>
       </div>
-    </div>
+    </View>
   );
 };
 

@@ -1,7 +1,6 @@
 import debounce from 'lodash/debounce';
-import { JSX } from 'preact';
+import { useEffect, useRef } from 'preact/hooks';
 
-import Component from '../BaseComponent';
 import ErrorBoundary from '../components/ErrorBoundary';
 import Header from '../components/Header';
 import Show from '../components/helpers/Show';
@@ -15,61 +14,27 @@ const listener = function () {
 };
 window.addEventListener('popstate', listener);
 
-abstract class View extends Component {
-  class = '';
-  id = '';
-  observer: ResizeObserver | null = null;
-  scrollPosition = 0;
-  hideSideBar = false;
-  hideHeader = false;
+const View = ({ children, hideHeader = false, hideSideBar = false }) => {
+  const observerRef = useRef<any>(null);
 
-  abstract renderView(): JSX.Element;
-
-  render() {
-    return (
-      <div className="flex flex-row h-full w-full">
-        <div className={`flex flex-col w-full h-full ${this.hideSideBar ? '' : 'lg:w-2/3'}`}>
-          <Show when={!this.hideHeader}>
-            <Header />
-          </Show>
-          <div class={this.class} id={this.id} className="h-full">
-            <ErrorBoundary>{this.renderView()}</ErrorBoundary>
-          </div>
-        </div>
-        <Show when={!this.hideSideBar}>
-          <div className="flex-col hidden lg:flex lg:w-1/3">
-            <Search focus={false} />
-          </div>
-        </Show>
-      </div>
-    );
-  }
-
-  componentDidMount() {
-    window.addEventListener('scroll', this.saveScrollPosition);
-    this.restoreScrollPosition();
-  }
-
-  saveScrollPosition = debounce(() => {
-    const scrollPosition = window.scrollY || document.documentElement.scrollTop;
+  const saveScrollPosition = debounce(() => {
+    const position = window.scrollY || document.documentElement.scrollTop;
     const currentHistoryState = window.history.state;
     const newHistoryState = {
       ...currentHistoryState,
-      scrollPosition,
+      scrollPosition: position,
     };
     window.history.replaceState(newHistoryState, '');
   }, 100);
 
-  restoreScrollPosition(observe = true) {
+  const restoreScrollPosition = (observe = true) => {
     const currentHistoryState = window.history.state;
     const previousHistoryState = window.history.state?.previousState;
     if (!isInitialLoad && currentHistoryState !== previousHistoryState) {
-      observe && this.observeScrollElement();
-      if (!this.scrollPosition) {
-        this.scrollPosition = window.history.state?.scrollPosition;
-      }
-      if (this.scrollPosition) {
-        window.scrollTo(0, this.scrollPosition);
+      observe && observeScrollElement();
+      const position = window.history.state?.scrollPosition || 0;
+      if (position) {
+        window.scrollTo(0, position);
       }
     } else {
       const oldState = window.history.state || {};
@@ -79,29 +44,50 @@ abstract class View extends Component {
       };
       window.history.replaceState(newHistoryState, '');
     }
-  }
+  };
 
-  observeScrollElement = () => {
-    this.observer = new ResizeObserver((entries) => {
+  const observeScrollElement = () => {
+    observerRef.current = new ResizeObserver((entries) => {
       entries.forEach(() => {
-        this.restoreScrollPosition(false);
+        restoreScrollPosition(false);
       });
     });
 
-    this.observer.observe(document.body);
+    observerRef.current.observe(document.body);
     setTimeout(() => {
-      if (this.observer) {
-        this.observer.disconnect();
-      }
+      observerRef.current.disconnect();
     }, 1000);
   };
 
-  componentWillUnmount() {
-    if (this.observer) {
-      this.observer.disconnect();
-    }
-    window.removeEventListener('scroll', this.saveScrollPosition);
-  }
-}
+  useEffect(() => {
+    window.addEventListener('scroll', saveScrollPosition);
+    restoreScrollPosition();
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      window.removeEventListener('scroll', saveScrollPosition);
+    };
+  }, []);
+
+  return (
+    <div className="flex flex-row h-full w-full">
+      <div className={`flex flex-col w-full h-full ${hideSideBar ? '' : 'lg:w-2/3'}`}>
+        <Show when={!hideHeader}>
+          <Header />
+        </Show>
+        <div className="h-full">
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </div>
+      </div>
+      <Show when={!hideSideBar}>
+        <div className="flex-col hidden lg:flex lg:w-1/3">
+          <Search focus={false} />
+        </div>
+      </Show>
+    </div>
+  );
+};
 
 export default View;

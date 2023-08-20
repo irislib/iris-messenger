@@ -1,4 +1,5 @@
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import { useEffect } from 'preact/hooks';
 
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation.mjs';
@@ -9,33 +10,23 @@ import ChatMessages from './ChatMessages';
 import Header from './Header';
 import NewChat, { addChatWithInputKey } from './NewChat';
 
-class Chat extends View {
-  id: string;
-
-  constructor() {
-    super();
-    this.id = 'chat-view';
-    this.hideSideBar = true;
-    this.hideHeader = true;
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
-    const id = window.location.hash.substr(1);
-    if (id && id.startsWith('nsec')) {
+const Chat = ({ id }) => {
+  useEffect(() => {
+    const hashId = window.location.hash.substr(1);
+    if (hashId && hashId.startsWith('nsec')) {
       window.history.replaceState({}, document.title, window.location.pathname);
       if (!Key.getPubKey()) {
         Key.loginAsNewUser();
       }
-      addChatWithInputKey(id);
+      addChatWithInputKey(hashId);
     }
-  }
+  }, []);
 
-  renderContent = (id) => {
-    if (id === 'new') {
+  const renderContent = (chatId) => {
+    if (chatId === 'new') {
       return <NewChat />;
-    } else if (id) {
-      return <ChatMessages id={id} key={id} />;
+    } else if (chatId) {
+      return <ChatMessages id={chatId} key={chatId} />;
     } else {
       return (
         <div className="hidden md:flex flex-col items-center justify-center flex-1">
@@ -48,10 +39,8 @@ class Chat extends View {
     }
   };
 
-  renderView() {
-    const { id } = this.props;
-
-    return (
+  return (
+    <View>
       <div className="flex flex-col h-full max-h-screen">
         <Header key={id} activeChat={id} />
         <div className="flex flex-row flex-grow overflow-hidden">
@@ -66,12 +55,12 @@ class Chat extends View {
             key={`chat-content-${id}`}
             className={`flex-grow overflow-y-auto ${!id ? 'hidden md:flex' : 'flex'}`}
           >
-            {this.renderContent(id)}
+            {renderContent(id)}
           </div>
         </div>
       </div>
-    );
-  }
-}
+    </View>
+  );
+};
 
 export default Chat;
