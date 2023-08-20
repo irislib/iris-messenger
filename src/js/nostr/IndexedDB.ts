@@ -21,8 +21,8 @@ export class MyDexie extends Dexie {
   constructor() {
     super('iris');
 
-    this.version(4).stores({
-      events: 'id, pubkey, kind, created_at',
+    this.version(5).stores({
+      events: 'id, pubkey, kind, created_at, [pubkey+kind]',
       tags: 'id, eventId, [type+value]',
     });
   }

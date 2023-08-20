@@ -6,6 +6,7 @@ import OnboardingNotification from '@/components/onboarding/OnboardingNotificati
 import { getEventReplyingTo } from '@/nostr/utils';
 import { translate as t } from '@/translations/Translation.mjs';
 import { RouteProps } from '@/views/types.ts';
+import View from '@/views/View.tsx';
 
 const Global: React.FC<RouteProps> = () => {
   const filterOptions = useMemo(
@@ -26,15 +27,17 @@ const Global: React.FC<RouteProps> = () => {
   );
 
   return (
-    <div className="flex flex-row">
-      <div className="flex flex-col w-full">
-        <OnboardingNotification />
-        <div className="hidden md:block px-4">
-          <CreateNoteForm autofocus={false} placeholder={t('whats_on_your_mind')} />
+    <View>
+      <div className="flex flex-row">
+        <div className="flex flex-col w-full">
+          <OnboardingNotification />
+          <div className="hidden md:block px-4">
+            <CreateNoteForm autofocus={false} placeholder={t('whats_on_your_mind')} />
+          </div>
+          <FeedComponent filterOptions={filterOptions} />
         </div>
-        <FeedComponent filterOptions={filterOptions} />
       </div>
-    </div>
+    </View>
   );
 };
 

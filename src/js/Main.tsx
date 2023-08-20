@@ -45,10 +45,7 @@ type ReactState = {
 
 class Main extends Component<Props, ReactState> {
   componentDidMount() {
-    window.onload = () => {
-      // this makes sure that window.nostr is there
-      localState.get('loggedIn').on(this.inject());
-    };
+    localState.get('loggedIn').on(this.inject());
     // iris.electron && iris.electron.get('platform').on(this.inject());
     localState.get('unseenMsgsTotal').on(this.inject());
     translationLoaded.then(() => this.setState({ translationLoaded: true }));
