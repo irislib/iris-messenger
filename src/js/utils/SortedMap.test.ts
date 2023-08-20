@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import RBSortedMap from './RBSortedMap.ts';
-import SortedMap from '../src/js/utils/SortedMap';
+import RBSortedMap from '../../../tests/RBSortedMap.ts';
+
+import SortedMap from './SortedMap.tsx';
 
 function runTestsForMap(MapConstructor: any, mapName: string) {
   describe(mapName, () => {

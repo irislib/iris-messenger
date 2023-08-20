@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test } from 'vitest';
 
 import { EventDB } from '@/nostr/EventDB.ts';
 
-import events from './events.json';
+import events from '../../../tests/events.json';
 
 describe('EventDB', () => {
   let db: EventDB;

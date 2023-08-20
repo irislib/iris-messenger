@@ -6,7 +6,7 @@ import { translate as t } from '@/translations/Translation.mjs';
 
 import View from '../View';
 
-class Feed extends View {
+class Global extends View {
   constructor() {
     super();
     this.state = { sortedMessages: [] };
@@ -47,4 +47,4 @@ class Feed extends View {
   }
 }
 
-export default Feed;
+export default Global;

@@ -2,7 +2,7 @@ import FeedComponent from '@/components/feed/Feed';
 
 import View from '../View';
 
-class Feed extends View {
+class Search extends View {
   constructor() {
     super();
     this.state = { sortedMessages: [] };
@@ -39,4 +39,4 @@ class Feed extends View {
   }
 }
 
-export default Feed;
+export default Search;

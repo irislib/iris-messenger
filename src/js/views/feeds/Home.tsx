@@ -11,7 +11,7 @@ import { ID, STR } from '@/utils/UniqueIds';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import View from '../View';
 
-class Feed extends View {
+class Home extends View {
   unsub?: Unsubscribe;
 
   constructor() {
@@ -74,4 +74,4 @@ class Feed extends View {
   }
 }
 
-export default Feed;
+export default Home;

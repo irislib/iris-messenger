@@ -1,8 +1,8 @@
-import { fireEvent, render, screen, cleanup } from '@testing-library/preact';
-import { describe, expect, it, afterEach } from 'vitest';
+import { cleanup, fireEvent, render, screen } from '@testing-library/preact';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { translate as t } from '@/translations/Translation.mjs';
-import Login from '@/views/login/Login';
+import Login from '@/views/login/Login.tsx';
 
 describe('Login View Rendering', () => {
   afterEach(cleanup);
