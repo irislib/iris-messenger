@@ -10,6 +10,7 @@
     "lint": "eslint 'src/**/*.{js,ts,tsx}'",
     "lint:fix": "eslint --fix --quiet 'src/**/*.{js,ts,tsx}'",
     "test": "vitest",
+    "coverage": "vitest --coverage",
     "bench": "vitest bench"
   },
   "dependencies": {
@@ -46,6 +47,7 @@
     "@testing-library/preact": "^3.2.3",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.4.0",
+    "@vitest/coverage-v8": "^0.34.2",
     "autoprefixer": "^10.4.15",
     "daisyui": "^3.5.1",
     "eslint": "^8.47.0",

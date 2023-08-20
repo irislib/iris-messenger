@@ -61,5 +61,8 @@ export default defineConfig({
   testDir: 'tests',
   test: {
     environment: 'jsdom',
+    coverage: {
+      reporter: ['text', 'json', 'html'],
+    },
   },
 });
