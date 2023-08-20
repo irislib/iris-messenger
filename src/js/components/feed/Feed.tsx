@@ -46,6 +46,7 @@ const Feed = (props: FeedProps) => {
     [mutedUsers, filterOption],
   );
 
+  // when giving params to Feed, be careful that they don't unnecessarily change on every render
   const { events, loadMore } = fetchEvents({
     filter: filterOption.filter,
     filterFn,

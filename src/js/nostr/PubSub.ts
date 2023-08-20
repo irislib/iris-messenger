@@ -81,7 +81,7 @@ localState.get('lastOpened').once((lo) => {
 const reconnect = () => {
   if (Date.now() - lastResubscribed > 60 * 1000) {
     lastResubscribed = Date.now();
-    //relayPool.reconnect();
+    relayPool.reconnect();
   }
 };
 

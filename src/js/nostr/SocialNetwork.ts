@@ -332,7 +332,7 @@ export default {
         }
       });
     }
-    return PubSub.subscribe({ kinds: [0], authors: [address] }, callback, false);
+    return PubSub.subscribe({ kinds: [0], authors: [address], limit: 1 }, callback, false);
   },
   setMetadata(data: any) {
     const event = {

@@ -1,11 +1,10 @@
-import { Helmet } from 'react-helmet';
 import { route } from 'preact-router';
 
 import BaseComponent from '@/BaseComponent.ts';
 import SimpleImageModal from '@/components/modal/Image.tsx';
 import { getEventReplyingTo } from '@/nostr/utils.ts';
+import ProfileHelmet from '@/views/profile/Helmet.tsx';
 
-import Copy from '../../components/buttons/Copy.tsx';
 import Feed from '../../components/feed/Feed.tsx';
 import Show from '../../components/helpers/Show.tsx';
 import { isSafeOrigin } from '../../components/SafeImg.tsx';
@@ -14,7 +13,6 @@ import localState from '../../LocalState.ts';
 import Key from '../../nostr/Key.ts';
 import SocialNetwork from '../../nostr/SocialNetwork.ts';
 import { translate as t } from '../../translations/Translation.mjs';
-import Helpers from '../../utils/Helpers.tsx';
 import View from '../View.tsx';
 
 class Profile extends BaseComponent {
@@ -34,59 +32,11 @@ class Profile extends BaseComponent {
     blocked: false,
     bannerModalOpen: false,
     notFound: false,
-    noFollowers: false,
   };
 
   constructor() {
     super();
     this.subscriptions = [];
-  }
-
-  getNotification() {
-    if (this.state.noFollowers /* && this.followers.has(Key.getPubKey()) */) {
-      return (
-        <div className="msg">
-          <div className="msg-content">
-            <p>Share your profile link so {this.state.name || 'this user'} can follow you:</p>
-            <p>
-              <Copy text={t('copy_link')} copyStr={Helpers.getMyProfileLink()} />
-            </p>
-            <small>{t('no_followers_yet_info')}</small>
-          </div>
-        </div>
-      );
-    }
-  }
-
-  renderLinks() {
-    return (
-      <div className="flex flex-1 flex-row align-center justify-center mt-2">
-        <Show when={this.state.lightning}>
-          <div className="flex-1">
-            <a
-              className="btn btn-sm btn-neutral"
-              href={this.state.lightning}
-              onClick={(e) => Helpers.handleLightningLinkClick(e)}
-            >
-              ⚡ {t('tip_lightning')}
-            </a>
-          </div>
-        </Show>
-        <Show when={this.state.website}>
-          <div className="flex-1">
-            <a href={this.state.website} target="_blank" className="link">
-              {this.state.website.replace(/^https?:\/\//, '')}
-            </a>
-          </div>
-        </Show>
-      </div>
-    );
-  }
-
-  async viewAs(event) {
-    event.preventDefault();
-    route('/');
-    Key.login({ rpub: this.state.hexPub });
   }
 
   render() {
@@ -126,17 +76,12 @@ class Profile extends BaseComponent {
           </Show>
         </Show>
         <div>
-          <Helmet>
-            <title>{title}</title>
-            <meta name="description" content={description} />
-            <meta property="og:type" content="profile" />
-            <Show when={picture}>
-              <meta property="og:image" content={picture} />
-              <meta name="twitter:image" content={picture} />
-            </Show>
-            <meta property="og:title" content={ogTitle} />
-            <meta property="og:description" content={description} />
-          </Helmet>
+          <ProfileHelmet
+            title={title}
+            description={description}
+            picture={picture}
+            ogTitle={ogTitle}
+          />
           <ProfileCard npub={this.state.npub} hexPub={this.state.hexPub} />
           <Show when={!blocked}>
             <Feed
@@ -184,7 +129,6 @@ class Profile extends BaseComponent {
   loadProfile(hexPub: string) {
     const isMyProfile = hexPub === Key.getPubKey();
     localState.get('isMyProfile').put(isMyProfile);
-    //localState.get('noFollowers').on(this.inject());
     this.subscriptions.push(
       SocialNetwork.getProfile(hexPub, (profile) => {
         let banner, fullBanner;
