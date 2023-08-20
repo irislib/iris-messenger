@@ -87,7 +87,7 @@ const reconnect = () => {
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    reconnect();
+    //reconnect();
   }
 });
 document.addEventListener('online', reconnect);
