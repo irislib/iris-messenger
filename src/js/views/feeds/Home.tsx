@@ -1,77 +1,71 @@
+import { useEffect, useMemo, useState } from 'react';
+
 import CreateNoteForm from '@/components/create/CreateNoteForm';
 import FeedComponent from '@/components/feed/Feed';
 import Show from '@/components/helpers/Show';
 import OnboardingNotification from '@/components/onboarding/OnboardingNotification';
 import Key from '@/nostr/Key';
-import { Unsubscribe } from '@/nostr/PubSub';
 import { getEventReplyingTo } from '@/nostr/utils';
 import { translate as t } from '@/translations/Translation.mjs';
 import { ID, STR } from '@/utils/UniqueIds';
+import { RouteProps } from '@/views/types.ts';
 
 import SocialNetwork from '../../nostr/SocialNetwork';
-import View from '../View';
 
-class Home extends View {
-  unsub?: Unsubscribe;
-
-  constructor() {
-    super();
-    const followedUsers: string[] = Array.from(
+const Home: React.FC<RouteProps> = () => {
+  const [followedUsers, setFollowedUsers] = useState(() => {
+    const initialFollowedUsers = Array.from(
       SocialNetwork.followedByUser.get(ID(Key.getPubKey())) || [],
-    ).map((n) => STR(n));
-    this.state = {
-      followedUsers,
-    };
-    this.id = 'message-view';
-    this.class = 'public-messages-view';
-  }
+    );
+    return initialFollowedUsers.map((n) => STR(n));
+  });
 
-  componentDidMount() {
-    this.restoreScrollPosition();
-    this.unsub = SocialNetwork.getFollowedByUser(
+  useEffect(() => {
+    const unsub = SocialNetwork.getFollowedByUser(
       Key.getPubKey(),
-      (followedUsers) => {
-        this.setState({ followedUsers: Array.from(followedUsers) });
+      (newFollowedUsers) => {
+        setFollowedUsers(Array.from(newFollowedUsers));
       },
       true,
     );
-  }
 
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    this.unsub?.();
-  }
+    return () => {
+      unsub?.();
+    };
+  }, []);
 
-  renderView() {
-    return (
-      <div className="flex flex-row">
-        <div className="flex flex-col w-full">
-          <OnboardingNotification />
-          <div className="hidden md:block px-4">
-            <CreateNoteForm autofocus={false} placeholder={t('whats_on_your_mind')} />
-          </div>
-          <Show when={this.state.followedUsers.length}>
-            <FeedComponent
-              key={`feed-${this.state.followedUsers.length}`}
-              filterOptions={[
-                {
-                  name: t('posts'),
-                  filter: { kinds: [1, 6], authors: this.state.followedUsers, limit: 10 },
-                  filterFn: (event) => !getEventReplyingTo(event),
-                  eventProps: { showRepliedMsg: true },
-                },
-                {
-                  name: t('posts_and_replies'),
-                  filter: { kinds: [1, 6], authors: this.state.followedUsers, limit: 5 },
-                  eventProps: { showRepliedMsg: true, fullWidth: false },
-                },
-              ]}
-            />
-          </Show>
+  const filterOptions = useMemo(
+    () => [
+      {
+        name: t('posts'),
+        filter: { kinds: [1, 6], authors: followedUsers, limit: 10 },
+        filterFn: (event) => !getEventReplyingTo(event),
+        eventProps: { showRepliedMsg: true },
+      },
+      {
+        name: t('posts_and_replies'),
+        filter: { kinds: [1, 6], authors: followedUsers, limit: 5 },
+        eventProps: { showRepliedMsg: true, fullWidth: false },
+      },
+    ],
+    [followedUsers],
+  );
+
+  console.log('followedUsers.length', followedUsers.length); // TODO this keeps changing, fix
+
+  return (
+    <div className="flex flex-row">
+      <div className="flex flex-col w-full">
+        <OnboardingNotification />
+        <div className="hidden md:block px-4">
+          <CreateNoteForm autofocus={false} placeholder={t('whats_on_your_mind')} />
         </div>
+        <Show when={followedUsers.length}>
+          <FeedComponent key={`feed-${followedUsers.length}`} filterOptions={filterOptions} />
+        </Show>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default Home;

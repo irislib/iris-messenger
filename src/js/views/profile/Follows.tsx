@@ -8,7 +8,6 @@ import Follow from '../../components/buttons/Follow.tsx';
 import Show from '../../components/helpers/Show.tsx';
 import Avatar from '../../components/user/Avatar.tsx';
 import Name from '../../components/user/Name.tsx';
-import localState from '../../LocalState.ts';
 import Key from '../../nostr/Key.ts';
 import SocialNetwork from '../../nostr/SocialNetwork.ts';
 import { translate as t } from '../../translations/Translation.mjs';
@@ -45,7 +44,7 @@ class Follows extends View {
     this.myPub = null;
     this.follows = new Set();
     this.id = 'follows-view';
-    this.state = { follows: [], contacts: {} };
+    this.state = { follows: [] };
   }
 
   sortByName(aK, bK) {
@@ -115,7 +114,6 @@ class Follows extends View {
     if (this.props.id) {
       this.myPub = Key.toNostrBech32Address(Key.getPubKey(), 'npub');
       this.props.followers ? this.getFollowers() : this.getFollows();
-      localState.get('contacts').on(this.inject());
     }
   }
 

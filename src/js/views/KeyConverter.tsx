@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+
+import { RouteProps } from '@/views/types.ts';
 
 import Header from '../components/Header';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function KeyConverter(_props) {
+const KeyConverter: React.FC<RouteProps> = () => {
   const [key, setKey] = useState('');
 
   const hex = Key.toNostrHexAddress(key);
@@ -55,4 +56,6 @@ export default function KeyConverter(_props) {
       </div>
     </>
   );
-}
+};
+
+export default KeyConverter;
