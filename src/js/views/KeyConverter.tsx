@@ -17,41 +17,37 @@ const KeyConverter: React.FC<RouteProps> = () => {
   return (
     <>
       <Header />
-      <div class="main-view" id="settings">
-        <div class="centered-container mobile-padding15">
-          <h2>{t('key_converter')}</h2>
-          <p>
+      <div className="min-h-screen" id="settings">
+        <div className="flex flex-col items-center justify-center py-5 px-4 sm:px-8">
+          <h2 className="text-2xl font-bold mb-5">{t('key_converter')}</h2>
+          <div className="w-full max-w-md">
             <input
               type="text"
-              style={{ width: '100%' }}
+              className="input input-bordered w-full text-center"
               placeholder="Enter hex or bech32 key"
               onInput={(e) => setKey((e.target as HTMLInputElement).value?.trim())}
             />
-          </p>
+          </div>
           {key &&
             hex &&
             (key === hex ? (
               <>
-                <p>
-                  <b>note:</b> {note}
+                <p className="mt-3">
+                  <span className="font-bold">note:</span> {note}
                 </p>
-                <p>
-                  <b>npub:</b> {npub}
+                <p className="mt-1">
+                  <span className="font-bold">npub:</span> {npub}
                 </p>
-                <p>
-                  <b>nsec:</b> {nsec}
+                <p className="mt-1">
+                  <span className="font-bold">nsec:</span> {nsec}
                 </p>
               </>
             ) : (
-              <p>
-                <b>hex:</b> {hex}
+              <p className="mt-3">
+                <span className="font-bold">hex:</span> {hex}
               </p>
             ))}
-          {key && !hex && (
-            <p>
-              <b>Invalid key</b>
-            </p>
-          )}
+          {key && !hex && <p className="mt-3 text-red-500 font-bold">Invalid key</p>}
         </div>
       </div>
     </>

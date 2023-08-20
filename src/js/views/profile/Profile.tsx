@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
-import { PureComponent } from 'preact/compat';
 import { route } from 'preact-router';
 
+import BaseComponent from '@/BaseComponent.ts';
 import SimpleImageModal from '@/components/modal/Image.tsx';
 import { getEventReplyingTo } from '@/nostr/utils.ts';
 
@@ -17,40 +17,28 @@ import { translate as t } from '../../translations/Translation.mjs';
 import Helpers from '../../utils/Helpers.tsx';
 import View from '../View.tsx';
 
-type Props = {
-  id: string;
-};
-
-type State = {
-  hexPub: string;
-  npub: string;
-  name: string;
-  display_name: string;
-  profile: any;
-  banner: string;
-  fullBanner: string;
-  picture: string;
-  website: string;
-  lightning: string;
-  blocked: boolean;
-  bannerModalOpen: boolean;
-  noFollowers: boolean;
-  notFound: boolean;
-  followedUserCount: number;
-  followerCount: number;
-};
-
-class Profile extends PureComponent<Props, State> {
+class Profile extends BaseComponent {
   subscriptions: any[];
   unsub: any;
+  state = {
+    hexPub: '',
+    npub: '',
+    name: '',
+    display_name: '',
+    profile: {} as any,
+    banner: '',
+    fullBanner: '',
+    picture: '',
+    website: '',
+    lightning: '',
+    blocked: false,
+    bannerModalOpen: false,
+    notFound: false,
+    noFollowers: false,
+  };
 
   constructor() {
     super();
-    this.state = {
-      followedUserCount: 0,
-      followerCount: 0,
-      bannerModalOpen: false,
-    };
     this.subscriptions = [];
   }
 

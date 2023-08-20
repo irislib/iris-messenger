@@ -10,7 +10,12 @@ import ChatMessages from './ChatMessages';
 import Header from './Header';
 import NewChat, { addChatWithInputKey } from './NewChat';
 
-const Chat = ({ id }) => {
+type Props = {
+  id?: string;
+  path: string;
+};
+
+const Chat: React.FC<Props> = ({ id }) => {
   useEffect(() => {
     const hashId = window.location.hash.substr(1);
     if (hashId && hashId.startsWith('nsec')) {
@@ -40,7 +45,7 @@ const Chat = ({ id }) => {
   };
 
   return (
-    <View>
+    <View hideHeader={true} hideSideBar={true}>
       <div className="flex flex-col h-full max-h-screen">
         <Header key={id} activeChat={id} />
         <div className="flex flex-row flex-grow overflow-hidden">

@@ -60,8 +60,8 @@ const View = ({ children, hideHeader = false, hideSideBar = false }) => {
   };
 
   useEffect(() => {
-    window.addEventListener('scroll', saveScrollPosition);
     restoreScrollPosition();
+    window.addEventListener('scroll', saveScrollPosition);
 
     return () => {
       if (observerRef.current) {

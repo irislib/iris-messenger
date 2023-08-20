@@ -1,10 +1,16 @@
+import React from 'react';
 import { useMemo } from 'preact/hooks';
 
 import FeedComponent from '@/components/feed/Feed';
 
 import View from '../View';
 
-const Search = ({ keyword }) => {
+type Props = {
+  path: string;
+  keyword?: string;
+};
+
+const Search: React.FC<Props> = ({ keyword }) => {
   const filterOptions = useMemo(() => {
     const filter = { kinds: [1], keywords: [keyword || ''] };
 

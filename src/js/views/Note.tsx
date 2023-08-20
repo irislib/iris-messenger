@@ -1,6 +1,8 @@
 import { useEffect } from 'preact/hooks';
 import { route } from 'preact-router';
 
+import View from '@/views/View.tsx';
+
 import CreateNoteForm from '../components/create/CreateNoteForm';
 import EventComponent from '../components/events/EventComponent';
 import Key from '../nostr/Key';
@@ -38,7 +40,11 @@ const Note = (props) => {
       />
     );
   }
-  return <div className="w-full">{content}</div>;
+  return (
+    <View>
+      <div className="w-full">{content}</div>
+    </View>
+  );
 };
 
 export default Note;

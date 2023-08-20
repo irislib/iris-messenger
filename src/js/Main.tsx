@@ -122,7 +122,6 @@ class Main extends Component<Props, ReactState> {
               <SearchFeed path="/search/:keyword" />
               <Login path="/login" fullScreen={true} />
               <Notifications path="/notifications" />
-              <Chat path="/chat/hashtag/:hashtag?" />
               <Chat path="/chat/:id?" />
               <Note path="/post/:id+" />
               <About path="/about" />
