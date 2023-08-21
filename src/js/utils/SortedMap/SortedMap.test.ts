@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import RBSortedMap from '../../../tests/RBSortedMap.ts';
+import RBSortedMap from '../../../../tests/RBSortedMap.ts';
 
 import SortedMap from './SortedMap.tsx';
 

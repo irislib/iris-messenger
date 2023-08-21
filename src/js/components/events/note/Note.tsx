@@ -6,7 +6,7 @@ import { Link, route } from 'preact-router';
 import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 import PubSub from '@/nostr/PubSub';
 import { getEventReplyingTo, getEventRoot } from '@/nostr/utils';
-import SortedMap from '@/utils/SortedMap';
+import SortedMap from '@/utils/SortedMap/SortedMap.tsx';
 
 import Key from '../../../nostr/Key';
 import { translate as t } from '../../../translations/Translation.mjs';

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { EventID, PublicKey } from '@/utils/Hex';
+import { EventID, PublicKey } from '@/utils/Hex/Hex.ts';
 
 describe('PublicKey', () => {
   it('should convert npub bech32 to hex', () => {
@@ -53,5 +53,39 @@ describe('EventID', () => {
     const eventId = new EventID(noteBech32);
     expect(eventId.toHex()).toEqual(noteHex);
     expect(eventId.toBech32()).toEqual(noteBech32);
+  });
+
+  it('should init from hex', () => {
+    const hex = '7349d97665c15be53bb30655f8d7e6437910533047ee0e7209b22354801aae94';
+    const eventId = new EventID(hex);
+    expect(eventId.toHex()).toEqual(hex);
+    expect(eventId.toBech32()).toEqual(
+      'note1wdyajan9c9d72wanqe2l34lxgdu3q5esglhquusfkg34fqq6462qh4cjd5',
+    );
+  });
+
+  it('should fail with too long hex', () => {
+    const hex =
+      '7349d97665c15be53bb30655f8d7e6437910533047ee0e7209b22354801aae947349d97665c15be53bb30655f8d7e6437910533047ee0e7209b22354801aae94';
+    expect(() => new EventID(hex)).toThrow();
+  });
+
+  it('equals(hexStr)', () => {
+    const hex = '7349d97665c15be53bb30655f8d7e6437910533047ee0e7209b22354801aae94';
+    const eventId = new EventID(hex);
+    expect(eventId.equals(hex)).toEqual(true);
+  });
+
+  it('equals(EventID)', () => {
+    const hex = '7349d97665c15be53bb30655f8d7e6437910533047ee0e7209b22354801aae94';
+    const eventId = new EventID(hex);
+    const eventId2 = new EventID(hex);
+    expect(eventId.equals(eventId2)).toEqual(true);
+  });
+
+  it('equals(bech32)', () => {
+    const bech32 = 'note1wdyajan9c9d72wanqe2l34lxgdu3q5esglhquusfkg34fqq6462qh4cjd5';
+    const eventId = new EventID(bech32);
+    expect(eventId.equals(bech32)).toEqual(true);
   });
 });

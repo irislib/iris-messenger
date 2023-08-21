@@ -5,7 +5,7 @@ import SimpleImageModal from '@/components/modal/Image.tsx';
 import { useProfile } from '@/nostr/hooks/useProfile.ts';
 import { getEventReplyingTo, isRepost } from '@/nostr/utils.ts';
 import useLocalState from '@/state/useLocalState.ts';
-import { PublicKey } from '@/utils/Hex.ts';
+import { PublicKey } from '@/utils/Hex/Hex.ts';
 import ProfileHelmet from '@/views/profile/Helmet.tsx';
 
 import Feed from '../../components/feed/Feed.tsx';

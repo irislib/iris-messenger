@@ -9,7 +9,7 @@ import {
 } from 'nostr-tools';
 import { route } from 'preact-router';
 
-import { PublicKey } from '@/utils/Hex.ts';
+import { PublicKey } from '@/utils/Hex/Hex.ts';
 
 import localState from '../state/LocalState.ts';
 import Helpers from '../utils/Helpers';

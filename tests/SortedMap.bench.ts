@@ -1,7 +1,7 @@
 import { Event } from 'nostr-tools';
 import { bench, describe } from 'vitest';
 
-import SortedMap from '@/utils/SortedMap.tsx';
+import SortedMap from '@/utils/SortedMap/SortedMap.tsx';
 
 import events from './events.json';
 import RBSortedMap from './RBSortedMap.ts';

@@ -5,7 +5,7 @@ import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 import Key from '../../nostr/Key';
 import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
-import SortedMap from '../../utils/SortedMap';
+import SortedMap from '../../utils/SortedMap/SortedMap.tsx';
 
 import ChatListItem from './ChatListItem';
 import NewChatButton from './NewChatButton';

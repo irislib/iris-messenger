@@ -1,7 +1,7 @@
 import { useEffect } from 'preact/hooks';
 import { route } from 'preact-router';
 
-import { EventID } from '@/utils/Hex.ts';
+import { EventID } from '@/utils/Hex/Hex.ts';
 import View from '@/views/View.tsx';
 
 import CreateNoteForm from '../components/create/CreateNoteForm';

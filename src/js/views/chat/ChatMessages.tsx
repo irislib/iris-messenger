@@ -14,7 +14,7 @@ import PubSub from '../../nostr/PubSub';
 import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 import Helpers from '../../utils/Helpers';
-import SortedMap from '../../utils/SortedMap';
+import SortedMap from '../../utils/SortedMap/SortedMap.tsx';
 
 import ChatMessageForm from './ChatMessageForm';
 import { addGroup, sendSecretInvite } from './NewChat';
