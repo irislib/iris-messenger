@@ -2,7 +2,7 @@ import debounce from 'lodash/debounce';
 import { useEffect, useRef } from 'preact/hooks';
 
 import ErrorBoundary from '../components/ErrorBoundary';
-import Header from '../components/Header';
+import Header from '../components/header/Header.tsx';
 import Show from '../components/helpers/Show';
 
 import Search from './Search';

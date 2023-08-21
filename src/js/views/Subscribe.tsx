@@ -1,6 +1,6 @@
 import { RouteProps } from '@/views/types';
 
-import Header from '../components/Header';
+import Header from '../components/header/Header.tsx';
 import { translate as t } from '../translations/Translation.mjs';
 
 const Subscribe: React.FC<RouteProps> = () => (

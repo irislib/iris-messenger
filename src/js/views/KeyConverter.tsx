@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { RouteProps } from '@/views/types.ts';
 
-import Header from '../components/Header';
+import Header from '../components/header/Header.tsx';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 

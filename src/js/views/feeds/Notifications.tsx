@@ -6,6 +6,7 @@ import EventDB from '@/nostr/EventDB';
 import Events from '@/nostr/Events';
 import Key from '@/nostr/Key';
 import { RouteProps } from '@/views/types.ts';
+import View from '@/views/View.tsx';
 
 import Feed from '../../components/feed/Feed';
 import Session from '../../nostr/Session';
@@ -60,13 +61,15 @@ const Notifications: React.FC<RouteProps> = () => {
   }, [updateNotificationsLastOpened]);
 
   return (
-    <Feed
-      key="notifications"
-      showDisplayAs={false}
-      emptyMessage={t('no_notifications_yet')}
-      filterOptions={filterOptions}
-      fetchEvents={fetchEvents}
-    />
+    <View>
+      <Feed
+        key="notifications"
+        showDisplayAs={false}
+        emptyMessage={t('no_notifications_yet')}
+        filterOptions={filterOptions}
+        fetchEvents={fetchEvents}
+      />
+    </View>
   );
 };
 

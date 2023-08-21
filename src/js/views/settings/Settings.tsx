@@ -1,4 +1,4 @@
-import Header from '../../components/Header';
+import Header from '../../components/header/Header.tsx';
 
 import SettingsContent from './SettingsContent';
 import SettingsMenu from './SettingsMenu';

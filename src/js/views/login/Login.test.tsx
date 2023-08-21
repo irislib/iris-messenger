@@ -7,7 +7,7 @@ import Login from '@/views/login/Login.tsx';
 describe('Login View Rendering', () => {
   afterEach(cleanup);
 
-  it('renders login form', () => {
+  it('renders login form', async () => {
     render(<Login />);
 
     const loginInput = screen.getByPlaceholderText(t('whats_your_name'));

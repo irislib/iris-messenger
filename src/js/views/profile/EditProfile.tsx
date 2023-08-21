@@ -6,7 +6,7 @@ import { ID } from '@/utils/UniqueIds.ts';
 import { RouteProps } from '@/views/types.ts';
 
 import Upload from '../../components/buttons/Upload.tsx';
-import Header from '../../components/Header.tsx';
+import Header from '../../components/header/Header.tsx';
 import SafeImg from '../../components/SafeImg.tsx';
 import Key from '../../nostr/Key.ts';
 import SocialNetwork from '../../nostr/SocialNetwork.ts';

@@ -4,7 +4,7 @@ import Show from '@/components/helpers/Show';
 import { RouteProps } from '@/views/types';
 
 import Follow from '../components/buttons/Follow';
-import Header from '../components/Header';
+import Header from '../components/header/Header.tsx';
 import Avatar from '../components/user/Avatar';
 import Name from '../components/user/Name';
 import { translate as t } from '../translations/Translation.mjs';
