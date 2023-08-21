@@ -2,6 +2,7 @@ import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
+import { ID } from '@/utils/UniqueIds.ts';
 import { RouteProps } from '@/views/types.ts';
 
 import Upload from '../../components/buttons/Upload.tsx';
@@ -19,7 +20,7 @@ const explainers = {
 };
 
 const EditProfile: React.FC<RouteProps> = () => {
-  const [profile, setProfile] = useState({});
+  const [profile, setProfile] = useState(SocialNetwork.profiles.get(ID(Key.getPubKey())) || {});
   const [newFieldName, setNewFieldName] = useState('');
   const [newFieldValue, setNewFieldValue] = useState('');
   const [edited, setEdited] = useState(false);

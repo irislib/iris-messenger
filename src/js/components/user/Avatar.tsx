@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { sha256 } from '@noble/hashes/sha256';
 import Identicon from 'identicon.js';
 
+import { useProfile } from '@/nostr/hooks/useProfile.ts';
+
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import Show from '../helpers/Show';
@@ -17,41 +19,29 @@ type Props = {
 };
 
 const MyAvatar: React.FC<Props> = (props) => {
-  const [picture, setPicture] = useState<string | null>(null);
-  const [name, setName] = useState<string | null>(null);
   const [activity] = useState<string | null>(null); // TODO
   const [avatar, setAvatar] = useState<string | null>(null);
   const [hasError, setHasError] = useState<boolean>(false);
 
   const hex = React.useMemo(() => Key.toNostrHexAddress(props.str as string), [props.str]);
 
+  const { picture, name } = useProfile(hex || '');
+
   useEffect(() => {
-    const updateAvatar = () => {
-      const hash = sha256(hex || (props.str as string));
-      const hexVal = Array.from(new Uint8Array(hash))
-        .map((b) => b.toString(16).padStart(2, '0'))
-        .join('');
-
-      const identicon = new Identicon(hexVal, {
-        width: props.width,
-        format: 'svg',
-      });
-
-      setAvatar(`data:image/svg+xml;base64,${identicon.toString()}`);
-    };
-
-    if (hex) {
-      updateAvatar();
-
-      const unsub = SocialNetwork.getProfile(hex, (profile) => {
-        if (profile) {
-          setPicture(profile.picture);
-          setName(profile.name);
-        }
-      });
-
-      return () => unsub?.();
+    if (!hex) {
+      return;
     }
+    const hash = sha256(hex || (props.str as string));
+    const hexVal = Array.from(new Uint8Array(hash))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    const identicon = new Identicon(hexVal, {
+      width: props.width,
+      format: 'svg',
+    });
+
+    setAvatar(`data:image/svg+xml;base64,${identicon.toString()}`);
   }, [hex, props.str]);
 
   const width = props.width;

@@ -8,7 +8,7 @@ import ShowNewEvents from '@/components/feed/ShowNewEvents';
 import { FeedProps } from '@/components/feed/types';
 import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 import Show from '@/components/helpers/Show';
-import useSubscribe from '@/hooks/useSubscribe';
+import useSubscribe from '@/nostr/hooks/useSubscribe';
 import Key from '@/nostr/Key';
 import useHistoryState from '@/state/useHistoryState.ts';
 import useLocalState from '@/state/useLocalState.ts';

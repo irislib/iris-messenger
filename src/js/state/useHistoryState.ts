@@ -6,8 +6,6 @@ function useHistoryState(initialValue, key) {
   const myInitialValue = currentHistoryState === undefined ? initialValue : currentHistoryState;
   const [state, setState] = useState(myInitialValue);
 
-  console.log('loaded history state for key', key, 'with value', currentHistoryState, initialValue);
-
   const latestValue = useRef(state);
 
   const throttledSetHistoryState = useRef(

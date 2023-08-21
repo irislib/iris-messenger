@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
 import SimpleImageModal from '@/components/modal/Image.tsx';
+import { useProfile } from '@/nostr/hooks/useProfile.ts';
 import { getEventReplyingTo, isRepost } from '@/nostr/utils.ts';
 import useLocalState from '@/state/useLocalState.ts';
 import ProfileHelmet from '@/views/profile/Helmet.tsx';
@@ -20,10 +20,44 @@ function Profile(props) {
   const [blocked, setBlocked] = useState(false);
   const [hexPub, setHexPub] = useState('');
   const [npub, setNpub] = useState('');
-  const [profile, setProfile] = useState({} as any);
   const [banner, setBanner] = useState('');
   const [bannerModalOpen, setBannerModalOpen] = useState(false);
   const setIsMyProfile = useLocalState('isMyProfile', false)[1];
+
+  const profile = useProfile(hexPub);
+
+  useEffect(() => {
+    if (!hexPub) {
+      return;
+    }
+    const isMyProfile = hexPub === Key.getPubKey();
+    setIsMyProfile(isMyProfile);
+    SocialNetwork.getBlockedUsers((blockedUsers) => {
+      setBlocked(blockedUsers.has(hexPub));
+    });
+  }, [hexPub]);
+
+  useEffect(() => {
+    if (!profile) {
+      return;
+    }
+    let bannerURL;
+
+    try {
+      bannerURL = profile.banner && new URL(profile.banner).toString();
+      if (!bannerURL) {
+        return;
+      }
+
+      bannerURL = isSafeOrigin(bannerURL)
+        ? bannerURL
+        : `https://imgproxy.iris.to/insecure/rs:fit:948:948/plain/${bannerURL}`;
+
+      setBanner(bannerURL);
+    } catch (e) {
+      console.log('Invalid banner URL', profile.banner);
+    }
+  }, [profile]);
 
   useEffect(() => {
     const pub = props.id;
@@ -35,7 +69,11 @@ function Profile(props) {
     }
 
     const hexPubComputed = Key.toNostrHexAddress(pub) || '';
-    if (!hexPubComputed) {
+
+    if (hexPubComputed) {
+      setHexPub(hexPubComputed);
+      setNpub(Key.toNostrBech32Address(hexPubComputed, 'npub') || '');
+    } else {
       let nostrAddress = pub;
       if (!nostrAddress.match(/.+@.+\..+/)) {
         if (nostrAddress.match(/.+\..+/)) {
@@ -51,7 +89,6 @@ function Profile(props) {
           if (npubComputed && npubComputed !== pubKey) {
             setNpub(npubComputed);
             setHexPub(pubKey);
-            loadProfile(pubKey);
           }
         } else {
           setNpub(''); // To indicate not found
@@ -59,9 +96,6 @@ function Profile(props) {
       });
     }
 
-    setHexPub(hexPubComputed);
-    setNpub(Key.toNostrBech32Address(hexPubComputed, 'npub') || '');
-    loadProfile(hexPubComputed);
     setTimeout(() => {
       window.prerenderReady = true;
     }, 1000);
@@ -89,40 +123,6 @@ function Profile(props) {
       },
     ];
   }, [hexPub]);
-
-  const loadProfile = (hexPub) => {
-    if (!hexPub) {
-      return;
-    }
-    const isMyProfile = hexPub === Key.getPubKey();
-    setIsMyProfile(isMyProfile);
-    SocialNetwork.getBlockedUsers((blockedUsers) => {
-      setBlocked(blockedUsers.has(hexPub));
-    });
-
-    SocialNetwork.getProfile(hexPub, (profileData) => {
-      if (!profileData) {
-        return;
-      }
-      setProfile(profileData);
-      let bannerURL;
-
-      try {
-        bannerURL = profileData.banner && new URL(profileData.banner).toString();
-        if (!bannerURL) {
-          return;
-        }
-
-        bannerURL = isSafeOrigin(bannerURL)
-          ? bannerURL
-          : `https://imgproxy.iris.to/insecure/rs:fit:948:948/plain/${bannerURL}`;
-
-        setBanner(bannerURL);
-      } catch (e) {
-        console.log('Invalid banner URL', profileData.banner);
-      }
-    });
-  };
 
   if (!hexPub) {
     return <div></div>;

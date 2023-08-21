@@ -2,15 +2,16 @@ import { memo, useMemo } from 'react';
 import { nip19 } from 'nostr-tools';
 import { Link, route } from 'preact-router';
 
+import { useProfile } from '@/nostr/hooks/useProfile';
+
 import FollowButton from '../components/buttons/Follow';
 import SmallFeed from '../components/feed/SmallFeed';
 import SearchBox from '../components/SearchBox';
 import Avatar from '../components/user/Avatar';
 import Name from '../components/user/Name';
-import useCachedFetch from '../hooks/useCachedFetch';
-import { useProfile } from '../hooks/useProfile';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
+import useCachedFetch from '../utils/useCachedFetch.ts';
 
 const SuggestionProfile = memo(({ pubkey }: { pubkey: string }) => {
   const profile = useProfile(pubkey);

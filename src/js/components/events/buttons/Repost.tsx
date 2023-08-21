@@ -3,7 +3,6 @@ import { useEffect, useState } from 'preact/hooks';
 
 import Events from '../../../nostr/Events';
 import Key from '../../../nostr/Key';
-import SocialNetwork from '../../../nostr/SocialNetwork';
 
 const Repost = ({ event }) => {
   const [state, setState] = useState({
@@ -13,16 +12,7 @@ const Repost = ({ event }) => {
   });
 
   useEffect(() => {
-    const unsubProfile = SocialNetwork.getProfile(event.pubkey, (profile) => {
-      if (!profile) return;
-    });
-
-    const unsubReposts = Events.getReposts(event.id, handleReposts);
-
-    return () => {
-      unsubProfile();
-      unsubReposts();
-    };
+    return Events.getReposts(event.id, handleReposts);
   }, [event]);
 
   const handleReposts = (repostedBy) => {

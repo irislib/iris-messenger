@@ -4,13 +4,13 @@ import { useEffect, useState } from 'preact/hooks';
 
 import Show from '@/components/helpers/Show';
 import EventDB from '@/nostr/EventDB';
+import { useProfile } from '@/nostr/hooks/useProfile.ts';
 import Key from '@/nostr/Key';
 import { getZappingUser } from '@/nostr/utils';
 import useLocalState from '@/state/useLocalState.ts';
 import Icons from '@/utils/Icons';
 
 import Events from '../../../nostr/Events';
-import SocialNetwork from '../../../nostr/SocialNetwork';
 import { decodeInvoice, formatAmount } from '../../../utils/Lightning';
 import ZapModal from '../../modal/Zap';
 
@@ -20,12 +20,13 @@ const Zap = ({ event }) => {
     formattedZapAmount: '',
     zapped: false,
     showZapModal: false,
-    lightning: undefined,
     defaultZapAmount: 0,
   });
 
   const [defaultZapAmount] = useLocalState('defaultZapAmount', 0);
   const [longPress, setLongPress] = useState(false); // state to determine if it's a long press
+  const { lud16, lud06 } = useProfile(event.pubkey);
+  const lightning = lud16 || lud06;
 
   let pressTimer: any = null;
 
@@ -55,21 +56,7 @@ const Zap = ({ event }) => {
   };
 
   useEffect(() => {
-    const unsubProfile = SocialNetwork.getProfile(event.pubkey, (profile) => {
-      if (!profile) return;
-      const lightning = profile.lud16 || profile.lud06;
-      setState((prevState) => ({
-        ...prevState,
-        lightning,
-      }));
-    });
-
-    const unsubZaps = Events.getZaps(event.id, handleZaps);
-
-    return () => {
-      unsubProfile();
-      unsubZaps();
-    };
+    return Events.getZaps(event.id, handleZaps);
   }, [event]);
 
   const handleZaps = debounce(
@@ -102,7 +89,7 @@ const Zap = ({ event }) => {
     { leading: true },
   );
 
-  return state.lightning ? (
+  return lightning ? (
     <>
       <a
         onMouseDown={onMouseDown}
@@ -120,7 +107,7 @@ const Zap = ({ event }) => {
         <ZapModal
           quickZap={!!defaultZapAmount && !longPress}
           show={true}
-          lnurl={state.lightning}
+          lnurl={lightning}
           note={event.id}
           recipient={event.pubkey}
           onClose={() => setState((prevState) => ({ ...prevState, showZapModal: false }))}

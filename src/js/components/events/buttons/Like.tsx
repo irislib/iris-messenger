@@ -4,7 +4,6 @@ import { useEffect, useState } from 'preact/hooks';
 
 import Events from '../../../nostr/Events';
 import Key from '../../../nostr/Key';
-import SocialNetwork from '../../../nostr/SocialNetwork';
 
 const Like = ({ event }) => {
   const [state, setState] = useState({
@@ -14,16 +13,7 @@ const Like = ({ event }) => {
   });
 
   useEffect(() => {
-    const unsubProfile = SocialNetwork.getProfile(event.pubkey, (profile) => {
-      if (!profile) return;
-    });
-
-    const unsubLikes = Events.getLikes(event.id, handleLikes);
-
-    return () => {
-      unsubProfile();
-      unsubLikes();
-    };
+    return Events.getLikes(event.id, handleLikes);
   }, [event]);
 
   const handleLikes = (likedBy) => {

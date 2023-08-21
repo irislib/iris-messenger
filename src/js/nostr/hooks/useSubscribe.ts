@@ -2,9 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import throttle from 'lodash/throttle';
 import { Event } from 'nostr-tools';
 
-import Filter from '@/nostr/Filter';
-import PubSub from '@/nostr/PubSub';
-import SortedMap from '@/utils/SortedMap';
+import Filter from '@/nostr/Filter.ts';
+import PubSub from '@/nostr/PubSub.ts';
+import SortedMap from '@/utils/SortedMap.tsx';
 
 interface SubscribeOptions {
   filter: Filter;
