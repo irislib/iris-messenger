@@ -16,6 +16,7 @@ export class Hex {
   value: string;
 
   constructor(str: string, expectedLength?: number) {
+    // maybe should accept bech32 input and convert to hex?
     this.validateHex(str, expectedLength);
     this.value = str;
   }
@@ -45,6 +46,10 @@ export class Hex {
   toHex(): string {
     return this.value;
   }
+
+  toString(): string {
+    return this.value;
+  }
 }
 
 export class EventID extends Hex {
@@ -61,6 +66,9 @@ export class EventID extends Hex {
 
   equals(other: EventID | string): boolean {
     if (typeof other === 'string') {
+      if (other === this.value) {
+        return true;
+      }
       other = new EventID(other);
     }
     return this.value === other.value;
@@ -81,6 +89,9 @@ export class PublicKey extends Hex {
 
   equals(other: PublicKey | string): boolean {
     if (typeof other === 'string') {
+      if (other === this.value) {
+        return true;
+      }
       other = new PublicKey(other);
     }
     return this.value === other.value;

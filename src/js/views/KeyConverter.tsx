@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { Hex } from '@/utils/Hex/Hex.ts';
 import { RouteProps } from '@/views/types.ts';
 
 import Header from '../components/header/Header.tsx';
@@ -9,10 +10,18 @@ import { translate as t } from '../translations/Translation.mjs';
 const KeyConverter: React.FC<RouteProps> = () => {
   const [key, setKey] = useState('');
 
-  const hex = Key.toNostrHexAddress(key);
-  const note = Key.toNostrBech32Address(key, 'note');
-  const npub = Key.toNostrBech32Address(key, 'npub');
-  const nsec = Key.toNostrBech32Address(key, 'nsec');
+  let hex;
+  let note;
+  let npub;
+  let nsec;
+  try {
+    hex = new Hex(Key.toNostrHexAddress(key) || key);
+    note = hex.toBech32('note');
+    npub = hex.toBech32('npub');
+    nsec = Key.toNostrBech32Address(key, 'nsec');
+  } catch (e) {
+    hex = null;
+  }
 
   return (
     <>
@@ -20,17 +29,17 @@ const KeyConverter: React.FC<RouteProps> = () => {
       <div className="min-h-screen" id="settings">
         <div className="flex flex-col items-center justify-center py-5 px-4 sm:px-8">
           <h2 className="text-2xl font-bold mb-5">{t('key_converter')}</h2>
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-lg">
             <input
               type="text"
-              className="input input-bordered w-full text-center"
+              className="input input-bordered w-full text-center text-sm"
               placeholder="Enter hex or bech32 key"
               onInput={(e) => setKey((e.target as HTMLInputElement).value?.trim())}
             />
           </div>
           {key &&
             hex &&
-            (key === hex ? (
+            (key === hex.toHex() ? (
               <>
                 <p className="mt-3">
                   <span className="font-bold">note:</span> {note}
@@ -44,7 +53,7 @@ const KeyConverter: React.FC<RouteProps> = () => {
               </>
             ) : (
               <p className="mt-3">
-                <span className="font-bold">hex:</span> {hex}
+                <span className="font-bold">hex:</span> {hex.toHex()}
               </p>
             ))}
           {key && !hex && <p className="mt-3 text-red-500 font-bold">Invalid key</p>}
