@@ -35,7 +35,7 @@
     "lokijs": "^1.5.12",
     "nostr-relaypool": "^0.6.28",
     "nostr-tools": "^1.14.0",
-    "preact": "^10.17.0",
+    "preact": "^10.17.1",
     "preact-router": "^4.1.2",
     "react-helmet": "^6.1.0",
     "react-string-replace": "^1.1.1"

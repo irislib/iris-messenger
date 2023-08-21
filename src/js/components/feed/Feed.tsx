@@ -57,7 +57,7 @@ const Feed = (props: FeedProps) => {
     mergeSubscriptions: false,
   });
 
-  // TODO [shownEvents, setShownEvents] = useHistoryState([], 'shownEvents'); which is only updated when user wants
+  // TODO [shownEvents, setShownEvents] = useHistoryState([], 'shownEvents'); which is only updated when user clicks
 
   if (events.length && events[0].pubkey === Key.getPubKey() && events[0].created_at > showUntil) {
     setShowUntil(Math.floor(Date.now() / 1000));
