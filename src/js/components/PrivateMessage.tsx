@@ -58,7 +58,7 @@ const PrivateMessage = ({ event, selfAuthored, showName }: Props) => {
       <PrivateMessage
         event={innerEvent}
         showName={true}
-        selfAuthored={innerEvent.pubkey === Key.getPubKey()}
+        selfAuthored={Key.isMine(innerEvent.pubkey)}
       />
     );
   }

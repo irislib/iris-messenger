@@ -85,6 +85,9 @@ export default {
   getPrivKey(): string {
     return this.key?.priv || '';
   },
+  isMine(pubkey: string) {
+    return new PublicKey(pubkey).equals(this.getPubKey());
+  },
   encrypt: async function (data: string, pub?: string): Promise<string> {
     const k = this.key;
     pub = pub || k.rpub || '';
