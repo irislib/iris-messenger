@@ -4,13 +4,13 @@ import { route } from 'preact-router';
 
 import SimpleImageModal from '@/components/modal/Image.tsx';
 import { getEventReplyingTo, isRepost } from '@/nostr/utils.ts';
+import useLocalState from '@/state/useLocalState.ts';
 import ProfileHelmet from '@/views/profile/Helmet.tsx';
 
 import Feed from '../../components/feed/Feed.tsx';
 import Show from '../../components/helpers/Show.tsx';
 import { isSafeOrigin } from '../../components/SafeImg.tsx';
 import ProfileCard from '../../components/user/ProfileCard.tsx';
-import { useLocalState } from '../../LocalState.ts';
 import Key from '../../nostr/Key.ts';
 import SocialNetwork from '../../nostr/SocialNetwork.ts';
 import { translate as t } from '../../translations/Translation.mjs';

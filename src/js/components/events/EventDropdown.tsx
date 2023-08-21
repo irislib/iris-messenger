@@ -3,9 +3,9 @@ import { useState } from 'preact/hooks';
 
 import EventDB from '@/nostr/EventDB';
 
-import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
+import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 import Helpers from '../../utils/Helpers';
 import Block from '../buttons/Block';

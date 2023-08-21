@@ -3,10 +3,10 @@ import { generatePrivateKey, getEventHash, getPublicKey, nip04, signEvent } from
 import { useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
-import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
+import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 import AnimalName from '../../utils/AnimalName';
 

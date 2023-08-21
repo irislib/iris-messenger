@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PureComponent } from 'preact/compat';
 
-import { Callback, Unsubscribe } from './LocalState';
+import { Callback, Unsubscribe } from './state/LocalState.ts';
 
 type OwnState = {
   ogImageUrl?: any;

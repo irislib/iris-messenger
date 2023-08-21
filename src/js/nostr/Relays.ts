@@ -4,7 +4,7 @@ import { Event, Filter, Sub } from 'nostr-tools';
 
 import EventDB from '@/nostr/EventDB';
 
-import localState from '../LocalState';
+import localState from '../state/LocalState.ts';
 import Helpers from '../utils/Helpers';
 
 import Events from './Events';

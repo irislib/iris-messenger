@@ -5,10 +5,10 @@ import { route } from 'preact-router';
 import Helpers from '@/utils/Helpers';
 
 import Component from '../BaseComponent';
-import localState from '../LocalState';
 import Events from '../nostr/Events';
 import FuzzySearch from '../nostr/FuzzySearch';
 import Key from '../nostr/Key';
+import localState from '../state/LocalState.ts';
 import { translate as t } from '../translations/Translation.mjs';
 
 import Avatar from './user/Avatar';

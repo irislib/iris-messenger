@@ -8,8 +8,8 @@ const { authenticate } = nip42;
 import EventDB from '@/nostr/EventDB';
 import { UniqueIds } from '@/utils/UniqueIds';
 
-import localState from '../LocalState';
 import Events from '../nostr/Events';
+import localState from '../state/LocalState.ts';
 
 import IndexedDB from './IndexedDB';
 import Relays from './Relays';

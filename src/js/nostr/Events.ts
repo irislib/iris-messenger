@@ -21,8 +21,8 @@ import {
 } from '@/nostr/utils';
 import { ID, STR, UniqueIds } from '@/utils/UniqueIds';
 
-import localState from '../LocalState';
-import { Node } from '../LocalState';
+import localState from '../state/LocalState.ts';
+import { Node } from '../state/LocalState.ts';
 import { DecryptedEvent } from '../views/chat/ChatMessages';
 import { addGroup, setGroupNameByInvite } from '../views/chat/NewChat';
 

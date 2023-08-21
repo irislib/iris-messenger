@@ -8,8 +8,8 @@ import {
 import { useEffect, useState } from 'preact/hooks';
 import { Link } from 'preact-router';
 
-import localState from '../LocalState';
 import Key from '../nostr/Key';
+import localState from '../state/LocalState.ts';
 import Icons from '../utils/Icons';
 
 import Show from './helpers/Show';

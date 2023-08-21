@@ -1,6 +1,6 @@
 import EventDB from '@/nostr/EventDB';
 
-import localState from '../LocalState';
+import localState from '../state/LocalState.ts';
 import { ID, STR, UID } from '../utils/UniqueIds';
 
 import Events from './Events';

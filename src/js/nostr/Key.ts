@@ -9,7 +9,7 @@ import {
 } from 'nostr-tools';
 import { route } from 'preact-router';
 
-import localState from '../LocalState';
+import localState from '../state/LocalState.ts';
 import Helpers from '../utils/Helpers';
 
 import Events from './Events';

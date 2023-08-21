@@ -2,7 +2,7 @@ import { memo } from 'react';
 import reactStringReplace from 'react-string-replace';
 import { Event } from 'nostr-tools';
 
-import localState from '../LocalState';
+import localState from '../state/LocalState.ts';
 
 import { allEmbeds, textEmbeds } from './embed';
 

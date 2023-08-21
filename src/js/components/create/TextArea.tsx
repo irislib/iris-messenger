@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Show from '@/components/helpers/Show';
 import SearchBox from '@/components/SearchBox';
-import localState from '@/LocalState';
 import Key from '@/nostr/Key';
+import localState from '@/state/LocalState.ts';
 import { translate as t } from '@/translations/Translation.mjs';
 import Helpers from '@/utils/Helpers';
 import { uploadFile } from '@/utils/uploadFile';

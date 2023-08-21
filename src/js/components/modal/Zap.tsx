@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Event } from 'nostr-tools';
 
-import { useLocalState } from '@/LocalState';
+import useLocalState from '@/state/useLocalState.ts';
 
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';

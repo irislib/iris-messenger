@@ -1,7 +1,7 @@
 import Fuse from 'fuse.js';
 import throttle from 'lodash/throttle';
 
-import localState from '../LocalState';
+import localState from '../state/LocalState.ts';
 
 const options = {
   keys: ['name', 'display_name'],

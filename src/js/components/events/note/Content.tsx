@@ -5,8 +5,8 @@ import CreateNoteForm from '@/components/create/CreateNoteForm';
 import Reactions from '@/components/events/buttons/ReactionButtons';
 import Show from '@/components/helpers/Show';
 import HyperText from '@/components/HyperText';
-import localState from '@/LocalState';
 import SocialNetwork from '@/nostr/SocialNetwork';
+import localState from '@/state/LocalState.ts';
 import { translate as t } from '@/translations/Translation.mjs';
 import Helpers from '@/utils/Helpers';
 

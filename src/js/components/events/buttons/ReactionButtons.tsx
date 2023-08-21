@@ -4,7 +4,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
 import Show from '@/components/helpers/Show';
-import localState from '@/LocalState';
+import localState from '@/state/LocalState.ts';
 
 import Events from '../../../nostr/Events';
 import Key from '../../../nostr/Key';

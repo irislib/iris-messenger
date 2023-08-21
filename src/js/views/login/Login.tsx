@@ -2,10 +2,10 @@ import { useState } from 'preact/hooks';
 
 import EULA from '@/components/EULA';
 import Show from '@/components/helpers/Show.tsx';
-import localState from '@/LocalState';
 import Events from '@/nostr/Events';
 import Key from '@/nostr/Key';
 import SocialNetwork from '@/nostr/SocialNetwork';
+import localState from '@/state/LocalState.ts';
 import Helpers from '@/utils/Helpers.tsx';
 
 import ExistingAccountLogin from './ExistingAccountLogin';

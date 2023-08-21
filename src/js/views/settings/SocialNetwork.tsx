@@ -2,10 +2,10 @@ import { useEffect, useState } from 'preact/hooks';
 import { Link } from 'preact-router';
 
 import Name from '../../components/user/Name';
-import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
+import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 
 const SocialNetworkSettings = () => {

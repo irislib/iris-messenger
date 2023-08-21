@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 
-import localState from '../../LocalState';
 import Session from '../../nostr/Session';
+import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 
 //type ColorScheme = 'default' | 'light' | 'dark';

@@ -8,8 +8,8 @@ import Key from '@/nostr/Key';
 import { RouteProps } from '@/views/types.ts';
 
 import Feed from '../../components/feed/Feed';
-import localState from '../../LocalState';
 import Session from '../../nostr/Session';
+import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 
 const Notifications: React.FC<RouteProps> = () => {

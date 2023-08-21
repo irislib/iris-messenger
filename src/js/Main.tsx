@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import Show from './components/helpers/Show';
 import Menu from './components/Menu';
 import Modal from './components/modal/Modal';
+import localState from './state/LocalState.ts';
 import { translationLoaded } from './translations/Translation.mjs';
 import Helpers from './utils/Helpers';
 import About from './views/About';
@@ -25,7 +26,6 @@ import LogoutConfirmation from './views/settings/LogoutConfirmation.tsx';
 import Settings from './views/settings/Settings';
 import Subscribe from './views/Subscribe';
 import Component from './BaseComponent';
-import localState from './LocalState';
 
 import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';

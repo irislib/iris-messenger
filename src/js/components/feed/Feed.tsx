@@ -5,12 +5,13 @@ import DisplaySelector from '@/components/feed/DisplaySelector';
 import FilterOptionsSelector from '@/components/feed/FilterOptionsSelector';
 import ImageGrid from '@/components/feed/ImageGrid';
 import ShowNewEvents from '@/components/feed/ShowNewEvents';
-import { DisplayAs, FeedProps } from '@/components/feed/types';
+import { FeedProps } from '@/components/feed/types';
 import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 import Show from '@/components/helpers/Show';
 import useSubscribe from '@/hooks/useSubscribe';
-import { useLocalState } from '@/LocalState';
 import Key from '@/nostr/Key';
+import useHistoryState from '@/state/useHistoryState.ts';
+import useLocalState from '@/state/useLocalState.ts';
 import Helpers from '@/utils/Helpers';
 
 import { translate as t } from '../../translations/Translation.mjs';
@@ -23,11 +24,13 @@ const Feed = (props: FeedProps) => {
     throw new Error('Feed requires at least one filter option');
   }
   const displayAsParam = Helpers.getUrlParameter('display') === 'grid' ? 'grid' : 'feed';
-  const [filterOption, setFilterOption] = useState(filterOptions[0]);
-  const [displayAs, setDisplayAs] = useState<DisplayAs>(displayAsParam);
+  const [filterOptionIndex, setFilterOptionIndex] = useHistoryState(0, 'filterOptionIndex');
+  const [displayAs, setDisplayAs] = useHistoryState(displayAsParam, 'display');
   const [mutedUsers] = useLocalState('muted', {});
-  const [showUntil, setShowUntil] = useState(Math.floor(Date.now() / 1000));
+  const [showUntil, setShowUntil] = useHistoryState(Math.floor(Date.now() / 1000), 'showUntil');
   const [infiniteScrollKey, setInfiniteScrollKey] = useState(0);
+
+  const filterOption = filterOptions[filterOptionIndex];
 
   useEffect(() => {
     setShowUntil(Math.floor(Date.now() / 1000));
@@ -88,8 +91,8 @@ const Feed = (props: FeedProps) => {
         <FilterOptionsSelector
           filterOptions={filterOptions}
           activeOption={filterOption}
-          onOptionClick={(opt) => {
-            setFilterOption(opt);
+          onOptionClick={(index) => {
+            setFilterOptionIndex(index);
           }}
         />
       </Show>

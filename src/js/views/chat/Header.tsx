@@ -4,8 +4,8 @@ import { route } from 'preact-router';
 import Show from '../../components/helpers/Show';
 import Avatar from '../../components/user/Avatar';
 import Name from '../../components/user/Name';
-import localState from '../../LocalState';
 import Key from '../../nostr/Key';
+import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 
 const Header = ({ activeChat }) => {

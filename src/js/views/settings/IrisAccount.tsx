@@ -3,10 +3,10 @@ import { Event, UnsignedEvent } from 'nostr-tools';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
-import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
+import localState from '../../state/LocalState.ts';
 
 declare global {
   interface Window {

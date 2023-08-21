@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'preact/compat';
 
-import localState from '../../LocalState';
 import PubSub from '../../nostr/PubSub';
 import Relays, { PopularRelay } from '../../nostr/Relays';
+import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 
 const Network = () => {

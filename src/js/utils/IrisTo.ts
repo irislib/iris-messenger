@@ -1,7 +1,7 @@
-import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
+import localState from '../state/LocalState.ts';
 
 export default {
   async checkExistingAccount(pub) {

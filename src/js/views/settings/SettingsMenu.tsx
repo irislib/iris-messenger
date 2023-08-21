@@ -2,7 +2,7 @@ import { LanguageIcon } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 
 import Show from '../../components/helpers/Show';
-import localState from '../../LocalState';
+import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 
 const SETTINGS = {

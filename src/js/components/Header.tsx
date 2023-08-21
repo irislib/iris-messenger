@@ -4,9 +4,9 @@ import { ArrowLeftIcon, HeartIcon as HeartIconFull } from '@heroicons/react/24/s
 import { Link, route } from 'preact-router';
 
 import Component from '../BaseComponent';
-import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
+import localState from '../state/LocalState.ts';
 import { translate as t } from '../translations/Translation.mjs';
 import Icons from '../utils/Icons';
 

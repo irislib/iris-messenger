@@ -4,7 +4,7 @@ import { route } from 'preact-router';
 
 import Helpers from '@/utils/Helpers.tsx';
 
-import localState from '../LocalState';
+import localState from '../state/LocalState.ts';
 import IrisTo from '../utils/IrisTo';
 import { ID } from '../utils/UniqueIds';
 

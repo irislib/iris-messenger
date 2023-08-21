@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import localState from '../../LocalState';
+import localState from '../../state/LocalState.ts';
 
 export default function DevSettings() {
   const [state, setState] = useState({});

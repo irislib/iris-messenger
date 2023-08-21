@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 
-import localState from '../../LocalState';
 import Key from '../../nostr/Key';
+import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 import SortedMap from '../../utils/SortedMap';
 

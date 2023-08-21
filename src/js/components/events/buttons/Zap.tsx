@@ -3,10 +3,10 @@ import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'preact/hooks';
 
 import Show from '@/components/helpers/Show';
-import { useLocalState } from '@/LocalState';
 import EventDB from '@/nostr/EventDB';
 import Key from '@/nostr/Key';
 import { getZappingUser } from '@/nostr/utils';
+import useLocalState from '@/state/useLocalState.ts';
 import Icons from '@/utils/Icons';
 
 import Events from '../../../nostr/Events';

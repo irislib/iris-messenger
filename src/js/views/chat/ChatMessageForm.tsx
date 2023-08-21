@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { getEventHash, getSignature, nip04 } from 'nostr-tools';
 
-import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
+import localState from '../../state/LocalState.ts';
 import Helpers from '../../utils/Helpers';
 
 interface ChatMessageFormProps {

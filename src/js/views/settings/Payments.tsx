@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 
-import localState from '../../LocalState';
+import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 
 const Payments = () => {

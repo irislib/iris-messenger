@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { bech32 } from 'bech32';
 
-import localState from '../LocalState';
 import Key from '../nostr/Key';
+import localState from '../state/LocalState.ts';
 import { language } from '../translations/Translation.mjs';
 
 const emojiRegex =
