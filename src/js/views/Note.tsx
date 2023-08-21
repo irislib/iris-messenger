@@ -10,9 +10,9 @@ import { translate as t } from '../translations/Translation.mjs';
 
 const Note = (props) => {
   useEffect(() => {
-    const nostrBech32Id = new EventID(props.id).toBech32();
-    if (nostrBech32Id && props.id !== nostrBech32Id) {
-      route(`/${nostrBech32Id}`, true);
+    const noteId = new EventID(props.id).note;
+    if (noteId && props.id !== noteId) {
+      route(`/${noteId}`, true);
       return;
     }
   }, [props.id]);

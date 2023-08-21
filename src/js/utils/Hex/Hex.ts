@@ -43,7 +43,7 @@ export class Hex {
     return bech32.encode(prefix, bytes);
   }
 
-  toHex(): string {
+  get hex(): string {
     return this.value;
   }
 
@@ -53,15 +53,25 @@ export class Hex {
 }
 
 export class EventID extends Hex {
+  noteValue: string | undefined;
+
   constructor(str: string) {
-    if (str.startsWith('note')) {
-      str = bech32ToHex(str);
+    const isNote = str.startsWith('note');
+    let hexValue = str;
+    if (isNote) {
+      hexValue = bech32ToHex(str);
     }
-    super(str, 64);
+    super(hexValue, 64);
+    if (isNote) {
+      this.noteValue = str; // preserve the original Bech32 value
+    }
   }
 
-  toBech32(): string {
-    return super.toBech32('note');
+  get note(): string {
+    if (!this.noteValue) {
+      this.noteValue = super.toBech32('note');
+    }
+    return this.noteValue;
   }
 
   equals(other: EventID | string): boolean {
@@ -76,15 +86,25 @@ export class EventID extends Hex {
 }
 
 export class PublicKey extends Hex {
+  npubValue: string | undefined;
+
   constructor(str: string) {
-    if (str.startsWith('npub')) {
-      str = bech32ToHex(str);
+    const isNpub = str.startsWith('npub');
+    let hexValue = str;
+    if (isNpub) {
+      hexValue = bech32ToHex(str);
     }
-    super(str, 64);
+    super(hexValue, 64);
+    if (isNpub) {
+      this.npubValue = str; // preserve the original Bech32 value
+    }
   }
 
-  toBech32(): string {
-    return super.toBech32('npub');
+  get npub(): string {
+    if (!this.npubValue) {
+      this.npubValue = super.toBech32('npub');
+    }
+    return this.npubValue;
   }
 
   equals(other: PublicKey | string): boolean {

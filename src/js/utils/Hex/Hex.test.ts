@@ -7,15 +7,15 @@ describe('PublicKey', () => {
     const bech32 = 'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk';
     const hex = '4523be58d395b1b196a9b8c82b038b6895cb02b683d0c253a955068dba1facd0';
     const publicKey = new PublicKey(bech32);
-    expect(publicKey.toHex()).toEqual(hex);
-    expect(publicKey.toBech32()).toEqual(bech32);
+    expect(publicKey.hex).toEqual(hex);
+    expect(publicKey.npub).toEqual(bech32);
   });
 
   it('should init from hex', () => {
     const hex = '4523be58d395b1b196a9b8c82b038b6895cb02b683d0c253a955068dba1facd0';
     const publicKey = new PublicKey(hex);
-    expect(publicKey.toHex()).toEqual(hex);
-    expect(publicKey.toBech32()).toEqual(
+    expect(publicKey.hex).toEqual(hex);
+    expect(publicKey.npub).toEqual(
       'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk',
     );
   });
@@ -51,17 +51,15 @@ describe('EventID', () => {
     const noteBech32 = 'note1wdyajan9c9d72wanqe2l34lxgdu3q5esglhquusfkg34fqq6462qh4cjd5';
     const noteHex = '7349d97665c15be53bb30655f8d7e6437910533047ee0e7209b22354801aae94';
     const eventId = new EventID(noteBech32);
-    expect(eventId.toHex()).toEqual(noteHex);
-    expect(eventId.toBech32()).toEqual(noteBech32);
+    expect(eventId.hex).toEqual(noteHex);
+    expect(eventId.note).toEqual(noteBech32);
   });
 
   it('should init from hex', () => {
     const hex = '7349d97665c15be53bb30655f8d7e6437910533047ee0e7209b22354801aae94';
     const eventId = new EventID(hex);
-    expect(eventId.toHex()).toEqual(hex);
-    expect(eventId.toBech32()).toEqual(
-      'note1wdyajan9c9d72wanqe2l34lxgdu3q5esglhquusfkg34fqq6462qh4cjd5',
-    );
+    expect(eventId.hex).toEqual(hex);
+    expect(eventId.note).toEqual('note1wdyajan9c9d72wanqe2l34lxgdu3q5esglhquusfkg34fqq6462qh4cjd5');
   });
 
   it('should fail with too long hex', () => {

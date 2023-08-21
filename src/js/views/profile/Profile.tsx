@@ -63,15 +63,14 @@ function Profile(props) {
   useEffect(() => {
     try {
       const pub = new PublicKey(props.id);
-      const npubComputed = pub.toBech32();
 
-      if (npubComputed !== props.id) {
-        route(`/${npubComputed}`, true);
+      if (pub.npub !== props.id) {
+        route(`/${pub.npub}`, true);
         return;
       }
 
-      setHexPub(pub.toHex());
-      setNpub(npubComputed);
+      setHexPub(pub.hex);
+      setNpub(pub.npub);
     } catch (e) {
       let nostrAddress = props.id;
 
@@ -85,8 +84,8 @@ function Profile(props) {
 
       Key.getPubKeyByNip05Address(nostrAddress).then((pubKey) => {
         if (pubKey) {
-          setNpub(pubKey.toBech32());
-          setHexPub(pubKey.toHex());
+          setNpub(pubKey.npub);
+          setHexPub(pubKey.hex);
         } else {
           setNpub(''); // To indicate not found
         }
