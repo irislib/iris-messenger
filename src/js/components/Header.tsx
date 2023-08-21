@@ -11,8 +11,8 @@ import { translate as t } from '../translations/Translation.mjs';
 import Icons from '../utils/Icons';
 
 import Show from './helpers/Show';
+import SearchBox from './searchbox/SearchBox.tsx';
 import Name from './user/Name';
-import SearchBox from './SearchBox';
 
 declare global {
   interface Window {

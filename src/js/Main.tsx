@@ -46,7 +46,7 @@ const Main = () => {
     translationLoaded.then(() => {
       setTranslationsLoadedState(true);
     });
-  });
+  }, []);
 
   const handleRoute = (e: RouterOnChangeArgs) => {
     const currentActiveRoute = e.url;

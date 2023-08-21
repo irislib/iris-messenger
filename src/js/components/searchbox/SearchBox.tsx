@@ -2,18 +2,16 @@ import debounce from 'lodash/debounce';
 import { createRef } from 'preact';
 import { route } from 'preact-router';
 
-import Helpers from '@/utils/Helpers';
+import Show from '@/components/helpers/Show.tsx';
+import SearchResult from '@/components/searchbox/SearchResult.tsx';
+import Helpers from '@/utils/Helpers.tsx';
 
-import Component from '../BaseComponent';
-import Events from '../nostr/Events';
-import FuzzySearch from '../nostr/FuzzySearch';
-import Key from '../nostr/Key';
-import localState from '../state/LocalState.ts';
-import { translate as t } from '../translations/Translation.mjs';
-
-import Avatar from './user/Avatar';
-import Name from './user/Name';
-import SafeImg from './SafeImg';
+import Component from '../../BaseComponent.ts';
+import Events from '../../nostr/Events.ts';
+import FuzzySearch from '../../nostr/FuzzySearch.ts';
+import Key from '../../nostr/Key.ts';
+import localState from '../../state/LocalState.ts';
+import { translate as t } from '../../translations/Translation.mjs';
 
 const RESULTS_MAX = 5;
 
@@ -133,7 +131,7 @@ class SearchBox extends Component<Props, State> {
 
   adjustResultsPosition() {
     const input = this.inputRef.current;
-    if (input.length) {
+    if (input?.length) {
       this.setState({ offsetLeft: input[0].offsetLeft });
     }
   }
@@ -241,11 +239,11 @@ class SearchBox extends Component<Props, State> {
   }
 
   render() {
+    console.log('SearchBox');
+
     return (
       <div className={`relative ${this.props.class}`}>
-        {this.props.resultsOnly ? (
-          ''
-        ) : (
+        <Show when={!this.props.resultsOnly}>
           <form onSubmit={(e) => this.onSubmit(e)}>
             <label>
               <input
@@ -261,14 +259,14 @@ class SearchBox extends Component<Props, State> {
               />
             </label>
           </form>
-        )}
+        </Show>
         <div
           onKeyUp={(e) => this.onKeyUp(e)}
           className={`${
             this.state.query ? '' : 'hidden'
           } absolute z-20 left-0 mt-2 w-full bg-black border border-neutral-700 rounded shadow-lg`}
         >
-          {this.state.query && !this.props.resultsOnly ? (
+          <Show when={this.state.query && !this.props.resultsOnly}>
             <a
               onFocus={(e) => this.onResultFocus(e, -1)}
               tabIndex={2}
@@ -278,7 +276,7 @@ class SearchBox extends Component<Props, State> {
               }
               href={`/search/${encodeURIComponent(this.state.query)}`}
             >
-              <div class="avatar-container">
+              <div className="avatar-container">
                 <div style="font-size: 1.5em; width: 40px">&#128269;</div>
               </div>
               <div>
@@ -287,44 +285,17 @@ class SearchBox extends Component<Props, State> {
                 <small>{t('search_posts')}</small>
               </div>
             </a>
-          ) : (
-            ''
-          )}
+          </Show>
           {this.state.results.map((r, index) => {
             const i = r.item;
-            let followText = '';
-            if (i.followers) {
-              if (i.followDistance === 0) {
-                followText = t('you');
-              } else if (i.followDistance === 1) {
-                followText = t('following');
-              } else {
-                followText = `${i.followers.size} ${t('followers')}`;
-              }
-            }
-            const npub = Key.toNostrBech32Address(i.key, 'npub');
             return (
-              <a
-                onFocus={(e) => this.onResultFocus(e, index)}
-                tabIndex={2}
-                className={
-                  'p-2 cursor-pointer flex gap-2 items-center result ' +
-                  (index === this.state.selected ? 'selected bg-neutral-700' : '')
-                }
-                href={`/${npub}`}
+              <SearchResult
+                key={i.key}
+                item={i}
+                selected={index === this.state.selected}
+                onFocus={(e) => this.onResultFocus(e, i)}
                 onClick={(e) => this.onClick(e, i)}
-              >
-                {i.picture ? (
-                  <SafeImg src={i.picture} className="rounded-full" width={40} />
-                ) : (
-                  <Avatar key={`${npub}ic`} str={npub} width={40} />
-                )}
-                <div>
-                  <Name pub={i.key} key={i.key + 'searchResult'} />
-                  <br />
-                  <small>{followText}</small>
-                </div>
-              </a>
+              />
             );
           })}
         </div>

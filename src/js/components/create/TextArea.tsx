@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Show from '@/components/helpers/Show';
-import SearchBox from '@/components/SearchBox';
+import SearchBox from '@/components/searchbox/SearchBox.tsx';
 import Key from '@/nostr/Key';
 import localState from '@/state/LocalState.ts';
 import { translate as t } from '@/translations/Translation.mjs';
