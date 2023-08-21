@@ -5,7 +5,7 @@ import FeedComponent from '@/components/feed/Feed';
 import Show from '@/components/helpers/Show';
 import OnboardingNotification from '@/components/onboarding/OnboardingNotification';
 import Key from '@/nostr/Key';
-import { getEventReplyingTo } from '@/nostr/utils';
+import { getEventReplyingTo, isRepost } from '@/nostr/utils';
 import { translate as t } from '@/translations/Translation.mjs';
 import { ID, STR } from '@/utils/UniqueIds';
 import { RouteProps } from '@/views/types.ts';
@@ -40,7 +40,7 @@ const Home: React.FC<RouteProps> = () => {
       {
         name: t('posts'),
         filter: { kinds: [1, 6], authors: followedUsers, limit: 10 },
-        filterFn: (event) => !getEventReplyingTo(event),
+        filterFn: (event) => !getEventReplyingTo(event) || isRepost(event),
         eventProps: { showRepliedMsg: true },
       },
       {

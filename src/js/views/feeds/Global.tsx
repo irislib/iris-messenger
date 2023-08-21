@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import CreateNoteForm from '@/components/create/CreateNoteForm';
 import FeedComponent from '@/components/feed/Feed';
 import OnboardingNotification from '@/components/onboarding/OnboardingNotification';
-import { getEventReplyingTo } from '@/nostr/utils';
+import { getEventReplyingTo, isRepost } from '@/nostr/utils';
 import { translate as t } from '@/translations/Translation.mjs';
 import { RouteProps } from '@/views/types.ts';
 import View from '@/views/View.tsx';
@@ -14,7 +14,7 @@ const Global: React.FC<RouteProps> = () => {
       {
         name: t('posts'),
         filter: { kinds: [1, 6], limit: 10 },
-        filterFn: (event) => !getEventReplyingTo(event),
+        filterFn: (event) => !getEventReplyingTo(event) || isRepost(event),
         eventProps: { showRepliedMsg: true },
       },
       {

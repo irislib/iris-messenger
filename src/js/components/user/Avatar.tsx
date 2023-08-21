@@ -52,7 +52,7 @@ const MyAvatar: React.FC<Props> = (props) => {
 
       return () => unsub?.();
     }
-  }, [hex, props.str, props.width]);
+  }, [hex, props.str]);
 
   const width = props.width;
   const isActive = ['online', 'active'].includes(activity || '');
