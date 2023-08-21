@@ -3,7 +3,7 @@ import { Link } from 'preact-router';
 import Embed from './index';
 
 const Url: Embed = {
-  regex: /(https?:\/\/[^\s]+)/g,
+  regex: /(https?:\/\/[^\s,\\.]+(?:\.[^\s,.]+)*)/g,
   component: ({ match }) => {
     const url = match.replace(/^(https:\/\/)?iris.to/, '');
     return (
