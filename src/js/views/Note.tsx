@@ -1,16 +1,16 @@
 import { useEffect } from 'preact/hooks';
 import { route } from 'preact-router';
 
+import { EventID } from '@/utils/Hex.ts';
 import View from '@/views/View.tsx';
 
 import CreateNoteForm from '../components/create/CreateNoteForm';
 import EventComponent from '../components/events/EventComponent';
-import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
 const Note = (props) => {
   useEffect(() => {
-    const nostrBech32Id = Key.toNostrBech32Address(props.id, 'note');
+    const nostrBech32Id = new EventID(props.id).toBech32();
     if (nostrBech32Id && props.id !== nostrBech32Id) {
       route(`/${nostrBech32Id}`, true);
       return;

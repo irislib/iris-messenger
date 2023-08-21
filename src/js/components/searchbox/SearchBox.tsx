@@ -183,7 +183,7 @@ class SearchBox extends Component<Props, State> {
         Key.getPubKeyByNip05Address(query).then((pubKey) => {
           // if query hasn't changed since we started the request
           if (pubKey && query === String(this.props.query || this.inputRef.current.value)) {
-            this.props.onSelect?.({ key: pubKey });
+            this.props.onSelect?.({ key: pubKey.toHex() });
           }
         });
       }

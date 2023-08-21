@@ -5,6 +5,7 @@ import SimpleImageModal from '@/components/modal/Image.tsx';
 import { useProfile } from '@/nostr/hooks/useProfile.ts';
 import { getEventReplyingTo, isRepost } from '@/nostr/utils.ts';
 import useLocalState from '@/state/useLocalState.ts';
+import { PublicKey } from '@/utils/Hex.ts';
 import ProfileHelmet from '@/views/profile/Helmet.tsx';
 
 import Feed from '../../components/feed/Feed.tsx';
@@ -60,21 +61,20 @@ function Profile(props) {
   }, [profile]);
 
   useEffect(() => {
-    const pub = props.id;
-    const npubComputed = Key.toNostrBech32Address(pub, 'npub');
+    try {
+      const pub = new PublicKey(props.id);
+      const npubComputed = pub.toBech32();
 
-    if (npubComputed && npubComputed !== pub) {
-      route(`/${npubComputed}`, true);
-      return;
-    }
+      if (npubComputed !== props.id) {
+        route(`/${npubComputed}`, true);
+        return;
+      }
 
-    const hexPubComputed = Key.toNostrHexAddress(pub) || '';
+      setHexPub(pub.toHex());
+      setNpub(npubComputed);
+    } catch (e) {
+      let nostrAddress = props.id;
 
-    if (hexPubComputed) {
-      setHexPub(hexPubComputed);
-      setNpub(Key.toNostrBech32Address(hexPubComputed, 'npub') || '');
-    } else {
-      let nostrAddress = pub;
       if (!nostrAddress.match(/.+@.+\..+/)) {
         if (nostrAddress.match(/.+\..+/)) {
           nostrAddress = '_@' + nostrAddress;
@@ -85,11 +85,8 @@ function Profile(props) {
 
       Key.getPubKeyByNip05Address(nostrAddress).then((pubKey) => {
         if (pubKey) {
-          const npubComputed = Key.toNostrBech32Address(pubKey, 'npub');
-          if (npubComputed && npubComputed !== pubKey) {
-            setNpub(npubComputed);
-            setHexPub(pubKey);
-          }
+          setNpub(pubKey.toBech32());
+          setHexPub(pubKey.toHex());
         } else {
           setNpub(''); // To indicate not found
         }
@@ -99,6 +96,7 @@ function Profile(props) {
     setTimeout(() => {
       window.prerenderReady = true;
     }, 1000);
+
     return () => {
       setIsMyProfile(false);
     };
