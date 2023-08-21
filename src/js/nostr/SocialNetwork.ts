@@ -88,9 +88,10 @@ export default {
     }
     if (distance <= 2) {
       let unsub;
-      // TODO subscribe once param?
+      // get also profile events for profile search indexing
       // eslint-disable-next-line prefer-const
       unsub = PubSub.subscribe({ authors: [STR(user)], kinds: [0] }, () => unsub?.(), true);
+      // TODO subscribe once param?
     }
     this.usersByFollowDistance.get(distance)?.add(user);
     // remove from higher distances
