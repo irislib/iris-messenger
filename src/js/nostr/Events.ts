@@ -240,7 +240,7 @@ const Events = {
       //EventDB.insert(event);
       const profile = JSON.parse(event.content);
       // if we have previously deleted our account, log out. appease app store.
-      if (event.pubkey === Key.getPubKey() && profile.deleted) {
+      if (Key.isMine(event.pubkey) && profile.deleted) {
         Session.logOut();
         return;
       }
@@ -373,7 +373,7 @@ const Events = {
     });
   },
   handleKeyValue(event: Event) {
-    if (event.pubkey !== Key.getPubKey()) {
+    if (!Key.isMine(event.pubkey)) {
       return;
     }
     //console.log('got key value event', event);
@@ -553,7 +553,7 @@ const Events = {
         IndexedDB.saveEvent(event as Event & { id: string });
       } else if (
         [2, 3].includes(followDistance) &&
-        event.tags.some((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey())
+        event.tags.some((tag) => tag[0] === 'p' && Key.isMine(tag[1]))
       ) {
         IndexedDB.saveEvent(event as Event & { id: string });
       } else if (followDistance <= 4 && [0, 3, 4].includes(event.kind)) {

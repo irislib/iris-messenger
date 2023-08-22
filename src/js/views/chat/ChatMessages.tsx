@@ -287,7 +287,7 @@ function ChatMessages({ id }) {
         setSortedMessages(Array.from(messages.current.values()));
       };
       subs.push(PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()], authors: [chatId] }, cb));
-      if (chatId !== Key.getPubKey()) {
+      if (!Key.isMine(chatId)) {
         subs.push(PubSub.subscribe({ kinds: [4], '#p': [chatId], authors: [Key.getPubKey()] }, cb));
       }
     };

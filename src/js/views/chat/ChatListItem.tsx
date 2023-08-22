@@ -17,6 +17,7 @@ const ChatListItem = ({ chat, active = false, latestMsg = {} as any, name }) => 
   };
 
   const npub = Key.toNostrBech32Address(chat, 'npub');
+  const isMyKey = Key.isMine(chat);
 
   return (
     <div
@@ -32,10 +33,10 @@ const ChatListItem = ({ chat, active = false, latestMsg = {} as any, name }) => 
           <span className="name">
             <Show when={name}>{name}</Show>
             <Show when={!name}>
-              <Show when={chat === Key.getPubKey()}>
+              <Show when={isMyKey}>
                 <span className="font-bold italic">📝 {t('note_to_self')}</span>
               </Show>
-              <Show when={chat !== Key.getPubKey()}>
+              <Show when={!isMyKey}>
                 <Name pub={chat} />
               </Show>
               <Show when={latestMsg.created_at}>

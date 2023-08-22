@@ -80,7 +80,7 @@ const IndexedDB = {
             return true;
           }
           // we're only interested in p tags where we are mentioned
-          if (tag[0] === 'p' && tag[1] === Key.getPubKey()) {
+          if (tag[0] === 'p' && Key.isMine(tag[1])) {
             return true;
           }
           return false;

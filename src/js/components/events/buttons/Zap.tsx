@@ -70,7 +70,7 @@ const Zap = ({ event }) => {
           console.log('Invalid zap, missing bolt11 tag');
           return;
         }
-        if (event && getZappingUser(event, false) === Key.getPubKey()) {
+        if (event && Key.isMine(getZappingUser(event, false))) {
           zapped = true;
         }
         const decoded = decodeInvoice(bolt11);

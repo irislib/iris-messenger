@@ -15,7 +15,7 @@ const ProfileStats = ({ address }) => {
   const [followerCountFromApi, setFollowerCountFromApi] = useState<number>(0);
   const [followedUserCountFromApi, setFollowedUserCountFromApi] = useState<number>(0);
   const [knownFollowers, setKnownFollowers] = useState<string[]>([]);
-  const isMyProfile = Key.getPubKey() === address;
+  const isMyProfile = Key.isMine(address);
 
   useEffect(() => {
     const subscriptions = [] as any[];

@@ -5,7 +5,7 @@ import { Link, route } from 'preact-router';
 
 import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 import PubSub from '@/nostr/PubSub';
-import { getEventReplyingTo, getEventRoot } from '@/nostr/utils';
+import { getEventRoot, getNoteReplyingTo } from '@/nostr/utils';
 import SortedMap from '@/utils/SortedMap/SortedMap.tsx';
 
 import Key from '../../../nostr/Key';
@@ -18,7 +18,6 @@ import Content from './Content';
 
 const Note = ({
   event,
-  meta = {} as any,
   asInlineQuote = false,
   isReply = false, // message that is rendered under a standalone message, separated by a small margin
   isQuote = false, // message that connects to the next message with a line
@@ -29,11 +28,12 @@ const Note = ({
   fullWidth,
 }) => {
   const [replies, setReplies] = useState([] as string[]);
+  const replyingTo = useMemo(() => getNoteReplyingTo(event), [event]);
 
   if (!standalone && showReplies && replies.length) {
     isQuote = true;
   }
-  if (meta.replyingTo && showRepliedMsg) {
+  if (replyingTo && showRepliedMsg) {
     isQuoting = true;
   }
 
@@ -82,7 +82,7 @@ const Note = ({
     const sortedRepliesMap = new SortedMap<string, Event>([], comparator);
 
     const callback = (reply) => {
-      if (getEventReplyingTo(reply) !== event.id) return;
+      if (getNoteReplyingTo(reply) !== event.id) return;
       sortedRepliesMap.set(reply.id, reply);
       const sortedReplies = Array.from(sortedRepliesMap.keys()).slice(0, showReplies);
       setReplies(sortedReplies);
@@ -97,7 +97,7 @@ const Note = ({
 
   let rootMsg = getEventRoot(event);
   if (!rootMsg) {
-    rootMsg = meta.replyingTo;
+    rootMsg = replyingTo;
   }
 
   function messageClicked(clickEvent) {
@@ -118,16 +118,10 @@ const Note = ({
     route(`/${Key.toNostrBech32Address(event.id, 'note')}`);
   }
 
-  const repliedMsg = (
-    <Show when={meta.replyingTo && showRepliedMsg}>
-      <EventComponent
-        key={event.id + meta.replyingTo}
-        id={meta.replyingTo}
-        isQuote={true}
-        showReplies={0}
-      />
-    </Show>
-  );
+  const repliedMsg =
+    replyingTo && showRepliedMsg ? (
+      <EventComponent key={event.id + replyingTo} id={replyingTo} isQuote={true} showReplies={0} />
+    ) : null;
 
   const showThreadBtn = (
     <Show when={!standalone && !isReply && !isQuoting && rootMsg}>

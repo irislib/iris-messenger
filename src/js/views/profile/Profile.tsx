@@ -31,7 +31,7 @@ function Profile(props) {
     if (!hexPub) {
       return;
     }
-    const isMyProfile = hexPub === Key.getPubKey();
+    const isMyProfile = Key.isMine(hexPub);
     setIsMyProfile(isMyProfile);
     SocialNetwork.getBlockedUsers((blockedUsers) => {
       setBlocked(blockedUsers.has(hexPub));

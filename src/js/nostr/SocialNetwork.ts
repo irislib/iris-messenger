@@ -28,7 +28,7 @@ export default {
   },
 
   getFollowDistance: function (user: string): number {
-    if (user === Key.getPubKey()) {
+    if (Key.isMine(user)) {
       return 0;
     }
     const userId = ID(user);

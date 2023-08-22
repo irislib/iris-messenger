@@ -123,7 +123,7 @@ const EventDropdown = (props: EventDropdownProps) => {
               text={t('copy_raw_data')}
               copyStr={JSON.stringify(event, null, 2)}
             />
-            {event.pubkey === Key.getPubKey() ? (
+            {Key.isMine(event.pubkey) ? (
               <a className="btn btn-sm" href="#" onClick={onDelete}>
                 {t('delete')}
               </a>

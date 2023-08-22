@@ -133,7 +133,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
       rawDataArray.push(followEvent);
     }
     setRawDataJson(JSON.stringify(rawDataArray, null, 2));
-    setIsMyProfile(hexPub === Key.getPubKey());
+    setIsMyProfile(Key.isMine(hexPub));
     getNostrProfile(hexPub, nostrAddress);
     const unsubLoggedIn = localState.get('loggedIn').on((loggedIn) => {
       setLoggedIn(loggedIn);

@@ -30,7 +30,7 @@ const FollowedUser = memo(({ hexKey }: { hexKey: string }) => {
           </span>
         </div>
       </Link>
-      {hexKey !== Key.getPubKey() && <Follow id={npub} />}
+      {Key.isMine(hexKey) && <Follow id={npub} />}
     </div>
   );
 });

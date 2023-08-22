@@ -32,8 +32,11 @@ export default function Zap(props: Props) {
   const [allZaps, setAllZaps] = useState<string[]>([]);
   const zappedId = getEventReplyingTo(props.event);
   const zappedEvent = EventDB.get(zappedId);
-  const authorIsYou = zappedEvent?.pubkey === Key.getPubKey();
-  const mentioned = zappedEvent?.tags?.find((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey());
+  if (!zappedEvent) {
+    return null;
+  }
+  const authorIsYou = Key.isMine(zappedEvent?.pubkey);
+  const mentioned = zappedEvent?.tags?.find((tag) => tag[0] === 'p' && Key.isMine(tag[1]));
   const zappedText = authorIsYou
     ? 'zapped your note'
     : mentioned

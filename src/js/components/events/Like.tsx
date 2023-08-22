@@ -32,8 +32,11 @@ export default function Like(props: Props) {
   const [allLikes, setAllLikes] = useState<string[]>([]);
   const likedId = getEventReplyingTo(props.event);
   const likedEvent = EventDB.get(likedId);
-  const authorIsYou = likedEvent?.pubkey === Key.getPubKey();
-  const mentioned = likedEvent?.tags?.find((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey());
+  if (!likedEvent) {
+    return null;
+  }
+  const authorIsYou = Key.isMine(likedEvent?.pubkey);
+  const mentioned = likedEvent?.tags?.find((tag) => tag[0] === 'p' && Key.isMine(tag[1]));
   const likeText = authorIsYou
     ? 'liked your note'
     : mentioned

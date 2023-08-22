@@ -2,7 +2,6 @@ import { memo } from 'react';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 import EventDB from '@/nostr/EventDB';
-import { getNoteReplyingTo } from '@/nostr/utils';
 
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -56,18 +55,7 @@ const EventComponent = (props: EventComponentProps) => {
       setState((prevState) => ({ ...prevState, retrieving: false }));
     }
 
-    const replyingTo = getNoteReplyingTo(event);
-
-    const meta = {
-      npub: Key.toNostrBech32Address(event.pubkey, 'npub'),
-      noteId: Key.toNostrBech32Address(event.id, 'note'),
-      time: event.created_at * 1000,
-      isMine: Key.getPubKey() === event.pubkey,
-      attachments: [],
-      replyingTo,
-    };
-
-    setState((prevState) => ({ ...prevState, event, meta }));
+    setState((prevState) => ({ ...prevState, event }));
   };
 
   useEffect(() => {
@@ -187,7 +175,6 @@ const EventComponent = (props: EventComponentProps) => {
         key={props.id}
         className={getClassName()}
         event={state.event}
-        meta={state.meta}
         fullWidth={props.fullWidth}
         fadeIn={!props.feedOpenedAt || props.feedOpenedAt < state.event.created_at}
         {...props}

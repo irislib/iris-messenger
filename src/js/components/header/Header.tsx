@@ -60,7 +60,7 @@ export default class Header extends Component {
 
     if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
       this.userId = replaced.length < activeRoute.length ? replaced : null;
-      if (activeRoute.indexOf('/chat/') === 0 && this.userId === Key.getPubKey()) {
+      if (activeRoute.indexOf('/chat/') === 0 && Key.isMine(this.userId || '')) {
         title = (
           <>
             <b className="mr-5">📝</b> <b>{t('note_to_self')}</b>

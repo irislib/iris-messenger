@@ -10,9 +10,7 @@ type Props = {
 };
 
 function Follow(props: Props) {
-  const followsYou = props.event.tags?.some(
-    (t: string[]) => t[0] === 'p' && t[1] === Key.getPubKey(),
-  );
+  const followsYou = props.event.tags?.some((t: string[]) => t[0] === 'p' && Key.isMine(t[1]));
   const text = followsYou ? 'started following you' : 'updated their following list';
   return (
     <div className="msg">
