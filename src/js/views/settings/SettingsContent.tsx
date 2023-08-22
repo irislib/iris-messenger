@@ -3,7 +3,7 @@ import Appearance from './Appearance';
 import Backup from './Backup';
 import ContentPage from './Content';
 import Dev from './Dev';
-import IrisAccount from './IrisAccount.js';
+import IrisAccount from './irisaccount/IrisAccount.tsx';
 import Language from './Language';
 import Network from './Network.js';
 import Payments from './Payments';
