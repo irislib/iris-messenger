@@ -15,10 +15,9 @@ import SocialNetwork from '../../nostr/SocialNetwork';
 
 const Home: React.FC<RouteProps> = () => {
   const [followedUsers, setFollowedUsers] = useState(() => {
-    const initialFollowedUsers = Array.from(
-      SocialNetwork.followedByUser.get(ID(Key.getPubKey())) || [],
-    );
-    return initialFollowedUsers.map((n) => STR(n));
+    const initialFollowedUsers = SocialNetwork.followedByUser.get(ID(Key.getPubKey())) || new Set();
+    initialFollowedUsers.add(ID(Key.getPubKey()));
+    return Array.from(initialFollowedUsers).map((n) => STR(n));
   });
 
   useEffect(() => {
