@@ -8,7 +8,8 @@ export default function ConnectedRelaysIndicator() {
   const [connectedRelays, setConnectedRelays] = useState(Relays.getConnectedRelayCount());
 
   const updateRelayCount = () => {
-    setConnectedRelays(Relays.getConnectedRelayCount());
+    const count = Relays.getConnectedRelayCount();
+    setConnectedRelays(count);
   };
 
   useEffect(() => {
@@ -24,9 +25,7 @@ export default function ConnectedRelaysIndicator() {
   return (
     <a
       href="/settings/network"
-      className={`ml-2 tooltip tooltip-bottom mobile-search-hidden ${
-        connectedRelays === 0 ? 'text-iris-orange' : ''
-      }`}
+      className={`ml-2 tooltip tooltip-bottom mobile-search-hidden`}
       data-tip={t('connected_relays')}
     >
       <small className="flex items-center gap-2">
