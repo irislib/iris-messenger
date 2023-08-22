@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks';
 
 import Modal from '../modal/Modal';
-import SafeImg from '../SafeImg';
+import ProxyImg from '../ProxyImg.tsx';
 
 type Props = { picture?: string; onError?: () => void };
 
@@ -22,7 +22,7 @@ const ProfilePicture = ({ picture, onError }: Props) => {
 
   return (
     <div className="rounded-full border-4 border-black bg-black">
-      <SafeImg
+      <ProxyImg
         width={128}
         square={true}
         className="rounded-full cursor-pointer"
@@ -32,7 +32,7 @@ const ProfilePicture = ({ picture, onError }: Props) => {
       />
       {showModal && (
         <Modal centerVertically={true} onClose={handleClose}>
-          <SafeImg
+          <ProxyImg
             className="max-w-full max-h-[90vh]"
             square={true}
             src={picture}

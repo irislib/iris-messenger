@@ -1,4 +1,4 @@
-import SafeImg from '@/components/SafeImg.tsx';
+import ProxyImg from '@/components/ProxyImg.tsx';
 import Avatar from '@/components/user/Avatar.tsx';
 import Name from '@/components/user/Name.tsx';
 import Key from '@/nostr/Key.ts';
@@ -28,7 +28,7 @@ export default function SearchResult({ item, onClick, onFocus, selected }) {
       onClick={(e) => onClick(e, item)}
     >
       {item.picture ? (
-        <SafeImg src={item.picture} className="rounded-full" width={40} />
+        <ProxyImg src={item.picture} className="rounded-full" width={40} />
       ) : (
         <Avatar key={`${npub}ic`} str={npub} width={40} />
       )}

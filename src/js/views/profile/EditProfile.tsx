@@ -7,7 +7,7 @@ import { RouteProps } from '@/views/types.ts';
 
 import Upload from '../../components/buttons/Upload.tsx';
 import Header from '../../components/header/Header.tsx';
-import SafeImg from '../../components/SafeImg.tsx';
+import ProxyImg from '../../components/ProxyImg.tsx';
 import Key from '../../nostr/Key.ts';
 import SocialNetwork from '../../nostr/SocialNetwork.ts';
 import { translate as t } from '../../translations/Translation.mjs';
@@ -115,7 +115,7 @@ const EditProfile: React.FC<RouteProps> = () => {
                       </p>
                       {val && (
                         <p>
-                          <SafeImg key={val} src={val} />
+                          <ProxyImg key={val} src={val} />
                         </p>
                       )}
                     </>

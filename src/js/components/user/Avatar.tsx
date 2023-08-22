@@ -7,7 +7,7 @@ import { useProfile } from '@/nostr/hooks/useProfile.ts';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import Show from '../helpers/Show';
-import SafeImg from '../SafeImg';
+import ProxyImg from '../ProxyImg.tsx';
 
 type Props = {
   str: unknown;
@@ -62,7 +62,7 @@ const MyAvatar: React.FC<Props> = (props) => {
     >
       <div>
         <Show when={hasPic}>
-          <SafeImg
+          <ProxyImg
             className="object-cover rounded-full"
             src={picture || ''}
             width={width}

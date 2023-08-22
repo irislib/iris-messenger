@@ -4,7 +4,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 import EventComponent from '@/components/events/EventComponent';
 import { ImageOrVideo } from '@/components/feed/types';
 import Modal from '@/components/modal/Modal';
-import SafeImg from '@/components/SafeImg';
+import ProxyImg from '@/components/ProxyImg.tsx';
 
 type ImageModalProps = {
   mediaItems: Array<ImageOrVideo>;
@@ -63,7 +63,7 @@ const ImageModal = ({ mediaItems, activeItemIndex, setActiveItemIndex }: ImageMo
               poster={`https://imgproxy.iris.to/thumbnail/638/${activeItem.url}`}
             />
           ) : (
-            <SafeImg
+            <ProxyImg
               key={activeItem.url}
               className="max-h-full max-w-full object-contain"
               src={activeItem.url}

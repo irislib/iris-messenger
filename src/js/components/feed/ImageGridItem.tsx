@@ -1,7 +1,7 @@
 import { route } from 'preact-router';
 
 import { ImageOrVideo } from '@/components/feed/types';
-import SafeImg from '@/components/SafeImg';
+import ProxyImg from '@/components/ProxyImg.tsx';
 import Key from '@/nostr/Key';
 import Icons from '@/utils/Icons';
 
@@ -34,7 +34,7 @@ export const ImageGridItem = ({
       }}
       ref={lastElementRef}
     >
-      <SafeImg square={true} width={319} src={url} alt="" className="w-full h-full object-cover" />
+      <ProxyImg square={true} width={319} src={url} alt="" className="w-full h-full object-cover" />
       {item.type === 'video' && (
         <div className="absolute top-0 right-0 m-2 shadow-md shadow-gray-500 ">{Icons.video}</div>
       )}

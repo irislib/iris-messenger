@@ -10,7 +10,7 @@ import ProfileHelmet from '@/views/profile/Helmet.tsx';
 
 import Feed from '../../components/feed/Feed.tsx';
 import Show from '../../components/helpers/Show.tsx';
-import { isSafeOrigin } from '../../components/SafeImg.tsx';
+import { shouldSkipProxy } from '../../components/ProxyImg.tsx';
 import ProfileCard from '../../components/user/ProfileCard.tsx';
 import Key from '../../nostr/Key.ts';
 import SocialNetwork from '../../nostr/SocialNetwork.ts';
@@ -50,7 +50,7 @@ function Profile(props) {
         return;
       }
 
-      bannerURL = isSafeOrigin(bannerURL)
+      bannerURL = shouldSkipProxy(bannerURL)
         ? bannerURL
         : `https://imgproxy.iris.to/insecure/rs:fit:948:948/plain/${bannerURL}`;
 

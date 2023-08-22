@@ -18,11 +18,11 @@ const safeOrigins = [
   'https://imgproxy.iris.to/',
 ];
 
-export const isSafeOrigin = (url: string) => {
+export const shouldSkipProxy = (url: string) => {
   return safeOrigins.some((origin) => url.startsWith(origin));
 };
 
-const SafeImg = (props: Props) => {
+const ProxyImg = (props: Props) => {
   const [proxyFailed, setProxyFailed] = useState(false);
   const [src, setSrc] = useState(props.src);
 
@@ -31,7 +31,7 @@ const SafeImg = (props: Props) => {
     if (
       props.src &&
       !props.src.startsWith('data:image') &&
-      (!isSafeOrigin(props.src) || props.width)
+      (!shouldSkipProxy(props.src) || props.width)
     ) {
       const originalSrc = props.src;
       if (props.width) {
@@ -70,4 +70,4 @@ const SafeImg = (props: Props) => {
   );
 };
 
-export default SafeImg;
+export default ProxyImg;
