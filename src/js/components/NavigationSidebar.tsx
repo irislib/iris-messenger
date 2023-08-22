@@ -55,7 +55,7 @@ const MENU_ITEMS = [
   },
 ];
 
-export default function Menu() {
+export default function NavigationSidebar() {
   const [unseenMsgsTotal, setUnseenMsgsTotal] = useState(0);
   const [activeRoute, setActiveRoute] = useState('');
   const [showNewPostModal, setShowNewPostModal] = useState(false);

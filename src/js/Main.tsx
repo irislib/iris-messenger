@@ -6,8 +6,8 @@ import useLocalState from '@/state/useLocalState.ts';
 
 import Footer from './components/Footer';
 import Show from './components/helpers/Show';
-import Menu from './components/Menu';
 import Modal from './components/modal/Modal';
+import NavigationSidebar from './components/NavigationSidebar.tsx';
 import localState from './state/LocalState.ts';
 import { translationLoaded } from './translations/Translation.mjs';
 import Helpers from './utils/Helpers';
@@ -80,7 +80,7 @@ const Main = () => {
     <div className="flex justify-center">
       <section className="flex w-full max-w-screen-xl justify-between relative">
         <Show when={loggedIn}>
-          <Menu />
+          <NavigationSidebar />
         </Show>
         <Helmet titleTemplate={titleTemplate} defaultTitle={defaultTitle}>
           <title>{title}</title>
