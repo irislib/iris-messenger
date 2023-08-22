@@ -15,6 +15,7 @@ export default {
   followersByUser: new Map<UID, Set<UID>>(),
   blockedUsers: new Set<UID>(),
   flaggedUsers: new Set<UID>(),
+  followListTimestamps: new Map<UID, number>(), // timestamp of last follow list update
 
   isFollowing: function (follower: string, followedUser: string): boolean {
     const followedUserId = ID(followedUser);
