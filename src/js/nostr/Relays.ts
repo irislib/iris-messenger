@@ -3,6 +3,7 @@ import throttle from 'lodash/throttle';
 import { Event, Filter, Sub } from 'nostr-tools';
 
 import EventDB from '@/nostr/EventDB';
+import relayPool from '@/nostr/relayPool.ts';
 
 import localState from '../state/LocalState.ts';
 import Helpers from '../utils/Helpers';
@@ -134,7 +135,7 @@ const Relays = {
   getConnectedRelayCount: function () {
     let count = 0;
     for (const url of this.relays.keys()) {
-      if (PubSub.relayPool.relayByUrl.get(url)?.status === 1) {
+      if (relayPool().relayByUrl.get(url)?.status === 1) {
         count++;
       }
     }
@@ -167,7 +168,7 @@ const Relays = {
           if (r) {
             r.enabled = false;
             this.relays.set(url, r);
-            PubSub.relayPool.removeRelay(url);
+            relayPool().removeRelay(url);
           }
         }
       }
@@ -180,7 +181,7 @@ const Relays = {
           // So this is backward compat.
           this.relays.set(url, { url, enabled: !!data.enabled });
           if (data.enabled) {
-            PubSub.relayPool.addOrGetRelay(url);
+            relayPool().addOrGetRelay(url);
           }
         }
       }
@@ -190,11 +191,11 @@ const Relays = {
     if (this.relays.has(url)) return;
     const relay = { enabled: true, url };
     this.relays.set(url, relay);
-    PubSub.relayPool.addOrGetRelay(url);
+    relayPool().addOrGetRelay(url);
   },
   remove(url: string) {
     try {
-      PubSub.relayPool.removeRelay(url);
+      relayPool().removeRelay(url);
     } catch (e) {
       console.log('error closing relay', e);
     }
@@ -205,14 +206,14 @@ const Relays = {
       return;
     }
     this.relays.set(url, { enabled: false, url });
-    PubSub.relayPool.removeRelay(url);
+    relayPool().removeRelay(url);
   },
   enable(url: string) {
     if (!this.relays.has(url)) {
       return;
     }
     this.relays.set(url, { enabled: true, url });
-    PubSub.relayPool.addOrGetRelay(url);
+    relayPool().addOrGetRelay(url);
   },
   restoreDefaults() {
     this.relays.clear();
@@ -298,9 +299,5 @@ const Relays = {
     };
   },
 };
-
-if (window.location.pathname !== '/') {
-  Relays.init();
-}
 
 export default Relays;

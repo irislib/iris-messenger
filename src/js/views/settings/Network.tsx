@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'preact/compat';
 
-import PubSub from '../../nostr/PubSub';
+import relayPool from '@/nostr/relayPool.ts';
+
 import Relays, { PopularRelay } from '../../nostr/Relays';
 import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
@@ -45,7 +46,7 @@ const Network = () => {
 
   const getStatus = (relay) => {
     try {
-      return PubSub.relayPool.relayByUrl.get(relay.url).status;
+      return relayPool().relayByUrl.get(relay.url).status;
     } catch (e) {
       return 3;
     }

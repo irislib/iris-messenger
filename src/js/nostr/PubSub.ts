@@ -1,12 +1,9 @@
 import throttle from 'lodash/throttle';
-import { RelayPool } from 'nostr-relaypool';
-import { Event, matchFilter, nip42 } from 'nostr-tools';
-
-import Filter from '@/nostr/Filter';
-const { authenticate } = nip42;
+import { Event, matchFilter } from 'nostr-tools';
 
 import EventDB from '@/nostr/EventDB';
-import { UniqueIds } from '@/utils/UniqueIds';
+import Filter from '@/nostr/Filter';
+import getRelayPool from '@/nostr/relayPool';
 
 import Events from '../nostr/Events';
 import localState from '../state/LocalState.ts';
@@ -21,44 +18,6 @@ type Subscription = {
 
 export type Unsubscribe = () => void;
 
-const relayPool = new RelayPool(Relays.enabledRelays(), {
-  useEventCache: false,
-  autoReconnect: true,
-  externalGetEventById: (id) => {
-    return (
-      (UniqueIds.has(id) && {
-        sig: '',
-        id: '',
-        kind: 0,
-        tags: [],
-        content: '',
-        created_at: 0,
-        pubkey: '',
-      }) ||
-      undefined
-    );
-  },
-});
-
-const compareUrls = (a: string, b: string): boolean => {
-  return new URL(a).host === new URL(b).host;
-};
-
-relayPool.onauth(async (relay, challenge) => {
-  if (!Relays.enabledRelays().some((r) => compareUrls(r, relay.url))) {
-    return;
-  }
-  try {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    await authenticate({ relay, challenge, sign: Events.sign });
-  } catch (e) {
-    console.log('error: authenticate to relay:', e);
-    relayPool.removeRelay(relay.url);
-    Relays.disable(relay.url);
-  }
-});
-
 let subscriptionId = 0;
 let dev = {
   logSubscriptions: false,
@@ -66,11 +25,9 @@ let dev = {
 };
 
 let lastOpened = 0;
-let lastResubscribed = Date.now();
 
 localState.get('dev').on((d) => {
   dev = d;
-  relayPool.logSubscriptions = dev.logSubscriptions;
 });
 
 localState.get('lastOpened').once((lo) => {
@@ -78,25 +35,10 @@ localState.get('lastOpened').once((lo) => {
   localState.get('lastOpened').put(Math.floor(Date.now() / 1000));
 });
 
-const reconnect = () => {
-  if (Date.now() - lastResubscribed > 60 * 1000) {
-    lastResubscribed = Date.now();
-    relayPool.reconnect();
-  }
-};
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') {
-    reconnect();
-  }
-});
-document.addEventListener('online', reconnect);
-
 const PubSub = {
   subscriptions: new Map<number, Subscription>(),
   subscribedEventIds: new Set<string>(),
   subscribedAuthors: new Set<string>(),
-  relayPool,
   log: throttle(console.log, 1000),
 
   subscribe(
@@ -137,7 +79,7 @@ const PubSub = {
   },
 
   publish(event: Event) {
-    relayPool.publish(event, Array.from(Relays.enabledRelays()));
+    getRelayPool().publish(event, Array.from(Relays.enabledRelays()));
   },
 
   handle(event: Event & { id: string }) {
@@ -160,7 +102,7 @@ const PubSub = {
       filter.since = lastOpened;
     }
 
-    return relayPool.subscribe(
+    return getRelayPool().subscribe(
       [filter],
       relays,
       (event, _, url) => {

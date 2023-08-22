@@ -116,7 +116,9 @@ const Session = {
       }
       document.documentElement.setAttribute('data-theme', 'dark');
     });
-    Relays.init();
+    if (window.location.pathname === '/') {
+      Relays.init();
+    }
     IndexedDB.init();
     const timeout = setTimeout(() => {
       IrisTo.checkExistingAccount(myPub);
@@ -152,6 +154,9 @@ const Session = {
     localState.get('isMyProfile').put(false);
     localState.get('loggedIn').on(() => this.onLoggedIn());
     Helpers.showConsoleWarning();
+    if (window.location.pathname !== '/') {
+      Relays.init();
+    }
   },
 };
 

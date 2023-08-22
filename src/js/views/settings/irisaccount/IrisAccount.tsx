@@ -1,6 +1,8 @@
 import debounce from 'lodash/debounce';
+import { Event, UnsignedEvent } from 'nostr-tools';
 import { Component } from 'preact';
 
+import localState from '@/state/LocalState.ts';
 import AccountName from '@/views/settings/irisaccount/AccountName.tsx';
 import ActiveAccount from '@/views/settings/irisaccount/ActiveAccount.tsx';
 import ReservedAccount from '@/views/settings/irisaccount/ReservedAccount.tsx';
@@ -36,7 +38,13 @@ export default class IrisAccount extends Component {
     } else if (this.state.existing && this.state.existing.confirmed) {
       view = <ActiveAccount name={this.state.existing.name} />;
     } else if (this.state.existing) {
-      view = <ReservedAccount name={this.state.existing.name} />;
+      view = (
+        <ReservedAccount
+          name={this.state.existing.name}
+          enableReserved={() => this.enableReserved()}
+          declineReserved={() => this.declineReserved()}
+        />
+      );
     } else if (this.state.error) {
       view = <div className="text-iris-red">Error: {this.state.error}</div>;
     } else if (this.state.showChallenge) {
@@ -191,6 +199,82 @@ export default class IrisAccount extends Component {
         },
       });
       delete window.cf_turnstile_callback;
+    } else {
+      res
+        .json()
+        .then((json) => {
+          this.setState({ error: json.message || 'error' });
+        })
+        .catch(() => {
+          this.setState({ error: 'error' });
+        });
+    }
+  }
+
+  async enableReserved() {
+    const pubkey = Key.getPubKey();
+    const event: any = {
+      content: `iris.to/${this.state.existing.name}`,
+      kind: 1,
+      tags: [],
+      pubkey,
+      created_at: Math.floor(Date.now() / 1000),
+    };
+    event.id = Events.getEventHash(event);
+    event.sig = await Key.sign(event);
+    // post signed event as request body to https://api.iris.to/user/confirm_user
+    const res = await fetch('https://api.iris.to/user/confirm_user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(event),
+    });
+    localState.get('showNoIrisToAddress').put(false);
+    localState
+      .get('existingIrisToAddress')
+      .put({ confirmed: true, name: this.state.existing.name });
+    if (res.status === 200) {
+      this.setState({
+        error: null,
+        existing: { confirmed: true, name: this.state.existing.name },
+      });
+    } else {
+      res
+        .json()
+        .then((json) => {
+          this.setState({ error: json.message || 'error' });
+        })
+        .catch(() => {
+          this.setState({ error: 'error' });
+        });
+    }
+  }
+
+  async declineReserved() {
+    if (!confirm(`Are you sure you want to decline iris.to/${name}?`)) {
+      return;
+    }
+    const pubkey = Key.getPubKey();
+    const event: Partial<Event> = {
+      content: `decline iris.to/${name}`,
+      kind: 1,
+      tags: [],
+      pubkey,
+      created_at: Math.floor(Date.now() / 1000),
+    };
+    event.id = Events.getEventHash(event as UnsignedEvent);
+    event.sig = await Key.sign(event as UnsignedEvent);
+    // post signed event as request body to https://api.iris.to/user/confirm_user
+    const res = await fetch('https://api.iris.to/user/decline_user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(event),
+    });
+    if (res.status === 200) {
+      this.setState({ confirmSuccess: false, error: null, existing: null });
     } else {
       res
         .json()
