@@ -38,6 +38,7 @@ function Profile(props) {
     });
   }, [hexPub]);
 
+  // many of these hooks should be moved to useProfile or hooks directory
   useEffect(() => {
     if (!profile) {
       return;
