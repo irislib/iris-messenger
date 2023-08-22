@@ -1,12 +1,12 @@
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { Cog8ToothIcon, HeartIcon } from '@heroicons/react/24/outline';
 import { ArrowLeftIcon, HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
+import { PureComponent } from 'preact/compat';
 import { Link, route } from 'preact-router';
 
-import Component from '../../BaseComponent.ts';
 import Key from '../../nostr/Key.ts';
 import Relays from '../../nostr/Relays.ts';
-import localState from '../../state/LocalState.ts';
+import localState, { Callback, Unsubscribe } from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 import Icons from '../../utils/Icons.tsx';
 import Show from '../helpers/Show.tsx';
@@ -19,9 +19,11 @@ declare global {
   }
 }
 
-export default class Header extends Component {
+export default class Header extends PureComponent<any, any> {
   userId = null as string | null;
   iv = null as any;
+  unmounted?: boolean;
+  unsubscribes: Record<string, Unsubscribe | undefined> = {};
 
   constructor() {
     super();
@@ -35,12 +37,32 @@ export default class Header extends Component {
     }
   }
 
+  sub(callback: CallableFunction, path?: string): Callback {
+    const cb = (data, key, unsubscribe, f): void => {
+      if (this.unmounted) {
+        unsubscribe?.();
+        return;
+      }
+      this.unsubscribes[path ?? key] = unsubscribe;
+      callback(data, key, unsubscribe, f);
+    };
+
+    return cb as any;
+  }
+
+  inject(name?: string, path?: string): Callback {
+    return this.sub((v: unknown, k: string) => {
+      const newState: any = {};
+      newState[name ?? k] = v as any;
+      this.setState(newState);
+    }, path);
+  }
+
   backButtonClicked() {
     window.history.back();
   }
 
   componentWillUnmount() {
-    super.componentWillUnmount();
     this.iv && clearInterval(this.iv);
     document.removeEventListener('keydown', this.escFunction, false);
   }

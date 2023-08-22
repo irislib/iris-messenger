@@ -1,8 +1,8 @@
 import debounce from 'lodash/debounce';
 import { Event, UnsignedEvent } from 'nostr-tools';
+import { Component } from 'preact';
 import { route } from 'preact-router';
 
-import Component from '../../BaseComponent';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
