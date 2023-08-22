@@ -169,6 +169,7 @@ const Events = {
       if ((SocialNetwork.followedByUser.get(ID(myPub))?.size || 0) > 10) {
         localState.get('showFollowSuggestions').put(false);
       }
+      localState.get('myFollowList').put(JSON.stringify(event));
     }
     if (event.pubkey === myPub && event.content?.length) {
       try {
