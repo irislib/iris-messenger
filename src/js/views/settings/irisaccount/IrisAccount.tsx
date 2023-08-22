@@ -17,6 +17,7 @@ declare global {
   }
 }
 
+// TODO split into smaller components
 export default class IrisAccount extends Component {
   state = {
     irisToActive: false,
@@ -36,7 +37,12 @@ export default class IrisAccount extends Component {
       const username = this.state.profile.nip05.split('@')[0];
       view = <AccountName name={username} />;
     } else if (this.state.existing && this.state.existing.confirmed) {
-      view = <ActiveAccount name={this.state.existing.name} />;
+      view = (
+        <ActiveAccount
+          name={this.state.existing.name}
+          setAsPrimary={() => this.setState({ irisToActive: true })}
+        />
+      );
     } else if (this.state.existing) {
       view = (
         <ReservedAccount
