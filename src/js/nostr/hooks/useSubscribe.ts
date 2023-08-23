@@ -32,17 +32,21 @@ const useSubscribe = (ops: SubscribeOptions) => {
     mergeSubscriptions = defaultOps.mergeSubscriptions,
   } = ops;
 
-  const [events, setEvents] = useState<Event[]>([]);
-  const lastUntilRef = useRef<number | null>(null);
-
-  const updateEvents = useCallback(() => {
+  const getEvents = useCallback(() => {
     // maybe we should still add filter by displaycount?
     let e = EventDB.findArray({ ...filter, limit: undefined });
     if (filterFn) {
       e = e.filter(filterFn);
     }
-    setEvents(e);
+    return e;
   }, [filter, filterFn]);
+
+  const [events, setEvents] = useState<Event[]>(getEvents());
+  const lastUntilRef = useRef<number | null>(null);
+
+  const updateEvents = useCallback(() => {
+    setEvents(getEvents());
+  }, [getEvents]);
 
   useEffect(() => {
     setEvents([]);
