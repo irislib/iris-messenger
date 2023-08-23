@@ -70,7 +70,12 @@ const SocialNetworkSettings = () => {
         value={globalFilter.maxFollowDistance}
         onChange={handleFilterChange}
       >
-        {/* ... options here ... */}
+        <option value={-1}>{t('off')}</option>
+        <option value={1}>1</option>
+        <option value={2}>2</option>
+        <option value={3}>3 ({t('default')})</option>
+        <option value={4}>4</option>
+        <option value={5}>5</option>
       </select>
       <p>Minimum number of followers at maximum follow distance:</p>
       <input
