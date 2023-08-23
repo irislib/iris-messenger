@@ -695,6 +695,7 @@ const Events = {
     return event as Event;
   },
   getLikes(id: string, cb?: (likedBy: Set<string>) => void): Unsubscribe {
+    // TODO these functions should return what we have immediately, and only subscribe if callback is provided
     const callback = () => {
       cb?.(this.likesByMessageId.get(id) ?? new Set());
     };

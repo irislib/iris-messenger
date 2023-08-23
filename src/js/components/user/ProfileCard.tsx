@@ -22,10 +22,30 @@ import ProfilePicture from './ProfilePicture';
 import Stats from './Stats';
 
 const ProfileCard = (props: { hexPub: string; npub: string }) => {
+  const getWebsite = (websiteProfile: string) => {
+    try {
+      const tempWebsite = websiteProfile.match(/^https?:\/\//)
+        ? websiteProfile
+        : 'http://' + websiteProfile;
+      const url = new URL(tempWebsite);
+      return url.href.endsWith('/') ? url.href.slice(0, -1) : url.href;
+    } catch (e) {
+      return '';
+    }
+  };
+
+  const getLightning = (profile: any) => {
+    let lightning = profile.lud16 || profile.lud06;
+    if (lightning && !lightning.startsWith('lightning:')) {
+      lightning = 'lightning:' + lightning;
+    }
+    return lightning;
+  };
+
   const { hexPub, npub } = props;
   const [profile, setProfile] = useState<any>(SocialNetwork.profiles.get(ID(hexPub)) || {});
-  const [lightning, setLightning] = useState<string>('');
-  const [website, setWebsite] = useState<string>('');
+  const [lightning, setLightning] = useState<string>(getLightning(profile));
+  const [website, setWebsite] = useState<string>(getWebsite(profile.website));
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [nostrAddress, setNostrAddress] = useState<string>('');
   const [rawDataJson, setRawDataJson] = useState<string>('');
@@ -82,29 +102,8 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
             window.history.replaceState(previousState, '', newUrl);
           }
 
-          let lightning = profile.lud16 || profile.lud06;
-          if (lightning && !lightning.startsWith('lightning:')) {
-            lightning = 'lightning:' + lightning;
-          }
-          setLightning(lightning);
-
-          let website = '';
-
-          try {
-            const tempWebsite =
-              profile.website &&
-              (profile.website.match(/^https?:\/\//)
-                ? profile.website
-                : 'http://' + profile.website);
-
-            const url = new URL(tempWebsite);
-
-            website = url.href.endsWith('/') ? url.href.slice(0, -1) : url.href;
-          } catch (e) {
-            website = '';
-          }
-
-          setWebsite(website);
+          setLightning(getLightning(profile));
+          setWebsite(getWebsite(profile.website));
 
           setProfile(profile);
         },
@@ -141,6 +140,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
     const unsubBlocked = SocialNetwork.getBlockedUsers((blockedUsers) => {
       setBlocked(blockedUsers.has(hexPub));
     });
+
     return () => {
       unsubBlocked();
       unsubLoggedIn();
