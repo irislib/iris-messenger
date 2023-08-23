@@ -32,7 +32,10 @@ const useSubscribe = (ops: SubscribeOptions) => {
     mergeSubscriptions = defaultOps.mergeSubscriptions,
   } = ops;
 
+  const shouldReturnEarly = !enabled || filter.limit === 0;
+
   const getEvents = useCallback(() => {
+    if (shouldReturnEarly) return [];
     // maybe we should still add filter by displaycount?
     let e = EventDB.findArray({ ...filter, limit: undefined });
     if (filterFn) {
@@ -82,6 +85,10 @@ const useSubscribe = (ops: SubscribeOptions) => {
       }
     };
   }, [loadMore]);
+
+  if (shouldReturnEarly) {
+    return { events: [], loadMore: () => {} };
+  }
 
   return { events, loadMore };
 };
