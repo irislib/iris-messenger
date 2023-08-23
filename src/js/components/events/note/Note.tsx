@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import classNames from 'classnames';
 import { Filter } from 'nostr-tools';
 import { Link, route } from 'preact-router';
 
@@ -14,18 +15,30 @@ import EventComponent from '../EventComponent';
 import Avatar from './Avatar';
 import Content from './Content';
 
-const Note = ({
+interface NoteProps {
+  event: any; // Define the proper type
+  asInlineQuote?: boolean;
+  isReply?: boolean;
+  isQuote?: boolean;
+  isQuoting?: boolean;
+  showReplies?: number;
+  showRepliedMsg?: boolean;
+  standalone?: boolean;
+  fullWidth?: boolean;
+}
+
+const Note: React.FC<NoteProps> = ({
   event,
   asInlineQuote = false,
-  isReply = false, // message that is rendered under a standalone message, separated by a small margin
-  isQuote = false, // message that connects to the next message with a line
-  isQuoting = false, // message that is under an isQuote message, no margin
+  isReply = false,
   showReplies = 0,
   showRepliedMsg,
   standalone = false,
   fullWidth,
+  isQuote = false,
+  isQuoting = false,
 }) => {
-  const replyingTo = useMemo(() => getEventReplyingTo(event), [event]);
+  const replyingTo = useMemo(() => getEventReplyingTo(event), [event.id]);
 
   const repliesFilter = useMemo(() => {
     const filter: Filter = { '#e': [event.id], kinds: [1] };
@@ -41,13 +54,6 @@ const Note = ({
     enabled: !!showReplies,
   });
 
-  if (!standalone && showReplies && replies.length) {
-    isQuote = true;
-  }
-  if (replyingTo && showRepliedMsg) {
-    isQuoting = true;
-  }
-
   if (showRepliedMsg === undefined) {
     showRepliedMsg = standalone;
   }
@@ -56,27 +62,26 @@ const Note = ({
     fullWidth = !isReply && !isQuoting && !isQuote && !asInlineQuote;
   }
 
+  const computedIsQuote = useMemo(
+    () => isQuote || (!standalone && showReplies && replies.length),
+    [isQuote, standalone, showReplies, replies.length],
+  );
+  const computedIsQuoting = useMemo(
+    () => isQuoting || (replyingTo && showRepliedMsg),
+    [isQuoting, replyingTo, showRepliedMsg],
+  );
+
   const className = useMemo(() => {
-    const classNames = [] as string[];
-
-    if (standalone) {
-      classNames.push('');
-    } else {
-      classNames.push(
-        'cursor-pointer transition-all ease-in-out duration-200 hover:bg-neutral-999',
-      );
-    }
-    if (isQuote) classNames.push('quote pb-2');
-    if (isQuoting) {
-      classNames.push('quoting pt-0');
-    } else {
-      classNames.push('pt-4');
-    }
-    if (asInlineQuote) classNames.push('inline-quote border-2 border-neutral-900 rounded-lg my-2');
-    if (fullWidth) classNames.push('full-width');
-
-    return classNames.join(' ');
-  }, [standalone, isQuote, isQuoting, asInlineQuote, fullWidth]);
+    return classNames({
+      'cursor-pointer transition-all ease-in-out duration-200 hover:bg-neutral-999': !standalone,
+      'quote pb-2': computedIsQuote,
+      'quoting pt-0': computedIsQuoting,
+      'pt-4': !computedIsQuoting,
+      'inline-quote border-2 border-neutral-900 rounded-lg my-2': asInlineQuote,
+      'full-width':
+        fullWidth || (!isReply && !computedIsQuoting && !computedIsQuote && !asInlineQuote),
+    });
+  }, [standalone, computedIsQuote, computedIsQuoting, asInlineQuote, fullWidth]);
 
   let threadRoot = getEventRoot(event);
   if (!threadRoot) {

@@ -25,6 +25,7 @@
     "bech32-buffer": "^0.2.1",
     "browserify-cipher": ">=1",
     "buffer": "^6.0.3",
+    "classnames": "^2.3.2",
     "dexie": "^3.2.4",
     "fuse.js": "^6.6.2",
     "history": "5.3.0",
