@@ -62,9 +62,14 @@ const ProxyImg = (props: Props) => {
       onError={handleError}
       onClick={props.onClick}
       className={props.className}
-      style={props.style}
-      width={props.width}
-      height={props.width}
+      style={{
+        ...props.style,
+        width: props.square ? props.width : undefined,
+        height: props.square ? props.width : undefined,
+        objectFit: props.square ? 'cover' : undefined,
+      }}
+      width={props.square ? props.width : undefined}
+      height={props.square ? props.width : undefined}
       alt={props.alt}
     />
   );

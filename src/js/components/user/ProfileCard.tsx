@@ -3,6 +3,7 @@ import { Event } from 'nostr-tools';
 import { route } from 'preact-router';
 
 import EventDB from '@/nostr/EventDB';
+import { useProfile } from '@/nostr/hooks/useProfile.ts';
 
 import Key from '../../nostr/Key';
 import PubSub from '../../nostr/PubSub';
@@ -10,7 +11,6 @@ import SocialNetwork from '../../nostr/SocialNetwork';
 import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 import Helpers from '../../utils/Helpers';
-import { ID } from '../../utils/UniqueIds';
 import Follow from '../buttons/Follow';
 import Show from '../helpers/Show';
 import HyperText from '../HyperText';
@@ -43,7 +43,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
   };
 
   const { hexPub, npub } = props;
-  const [profile, setProfile] = useState<any>(SocialNetwork.profiles.get(ID(hexPub)) || {});
+  const profile = useProfile(hexPub);
   const [lightning, setLightning] = useState<string>(getLightning(profile));
   const [website, setWebsite] = useState<string>(getWebsite(profile.website));
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
@@ -69,7 +69,7 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
     subscriptions.push(
       SocialNetwork.getProfile(
         address,
-        (profile) => {
+        () => {
           if (!profile) {
             return;
           }
@@ -104,8 +104,6 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
 
           setLightning(getLightning(profile));
           setWebsite(getWebsite(profile.website));
-
-          setProfile(profile);
         },
         true,
       ),
