@@ -44,6 +44,7 @@ function CreateNoteForm({
       localState.get('public').get('draft').put(null);
     }
     setText('');
+    setFocused(false);
   };
 
   const submit = useCallback(async () => {
@@ -53,6 +54,10 @@ function CreateNoteForm({
 
     await sendNostr(msg);
     onFormSubmit?.(msg);
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
 
     resetText();
   }, [text, replyingTo, onFormSubmit]);
@@ -106,7 +111,6 @@ function CreateNoteForm({
       e.preventDefault();
       if (!text || text.split(' ').length < 10 || confirm(t('discard_changes'))) {
         resetText();
-        setFocused(false);
       }
     },
     [text],
