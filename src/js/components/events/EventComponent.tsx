@@ -1,10 +1,10 @@
 import { memo } from 'react';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import EventDB from '@/nostr/EventDB';
+import { EventID } from '@/utils/Hex/Hex.ts';
 
 import Events from '../../nostr/Events';
-import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
 import Icons from '../../utils/Icons';
@@ -36,80 +36,63 @@ export interface EventComponentProps {
 }
 
 const EventComponent = (props: EventComponentProps) => {
-  const hex = Key.toNostrHexAddress(props.id);
-  const [state, setState] = useState<{ [key: string]: any }>({
-    sortedReplies: [],
-    meta: {},
-    event: hex && EventDB.get(hex),
-  });
+  const hex = useMemo(() => new EventID(props.id).hex, [props.id]);
+  const [event, setEvent] = useState(EventDB.get(hex));
+  const [retrieving, setRetrieving] = useState<boolean>(false);
   const retrievingTimeout = useRef<any>();
   const unmounted = useRef<boolean>(false);
 
-  const handleEvent = (event: any) => {
+  const handleEvent = (e: any) => {
+    if (!e) {
+      return;
+    }
+
     clearTimeout(retrievingTimeout.current);
     if (unmounted.current) {
       return;
     }
 
-    if (state.retrieving) {
-      setState((prevState) => ({ ...prevState, retrieving: false }));
+    if (retrieving) {
+      setRetrieving(false);
     }
 
-    setState((prevState) => ({ ...prevState, event }));
+    if (!event) {
+      setEvent(e);
+    }
   };
 
   useEffect(() => {
-    if (!props.id) {
-      console.log('error: no id', props);
-      return;
-    }
-    unmounted.current = false;
-    const hexId = Key.toNostrHexAddress(props.id);
-
-    /*
-    localState.get('mutedNotes').on(
-      (mutedNotes) => {
-        const muted = mutedNotes && mutedNotes[hexId];
-        setState((prevState) => ({ ...prevState, muted }));
-      },
-      // ...
-    );
-     */
-
-    retrievingTimeout.current = setTimeout(() => {
-      setState((prevState) => ({ ...prevState, retrieving: true }));
-    }, 1000);
-    hexId && Events.getEventById(hexId, true, (event) => handleEvent(event));
-
-    return () => {
-      unmounted.current = true;
-    };
-  }, []);
-
-  useEffect(() => {
     if (props.standalone) {
-      if (!state.msg && state.msg) {
+      if (event) {
+        window.prerenderReady = true;
+      } else {
         setTimeout(() => {
           window.prerenderReady = true;
         }, 1000);
       }
     }
-  });
+    if (!event) {
+      retrievingTimeout.current = setTimeout(() => {
+        setRetrieving(true);
+      }, 1000);
+      Events.getEventById(hex, true, (event) => handleEvent(event));
+    }
+
+    return () => {
+      unmounted.current = true;
+    };
+  }, [props.id]);
 
   const renderDropdown = () => {
-    return props.asInlineQuote ? null : <EventDropdown id={props.id || ''} event={state.event} />;
+    return props.asInlineQuote ? null : <EventDropdown id={props.id || ''} event={event} />;
   };
 
-  if (!props.id) {
-    console.error('no id on event', props);
-    return null;
-  }
-  if (!state.event) {
+  if (!event) {
     return (
       <div key={props.id}>
         <div
           className={`m-2 md:mx-4 flex items-center ${
-            state.retrieving ? 'opacity-100' : 'opacity-0'
+            retrieving ? 'opacity-100' : 'opacity-0'
           } transition-opacity duration-700 ease-in-out`}
         >
           <div className="text">{t('looking_up_message')}</div>
@@ -119,7 +102,7 @@ const EventComponent = (props: EventComponentProps) => {
     );
   }
 
-  if (SocialNetwork.isBlocked(state.event.pubkey)) {
+  if (SocialNetwork.isBlocked(event.pubkey)) {
     if (props.standalone || props.isQuote) {
       return (
         <div className="m-2 md:mx-4 flex items-center">
@@ -135,11 +118,9 @@ const EventComponent = (props: EventComponentProps) => {
   const renderComponent = () => {
     let Component: any = Note;
 
-    if (state.event.kind === 1) {
-      const mentionIndex = state.event?.tags?.findIndex(
-        (tag) => tag[0] === 'e' && tag[3] === 'mention',
-      );
-      if (state.event?.content === `#[${mentionIndex}]`) {
+    if (event.kind === 1) {
+      const mentionIndex = event?.tags?.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
+      if (event?.content === `#[${mentionIndex}]`) {
         Component = Repost;
       }
     } else {
@@ -149,20 +130,20 @@ const EventComponent = (props: EventComponentProps) => {
         6: Repost,
         7: Like,
         9735: Zap,
-      }[state.event.kind];
+      }[event.kind];
     }
 
     if (!Component) {
-      console.error('unknown event kind', state.event);
+      console.error('unknown event kind', event);
       return null;
     }
 
     return (
       <Component
         key={props.id}
-        event={state.event}
+        event={event}
         fullWidth={props.fullWidth}
-        fadeIn={!props.feedOpenedAt || props.feedOpenedAt < state.event.created_at}
+        fadeIn={!props.feedOpenedAt || props.feedOpenedAt < event.created_at}
         {...props}
       />
     );
