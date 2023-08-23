@@ -1,12 +1,10 @@
-import { useMemo } from 'react';
-import { Event } from 'nostr-tools';
-import { useEffect, useState } from 'preact/hooks';
+import { useCallback, useMemo } from 'react';
+import { Filter } from 'nostr-tools';
 import { Link, route } from 'preact-router';
 
 import InfiniteScroll from '@/components/helpers/InfiniteScroll';
-import PubSub from '@/nostr/PubSub';
-import { getEventRoot, getNoteReplyingTo } from '@/nostr/utils';
-import SortedMap from '@/utils/SortedMap/SortedMap.tsx';
+import useSubscribe from '@/nostr/hooks/useSubscribe.ts';
+import { getEventReplyingTo, getEventRoot } from '@/nostr/utils';
 
 import Key from '../../../nostr/Key';
 import { translate as t } from '../../../translations/Translation.mjs';
@@ -27,8 +25,21 @@ const Note = ({
   standalone = false,
   fullWidth,
 }) => {
-  const [replies, setReplies] = useState([] as string[]);
-  const replyingTo = useMemo(() => getNoteReplyingTo(event), [event]);
+  const replyingTo = useMemo(() => getEventReplyingTo(event), [event]);
+
+  const repliesFilter = useMemo(() => {
+    const filter: Filter = { '#e': [event.id], kinds: [1] };
+    if (showReplies !== Infinity) {
+      filter.limit = showReplies;
+    }
+    return filter;
+  }, [event.id, showReplies]);
+  const repliesFilterFn = useCallback((e) => getEventReplyingTo(e) === event.id, [event.id]);
+  const { events: replies } = useSubscribe({
+    filter: repliesFilter,
+    filterFn: repliesFilterFn,
+    enabled: !!showReplies,
+  });
 
   if (!standalone && showReplies && replies.length) {
     isQuote = true;
@@ -67,37 +78,9 @@ const Note = ({
     return classNames.join(' ');
   }, [standalone, isQuote, isQuoting, asInlineQuote, fullWidth]);
 
-  useEffect(() => {
-    const comparator = (a: [string, Event], b: [string, Event]) => {
-      const aEvent = a[1];
-      const bEvent = b[1];
-
-      if (!aEvent && !bEvent) return 0;
-      if (!aEvent) return -1;
-      if (!bEvent) return 1;
-
-      return aEvent.created_at - bEvent.created_at;
-    };
-
-    const sortedRepliesMap = new SortedMap<string, Event>([], comparator);
-
-    const callback = (reply) => {
-      if (getNoteReplyingTo(reply) !== event.id) return;
-      sortedRepliesMap.set(reply.id, reply);
-      const sortedReplies = Array.from(sortedRepliesMap.keys()).slice(0, showReplies);
-      setReplies(sortedReplies);
-    };
-
-    const unsubscribe = PubSub.subscribe({ '#e': [event.id], kinds: [1] }, callback, false);
-
-    return () => {
-      unsubscribe();
-    };
-  }, [event.id, showReplies]);
-
-  let rootMsg = getEventRoot(event);
-  if (!rootMsg) {
-    rootMsg = replyingTo;
+  let threadRoot = getEventRoot(event);
+  if (!threadRoot) {
+    threadRoot = replyingTo;
   }
 
   function messageClicked(clickEvent) {
@@ -124,10 +107,10 @@ const Note = ({
     ) : null;
 
   const showThreadBtn = (
-    <Show when={!standalone && !isReply && !isQuoting && rootMsg}>
+    <Show when={!standalone && !isReply && !isQuoting && threadRoot}>
       <Link
         className="text-iris-blue text-sm block mb-2"
-        href={`/${Key.toNostrBech32Address(rootMsg || '', 'note')}`}
+        href={`/${Key.toNostrBech32Address(threadRoot || '', 'note')}`}
       >
         {t('show_thread')}
       </Link>
@@ -160,8 +143,14 @@ const Note = ({
         <hr className="opacity-10" />
       </Show>
       <InfiniteScroll>
-        {replies.map((r) => (
-          <EventComponent key={r} id={r} isReply={true} isQuoting={!standalone} showReplies={1} />
+        {replies.reverse().map((r) => (
+          <EventComponent
+            key={r.id}
+            id={r.id}
+            isReply={true}
+            isQuoting={!standalone}
+            showReplies={1}
+          />
         ))}
       </InfiniteScroll>
     </>

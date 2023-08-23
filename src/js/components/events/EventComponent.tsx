@@ -100,26 +100,17 @@ const EventComponent = (props: EventComponentProps) => {
     return props.asInlineQuote ? null : <EventDropdown id={props.id || ''} event={state.event} />;
   };
 
-  const getClassName = () => {
-    let className = 'msg';
-    if (props.standalone) className += ' standalone';
-    const isQuote = props.isQuote || (props.showReplies && state.sortedReplies?.length);
-    if (isQuote) className += ' quote';
-    return className;
-  };
-
   if (!props.id) {
     console.error('no id on event', props);
     return null;
   }
   if (!state.event) {
     return (
-      <div key={props.id} className={getClassName()}>
+      <div key={props.id}>
         <div
-          className={`msg-content retrieving ${
+          className={`m-2 md:mx-4 flex items-center ${
             state.retrieving ? 'opacity-100' : 'opacity-0'
           } transition-opacity duration-700 ease-in-out`}
-          style={{ display: 'flex', alignItems: 'center' }}
         >
           <div className="text">{t('looking_up_message')}</div>
           <div>{renderDropdown()}</div>
@@ -131,13 +122,9 @@ const EventComponent = (props: EventComponentProps) => {
   if (SocialNetwork.isBlocked(state.event.pubkey)) {
     if (props.standalone || props.isQuote) {
       return (
-        <div className="msg">
-          <div className="msg-content">
-            <p style={{ display: 'flex', alignItems: 'center' }}>
-              <i style={{ marginRight: '15px' }}>{Icons.newFollower}</i>
-              <span> Message from a blocked user</span>
-            </p>
-          </div>
+        <div className="m-2 md:mx-4 flex items-center">
+          <i className="mr-2">{Icons.newFollower}</i>
+          <span> Message from a blocked user</span>
         </div>
       );
     } else {
@@ -173,7 +160,6 @@ const EventComponent = (props: EventComponentProps) => {
     return (
       <Component
         key={props.id}
-        className={getClassName()}
         event={state.event}
         fullWidth={props.fullWidth}
         fadeIn={!props.feedOpenedAt || props.feedOpenedAt < state.event.created_at}

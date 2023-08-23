@@ -36,6 +36,7 @@ const useSubscribe = (ops: SubscribeOptions) => {
   const lastUntilRef = useRef<number | null>(null);
 
   const updateEvents = useCallback(() => {
+    // maybe we should still add filter by displaycount?
     let e = EventDB.findArray({ ...filter, limit: undefined });
     if (filterFn) {
       e = e.filter(filterFn);
