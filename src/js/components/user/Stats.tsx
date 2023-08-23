@@ -1,6 +1,8 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import throttle from 'lodash/throttle';
 import { Link } from 'preact-router';
+
+import { ID, STR } from '@/utils/UniqueIds.ts';
 
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
@@ -14,50 +16,51 @@ const ProfileStats = ({ address }) => {
   const [followerCount, setFollowerCount] = useState<number>(0);
   const [followerCountFromApi, setFollowerCountFromApi] = useState<number>(0);
   const [followedUserCountFromApi, setFollowedUserCountFromApi] = useState<number>(0);
-  const [knownFollowers, setKnownFollowers] = useState<string[]>([]);
   const isMyProfile = Key.isMine(address);
 
-  useEffect(() => {
-    const subscriptions = [] as any[];
+  const getKnownFollowers = useCallback(() => {
+    const followerSet = SocialNetwork.followersByUser.get(ID(address));
+    const followers = Array.from(followerSet || new Set<number>());
+    return followers
+      ?.filter((id) => typeof id === 'number' && SocialNetwork.followDistanceByUser.get(id) === 1)
+      .map((id) => STR(id));
+  }, []);
 
-    fetch(`https://eu.rbr.bio/${address}/info.json`).then((res) => {
+  const [knownFollowers, setKnownFollowers] = useState<string[]>(getKnownFollowers());
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch(`https://eu.rbr.bio/${address}/info.json`);
       if (!res.ok) {
         return;
       }
-      res.json().then((json) => {
-        if (json) {
-          setFollowedUserCountFromApi(json.following?.length);
-          setFollowerCountFromApi(json.followerCount);
-        }
-      });
-    });
-
-    const throttledSetKnownFollowers = throttle((followers) => {
-      const knownFollowers = new Set<string>();
-      for (const follower of followers) {
-        if (SocialNetwork.getFollowDistance(follower) === 1) {
-          knownFollowers.add(follower);
-        }
+      const json = await res.json();
+      if (json) {
+        setFollowedUserCountFromApi(json.following?.length);
+        setFollowerCountFromApi(json.followerCount);
       }
-      setKnownFollowers(Array.from(knownFollowers));
+    };
+
+    fetchData();
+
+    const throttledSetKnownFollowers = throttle(() => {
+      setKnownFollowers(getKnownFollowers());
     }, 1000);
 
-    setTimeout(() => {
-      subscriptions.push(
-        SocialNetwork.getFollowersByUser(address, (followers) => {
-          setFollowerCount(followers.size);
-          throttledSetKnownFollowers(followers);
-        }),
-      );
-      subscriptions.push(
-        SocialNetwork.getFollowedByUser(address, (followed) => setFollowedUserCount(followed.size)),
-      );
-    }, 1000); // this causes social graph recursive loading, so let some other stuff like feed load first
+    const subscriptions = [
+      SocialNetwork.getFollowersByUser(address, (followers: Set<string>) => {
+        setFollowerCount(followers.size);
+        throttledSetKnownFollowers();
+      }),
+      SocialNetwork.getFollowedByUser(address, (followed) => setFollowedUserCount(followed.size)),
+    ];
+
+    setTimeout(() => subscriptions.forEach((sub) => sub()), 1000);
 
     return () => {
       subscriptions.forEach((unsub) => unsub());
     };
-  }, [address]);
+  }, [address, getKnownFollowers]);
 
   return (
     <div>
