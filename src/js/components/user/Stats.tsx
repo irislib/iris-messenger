@@ -12,14 +12,18 @@ import Show from '../helpers/Show';
 import Name from './Name';
 
 const ProfileStats = ({ address }) => {
-  const [followedUserCount, setFollowedUserCount] = useState<number>(0);
-  const [followerCount, setFollowerCount] = useState<number>(0);
-  const [followerCountFromApi, setFollowerCountFromApi] = useState<number>(0);
-  const [followedUserCountFromApi, setFollowedUserCountFromApi] = useState<number>(0);
+  const id = ID(address);
+  const [followedUserCount, setFollowedUserCount] = useState<number>(
+    SocialNetwork.followedByUser.get(id)?.size || 0,
+  );
+  const [followerCount, setFollowerCount] = useState<number>(
+    SocialNetwork.followersByUser.get(id)?.size || 0,
+  );
   const isMyProfile = Key.isMine(address);
 
   const getKnownFollowers = useCallback(() => {
-    const followerSet = SocialNetwork.followersByUser.get(ID(address));
+    const followerSet = SocialNetwork.followersByUser.get(id);
+    followerSet?.delete(id);
     const followers = Array.from(followerSet || new Set<number>());
     return followers
       ?.filter((id) => typeof id === 'number' && SocialNetwork.followDistanceByUser.get(id) === 1)
@@ -29,20 +33,6 @@ const ProfileStats = ({ address }) => {
   const [knownFollowers, setKnownFollowers] = useState<string[]>(getKnownFollowers());
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch(`https://eu.rbr.bio/${address}/info.json`);
-      if (!res.ok) {
-        return;
-      }
-      const json = await res.json();
-      if (json) {
-        setFollowedUserCountFromApi(json.following?.length);
-        setFollowerCountFromApi(json.followerCount);
-      }
-    };
-
-    fetchData();
-
     const throttledSetKnownFollowers = throttle(() => {
       setKnownFollowers(getKnownFollowers());
     }, 1000);
@@ -66,10 +56,10 @@ const ProfileStats = ({ address }) => {
     <div>
       <div className="text-sm flex gap-4">
         <Link href={`/follows/${address}`}>
-          <b>{Math.max(followedUserCount, followedUserCountFromApi)}</b> {t('following')}
+          <b>{followedUserCount}</b> {t('following')}
         </Link>
         <Link href={`/followers/${address}`}>
-          <b>{Math.max(followerCount, followerCountFromApi)}</b> {t('followers')}
+          <b>{followerCount}</b> {t('known_followers')}
         </Link>
       </div>
       <Show when={!isMyProfile && knownFollowers.length > 0}>

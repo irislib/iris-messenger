@@ -24,7 +24,7 @@ const Image: Embed = {
     return (
       <div
         key={match + index}
-        className="flex justify-center items-center md:justify-start min-h-96 my-2"
+        className="flex justify-center items-center md:justify-start md:h-96 my-2"
       >
         <ProxyImg
           onError={() => setHasError(true)}

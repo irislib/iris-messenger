@@ -18,28 +18,10 @@ import { translate as t } from '../../translations/Translation.mjs';
 import View from '../View.tsx';
 
 function Profile(props) {
-  const [blocked, setBlocked] = useState(false);
   const [hexPub, setHexPub] = useState('');
-  const [npub, setNpub] = useState('');
-  const [banner, setBanner] = useState('');
-  const [bannerModalOpen, setBannerModalOpen] = useState(false);
-  const setIsMyProfile = useLocalState('isMyProfile', false)[1];
-
   const profile = useProfile(hexPub);
-
-  useEffect(() => {
-    if (!hexPub) {
-      return;
-    }
-    const isMyProfile = Key.isMine(hexPub);
-    setIsMyProfile(isMyProfile);
-    SocialNetwork.getBlockedUsers((blockedUsers) => {
-      setBlocked(blockedUsers.has(hexPub));
-    });
-  }, [hexPub]);
-
   // many of these hooks should be moved to useProfile or hooks directory
-  useEffect(() => {
+  const banner = useMemo(() => {
     if (!profile) {
       return;
     }
@@ -55,11 +37,27 @@ function Profile(props) {
         ? bannerURL
         : `https://imgproxy.iris.to/insecure/rs:fit:948:948/plain/${bannerURL}`;
 
-      setBanner(bannerURL);
+      return bannerURL;
     } catch (e) {
       console.log('Invalid banner URL', profile.banner);
+      return '';
     }
-  }, [profile]);
+  }, [profile.banner]);
+  const [blocked, setBlocked] = useState(false);
+  const [npub, setNpub] = useState('');
+  const [bannerModalOpen, setBannerModalOpen] = useState(false);
+  const setIsMyProfile = useLocalState('isMyProfile', false)[1];
+
+  useEffect(() => {
+    if (!hexPub) {
+      return;
+    }
+    const isMyProfile = Key.isMine(hexPub);
+    setIsMyProfile(isMyProfile);
+    SocialNetwork.getBlockedUsers((blockedUsers) => {
+      setBlocked(blockedUsers.has(hexPub));
+    });
+  }, [hexPub]);
 
   useEffect(() => {
     try {
