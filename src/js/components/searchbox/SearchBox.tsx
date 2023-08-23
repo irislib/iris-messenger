@@ -1,5 +1,6 @@
 import { createRef } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
+import { route } from 'preact-router';
 
 import Show from '@/components/helpers/Show.tsx';
 import SearchForm from '@/components/searchbox/SearchForm.tsx';
@@ -53,10 +54,13 @@ const SearchBox = (props) => {
     setQuery('');
     inputRef.current.blur();
 
-    // Get the active item based on the selected index
-    const selectedItem = results[selected]?.item;
-    if (selectedItem && props.onSelect) {
-      props.onSelect(selectedItem);
+    if (selected === -1) {
+      route(`/search/${encodeURIComponent(query)}`);
+    } else {
+      const selectedItem = results[selected]?.item;
+      if (selectedItem && props.onSelect) {
+        props.onSelect(selectedItem);
+      }
     }
 
     close();
