@@ -1,7 +1,8 @@
-import { memo } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import classNames from 'classnames';
 
 import EventDB from '@/nostr/EventDB';
+import { isRepost } from '@/nostr/utils.ts';
 import { EventID } from '@/utils/Hex/Hex.ts';
 
 import Events from '../../nostr/Events';
@@ -21,6 +22,14 @@ declare global {
     prerenderReady: boolean;
   }
 }
+
+const COMPONENTS_BY_EVENT_KIND = {
+  1: Note,
+  3: Follow,
+  6: Repost,
+  7: Like,
+  9735: Zap,
+};
 
 export interface EventComponentProps {
   id: string;
@@ -43,39 +52,23 @@ const EventComponent = (props: EventComponentProps) => {
   const unmounted = useRef<boolean>(false);
 
   const handleEvent = (e: any) => {
-    if (!e) {
-      return;
-    }
-
-    clearTimeout(retrievingTimeout.current);
-    if (unmounted.current) {
-      return;
-    }
-
-    if (retrieving) {
-      setRetrieving(false);
-    }
-
-    if (!event) {
-      setEvent(e);
+    if (e) {
+      clearTimeout(retrievingTimeout.current);
+      if (!unmounted.current) {
+        setRetrieving(false);
+        setEvent(e);
+      }
     }
   };
 
   useEffect(() => {
-    if (props.standalone) {
-      if (event) {
-        window.prerenderReady = true;
-      } else {
-        setTimeout(() => {
-          window.prerenderReady = true;
-        }, 1000);
-      }
+    //console.log('EventComponent init'); // this gets called more than displayCount - unnecessary?
+    if (props.standalone && (event || retrievingTimeout.current)) {
+      window.prerenderReady = true;
     }
     if (!event) {
-      retrievingTimeout.current = setTimeout(() => {
-        setRetrieving(true);
-      }, 1000);
-      Events.getEventById(hex, true, (event) => handleEvent(event));
+      retrievingTimeout.current = setTimeout(() => setRetrieving(true), 1000);
+      Events.getEventById(hex, true, handleEvent);
     }
 
     return () => {
@@ -83,21 +76,16 @@ const EventComponent = (props: EventComponentProps) => {
     };
   }, [props.id]);
 
-  const renderDropdown = () => {
-    return props.asInlineQuote ? null : <EventDropdown id={props.id || ''} event={event} />;
-  };
+  const loadingClass = classNames('m-2 md:mx-4 flex items-center', {
+    'opacity-100': retrieving,
+    'opacity-0': !retrieving,
+  });
 
   if (!event) {
     return (
-      <div key={props.id}>
-        <div
-          className={`m-2 md:mx-4 flex items-center ${
-            retrieving ? 'opacity-100' : 'opacity-0'
-          } transition-opacity duration-700 ease-in-out`}
-        >
-          <div className="text">{t('looking_up_message')}</div>
-          <div>{renderDropdown()}</div>
-        </div>
+      <div key={props.id} className={loadingClass}>
+        <div className="text">{t('looking_up_message')}</div>
+        {props.asInlineQuote ? null : <EventDropdown id={props.id || ''} event={event} />}
       </div>
     );
   }
@@ -110,46 +98,26 @@ const EventComponent = (props: EventComponentProps) => {
           <span> Message from a blocked user</span>
         </div>
       );
-    } else {
-      return null;
     }
+    return null;
   }
 
-  const renderComponent = () => {
-    let Component: any = Note;
+  const Component: any = isRepost(event) ? Repost : COMPONENTS_BY_EVENT_KIND[event.kind];
 
-    if (event.kind === 1) {
-      const mentionIndex = event?.tags?.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
-      if (event?.content === `#[${mentionIndex}]`) {
-        Component = Repost;
-      }
-    } else {
-      Component = {
-        1: Note,
-        3: Follow,
-        6: Repost,
-        7: Like,
-        9735: Zap,
-      }[event.kind];
-    }
+  if (!Component) {
+    console.error('unknown event kind', event);
+    return null;
+  }
 
-    if (!Component) {
-      console.error('unknown event kind', event);
-      return null;
-    }
-
-    return (
-      <Component
-        key={props.id}
-        event={event}
-        fullWidth={props.fullWidth}
-        fadeIn={!props.feedOpenedAt || props.feedOpenedAt < event.created_at}
-        {...props}
-      />
-    );
-  };
-
-  return renderComponent();
+  return (
+    <Component
+      key={props.id}
+      event={event}
+      fullWidth={props.fullWidth}
+      fadeIn={!props.feedOpenedAt || props.feedOpenedAt < event.created_at}
+      {...props}
+    />
+  );
 };
 
 export default memo(EventComponent);

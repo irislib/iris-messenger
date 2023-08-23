@@ -46,9 +46,6 @@ const useSubscribe = (ops: SubscribeOptions) => {
 
   useEffect(() => {
     setEvents([]);
-  }, [filter, filterFn, enabled, sinceLastOpened, mergeSubscriptions]);
-
-  useEffect(() => {
     if (!enabled || !filter) return;
     return PubSub.subscribe(filter, updateEvents, sinceLastOpened, mergeSubscriptions);
   }, [filter, filterFn, enabled, sinceLastOpened, mergeSubscriptions]);
