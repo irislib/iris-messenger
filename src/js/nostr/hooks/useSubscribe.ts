@@ -2,9 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import throttle from 'lodash/throttle';
 import { Event } from 'nostr-tools';
 
+import EventDB from '@/nostr/EventDB.ts';
 import Filter from '@/nostr/Filter.ts';
 import PubSub from '@/nostr/PubSub.ts';
-import SortedMap from '@/utils/SortedMap/SortedMap.tsx';
 
 interface SubscribeOptions {
   filter: Filter;
@@ -32,42 +32,31 @@ const useSubscribe = (ops: SubscribeOptions) => {
     mergeSubscriptions = defaultOps.mergeSubscriptions,
   } = ops;
 
-  const sortedEvents = useRef(new SortedMap<string, Event>());
   const [events, setEvents] = useState<Event[]>([]);
   const lastUntilRef = useRef<number | null>(null);
 
-  const addEventToSortedEvents = (event: Event, shouldUpdateState = true) => {
-    if (sortedEvents.current.has(event.id)) return;
-
-    if (filterFn && !filterFn(event)) return;
-
-    if (filter.keywords && !filter.keywords.some((keyword) => event.content?.includes(keyword)))
-      return;
-
-    sortedEvents.current.set(event.created_at + event.id, event);
-    if (shouldUpdateState) {
-      const newEvents = [...sortedEvents.current.values()].reverse();
-      if (events.length !== newEvents.length) {
-        setEvents(newEvents);
-      }
+  const updateEvents = useCallback(() => {
+    let e = EventDB.findArray({ ...filter, limit: undefined });
+    if (filterFn) {
+      e = e.filter(filterFn);
     }
-  };
+    setEvents(e);
+  }, [filter, filterFn]);
 
   useEffect(() => {
     setEvents([]);
-    sortedEvents.current = new SortedMap<string, Event>();
   }, [filter, filterFn, enabled, sinceLastOpened, mergeSubscriptions]);
 
   useEffect(() => {
     if (!enabled || !filter) return;
-    return PubSub.subscribe(filter, addEventToSortedEvents, sinceLastOpened, mergeSubscriptions);
+    return PubSub.subscribe(filter, updateEvents, sinceLastOpened, mergeSubscriptions);
   }, [filter, filterFn, enabled, sinceLastOpened, mergeSubscriptions]);
 
   const loadMoreCleanupRef = useRef<null | (() => void)>(null);
 
   const loadMore = useCallback(
     throttle(() => {
-      const until = sortedEvents.current.first()?.[1].created_at;
+      const until = events.length ? events[events.length - 1].created_at : undefined;
 
       if (!until || lastUntilRef.current === until) return;
 
@@ -76,7 +65,7 @@ const useSubscribe = (ops: SubscribeOptions) => {
 
       console.log('loadMore until', until && new Date(until * 1000));
 
-      const cleanup = PubSub.subscribe(newFilter, addEventToSortedEvents, false, false);
+      const cleanup = PubSub.subscribe(newFilter, updateEvents, false, false);
 
       loadMoreCleanupRef.current = cleanup;
     }, 500),
