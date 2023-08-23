@@ -38,7 +38,7 @@ const TextArea: React.FC<TextAreaProps> = ({
 
   useEffect(() => {
     const el = ref.current;
-    if (el) {
+    if (el && value) {
       el.style.height = 'auto'; // Resetting the height
       el.style.height = `${el.scrollHeight}px`;
     }
