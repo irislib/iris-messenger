@@ -10,7 +10,9 @@ export const useProfile = (pub: string) => {
     if (!pub) return;
 
     return SocialNetwork.getProfile(pub, (p) => {
-      p && setProfile(p);
+      if (p && p.created_at !== profile.created_at) {
+        setProfile(p);
+      }
     });
   }, [pub]);
 
