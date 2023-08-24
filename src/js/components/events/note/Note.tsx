@@ -84,9 +84,9 @@ const Note: React.FC<NoteProps> = ({
     });
   }, [standalone, computedIsQuote, computedIsQuoting, asInlineQuote, fullWidth]);
 
-  let threadRoot = getEventRoot(event);
-  if (!threadRoot) {
-    threadRoot = replyingTo;
+  let threadRootId = getEventRoot(event);
+  if (!threadRootId) {
+    threadRootId = replyingTo;
   }
 
   function messageClicked(clickEvent) {
@@ -113,10 +113,10 @@ const Note: React.FC<NoteProps> = ({
     ) : null;
 
   const showThreadBtn = (
-    <Show when={!standalone && !isReply && !isQuoting && threadRoot}>
+    <Show when={!standalone && !showRepliedMsg && !isReply && !isQuoting && threadRootId}>
       <Link
         className="text-iris-blue text-sm block mb-2"
-        href={`/${Key.toNostrBech32Address(threadRoot || '', 'note')}`}
+        href={`/${Key.toNostrBech32Address(threadRootId || '', 'note')}`}
       >
         {t('show_thread')}
       </Link>
