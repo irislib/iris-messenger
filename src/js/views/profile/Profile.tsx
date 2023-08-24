@@ -130,17 +130,18 @@ function Profile(props) {
     profile.about || ''
   }`;
 
+  const showBanner = banner && !blocked;
+
   return (
     <View>
       <div
-        className="mb-4 h-48 bg-cover bg-center cursor-pointer"
+        className={`mb-4 h-48 bg-cover bg-center ${showBanner ? 'cursor-pointer' : ''}`}
         style={{
-          backgroundImage:
-            banner && !blocked
-              ? `url(${banner})`
-              : 'linear-gradient(120deg, #010101 0%, #1f0f26 50%, #010101 100%)',
+          backgroundImage: showBanner
+            ? `url(${banner})`
+            : 'linear-gradient(120deg, #010101 0%, #1f0f26 50%, #010101 100%)',
         }}
-        onClick={() => banner && !blocked && setBannerModalOpen(true)}
+        onClick={() => showBanner && setBannerModalOpen(true)}
       ></div>
       <Show when={bannerModalOpen}>
         <SimpleImageModal imageUrl={profile.banner} onClose={() => setBannerModalOpen(false)} />
