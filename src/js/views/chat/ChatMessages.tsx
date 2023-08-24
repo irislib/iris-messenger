@@ -207,7 +207,7 @@ function ChatMessages({ id }) {
             {msgListContent}
             <div className="italic my-2 text-neutral-500 w-full text-center justify-self-center">
               <Show when={isGroup && keyPair}>
-                <div>{t('secret_chat')}</div>
+                <div>{t('secret_chat_info')}</div>
                 <div className="flex gap-2 flex-1 items-center justify-center mt-4">
                   <button
                     className="btn btn-neutral btn-sm"

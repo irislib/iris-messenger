@@ -6,9 +6,9 @@ import localState from '@/state/LocalState.ts';
 import ReactionsList from '../ReactionsList';
 
 import Like from './Like';
+import Reply from './Reply';
 import Repost from './Repost';
 import Zap from './Zap';
-import Reply from './Reply'; // Add this import
 
 let settings: any = {};
 localState.get('settings').on((s) => (settings = s));
