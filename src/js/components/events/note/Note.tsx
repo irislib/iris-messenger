@@ -5,7 +5,7 @@ import { Link, route } from 'preact-router';
 
 import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 import useSubscribe from '@/nostr/hooks/useSubscribe.ts';
-import { getEventReplyingTo, getEventRoot } from '@/nostr/utils';
+import { getNoteReplyingTo, getEventRoot } from '@/nostr/utils';
 
 import Key from '../../../nostr/Key';
 import { translate as t } from '../../../translations/Translation.mjs';
@@ -38,7 +38,7 @@ const Note: React.FC<NoteProps> = ({
   isQuote = false,
   isQuoting = false,
 }) => {
-  const replyingTo = useMemo(() => getEventReplyingTo(event), [event.id]);
+  const replyingTo = useMemo(() => getNoteReplyingTo(event), [event.id]);
 
   const repliesFilter = useMemo(() => {
     const filter: Filter = { '#e': [event.id], kinds: [1] };
@@ -47,7 +47,7 @@ const Note: React.FC<NoteProps> = ({
     }
     return filter;
   }, [event.id, showReplies]);
-  const repliesFilterFn = useCallback((e) => getEventReplyingTo(e) === event.id, [event.id]);
+  const repliesFilterFn = useCallback((e) => getNoteReplyingTo(e) === event.id, [event.id]);
 
   const { events: replies } = useSubscribe({
     filter: repliesFilter,
@@ -150,11 +150,11 @@ const Note: React.FC<NoteProps> = ({
           />
         </div>
       </div>
-      <Show when={!(isQuote || asInlineQuote)}>
+      <Show when={!(computedIsQuote || asInlineQuote)}>
         <hr className="opacity-10" />
       </Show>
       <InfiniteScroll>
-        {replies.reverse().map((r) => (
+        {replies.slice(0, showReplies).map((r) => (
           <EventComponent
             key={r.id}
             id={r.id}

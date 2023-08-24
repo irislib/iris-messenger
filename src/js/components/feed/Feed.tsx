@@ -10,11 +10,13 @@ import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 import Show from '@/components/helpers/Show';
 import useSubscribe from '@/nostr/hooks/useSubscribe';
 import Key from '@/nostr/Key';
+import { isRepost } from '@/nostr/utils.ts';
 import useHistoryState from '@/state/useHistoryState.ts';
 import useLocalState from '@/state/useLocalState.ts';
 import Helpers from '@/utils/Helpers';
 
 import { translate as t } from '../../translations/Translation.mjs';
+import {useMemo} from "preact/hooks";
 
 const Feed = (props: FeedProps) => {
   const fetchEvents = props.fetchEvents || useSubscribe;
@@ -41,6 +43,7 @@ const Feed = (props: FeedProps) => {
       if (mutedUsers[event.pubkey]) {
         return false;
       }
+
       if (filterOption.filterFn) {
         return filterOption.filterFn(event);
       }
@@ -56,6 +59,27 @@ const Feed = (props: FeedProps) => {
     sinceLastOpened: false,
     mergeSubscriptions: false,
   });
+
+  const hiddenEvents = useMemo(() => {
+    const hiddenEvents = new Set<string>();
+    const seenReposts = new Set<string>();
+    for (const event of events) {
+      if (isRepost(event)) {
+        for (const tag of event.tags) {
+          if (tag[0] === 'e') {
+            if (seenReposts.has(tag[1])) {
+              hiddenEvents.add(event.id);
+              continue;
+            }
+            seenReposts.add(tag[1]);
+          }
+        }
+      } else if (seenReposts.has(event.id)) {
+        hiddenEvents.add(event.id);
+      }
+    }
+    return hiddenEvents;
+  }, [events]);
 
   // TODO [shownEvents, setShownEvents] = useHistoryState([], 'shownEvents'); which is only updated when user clicks
 
@@ -116,10 +140,14 @@ const Feed = (props: FeedProps) => {
       <Show when={displayAs === 'feed'}>
         <InfiniteScroll key={`${infiniteScrollKeyString}feed`} loadMore={loadMore}>
           {events.map((event) => {
-            // is this inefficient? should we rather pass a component function + list of events?
             if (event.created_at > showUntil) {
               return null;
             }
+
+            if (hiddenEvents.has(event.id)) {
+              return null;
+            }
+
             return (
               <EventComponent key={`${event.id}EC`} id={event.id} {...filterOption.eventProps} />
             );
