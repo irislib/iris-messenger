@@ -7,7 +7,7 @@ import Key from '../../../nostr/Key';
 
 const Like = ({ event }) => {
   const [state, setState] = useState({
-    likes: 0,
+    likes: Events.likesByMessageId.get(event.id)?.size || 0,
     liked: false,
     likedBy: new Set<string>(),
   });

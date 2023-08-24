@@ -6,7 +6,7 @@ import Key from '../../../nostr/Key';
 
 const Repost = ({ event }) => {
   const [state, setState] = useState({
-    reposts: 0,
+    reposts: Events.repostsByMessageId.get(event.id)?.size || 0,
     reposted: false,
     repostedBy: new Set<string>(),
   });

@@ -14,11 +14,12 @@ import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 
 const Notifications: React.FC<RouteProps> = () => {
+  const filter = { kinds: [1, 6, 7, 9735], '#p': [Key.getPubKey()], limit: 20 };
   const filterOptions = useMemo(
     () => [
       {
         name: 'notifications',
-        filter: { kinds: [1, 6, 7, 9735], '#p': [Key.getPubKey()], limit: 20 },
+        filter,
         eventProps: { fullWidth: false },
       },
     ],

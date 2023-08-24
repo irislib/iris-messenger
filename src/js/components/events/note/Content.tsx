@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { useEffect, useState } from 'preact/hooks';
 
 import CreateNoteForm from '@/components/create/CreateNoteForm';
-import Reactions from '@/components/events/buttons/ReactionButtons';
+import ReactionButtons from '@/components/events/buttons/ReactionButtons';
 import Show from '@/components/helpers/Show';
 import HyperText from '@/components/HyperText';
 import SocialNetwork from '@/nostr/SocialNetwork';
@@ -14,15 +14,13 @@ import Author from './Author';
 import Helmet from './Helmet';
 
 let loadReactions = true;
-let showLikes = true;
-let showZaps = true;
-let showReposts = true;
-localState.get('settings').on((s) => {
-  loadReactions = s.loadReactions !== false;
-  showLikes = s.showLikes !== false;
-  showZaps = s.showZaps !== false;
-  showReposts = s.showReposts !== false;
-});
+
+localState
+  .get('settings')
+  .get('loadReactions')
+  .on((val) => {
+    loadReactions = val !== false;
+  });
 
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
@@ -128,12 +126,7 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, isPrevi
         </a>
       </Show>
       <Show when={!isPreview && !asInlineQuote && loadReactions}>
-        <Reactions
-          key={event.id + 'reactions'}
-          settings={{ showLikes, showZaps, showReposts }}
-          standalone={standalone}
-          event={event}
-        />
+        <ReactionButtons key={event.id + 'reactions'} standalone={standalone} event={event} />
       </Show>
       <Show when={isQuote && !loadReactions}>
         <div style={{ marginBottom: '15px' }}></div>

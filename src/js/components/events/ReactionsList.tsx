@@ -30,8 +30,8 @@ const Reaction = memo(({ data }: { data: ReactionData }) => {
 });
 
 const ReactionsList = ({ event }) => {
-  const [likes, setLikes] = useState(new Set());
-  const [reposts, setReposts] = useState(new Set());
+  const [likes, setLikes] = useState(Events.likesByMessageId.get(event.id) || new Set());
+  const [reposts, setReposts] = useState(Events.repostsByMessageId.get(event.id) || new Set());
   const [zapAmountByUser, setZapAmountByUser] = useState(new Map());
   const [formattedZapAmount, setFormattedZapAmount] = useState('');
   const [modalReactions, setModalReactions] = useState([] as ReactionData[]);
