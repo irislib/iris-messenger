@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useMemo } from 'preact/hooks';
 
 import EventComponent from '@/components/events/EventComponent';
 import DisplaySelector from '@/components/feed/DisplaySelector';
@@ -16,7 +17,6 @@ import useLocalState from '@/state/useLocalState.ts';
 import Helpers from '@/utils/Helpers';
 
 import { translate as t } from '../../translations/Translation.mjs';
-import {useMemo} from "preact/hooks";
 
 const Feed = (props: FeedProps) => {
   const fetchEvents = props.fetchEvents || useSubscribe;
@@ -62,6 +62,9 @@ const Feed = (props: FeedProps) => {
 
   const hiddenEvents = useMemo(() => {
     const hiddenEvents = new Set<string>();
+    if (!filterOption.mergeReposts) {
+      return hiddenEvents;
+    }
     const seenReposts = new Set<string>();
     for (const event of events) {
       if (isRepost(event)) {

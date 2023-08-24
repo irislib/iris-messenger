@@ -19,11 +19,13 @@ const Home: React.FC<RouteProps> = () => {
         name: t('posts'),
         filter: { kinds: [1, 6], authors: followedUsers, limit: 10 },
         filterFn: (event) => !getEventReplyingTo(event) || isRepost(event),
+        mergeReposts: true,
         eventProps: { showRepliedMsg: true },
       },
       {
         name: t('posts_and_replies'),
         filter: { kinds: [1, 6], authors: followedUsers, limit: 5 },
+        mergeReposts: true,
         eventProps: { showRepliedMsg: true, fullWidth: false },
       },
     ],

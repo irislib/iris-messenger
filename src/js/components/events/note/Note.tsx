@@ -5,7 +5,7 @@ import { Link, route } from 'preact-router';
 
 import InfiniteScroll from '@/components/helpers/InfiniteScroll';
 import useSubscribe from '@/nostr/hooks/useSubscribe.ts';
-import { getNoteReplyingTo, getEventRoot } from '@/nostr/utils';
+import { getEventRoot, getNoteReplyingTo } from '@/nostr/utils';
 
 import Key from '../../../nostr/Key';
 import { translate as t } from '../../../translations/Translation.mjs';

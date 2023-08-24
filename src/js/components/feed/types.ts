@@ -26,4 +26,5 @@ export type FilterOption = {
   filter: Filter;
   filterFn?: (event: Event) => boolean;
   eventProps?: Partial<EventComponentProps>;
+  mergeReposts?: boolean;
 };

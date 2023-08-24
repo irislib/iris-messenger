@@ -16,11 +16,13 @@ const Global: React.FC<RouteProps> = () => {
         filter: { kinds: [1, 6], limit: 10 },
         filterFn: (event) => !getEventReplyingTo(event) || isRepost(event),
         eventProps: { showRepliedMsg: true },
+        mergeReposts: true,
       },
       {
         name: t('posts_and_replies'),
         filter: { kinds: [1, 6], limit: 5 },
         eventProps: { showRepliedMsg: true, fullWidth: false },
+        mergeReposts: true,
       },
     ],
     [],
