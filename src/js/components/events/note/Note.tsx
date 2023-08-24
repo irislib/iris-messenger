@@ -64,21 +64,21 @@ const Note: React.FC<NoteProps> = ({
   }
 
   const computedIsQuote = useMemo(
-    () => isQuote || (!standalone && showReplies && replies.length),
+    () => isQuote || !!(!standalone && showReplies && replies.length),
     [isQuote, standalone, showReplies, replies.length],
   );
   const computedIsQuoting = useMemo(
-    () => isQuoting || (replyingTo && showRepliedMsg),
+    () => isQuoting || !!(replyingTo && showRepliedMsg),
     [isQuoting, replyingTo, showRepliedMsg],
   );
 
   const className = useMemo(() => {
     return classNames({
       'cursor-pointer transition-all ease-in-out duration-200 hover:bg-neutral-999': !standalone,
-      'quote pb-2': computedIsQuote,
-      'quoting pt-0': computedIsQuoting,
+      'pb-2': computedIsQuote,
+      'pt-0': computedIsQuoting,
       'pt-4': !computedIsQuoting,
-      'inline-quote border-2 border-neutral-900 rounded-lg my-2': asInlineQuote,
+      'border-2 border-neutral-900 rounded-lg my-2': asInlineQuote,
       'full-width':
         fullWidth || (!isReply && !computedIsQuoting && !computedIsQuote && !asInlineQuote),
     });
@@ -113,7 +113,7 @@ const Note: React.FC<NoteProps> = ({
     ) : null;
 
   const showThreadBtn = (
-    <Show when={!standalone && !showRepliedMsg && !isReply && !isQuoting && threadRootId}>
+    <Show when={!standalone && !showRepliedMsg && !isReply && !computedIsQuoting && threadRootId}>
       <Link
         className="text-iris-blue text-sm block mb-2"
         href={`/${Key.toNostrBech32Address(threadRootId || '', 'note')}`}
@@ -134,12 +134,17 @@ const Note: React.FC<NoteProps> = ({
         {showThreadBtn}
         <div className="flex flex-row" onClick={(e) => messageClicked(e)}>
           <Show when={!fullWidth}>
-            <Avatar event={event} isQuote={isQuote} standalone={standalone} fullWidth={fullWidth} />
+            <Avatar
+              event={event}
+              isQuote={computedIsQuote}
+              standalone={standalone}
+              fullWidth={fullWidth}
+            />
           </Show>
           <Content
             event={event}
             standalone={standalone}
-            isQuote={isQuote}
+            isQuote={computedIsQuote}
             asInlineQuote={asInlineQuote}
             fullWidth={fullWidth}
           />

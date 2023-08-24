@@ -90,7 +90,7 @@ export default {
   "save": "Save",
   "save_backup_of_privkey_first": "Save a backup of your private key first!",
   "save_relays_publicly": "Save relays publicly",
-  "secret_chat_info": "This is a secret chat: Outsiders cannot see that you are messaging with each other.",
+  "secret_chat_info": "This is a secret chat. Outsiders cannot see that you are messaging with each other.",
   "search": "Search",
   "search_posts": "Search posts",
   "send_message": "Message",
