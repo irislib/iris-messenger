@@ -162,7 +162,9 @@ const ProfileCard = (props: { hexPub: string; npub: string }) => {
     <div key={`${hexPub}details`}>
       <div className="mb-2 mx-2 md:px-4 md:mx-0 flex flex-col gap-2">
         <div className="flex flex-row">
-          <div className="-mt-24">{profilePicture}</div>
+          <div className="-mt-24" style={{ 'max-width': '136px' }}>
+            {profilePicture}
+          </div>
           <div className="flex-1 justify-end items-center flex gap-2">
             <div onClick={onClickHandler}>
               <Show when={isMyProfile}>

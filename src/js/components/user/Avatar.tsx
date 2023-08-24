@@ -51,8 +51,8 @@ const MyAvatar: React.FC<Props> = (props) => {
   return (
     <div
       style={{
-        maxWidth: `${width}px`,
-        maxHeight: `${width}px`,
+        width: `${width}px`,
+        height: `${width}px`,
         cursor: props.onClick ? 'pointer' : undefined,
       }}
       className={`inline-flex flex-col flex-shrink-0 items-center justify-center relative select-none ${
@@ -60,20 +60,18 @@ const MyAvatar: React.FC<Props> = (props) => {
       } ${props.showTooltip ? 'tooltip' : ''} ${isActive ? activity : ''}`}
       onClick={props.onClick}
     >
-      <div>
-        <Show when={hasPic}>
-          <ProxyImg
-            className="object-cover rounded-full"
-            src={picture || ''}
-            width={width}
-            square={true}
-            onError={() => setHasError(true)}
-          />
-        </Show>
-        <Show when={!hasPic}>
-          <img width={width} className="max-w-full rounded-full" src={avatar || ''} />
-        </Show>
-      </div>
+      <Show when={hasPic}>
+        <ProxyImg
+          className="object-cover rounded-full"
+          src={picture || ''}
+          width={width}
+          square={true}
+          onError={() => setHasError(true)}
+        />
+      </Show>
+      <Show when={!hasPic}>
+        <img width={width} className="max-w-full rounded-full" src={avatar || ''} />
+      </Show>
       <Show when={props.showTooltip && name}>
         <span className="tooltiptext">{name}</span>
       </Show>

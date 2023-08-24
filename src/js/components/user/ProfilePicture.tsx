@@ -21,11 +21,11 @@ const ProfilePicture = ({ picture, onError }: Props) => {
   }
 
   return (
-    <div className="rounded-full border-4 border-black bg-black">
+    <div className="rounded-full aspect-square border-4 border-black bg-black">
       <ProxyImg
         width={128}
         square={true}
-        className="rounded-full cursor-pointer"
+        className="rounded-full w-full h-full cursor-pointer object-cover"
         src={picture}
         onError={onError}
         onClick={handleClick}
