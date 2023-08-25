@@ -19,6 +19,7 @@ function useHistoryState(initialValue, key) {
   useEffect(() => {
     if (state !== latestValue.current) {
       throttledSetHistoryState.current(state);
+      latestValue.current = state;
     }
 
     // Cleanup logic
