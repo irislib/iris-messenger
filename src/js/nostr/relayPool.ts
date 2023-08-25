@@ -7,6 +7,8 @@ import { UniqueIds } from '@/utils/UniqueIds.ts';
 
 let relayPoolInstance: RelayPool | null = null;
 
+let isListenerAdded = false;
+
 const getRelayPool = () => {
   if (relayPoolInstance) {
     return relayPoolInstance;
@@ -31,12 +33,15 @@ const getRelayPool = () => {
     }
   };
 
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      reconnect();
-    }
-  });
-  document.addEventListener('online', reconnect);
+  if (!isListenerAdded) {
+    isListenerAdded = true;
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        reconnect();
+      }
+    });
+    document.addEventListener('online', reconnect);
+  }
 
   relayPoolInstance = new RelayPool(Relays.enabledRelays(), {
     useEventCache: false,
