@@ -1,5 +1,5 @@
 import debounce from 'lodash/debounce';
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect } from 'preact/hooks';
 
 import Header from '../components/header/Header.tsx';
 import ErrorBoundary from '../components/helpers/ErrorBoundary.tsx';
