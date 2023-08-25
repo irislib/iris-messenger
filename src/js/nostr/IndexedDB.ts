@@ -187,7 +187,7 @@ const IndexedDB = {
       query = query.limit(filter.limit);
     }
     // TODO test that the sort is actually working
-    await query.sortBy('-created_at').each(handleEvent);
+    await query.each(handleEvent);
   },
 };
 
