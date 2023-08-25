@@ -96,4 +96,4 @@ const Search = (props: any) => {
   );
 };
 
-export default Search;
+export default memo(Search);

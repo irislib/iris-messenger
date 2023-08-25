@@ -1,7 +1,6 @@
 import loki from 'lokijs';
-import { Event } from 'nostr-tools';
+import { Event, Filter } from 'nostr-tools';
 
-import Filter from '@/nostr/Filter';
 import { ID, STR } from '@/utils/UniqueIds';
 
 export class EventDB {
@@ -98,7 +97,7 @@ export class EventDB {
       .chain()
       .find(query)
       .where((e: Event) => {
-        if (filter.keywords && !filter.keywords.some((keyword) => e.content?.includes(keyword))) {
+        if (filter.search && !e.content?.includes(filter.search)) {
           return false;
         }
         return true;

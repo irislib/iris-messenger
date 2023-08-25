@@ -98,7 +98,7 @@ const Main = () => {
             <Search path="/search" focus={true} />
             <KeyConverter path="/key" />
             <Global path="/global" />
-            <SearchFeed path="/search/:keyword" />
+            <SearchFeed path="/search/:query" />
             <Login path="/login" fullScreen={true} />
             <Notifications path="/notifications" />
             <Chat path="/chat/:id?" />

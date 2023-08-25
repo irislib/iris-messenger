@@ -7,16 +7,16 @@ import View from '../View';
 
 type Props = {
   path: string;
-  keyword?: string;
+  query?: string;
 };
 
-const Search: React.FC<Props> = ({ keyword }) => {
+const Search: React.FC<Props> = ({ query }) => {
   const filterOptions = useMemo(() => {
-    const filter = { kinds: [1], keywords: [keyword || ''] };
+    const filter = { kinds: [1], search: query };
 
     const filterFn = (event) => {
       // some relays don't support filtering by keyword
-      return event.content.includes(keyword);
+      return event.content.includes(query);
     };
 
     return [
@@ -26,13 +26,13 @@ const Search: React.FC<Props> = ({ keyword }) => {
         filterFn,
       },
     ];
-  }, [keyword]);
+  }, [query]);
 
   return (
     <View>
       <div className="flex flex-row">
         <div className="flex flex-col w-full">
-          <FeedComponent key={keyword} filterOptions={filterOptions} />
+          <FeedComponent key={query} filterOptions={filterOptions} />
         </div>
       </div>
     </View>

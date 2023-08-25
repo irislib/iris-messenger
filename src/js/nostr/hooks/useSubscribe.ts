@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import throttle from 'lodash/throttle';
-import { Event } from 'nostr-tools';
+import { Event, Filter } from 'nostr-tools';
 
 import EventDB from '@/nostr/EventDB.ts';
-import Filter from '@/nostr/Filter.ts';
 import PubSub from '@/nostr/PubSub.ts';
 
 interface SubscribeOptions {

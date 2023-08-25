@@ -1,8 +1,7 @@
 import throttle from 'lodash/throttle';
-import { Event, matchFilter } from 'nostr-tools';
+import { Event, Filter, matchFilter } from 'nostr-tools';
 
 import EventDB from '@/nostr/EventDB';
-import Filter from '@/nostr/Filter';
 import getRelayPool from '@/nostr/relayPool';
 
 import Events from '../nostr/Events';
@@ -92,7 +91,7 @@ const PubSub = {
 
   subscribeRelayPool(filter: Filter, sinceLastOpened: boolean, mergeSubscriptions: boolean) {
     let relays;
-    if (filter.keywords) {
+    if (filter.search) {
       relays = Array.from(Relays.searchRelays.keys());
     } else if (mergeSubscriptions || filter.authors?.length !== 1) {
       relays = Relays.enabledRelays();

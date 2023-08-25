@@ -83,7 +83,7 @@ const View = ({ children, hideHeader = false, hideSideBar = false }) => {
       </div>
       <Show when={!hideSideBar}>
         <div className="flex-col hidden lg:flex lg:w-1/3">
-          <Search focus={false} />
+          <Search key="search" focus={false} />
         </div>
       </Show>
     </div>

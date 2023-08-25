@@ -66,7 +66,6 @@ const Relays = {
   filtersBySubscriptionName: new Map<string, string>(),
   subscribedEventTags: new Set<string>(),
   subscribedProfiles: new Set<string>(),
-  subscribedKeywords: new Set<string>(), // seach keywords
   subscriptionsByName: new Map<string, Set<Sub>>(),
   newAuthors: new Set<string>(),
   DEFAULT_RELAYS,
