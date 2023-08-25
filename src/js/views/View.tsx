@@ -15,7 +15,11 @@ const listener = function () {
 window.addEventListener('popstate', listener);
 
 const View = ({ children, hideHeader = false, hideSideBar = false }) => {
-  const observerRef = useRef<any>(null);
+  const restoreScrollPosition = () => {
+    const currentHistoryState = window.history.state;
+    const position = currentHistoryState?.scrollPosition || 0;
+    window.scrollTo(0, position);
+  };
 
   const saveScrollPosition = debounce(() => {
     const position = window.scrollY || document.documentElement.scrollTop;
@@ -27,46 +31,15 @@ const View = ({ children, hideHeader = false, hideSideBar = false }) => {
     window.history.replaceState(newHistoryState, '');
   }, 100);
 
-  const restoreScrollPosition = (observe = true) => {
-    const currentHistoryState = window.history.state;
-    const previousHistoryState = window.history.state?.previousState;
-    if (!isInitialLoad && currentHistoryState !== previousHistoryState) {
-      observe && observeScrollElement();
-      const position = window.history.state?.scrollPosition || 0;
-      if (position) {
-        window.scrollTo(0, position);
-      }
-    } else {
-      const oldState = window.history.state || {};
-      const newHistoryState = {
-        ...oldState,
-        previousState: currentHistoryState,
-      };
-      window.history.replaceState(newHistoryState, '');
-    }
-  };
-
-  const observeScrollElement = () => {
-    observerRef.current = new ResizeObserver((entries) => {
-      entries.forEach(() => {
-        restoreScrollPosition(false);
-      });
-    });
-
-    observerRef.current.observe(document.body);
-    setTimeout(() => {
-      observerRef.current.disconnect();
-    }, 1000);
-  };
-
   useEffect(() => {
-    restoreScrollPosition();
+    if (!isInitialLoad) {
+      restoreScrollPosition();
+    } else {
+      isInitialLoad = false;
+    }
     window.addEventListener('scroll', saveScrollPosition);
 
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
       window.removeEventListener('scroll', saveScrollPosition);
     };
   }, []);
