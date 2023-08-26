@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
+
+import useHistoryState from '@/state/useHistoryState.ts';
 
 type Props = {
   children: any;
@@ -6,8 +8,13 @@ type Props = {
   loadMore?: () => void;
 };
 
+const DEFAULT_INITIAL_DISPLAY_COUNT = 10;
+
 const InfiniteScroll: React.FC<Props> = ({ children, margin = 2000, loadMore }) => {
-  const [displayCount, setDisplayCount] = useState<number>(10);
+  const [displayCount, setDisplayCount] = useHistoryState(
+    DEFAULT_INITIAL_DISPLAY_COUNT,
+    'scroller', // TODO use mandatory key prop, in case multiple infinite scrollers are used on the same page
+  );
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const lastLoadMoreCall = useRef<number>(0);
 

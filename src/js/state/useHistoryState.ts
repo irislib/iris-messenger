@@ -13,7 +13,7 @@ function useHistoryState(initialValue, key) {
       const newHistoryState = { ...history.state, [key]: value };
       history.replaceState(newHistoryState, '');
       latestValue.current = value;
-    }, 500),
+    }, 1000),
   );
 
   useEffect(() => {

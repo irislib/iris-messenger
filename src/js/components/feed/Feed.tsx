@@ -57,7 +57,7 @@ const Feed = (props: FeedProps) => {
     filter: filterOption.filter,
     filterFn,
     sinceLastOpened: false,
-    mergeSubscriptions: false,
+    mergeSubscriptions: true,
   });
 
   const hiddenEvents = useMemo(() => {
