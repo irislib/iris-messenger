@@ -31,6 +31,7 @@ import Subscribe from './views/Subscribe';
 import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
 import '../css/cropper.min.css';
+import Explorer from "@/views/explorer/Explorer.tsx";
 
 const Main = () => {
   const [loggedIn] = useLocalState('loggedIn', false);
@@ -113,6 +114,7 @@ const Main = () => {
             <Profile path="/:id/likes" tab="likes" />
             <Follows path="/follows/:id" />
             <Follows followers={true} path="/followers/:id" />
+            <Explorer path="/explorer/:p?" />
             <NoteOrProfile path="/:id" />
           </Router>
         </div>
