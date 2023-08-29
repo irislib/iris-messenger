@@ -21,11 +21,11 @@ export default class LocalForageAdapter extends Adapter {
     return unsub;
   }
 
-  set(path: string, data: NodeValue) {
+  async set(path: string, data: NodeValue) {
     if (data === undefined) {
-      localForage.removeItem(path);
+      await localForage.removeItem(path);
     } else {
-      localForage.setItem(path, data);
+      await localForage.setItem(path, data);
     }
   }
 }

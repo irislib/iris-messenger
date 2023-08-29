@@ -67,7 +67,7 @@ describe('Node', () => {
     expect(mockCallback).toHaveBeenCalledTimes(1);
   });
 
-  it('should trigger list callbacks when children are present', async () => {
+  it('should trigger map callbacks when children are present', async () => {
     const node = new Node({ id: 'test', adapters: [new MemoryAdapter()] });
     const mockCallback: Callback = vi.fn();
 
@@ -98,5 +98,37 @@ describe('Node', () => {
 
     // Should still have been called only twice
     expect(mockCallback).toHaveBeenCalledTimes(2);
+  });
+
+  it('should return children when on() is called on a branch node', async () => {
+    const node = new Node({ id: 'settings', adapters: [new MemoryAdapter()] });
+    const mockCallback: Callback = vi.fn();
+
+    // save settings object
+    await node.put({
+      theme: 'dark',
+      fontSize: 14,
+    });
+
+    node.on(mockCallback);
+
+    expect(mockCallback).toHaveBeenCalledWith(
+      {
+        theme: 'dark',
+        fontSize: 14,
+      },
+      'settings',
+      expect.any(Number),
+      expect.any(Function),
+    );
+
+    node.get('theme').on(mockCallback);
+
+    expect(mockCallback).toHaveBeenCalledWith(
+      'dark',
+      'settings/theme',
+      expect.any(Number),
+      expect.any(Function),
+    );
   });
 });

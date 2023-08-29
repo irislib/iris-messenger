@@ -43,26 +43,38 @@ export default class Node {
     return new_node;
   }
 
+  private async putLeaf(value: any, updatedAt: number) {
+    this.children = new Map();
+    const nodeValue: NodeValue = {
+      updatedAt,
+      value,
+    };
+    const promises = this.adapters.map((adapter) => adapter.set(this.id, nodeValue));
+    this.on_subscriptions.forEach((callback) => {
+      callback(value, this.id, updatedAt, () => {});
+    });
+    await Promise.all(promises);
+  }
+
+  private async putBranch(value: Record<string, any>, updatedAt: number) {
+    const promises = this.adapters.map((adapter) =>
+      adapter.set(this.id, { value: '__DIR__', updatedAt }),
+    );
+    const children = Object.keys(value);
+    const childPromises = children.map((key) => this.get(key).put(value[key], updatedAt));
+    await Promise.all([...promises, ...childPromises]);
+  }
+
   /**
    * Set a value to the node. If the value is an object, it will be converted to child nodes.
    * @param value
    * @example node.get('users').get('alice').put({name: 'Alice'})
    */
-  async put(value, updatedAt = Date.now()) {
+  async put(value: any, updatedAt = Date.now()) {
     if (typeof value === 'object' && value !== null) {
-      this.adapters.forEach((adapter) => adapter.set(this.id, { value: '__DIR__', updatedAt }));
-      const children = Object.keys(value);
-      children.map((key) => this.get(key).put(value[key], updatedAt));
+      await this.putBranch(value, updatedAt);
     } else {
-      this.children = new Map();
-      const nodeValue: NodeValue = {
-        updatedAt,
-        value,
-      };
-      this.adapters.forEach((adapter) => adapter.set(this.id, nodeValue));
-      this.on_subscriptions.forEach((callback) => {
-        callback(value, this.id, updatedAt, () => {});
-      });
+      await this.putLeaf(value, updatedAt);
     }
   }
 
@@ -72,7 +84,11 @@ export default class Node {
    */
   on(callback: Callback): Unsubscribe {
     let latest: NodeValue | null = null;
-    // TODO handle case where it's a branch node
+    if (this.children.size > 0) {
+      // TODO handle branch node
+    } else {
+      // TODO handle leaf node
+    }
     const cb = (value, path, updatedAt, unsubscribe) => {
       if (latest === null || latest.updatedAt < value.updatedAt) {
         latest = { value, updatedAt };

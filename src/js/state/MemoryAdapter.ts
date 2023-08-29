@@ -11,8 +11,8 @@ export default class MemoryAdapter extends Adapter {
     return () => {};
   }
 
-  set(path: string, value: NodeValue): void {
-    if (!value.updatedAt || !value.value) {
+  async set(path: string, value: NodeValue) {
+    if (value.updatedAt === undefined) {
       throw new Error(`Invalid value: ${JSON.stringify(value)}`);
     }
     if (value === undefined) {
