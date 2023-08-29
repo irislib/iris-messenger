@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MemoryAdapter from '@/state/MemoryAdapter.ts';
 import { Callback, Unsubscribe } from '@/state/types.ts';
 
-import Node from './Node';
+import Node, { DIR_VALUE } from './Node';
 
 describe('Node', () => {
   let node;
@@ -100,10 +100,10 @@ describe('Node', () => {
       const node = new Node({ id: 'root', adapters: [new MemoryAdapter()] });
       const mockCallback: Callback = vi.fn();
       const unsubscribe = node.get('chats').map(mockCallback);
-      await node.get('chats').get('someChatId').put({ id: 'someChatId' });
+      await node.get('chats').get('someChatId').get('latest').put({ id: 'messageId', text: 'hi' });
 
       expect(mockCallback).toHaveBeenCalledWith(
-        { id: 'someChatId' },
+        DIR_VALUE,
         'root/chats/someChatId',
         expect.any(Number),
         expect.any(Function),

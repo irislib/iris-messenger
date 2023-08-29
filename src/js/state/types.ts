@@ -12,4 +12,5 @@ export type Callback = (
 export abstract class Adapter {
   abstract get(path: string, callback: Callback): Unsubscribe;
   abstract set(path: string, data: NodeValue): Promise<void>;
+  // abstract list(path: string, callback: Callback): Unsubscribe; ?
 }
