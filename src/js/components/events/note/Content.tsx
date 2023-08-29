@@ -102,7 +102,7 @@ const Content = ({ standalone, isQuote, fullWidth, asInlineQuote, event, isPrevi
       </Show>
       <Show when={text?.length > 0}>
         <div
-          className={`preformatted-wrap pb-1 ${emojiOnly && 'text-2xl'} ${
+          className={`preformatted-wrap pb-1 ${emojiOnly && 'text-3xl'} ${
             fullWidth ? 'full-width-note' : ''
           } ${asInlineQuote ? 'inline-quote' : ''}`}
         >

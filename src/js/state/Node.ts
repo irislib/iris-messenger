@@ -12,6 +12,8 @@ type NodeProps = {
   parent?: Node | null;
 };
 
+const DIR_VALUE = '__DIR__';
+
 export default class Node {
   id: string;
   parent: Node | null;
@@ -58,7 +60,7 @@ export default class Node {
 
   private async putBranch(value: Record<string, any>, updatedAt: number) {
     const promises = this.adapters.map((adapter) =>
-      adapter.set(this.id, { value: '__DIR__', updatedAt }),
+      adapter.set(this.id, { value: DIR_VALUE, updatedAt }),
     );
     const children = Object.keys(value);
     const childPromises = children.map((key) => this.get(key).put(value[key], updatedAt));
@@ -76,6 +78,12 @@ export default class Node {
     } else {
       await this.putLeaf(value, updatedAt);
     }
+
+    if (this.parent) {
+      this.parent.map_subscriptions.forEach((callback) => {
+        callback(value, this.id, updatedAt, () => {});
+      });
+    }
   }
 
   /**
@@ -84,20 +92,35 @@ export default class Node {
    */
   on(callback: Callback): Unsubscribe {
     let latest: NodeValue | null = null;
-    if (this.children.size > 0) {
-      // TODO handle branch node
-    } else {
-      // TODO handle leaf node
-    }
     const cb = (value, path, updatedAt, unsubscribe) => {
-      if (latest === null || latest.updatedAt < value.updatedAt) {
+      if (value !== DIR_VALUE && (latest === null || latest.updatedAt < value.updatedAt)) {
         latest = { value, updatedAt };
         callback(value, path, updatedAt, unsubscribe);
+        // TODO send to other adapters? or PubSub which decides where to send?
       }
     };
     const subId = this.counter++;
     this.on_subscriptions.set(subId, cb);
     const adapterSubs = this.adapters.map((adapter) => adapter.get(this.id, cb));
+
+    if (this.children.size > 0) {
+      const aggregated: Record<string, any> = {};
+      const keys = Array.from(this.children.keys());
+      const total = keys.length;
+      let count = 0;
+
+      keys.forEach((key) => {
+        this.children.get(key)?.once((childValue) => {
+          aggregated[key] = childValue;
+          count++;
+
+          if (count === total) {
+            callback(aggregated, this.id, Date.now(), () => {});
+          }
+        });
+      });
+    }
+
     const unsubscribe = () => {
       this.on_subscriptions.delete(subId);
       adapterSubs.forEach((unsub) => unsub());
