@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Router, RouterOnChangeArgs } from 'preact-router';
 
 import useLocalState from '@/state/useLocalState.ts';
+import Explorer from '@/views/explorer/Explorer.tsx';
 
 import Footer from './components/Footer';
 import Show from './components/helpers/Show';
@@ -31,7 +32,6 @@ import Subscribe from './views/Subscribe';
 import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
 import '../css/cropper.min.css';
-import Explorer from "@/views/explorer/Explorer.tsx";
 
 const Main = () => {
   const [loggedIn] = useLocalState('loggedIn', false);

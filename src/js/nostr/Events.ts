@@ -22,7 +22,7 @@ import {
 import { ID, STR, UniqueIds } from '@/utils/UniqueIds';
 
 import localState from '../state/LocalState.ts';
-import { Node } from '../state/LocalState.ts';
+import Node from '../state/Node.ts';
 import { DecryptedEvent } from '../views/chat/ChatMessages';
 import { addGroup, setGroupNameByInvite } from '../views/chat/NewChat';
 
