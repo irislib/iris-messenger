@@ -22,7 +22,8 @@ export default class MemoryAdapter extends Adapter {
 
   list(path: string, callback: Callback): Unsubscribe {
     for (const [storedPath, storedValue] of this.storage) {
-      if (storedPath.startsWith(`${path}/`)) {
+      const remainingPath = storedPath.replace(`${path}/`, '');
+      if (storedPath.startsWith(`${path}/`) && !remainingPath.includes('/')) {
         callback(storedValue.value, storedPath, storedValue.updatedAt, () => {});
       }
     }
