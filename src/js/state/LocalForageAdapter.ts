@@ -15,6 +15,8 @@ export default class LocalForageAdapter extends Adapter {
       .then((result) => {
         if (result) {
           callback(result.value, path, result.updatedAt, unsub);
+        } else {
+          callback(undefined, path, undefined, unsub);
         }
       })
       .catch((err) => console.error(err));

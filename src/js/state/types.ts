@@ -4,9 +4,9 @@ export type NodeValue = {
   value: any;
 };
 export type Callback = (
-  value: any,
+  value: any, // must be serializable?
   path: string,
-  updatedAt: number,
+  updatedAt: number | undefined,
   unsubscribe: Unsubscribe,
 ) => void;
 export abstract class Adapter {

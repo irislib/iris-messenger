@@ -4,10 +4,8 @@ export default class MemoryAdapter extends Adapter {
   private storage = new Map<string, NodeValue>();
 
   get(path: string, callback: Callback): Unsubscribe {
-    const storedValue = this.storage.get(path);
-    if (storedValue) {
-      callback(storedValue.value, path, storedValue.updatedAt, () => {});
-    }
+    const storedValue = this.storage.get(path) || { value: undefined, updatedAt: undefined };
+    callback(storedValue.value, path, storedValue.updatedAt, () => {});
     return () => {};
   }
 

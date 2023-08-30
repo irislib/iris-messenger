@@ -69,6 +69,11 @@ describe('Node', () => {
       node.put('someValue2');
       expect(mockCallback).toHaveBeenCalledTimes(1);
     });
+
+    it('should return undefined if value is not found and returnIfUndefined param is true', async () => {
+      const result = await node.once(undefined, true);
+      expect(result).toBe(undefined);
+    });
   });
 
   describe('node.map()', () => {
@@ -108,6 +113,8 @@ describe('Node', () => {
         expect.any(Number),
         expect.any(Function),
       );
+
+      // TODO test & fix callback only called once
 
       unsubscribe();
     });

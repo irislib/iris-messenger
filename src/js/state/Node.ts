@@ -132,11 +132,15 @@ export default class Node {
   on(callback: Callback, returnIfUndefined: boolean = false): Unsubscribe {
     let latest: NodeValue | null = null;
     const cb = (value, path, updatedAt, unsubscribe) => {
-      if (value !== DIR_VALUE && (latest === null || latest.updatedAt < value.updatedAt)) {
-        if (value !== undefined || returnIfUndefined) {
-          latest = { value, updatedAt };
+      if (value === undefined) {
+        if (returnIfUndefined) {
           callback(value, path, updatedAt, unsubscribe);
         }
+        return;
+      }
+      if (value !== DIR_VALUE && (latest === null || latest.updatedAt < value.updatedAt)) {
+        latest = { value, updatedAt };
+        callback(value, path, updatedAt, unsubscribe);
         // TODO send to other adapters? or PubSub which decides where to send?
       }
     };
@@ -183,7 +187,7 @@ export default class Node {
           unsubscribe();
         }
         resolve(value);
-        callback?.(value, updatedAt, path, unsub);
+        callback?.(value, updatedAt, path, () => {});
         unsub();
       };
       this.on(cb, returnIfUndefined);
