@@ -30,4 +30,26 @@ export default class LocalForageAdapter extends Adapter {
       await localForage.setItem(path, data);
     }
   }
+
+  list(path: string, callback: Callback) {
+    localForage
+      .keys()
+      .then((keys) => {
+        keys.forEach((key) => {
+          if (key.startsWith(`${path}/`)) {
+            localForage
+              .getItem<NodeValue | null>(key)
+              .then((result) => {
+                if (result) {
+                  callback(result.value, key, result.updatedAt, unsub);
+                }
+              })
+              .catch((err) => console.error(err));
+          }
+        });
+      })
+      .catch((err) => console.error(err));
+
+    return unsub;
+  }
 }

@@ -168,10 +168,18 @@ export default class Node {
   map(callback: Callback): Unsubscribe {
     const id = this.counter++;
     this.map_subscriptions.set(id, callback);
-    const unsubscribe = () => this.map_subscriptions.delete(id);
-    for (const child of this.children.values()) {
-      child.once(callback, false, unsubscribe);
-    }
+
+    const cb = (value, path, updatedAt) => {
+      const childName = path.split('/').pop()!;
+      console.log('map callback', this.id, childName, value, updatedAt);
+      this.get(childName).put(value, updatedAt);
+    };
+
+    const adapterSubs = this.adapters.map((adapter) => adapter.list(this.id, cb));
+    const unsubscribe = () => {
+      this.map_subscriptions.delete(id);
+      adapterSubs.forEach((unsub) => unsub());
+    };
     return unsubscribe;
   }
 
