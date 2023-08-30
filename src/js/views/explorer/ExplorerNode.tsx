@@ -3,6 +3,7 @@ import { ChevronRightIcon } from '@heroicons/react/20/solid';
 
 import Show from '@/components/helpers/Show.tsx';
 import Node, { DIR_VALUE } from '@/state/Node';
+import SortedMap from '@/utils/SortedMap/SortedMap.tsx';
 
 type Props = {
   node: Node;
@@ -15,6 +16,8 @@ type Props = {
 
 const VALUE_TRUNCATE_LENGTH = 50;
 
+type Child = { node: Node; value: any };
+
 export default function ExplorerNode({
   node,
   value = DIR_VALUE,
@@ -23,7 +26,7 @@ export default function ExplorerNode({
   name,
   parentCounter = 0,
 }: Props) {
-  const [children, setChildren] = useState<{ [key: string]: { node: Node; value: any } }>({});
+  const [children, setChildren] = useState<SortedMap<string, Child>>(new SortedMap());
   const [isOpen, setIsOpen] = useState(expanded);
   const [showMore, setShowMore] = useState(false);
 
@@ -32,12 +35,13 @@ export default function ExplorerNode({
   useEffect(() => {
     if (!isDirectory) return;
     return node.map((value, key) => {
-      if (!children[key]) {
+      if (!children.has(key)) {
         const childName = key.split('/').pop()!;
-        setChildren((prev) => ({
-          ...prev,
-          [key]: { node: node.get(childName), value },
-        }));
+        setChildren((prev) => {
+          const newChildren = new SortedMap(prev);
+          newChildren.set(childName, { node: node.get(childName), value });
+          return newChildren;
+        });
       }
     });
   }, [node.id, value]);
@@ -90,7 +94,7 @@ export default function ExplorerNode({
       </div>
       {isOpen ? (
         <div>
-          {Object.values(children).map((child, index) => (
+          {Array.from(children.values()).map((child, index) => (
             <ExplorerNode
               key={node.id + child.node.id}
               node={child.node}
