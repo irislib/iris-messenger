@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Router, RouterOnChangeArgs } from 'preact-router';
 
 import useLocalState from '@/state/useLocalState.ts';
+import Explorer from '@/views/explorer/Explorer.tsx';
 
 import Footer from './components/Footer';
 import Show from './components/helpers/Show';
@@ -113,6 +114,7 @@ const Main = () => {
             <Profile path="/:id/likes" tab="likes" />
             <Follows path="/follows/:id" />
             <Follows followers={true} path="/followers/:id" />
+            <Explorer path="/explorer/:p?" />
             <NoteOrProfile path="/:id" />
           </Router>
         </div>

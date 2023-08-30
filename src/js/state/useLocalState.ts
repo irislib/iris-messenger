@@ -3,9 +3,14 @@ import { useCallback, useEffect, useState } from 'react';
 import localState from '@/state/LocalState.ts';
 
 export default function useLocalState(key: string, initialValue: any = undefined, once = false) {
-  const [value, setValue] = useState(initialValue || localState.get(key).value);
+  if (!initialValue) {
+    localState.get(key).once((val) => {
+      initialValue = val;
+    });
+  }
+  const [value, setValue] = useState(initialValue);
   useEffect(() => {
-    const unsub = localState.get(key).on((new_value, _key, unsubscribe) => {
+    const unsub = localState.get(key).on((new_value, _key, _updatedAt, unsubscribe) => {
       setValue(new_value);
       if (once) {
         unsubscribe();

@@ -22,7 +22,7 @@ const Login: React.FC<Props> = ({ fullScreen }) => {
 
   const loginAsNewUser = () => {
     console.log('name', name);
-    Key.loginAsNewUser(fullScreen);
+    Key.loginAsNewUser();
     localState.get('showFollowSuggestions').put(true);
     name &&
       setTimeout(() => {

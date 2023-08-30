@@ -8,6 +8,8 @@ import {
 import { useEffect, useState } from 'preact/hooks';
 import { Link } from 'preact-router';
 
+import useLocalState from '@/state/useLocalState.ts';
+
 import Key from '../nostr/Key';
 import localState from '../state/LocalState.ts';
 import Icons from '../utils/Icons';
@@ -23,12 +25,11 @@ const MENU_ITEMS = [
 ];
 
 const Footer = () => {
-  const [isMyProfile, setIsMyProfile] = useState(false);
+  const [isMyProfile] = useLocalState('isMyProfile', false);
   const [activeRoute, setActiveRoute] = useState('/');
   const [chatId, setChatId] = useState(null);
 
   useEffect(() => {
-    localState.get('isMyProfile').on((value) => setIsMyProfile(value));
     localState.get('activeRoute').on((activeRoute) => {
       const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
       const chatId = replaced.length < activeRoute.length ? replaced : null;

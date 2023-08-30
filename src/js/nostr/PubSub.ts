@@ -32,7 +32,7 @@ localState.get('dev').on((d) => {
 localState.get('lastOpened').once((lo) => {
   lastOpened = lo;
   localState.get('lastOpened').put(Math.floor(Date.now() / 1000));
-});
+}, true);
 
 const PubSub = {
   subscriptions: new Map<number, Subscription>(),

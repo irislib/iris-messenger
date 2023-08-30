@@ -42,8 +42,9 @@ const ChatList = ({ activeChat, className }) => {
     const unsubs = [] as any[];
 
     const addToChats = (value, key) => {
+      console.log('addToChats', key, value);
       setChats((prevChats) => {
-        prevChats.set(key, { ...value });
+        prevChats.set(key.split('/').pop(), { ...value });
         return prevChats;
       });
       setRenderCount((prevCount) => prevCount + 1);
