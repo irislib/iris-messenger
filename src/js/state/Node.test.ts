@@ -74,6 +74,15 @@ describe('Node', () => {
       const result = await node.once(undefined, true);
       expect(result).toBe(undefined);
     });
+
+    it('should return if the data was pre-existing in an adapter', async () => {
+      const adapter = new MemoryAdapter();
+      const node = new Node({ id: 'user', adapters: [adapter] });
+      await node.put({ name: 'Snowden', age: 30 });
+      const node2 = new Node({ id: 'user', adapters: [adapter] });
+      const result = await node2.once();
+      expect(result).toEqual({ name: 'Snowden', age: 30 });
+    });
   });
 
   describe('node.map()', () => {
@@ -142,6 +151,21 @@ describe('Node', () => {
       // TODO test & fix callback only called once
 
       unsubscribe();
+    });
+
+    it('should return if the data was pre-existing in an adapter', async () => {
+      const adapter = new MemoryAdapter();
+      const node = new Node({ id: 'user', adapters: [adapter] });
+      await node.put({ name: 'Snowden', age: 30 });
+      const node2 = new Node({ id: 'user', adapters: [adapter] });
+      const fn = vi.fn();
+      node2.map(fn);
+      expect(fn).toHaveBeenCalledWith(
+        'Snowden',
+        'user/name',
+        expect.any(Number),
+        expect.any(Function),
+      );
     });
   });
 

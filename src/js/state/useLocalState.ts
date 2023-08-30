@@ -5,7 +5,6 @@ import localState from '@/state/LocalState.ts';
 export default function useLocalState(key: string, initialValue: any = undefined, once = false) {
   if (!initialValue) {
     localState.get(key).once((val) => {
-      // TODO some way to get memory value
       initialValue = val;
     });
   }
