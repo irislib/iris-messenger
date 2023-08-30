@@ -101,7 +101,32 @@ describe('Node', () => {
       expect(mockCallback).toHaveBeenCalledTimes(2);
     });
 
-    it('should trigger map callbacks when a new child is added', async () => {
+    it('should trigger map callbacks when children are added', async () => {
+      const mockCallback: Callback = vi.fn();
+      const unsubscribe: Unsubscribe = node.map(mockCallback);
+
+      await node.get('child1').put('value1');
+      await node.get('child2').put('value2');
+
+      expect(mockCallback).toHaveBeenCalledWith(
+        'value1',
+        'test/child1',
+        expect.any(Number),
+        expect.any(Function),
+      );
+      expect(mockCallback).toHaveBeenCalledWith(
+        'value2',
+        'test/child2',
+        expect.any(Number),
+        expect.any(Function),
+      );
+
+      unsubscribe();
+      await node.get('child3').put('value3');
+      expect(mockCallback).toHaveBeenCalledTimes(2);
+    });
+
+    it('should trigger map callbacks when a nested child is added', async () => {
       const node = new Node({ id: 'root', adapters: [new MemoryAdapter()] });
       const mockCallback: Callback = vi.fn();
       const unsubscribe = node.get('chats').map(mockCallback);

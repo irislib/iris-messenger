@@ -49,7 +49,7 @@ const ExistingAccountLogin: React.FC<Props> = ({ fullScreen, onBack }) => {
       if (!k) {
         return;
       }
-      await Key.login(k, fullScreen);
+      await Key.login(k);
       event.target.value = '';
       Helpers.copyToClipboard(''); // clear the clipboard
     },

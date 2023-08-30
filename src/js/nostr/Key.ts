@@ -7,7 +7,6 @@ import {
   signEvent,
   UnsignedEvent,
 } from 'nostr-tools';
-import { route } from 'preact-router';
 
 import { PublicKey } from '@/utils/Hex/Hex.ts';
 
@@ -32,10 +31,10 @@ export default {
   windowNostrQueue: [] as any[],
   isProcessingQueue: false,
   getPublicKey, // TODO confusing similarity to getPubKey
-  loginAsNewUser(redirect = false) {
-    this.login(this.generateKey(), redirect);
+  loginAsNewUser() {
+    this.login(this.generateKey());
   },
-  login(key: any, redirect = false) {
+  login(key: any) {
     const shouldRefresh = !!this.key;
     this.key = key;
     localStorage.setItem('iris.myKey', JSON.stringify(key));
@@ -43,11 +42,6 @@ export default {
       location.reload();
     }
     localState.get('loggedIn').put(true);
-    if (redirect) {
-      setTimeout(() => {
-        route('/following');
-      });
-    }
     localState.get('showLoginModal').put(false);
   },
   generateKey(): Key {

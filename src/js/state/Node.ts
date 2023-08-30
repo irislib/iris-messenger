@@ -124,7 +124,7 @@ export default class Node {
     });
   }
 
-  // note to self: may be problematic that on behaves differently for leaf and branch nodes
+  // is it problematic that on behaves differently for leaf and branch nodes?
   /**
    * Subscribe to a value
    * @param callback
