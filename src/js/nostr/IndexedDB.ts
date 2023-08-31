@@ -14,7 +14,7 @@ type Tag = {
   value: string;
 };
 
-export class MyDexie extends Dexie {
+class MyDexie extends Dexie {
   events!: Table<Event & { id: string }>;
   tags!: Table<Tag>;
 
