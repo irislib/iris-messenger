@@ -64,8 +64,11 @@ export default function ExplorerNode({
         <span className="ml-2 w-1/3 truncate">{displayName}</span>
         <Show when={!isDirectory}>
           <div className="ml-auto w-1/2">
-            <ExplorerNodeValue displayName={displayName} value={value} />{' '}
-            {/* Using the new component */}
+            <ExplorerNodeValue
+              displayName={displayName}
+              value={value}
+              setValue={(v) => node.put(v)}
+            />
           </div>
         </Show>
       </div>

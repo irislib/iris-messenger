@@ -1,14 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const VALUE_TRUNCATE_LENGTH = 50;
 
 type ExplorerNodeValueProps = {
   value: any;
   displayName: string;
+  setValue: (value: any) => void;
 };
 
-const ExplorerNodeValue: React.FC<ExplorerNodeValueProps> = ({ displayName, value }) => {
+const ExplorerNodeValue: React.FC<ExplorerNodeValueProps> = ({ displayName, value, setValue }) => {
   const [showMore, setShowMore] = useState(false);
+  const [editableValue, setEditableValue] = useState<any>(JSON.stringify(value));
+  const inputRef = useRef<any>(null);
 
   const truncateValue = () => {
     if (displayName === 'priv' || displayName === 'key') {
@@ -18,6 +21,23 @@ const ExplorerNodeValue: React.FC<ExplorerNodeValueProps> = ({ displayName, valu
       ? `${value.substring(0, VALUE_TRUNCATE_LENGTH)}...`
       : value;
   };
+
+  const handleBlur = () => {
+    let parsedValue;
+    try {
+      parsedValue = JSON.parse(editableValue);
+    } catch (e) {
+      parsedValue = editableValue;
+    }
+    setValue(parsedValue);
+  };
+
+  useEffect(() => {
+    // Handling unmount
+    return () => {
+      handleBlur();
+    };
+  }, []);
 
   if (typeof value === 'string') {
     return (
@@ -30,12 +50,30 @@ const ExplorerNodeValue: React.FC<ExplorerNodeValueProps> = ({ displayName, valu
             Show {showMore ? 'less' : 'more'}{' '}
           </span>
         )}
-        "{showMore ? value : truncateValue()}"
+        <span
+          ref={inputRef}
+          contentEditable
+          onBlur={handleBlur}
+          onInput={(e) => setEditableValue(e.currentTarget.textContent)}
+        >
+          {showMore ? value : truncateValue()}
+        </span>
       </span>
     );
   }
 
-  return <span className="text-xs text-green-400">{JSON.stringify(value)}</span>;
+  return (
+    <span className="text-xs text-green-400">
+      <span
+        ref={inputRef}
+        contentEditable
+        onBlur={handleBlur}
+        onInput={(e) => setEditableValue(e.currentTarget.textContent)}
+      >
+        {JSON.stringify(value)}
+      </span>
+    </span>
+  );
 };
 
 export default ExplorerNodeValue;
