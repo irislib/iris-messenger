@@ -98,7 +98,6 @@ export default class Node {
         this.parent.children.set(childName, this);
       }
       for (const [id, callback] of this.parent.map_subscriptions) {
-        console.log('calling map callback of ', this.parent.id, ' with ', this.id, value);
         callback(value, this.id, updatedAt, () => {
           this.parent?.map_subscriptions.delete(id);
         });
@@ -130,7 +129,7 @@ export default class Node {
    * @param callback
    */
   on(callback: Callback, returnIfUndefined: boolean = false): Unsubscribe {
-    let latest: NodeValue | null = null;
+    let latest: NodeValue | null = null; // replace with this.value?
     const cb = (value, path, updatedAt, unsubscribe) => {
       if (value === undefined) {
         if (returnIfUndefined) {
@@ -168,10 +167,15 @@ export default class Node {
   map(callback: Callback): Unsubscribe {
     const id = this.counter++;
     this.map_subscriptions.set(id, callback);
+    const latestMap = new Map<string, NodeValue>(); // replace with this.value?
 
     const cb = (value, path, updatedAt) => {
+      const latest = latestMap.get(path);
+      if (latest && latest.updatedAt >= updatedAt) {
+        return;
+      }
+      latestMap.set(path, { value, updatedAt });
       const childName = path.split('/').pop()!;
-      console.log('map callback', this.id, childName, value, updatedAt);
       this.get(childName).put(value, updatedAt);
     };
 

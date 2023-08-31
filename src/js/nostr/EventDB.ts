@@ -66,7 +66,7 @@ export class EventDB {
 
     const clone = this.pack(event);
     const flatTags = clone.tags
-      .filter((tag) => ['e', 'p'].includes(tag[0]))
+      .filter((tag) => ['e', 'p', 'd'].includes(tag[0]))
       .map((tag) => tag.join('_'));
 
     try {
@@ -132,6 +132,8 @@ export class EventDB {
         query.flatTags = { $contains: 'e_' + filter['#e'].map(ID) };
       } else if (filter['#p']) {
         query.flatTags = { $contains: 'p_' + filter['#p'].map(ID) };
+      } else if (filter['#d']) {
+        query.flatTags = { $contains: 'd_' + filter['#d'].map(ID) };
       }
       if (filter.since && filter.until) {
         query.created_at = { $between: [filter.since, filter.until] };

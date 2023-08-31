@@ -5,11 +5,11 @@ import { Event } from 'nostr-tools';
 import EventDB from '@/nostr/EventDB';
 import Events from '@/nostr/Events';
 import Key from '@/nostr/Key';
+import publicState from '@/state/PublicState.ts';
 import { RouteProps } from '@/views/types.ts';
 import View from '@/views/View.tsx';
 
 import Feed from '../../components/feed/Feed';
-import Session from '../../nostr/Session';
 import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 
@@ -43,16 +43,14 @@ const Notifications: React.FC<RouteProps> = () => {
         const node = localState.get('settings').get('notifications').get('saveLastOpened');
         node.once((saveLastOpened) => {
           if (saveLastOpened !== false) {
+            // TODO this gets triggered only once per Iris session?
             const time = Math.floor(Date.now() / 1000);
-            const success = Session.public?.set('notifications/lastOpened', time);
-            if (!success) {
-              console.log('user rejected');
-              // stop pestering if user rejects signature request
-              node.put(false);
-            }
+            console.log('set state');
+            publicState.get('notifications').get('lastOpened').put(time);
+            // TODO if user rejected, stop pestering them with sign prompt
             localState.get('unseenNotificationCount').put(0);
           }
-        });
+        }, true);
       }, 1000),
     [],
   );

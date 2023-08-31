@@ -37,7 +37,7 @@ export default class LocalForageAdapter extends Adapter {
       .then((keys) => {
         keys.forEach((key) => {
           const remainingPath = key.replace(`${path}/`, '');
-          if (key.startsWith(`${path}/`) && !remainingPath.includes('/')) {
+          if (key.startsWith(`${path}/`) && remainingPath.length && !remainingPath.includes('/')) {
             localForage
               .getItem<NodeValue | null>(key)
               .then((result) => {

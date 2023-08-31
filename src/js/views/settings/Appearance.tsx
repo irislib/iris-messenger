@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
 
-import Session from '../../nostr/Session';
 import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
 
@@ -11,10 +10,12 @@ const Appearance = () => {
   const [showConnectedRelays, setShowConnectedRelays] = useState(false);
 
   useEffect(() => {
-    // TODO use Nostr.private
-    Session.public?.get('settings/colorScheme', (/*entry*/) => {
-      //setColorScheme(entry.value);
+    // TODO use privateState. or localState?
+    /*
+    publicState.get('settings/colorScheme', (value) => {
+      //setColorScheme(value);
     });
+    */
     localState.get('showConnectedRelays').on(setShowConnectedRelays);
   }, []);
 

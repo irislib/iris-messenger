@@ -283,7 +283,6 @@ const Events = {
   async saveDMToLocalState(event: DecryptedEvent, chatNode: Node) {
     const latest = chatNode.get('latest');
     const e = await latest.once(undefined, true);
-    console.log('latest', e, event);
     if (!e || !e.created_at || e.created_at < event.created_at) {
       latest.put({ id: event.id, created_at: event.created_at, text: event.text });
     }
@@ -336,7 +335,6 @@ const Events = {
 
     EventDB.insert(event);
     if (!maybeSecretChat) {
-      console.log('saving dm to local state', chatId);
       this.saveDMToLocalState(event, localState.get('chats').get(chatId));
     }
   },

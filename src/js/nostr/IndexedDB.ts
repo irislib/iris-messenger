@@ -76,6 +76,9 @@ const IndexedDB = {
     const eventTags =
       event.tags
         ?.filter((tag) => {
+          if (tag[0] === 'd') {
+            return true;
+          }
           if (tag[0] === 'e') {
             return true;
           }
@@ -125,7 +128,7 @@ const IndexedDB = {
   }, 1000),
 
   subscribeToTags: throttle(async function (this: typeof IndexedDB) {
-    const tagPairs = [...this.subscribedTags].map((tag) => tag.split('|')); // assuming you used '|' as delimiter
+    const tagPairs = [...this.subscribedTags].map((tag) => tag.split('|'));
     this.subscribedTags.clear();
     await db.tags
       .where('[type+value]')
@@ -158,6 +161,15 @@ const IndexedDB = {
     if (filter['#e'] && Array.isArray(filter['#e'])) {
       for (const eventId of filter['#e']) {
         this.subscribedTags.add('e|' + eventId);
+      }
+
+      await this.subscribeToTags();
+      return;
+    }
+
+    if (filter['#d'] && Array.isArray(filter['#d'])) {
+      for (const eventId of filter['#d']) {
+        this.subscribedTags.add('d|' + eventId);
       }
 
       await this.subscribeToTags();
