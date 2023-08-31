@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Router, RouterOnChangeArgs } from 'preact-router';
 
@@ -37,10 +37,7 @@ const Main = () => {
   const [loggedIn] = useLocalState('loggedIn', false);
   const [unseenMsgsTotal] = useLocalState('unseenMsgsTotal', 0);
   const [activeRoute, setActiveRoute] = useLocalState('activeRoute', '');
-  const [translationsLoadedState, setTranslationsLoadedState] = useLocalState(
-    'translationsLoaded',
-    false,
-  );
+  const [translationsLoadedState, setTranslationsLoadedState] = useState(false);
   const [showLoginModal] = useLocalState('showLoginModal', false);
 
   useEffect(() => {

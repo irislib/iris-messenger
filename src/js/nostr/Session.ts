@@ -1,4 +1,3 @@
-import localForage from 'localforage';
 import { route } from 'preact-router';
 
 import publicState from '@/state/PublicState.ts';
@@ -43,10 +42,7 @@ const Session = {
       }
     }
     IndexedDB.clear();
-    localStorage.clear(); // TODO clear only iris data
-    localForage.clear().then(() => {
-      location.reload();
-    });
+    localStorage.clear();
   },
   unsubscribe() {
     // wat dis
@@ -121,14 +117,17 @@ const Session = {
         clearTimeout(timeout);
       }
     });
-    const unsubFollowers = SocialNetwork.getFollowersByUser(myPub, (followers) => {
+    let unsubFollowers = () => {};
+
+    unsubFollowers = SocialNetwork.getFollowersByUser(myPub, (followers) => {
       if (!followers?.size) {
         localState.get('noFollowers').put(true);
       } else {
         localState.get('noFollowers').put(false);
-        unsubFollowers();
+        setTimeout(() => unsubFollowers());
       }
     });
+
     setTimeout(() => {
       PubSub.subscribe({ authors: [myPub] }, undefined, true); // our stuff
       PubSub.subscribe({ '#p': [myPub], kinds: [1, 3, 6, 7, 9735] }, undefined, true); // mentions, reactions, DMs

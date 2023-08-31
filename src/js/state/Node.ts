@@ -1,4 +1,4 @@
-import LocalForageAdapter from '@/state/LocalForageAdapter.ts';
+import LocalStorageAdapter from '@/state/LocalStorageAdapter.ts';
 import MemoryAdapter from '@/state/MemoryAdapter.ts';
 import { Adapter, Callback, NodeValue, Unsubscribe } from '@/state/types.ts';
 
@@ -31,7 +31,8 @@ export default class Node {
   constructor({ id = '', adapters, parent = null }: NodeProps = {}) {
     this.id = id;
     this.parent = parent;
-    this.adapters = adapters ?? parent?.adapters ?? [new MemoryAdapter(), new LocalForageAdapter()];
+    this.adapters = adapters ??
+      parent?.adapters ?? [new MemoryAdapter(), new LocalStorageAdapter()];
   }
 
   isBranchNode() {
