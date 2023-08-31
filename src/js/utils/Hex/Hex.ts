@@ -1,11 +1,14 @@
-import * as bech32 from 'bech32-buffer';
+import { hexToBytes } from '@noble/hashes/utils';
+import { bech32 } from 'bech32';
 
 import Helpers from '@/utils/Helpers.tsx';
 
 function bech32ToHex(str: string): string {
   try {
-    const { data } = bech32.decode(str);
+    const { words } = bech32.decode(str);
+    const data = new Uint8Array(bech32.fromWords(words));
     const addr = Helpers.arrayToHex(data);
+
     return addr;
   } catch (e) {
     throw new Error('The provided string is not a valid bech32 address: ' + str);
@@ -38,9 +41,9 @@ export class Hex {
       throw new Error('prefix is required');
     }
 
-    const bytesArray = this.value.match(/.{1,2}/g);
-    const bytes = new Uint8Array(bytesArray!.map((byte) => parseInt(byte, 16)));
-    return bech32.encode(prefix, bytes);
+    const data = hexToBytes(this.value);
+    const words = bech32.toWords(data);
+    return bech32.encode(prefix, words);
   }
 
   get hex(): string {

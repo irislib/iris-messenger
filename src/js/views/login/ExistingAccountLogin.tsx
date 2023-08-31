@@ -1,5 +1,5 @@
-import * as secp from '@noble/secp256k1';
-import * as bech32 from 'bech32-buffer';
+import { secp256k1 } from '@noble/curves/secp256k1';
+import { bech32 } from 'bech32';
 import { useCallback, useState } from 'preact/hooks';
 
 import Key from '@/nostr/Key';
@@ -29,11 +29,12 @@ const ExistingAccountLogin: React.FC<Props> = ({ fullScreen, onBack }) => {
         /* empty */
       }
       if (!k) {
-        if (secp.utils.isValidPrivateKey(val)) {
+        if (secp256k1.utils.isValidPrivateKey(val)) {
           k = { priv: val, rpub: Key.getPublicKey(val) };
         } else {
           try {
-            const { data, prefix } = bech32.decode(val);
+            const { words, prefix } = bech32.decode(val);
+            const data = new Uint8Array(bech32.fromWords(words));
             const hex = Helpers.arrayToHex(data);
             if (prefix === 'npub') {
               k = { rpub: hex };
