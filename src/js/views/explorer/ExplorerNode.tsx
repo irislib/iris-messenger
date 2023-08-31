@@ -5,6 +5,8 @@ import Show from '@/components/helpers/Show.tsx';
 import Node, { DIR_VALUE } from '@/state/Node';
 import SortedMap from '@/utils/SortedMap/SortedMap.tsx';
 
+import ExplorerNodeValue from './ExplorerNodeValue';
+
 type Props = {
   node: Node;
   value?: any;
@@ -13,8 +15,6 @@ type Props = {
   name?: string;
   parentCounter?: number;
 };
-
-const VALUE_TRUNCATE_LENGTH = 50;
 
 type Child = { node: Node; value: any };
 
@@ -28,7 +28,6 @@ export default function ExplorerNode({
 }: Props) {
   const [children, setChildren] = useState<SortedMap<string, Child>>(new SortedMap());
   const [isOpen, setIsOpen] = useState(expanded);
-  const [showMore, setShowMore] = useState(false);
 
   const isDirectory = value === DIR_VALUE;
 
@@ -50,31 +49,6 @@ export default function ExplorerNode({
   const rowColor = parentCounter % 2 === 0 ? 'bg-gray-800' : 'bg-gray-700';
   const displayName = name || node.id.split('/').pop()!;
 
-  const renderValue = (value) => {
-    if (typeof value === 'string') {
-      return (
-        <span className="text-xs text-blue-400">
-          {value.length > VALUE_TRUNCATE_LENGTH && (
-            <span
-              className="text-xs text-blue-200 cursor-pointer"
-              onClick={() => setShowMore(!showMore)}
-            >
-              Show {showMore ? 'less' : 'more'}{' '}
-            </span>
-          )}
-          "
-          {showMore
-            ? value
-            : value.length > VALUE_TRUNCATE_LENGTH
-            ? `${value.substring(0, VALUE_TRUNCATE_LENGTH)}...`
-            : value}
-          "
-        </span>
-      );
-    }
-    return <span className="text-xs text-green-400">{JSON.stringify(value)}</span>;
-  };
-
   return (
     <div className={`relative w-full ${rowColor}`}>
       <div
@@ -89,7 +63,10 @@ export default function ExplorerNode({
         </Show>
         <span className="ml-2 w-1/3 truncate">{displayName}</span>
         <Show when={!isDirectory}>
-          <div className="ml-auto w-1/2">{renderValue(value)}</div>
+          <div className="ml-auto w-1/2">
+            <ExplorerNodeValue displayName={displayName} value={value} />{' '}
+            {/* Using the new component */}
+          </div>
         </Show>
       </div>
       {isOpen ? (
