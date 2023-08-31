@@ -40,7 +40,7 @@ export const ExplorerNodeEditRow = ({ level, parent }: EditRowProps) => {
   };
 
   return (
-    <div style={{ paddingLeft: `${(level + 1) * 15}px` }}>
+    <div className="pb-1" style={{ paddingLeft: `${level * 15 + 9}px` }}>
       <div className="flex flex-row items-center gap-4">
         <a className={`link text-sm ${showDirForm ? 'underline' : ''}`} onClick={toggleDirForm}>
           New Directory

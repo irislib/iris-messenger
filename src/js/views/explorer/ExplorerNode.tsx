@@ -50,19 +50,21 @@ export default function ExplorerNode({
   const rowColor = parentCounter % 2 === 0 ? 'bg-gray-800' : 'bg-gray-700';
   const displayName = name || node.id.split('/').pop()!;
 
+  const paddingLeft = `${level * 15 + (isDirectory ? 0 : 16)}px`;
+
   return (
     <div className={`relative w-full ${rowColor}`}>
       <div
         className={`flex items-center text-white ${isDirectory ? 'cursor-pointer' : ''}`}
         onClick={toggleOpen}
-        style={{ paddingLeft: `${level * 15}px` }}
+        style={{ paddingLeft }}
       >
         <Show when={isDirectory}>
           <ChevronRightIcon
             className={`w-4 h-4 transition ${isOpen ? 'transform rotate-90' : ''}`}
           />
         </Show>
-        <span className="ml-2 w-1/3 truncate">{displayName}</span>
+        <span className="ml-1 w-1/3 truncate">{displayName}</span>
         <Show when={!isDirectory}>
           <div className="ml-auto w-1/2">
             <ExplorerNodeValue
