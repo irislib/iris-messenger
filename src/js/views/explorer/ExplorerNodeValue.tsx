@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-const VALUE_TRUNCATE_LENGTH = 50;
+const VALUE_TRUNCATE_LENGTH = 20;
 
 type ExplorerNodeValueProps = {
   value: any;

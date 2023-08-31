@@ -4,6 +4,7 @@ import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import Show from '@/components/helpers/Show.tsx';
 import Node, { DIR_VALUE } from '@/state/Node';
 import SortedMap from '@/utils/SortedMap/SortedMap.tsx';
+import { ExplorerNodeEditRow } from '@/views/explorer/ExplorerNodeEditRow.tsx';
 
 import ExplorerNodeValue from './ExplorerNodeValue';
 
@@ -52,7 +53,7 @@ export default function ExplorerNode({
   return (
     <div className={`relative w-full ${rowColor}`}>
       <div
-        className={`flex items-center text-white ${isDirectory ? 'cursor-pointer' : null}`}
+        className={`flex items-center text-white ${isDirectory ? 'cursor-pointer' : ''}`}
         onClick={toggleOpen}
         style={{ paddingLeft: `${level * 15}px` }}
       >
@@ -72,8 +73,9 @@ export default function ExplorerNode({
           </div>
         </Show>
       </div>
-      {isOpen ? (
+      {isDirectory && isOpen ? (
         <div>
+          <ExplorerNodeEditRow level={level + 1} parent={node} />
           {Array.from(children.values()).map((child, index) => (
             <ExplorerNode
               key={node.id + child.node.id}
