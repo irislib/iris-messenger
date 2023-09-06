@@ -78,10 +78,24 @@ describe('Node', () => {
     it('should return if the data was pre-existing in an adapter', async () => {
       const adapter = new MemoryAdapter();
       const node = new Node({ id: 'user', adapters: [adapter] });
+
+      let val = await new Promise((resolve) => {
+        adapter.get('user', resolve);
+      });
+      expect(val).toBe(undefined);
+
       await node.put({ name: 'Snowden', age: 30 });
+
+      val = await new Promise((resolve) => {
+        adapter.get('user', resolve);
+      });
+      expect(val).toBe(DIR_VALUE);
+
       const node2 = new Node({ id: 'user', adapters: [adapter] });
-      const result = await node2.once();
-      expect(result).toEqual({ name: 'Snowden', age: 30 });
+      const name = await node2.get('name').once();
+      expect(name).toEqual('Snowden');
+      const age = await node2.get('age').once();
+      expect(age).toEqual(30);
     });
   });
 
