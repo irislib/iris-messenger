@@ -52,8 +52,8 @@ const ChatList = ({ activeChat, className }) => {
 
     const myPub = Key.getPubKey();
     localState.get('chats').get(myPub).put({ id: myPub });
-    unsubs.push(localState.get('chats').map(addToChats));
-    unsubs.push(localState.get('groups').map(addToChats));
+    unsubs.push(localState.get('chats').map(addToChats, 2));
+    unsubs.push(localState.get('groups').map(addToChats, 2));
 
     unsubs.push(
       localState.get('scrollUp').on(() => {

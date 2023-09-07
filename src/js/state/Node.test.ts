@@ -50,6 +50,30 @@ describe('Node', () => {
         expect.any(Function),
       );
     });
+
+    it('should return an object containing children when called with recursion = 1', async () => {
+      const settingsNode = new Node({ id: 'settings', adapters: [new MemoryAdapter()] });
+      const mockCallback1: Callback = vi.fn();
+      const mockCallback2: Callback = vi.fn();
+
+      await settingsNode.put({ theme: 'dark', fontSize: 14 });
+
+      settingsNode.on(mockCallback1, false, 1);
+      expect(mockCallback1).toHaveBeenCalledWith(
+        { theme: 'dark', fontSize: 14 },
+        'settings',
+        expect.any(Number),
+        expect.any(Function),
+      );
+
+      settingsNode.get('theme').on(mockCallback2);
+      expect(mockCallback2).toHaveBeenCalledWith(
+        'dark',
+        'settings/theme',
+        expect.any(Number),
+        expect.any(Function),
+      );
+    });
   });
 
   describe('node.once()', () => {
@@ -199,28 +223,20 @@ describe('Node', () => {
         expect.any(Function),
       );
     });
-  });
 
-  describe('Branch node behavior', () => {
-    it('should return children when on() is called on a branch node', async () => {
-      const settingsNode = new Node({ id: 'settings', adapters: [new MemoryAdapter()] });
-      const mockCallback1: Callback = vi.fn();
-      const mockCallback2: Callback = vi.fn();
+    it('should return children of children when called recursively', async () => {
+      const mockCallback: Callback = vi.fn();
 
-      await settingsNode.put({ theme: 'dark', fontSize: 14 });
+      await node.put({ chat1: { latest: { id: 'messageId', text: 'hi' } } });
+      await node.put({ chat2: { latest: { id: 'messageId2', text: 'hi2' } } });
 
-      settingsNode.on(mockCallback1);
-      expect(mockCallback1).toHaveBeenCalledWith(
-        { theme: 'dark', fontSize: 14 },
-        'settings',
-        expect.any(Number),
-        expect.any(Function),
-      );
-
-      settingsNode.get('theme').on(mockCallback2);
-      expect(mockCallback2).toHaveBeenCalledWith(
-        'dark',
-        'settings/theme',
+      node.map(mockCallback, 3);
+      expect(mockCallback).toHaveBeenCalledWith(
+        {
+          chat1: { latest: { id: 'messageId', text: 'hi' } },
+          chat2: { latest: { id: 'messageId2', text: 'hi2' } },
+        },
+        'test',
         expect.any(Number),
         expect.any(Function),
       );
