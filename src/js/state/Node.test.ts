@@ -101,18 +101,36 @@ describe('Node', () => {
 
   describe('node.map()', () => {
     it('should trigger map callbacks when children are present', async () => {
-      const mockCallback: Callback = vi.fn();
+      const adapter = new MemoryAdapter();
+      const node = new Node({ id: 'test', adapters: [adapter] });
+
       await node.get('child1').put('value1');
       await node.get('child2').put('value2');
 
-      const unsubscribe: Unsubscribe = node.map(mockCallback);
-      expect(mockCallback).toHaveBeenCalledWith(
+      const listMockCallback: Callback = vi.fn();
+      adapter.list('test', listMockCallback);
+      expect(listMockCallback).toHaveBeenCalledWith(
         'value1',
         'test/child1',
         expect.any(Number),
         expect.any(Function),
       );
-      expect(mockCallback).toHaveBeenCalledWith(
+      expect(listMockCallback).toHaveBeenCalledWith(
+        'value2',
+        'test/child2',
+        expect.any(Number),
+        expect.any(Function),
+      );
+
+      const mapMockCallback: Callback = vi.fn();
+      const unsubscribe: Unsubscribe = node.map(mapMockCallback);
+      expect(mapMockCallback).toHaveBeenCalledWith(
+        'value1',
+        'test/child1',
+        expect.any(Number),
+        expect.any(Function),
+      );
+      expect(mapMockCallback).toHaveBeenCalledWith(
         'value2',
         'test/child2',
         expect.any(Number),
@@ -121,7 +139,7 @@ describe('Node', () => {
 
       unsubscribe();
       await node.get('child3').put('value3');
-      expect(mockCallback).toHaveBeenCalledTimes(2);
+      expect(mapMockCallback).toHaveBeenCalledTimes(2);
     });
 
     it('should trigger map callbacks when children are added', async () => {

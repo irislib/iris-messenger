@@ -178,6 +178,9 @@ export default class Node {
       latestMap.set(path, { value, updatedAt });
       const childName = path.split('/').pop()!;
       this.get(childName).put(value, updatedAt);
+      callback(value, path, updatedAt, () => {
+        this.map_subscriptions.delete(id);
+      });
     };
 
     const adapterSubs = this.adapters.map((adapter) => adapter.list(this.id, cb));
