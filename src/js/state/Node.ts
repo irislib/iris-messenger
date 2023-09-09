@@ -179,12 +179,12 @@ export default class Node {
     const latestMap = new Map<string, NodeValue>();
 
     let adapterSubs: Unsubscribe[] = [];
+    const openUnsubs: Record<string, Unsubscribe> = {}; // Changed to a dictionary
 
     const unsubscribeFromAdapters = () => {
       adapterSubs.forEach((unsub) => unsub());
     };
 
-    let openUnsub: Unsubscribe | undefined;
     const cb = (value: any, path: string, updatedAt: number | undefined) => {
       const latest = latestMap.get(path);
       if (updatedAt !== undefined && latest && latest.updatedAt >= updatedAt) {
@@ -199,14 +199,15 @@ export default class Node {
       this.get(childName).put(value, updatedAt);
 
       if (recursion > 0 && value === DIR_VALUE) {
-        if (!openUnsub) {
-          openUnsub = this.get(childName).open(callback, recursion - 1);
+        if (!openUnsubs[childName]) {
+          // Check if an Unsubscribe exists for this child
+          openUnsubs[childName] = this.get(childName).open(callback, recursion - 1);
         }
       } else {
         callback(value, path, updatedAt, () => {
           this.map_subscriptions.delete(id);
           unsubscribeFromAdapters();
-          openUnsub?.();
+          Object.values(openUnsubs).forEach((unsub) => unsub()); // Unsubscribe all
         });
       }
     };
@@ -216,6 +217,7 @@ export default class Node {
     const unsubscribe = () => {
       this.map_subscriptions.delete(id);
       unsubscribeFromAdapters();
+      Object.values(openUnsubs).forEach((unsub) => unsub()); // Unsubscribe all
     };
 
     return unsubscribe;

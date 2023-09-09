@@ -227,16 +227,23 @@ describe('Node', () => {
     it('should return children of children when called recursively', async () => {
       const mockCallback: Callback = vi.fn();
 
-      await node.put({ chat1: { latest: { id: 'messageId', text: 'hi' } } });
-      await node.put({ chat2: { latest: { id: 'messageId2', text: 'hi2' } } });
+      await node
+        .get('chat1')
+        .put({ latest: { id: 'alienMessage', text: 'Take me to your leader' } });
+      await node
+        .get('chat2')
+        .put({ latest: { id: 'cowMessage', text: "Mooove over, I'm coming too!" } });
 
       node.map(mockCallback, 3);
       expect(mockCallback).toHaveBeenCalledWith(
-        {
-          chat1: { latest: { id: 'messageId', text: 'hi' } },
-          chat2: { latest: { id: 'messageId2', text: 'hi2' } },
-        },
-        'test',
+        { latest: { id: 'alienMessage', text: 'Take me to your leader' } },
+        'test/chat1',
+        expect.any(Number),
+        expect.any(Function),
+      );
+      expect(mockCallback).toHaveBeenCalledWith(
+        { latest: { id: 'cowMessage', text: "Mooove over, I'm coming too!" } },
+        'test/chat2',
         expect.any(Number),
         expect.any(Function),
       );
