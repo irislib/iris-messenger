@@ -56,12 +56,9 @@ export default class LocalStorageMemoryAdapter extends Adapter {
   }
 
   async set(path: string, value: NodeValue) {
-    await this.loadingPromise;
-
     if (value.updatedAt === undefined) {
       throw new Error(`Invalid value: ${JSON.stringify(value)}`);
     }
-
     this.storage.set(path, value);
     localStorage.setItem(path, JSON.stringify(value));
   }
