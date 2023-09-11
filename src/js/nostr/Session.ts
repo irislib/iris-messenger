@@ -43,6 +43,7 @@ const Session = {
     }
     IndexedDB.clear();
     localStorage.clear();
+    location.reload();
   },
   unsubscribe() {
     // wat dis

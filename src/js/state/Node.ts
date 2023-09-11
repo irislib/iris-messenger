@@ -12,6 +12,11 @@ type NodeProps = {
   parent?: Node | null;
 };
 
+type Subscription = {
+  callback: Callback;
+  recursion: number;
+};
+
 export const DIR_VALUE = '__DIR__';
 
 /**
@@ -24,8 +29,8 @@ export default class Node {
   parent: Node | null;
   children = new Map<string, Node>();
   // should subscriptions also include the desired level of recursion?
-  on_subscriptions = new Map<number, Callback>();
-  map_subscriptions = new Map<number, Callback>();
+  on_subscriptions = new Map<number, Subscription>();
+  map_subscriptions = new Map<number, Subscription>();
   adapters: Adapter[];
   private counter = 0;
 
@@ -61,7 +66,7 @@ export default class Node {
       value,
     };
     const promises = this.adapters.map((adapter) => adapter.set(this.id, nodeValue));
-    this.on_subscriptions.forEach((callback) => {
+    this.on_subscriptions.forEach(({ callback }) => {
       callback(value, this.id, updatedAt, () => {});
     });
     await Promise.all(promises);
@@ -95,10 +100,15 @@ export default class Node {
       if (!this.parent.children.has(childName)) {
         this.parent.children.set(childName, this);
       }
-      for (const [id, callback] of this.parent.map_subscriptions) {
-        callback(value, this.id, updatedAt, () => {
-          this.parent?.map_subscriptions.delete(id);
-        });
+      for (const [id, { callback, recursion }] of this.parent.map_subscriptions) {
+        if (value !== DIR_VALUE || recursion === 0) {
+          callback(value, this.id, updatedAt, () => {
+            this.parent?.map_subscriptions.delete(id);
+          });
+        } else if (recursion > 0) {
+          // TODO fix
+          //this.open(callback, recursion - 1);
+        }
       }
     }
   }
@@ -156,7 +166,7 @@ export default class Node {
       }
     };
 
-    this.on_subscriptions.set(uniqueId, localCallback);
+    this.on_subscriptions.set(uniqueId, { callback: localCallback, recursion });
 
     const adapterUnsubscribes = this.adapters.map((adapter) => adapter.get(this.id, localCallback));
 
@@ -175,7 +185,7 @@ export default class Node {
    */
   map(callback: Callback, recursion = 0): Unsubscribe {
     const id = this.counter++;
-    this.map_subscriptions.set(id, callback);
+    this.map_subscriptions.set(id, { callback, recursion });
     const latestMap = new Map<string, NodeValue>();
 
     let adapterSubs: Unsubscribe[] = [];
