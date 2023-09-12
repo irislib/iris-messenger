@@ -10,7 +10,7 @@ import Show from '../helpers/Show';
 import ProxyImg from '../ProxyImg.tsx';
 
 type Props = {
-  str: unknown;
+  str: string;
   hidePicture?: boolean;
   showTooltip?: boolean;
   activity?: string;
@@ -23,7 +23,10 @@ const MyAvatar: React.FC<Props> = (props) => {
   const [avatar, setAvatar] = useState<string | null>(null);
   const [hasError, setHasError] = useState<boolean>(false);
 
-  const hex = React.useMemo(() => Key.toNostrHexAddress(props.str as string), [props.str]);
+  const hex = React.useMemo(
+    () => Key.toNostrHexAddress(props.str as string) || props.str,
+    [props.str],
+  );
 
   const { picture, name } = useProfile(hex || '');
 

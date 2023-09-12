@@ -242,7 +242,12 @@ export default {
 
     try {
       const hex = new Hex(address);
-      return hex.toBech32(prefix);
+      const bech32 = hex.toBech32(prefix);
+      if (bech32.length < 60) {
+        // not a nostr key
+        return null;
+      }
+      return bech32;
     } catch (e) {
       // not a valid hex
       console.error(address, e);
