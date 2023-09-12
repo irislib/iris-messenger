@@ -7,9 +7,13 @@ export default function Content() {
   const [settings, setSettings] = useState({});
 
   useEffect(() => {
-    const unsubscribe = localState.get('settings').on((newSettings) => {
-      setSettings(newSettings);
-    });
+    const unsubscribe = localState.get('settings').on(
+      (newSettings) => {
+        setSettings(newSettings);
+      },
+      false,
+      1,
+    );
     return () => unsubscribe();
   }, []);
 

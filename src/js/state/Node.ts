@@ -135,7 +135,7 @@ export default class Node {
    * Subscribe to a value
    * @param callback
    */
-  on(callback: Callback, returnIfUndefined: boolean = false, recursion = 0): Unsubscribe {
+  on(callback: Callback, returnIfUndefined: boolean = false, recursion = 1): Unsubscribe {
     let latestValue: NodeValue | null = null;
     let openUnsubscribe: Unsubscribe | undefined;
     const uniqueId = this.counter++;
@@ -237,7 +237,7 @@ export default class Node {
    * Same as on(), but will unsubscribe after the first callback
    * @param callback
    */
-  once(callback?: Callback, returnIfUndefined = false, recursion = 0): Promise<any> {
+  once(callback?: Callback, returnIfUndefined = false, recursion = 1): Promise<any> {
     return new Promise((resolve) => {
       let resolved = false;
       const cb = (value, updatedAt, path, unsub) => {

@@ -6,7 +6,7 @@ export default function DevSettings() {
   const [state, setState] = useState({});
 
   useEffect(() => {
-    const unsubscribe = localState.get('dev').on((data) => setState(data));
+    const unsubscribe = localState.get('dev').on((data) => setState(data), false, 1);
     return () => unsubscribe();
   }, []);
 
