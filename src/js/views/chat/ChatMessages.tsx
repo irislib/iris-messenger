@@ -295,35 +295,43 @@ function ChatMessages({ id }) {
     localState
       .get('chatInvites')
       .get(chatId)
-      .once((invite) => {
-        if (invite?.priv) {
-          setInvitedToPriv(invite.priv);
-        }
-      });
+      .once(
+        (invite) => {
+          if (invite?.priv) {
+            setInvitedToPriv(invite.priv);
+          }
+        },
+        false,
+        1,
+      );
 
     const subscribeGroup = () => {
       const node = localState.get('groups').get(id);
-      node.on((group) => {
-        const privKey = group.key;
-        const pubKey = getPublicKey(privKey);
-        setKeyPair({ privKey, pubKey });
-        subs.push(
-          PubSub.subscribe({ kinds: [4], '#p': [pubKey], authors: [pubKey] }, async (event) => {
-            const decrypted = await nip04.decrypt(privKey, pubKey, event.content);
-            messages.current.set(event.id, { ...event, text: decrypted });
-            setSortedMessages(Array.from(messages.current.values()));
-            const latest = node.get('latest');
-            const e = await latest.once();
-            if (!e || !e.created_at || e.created_at < event.created_at) {
-              latest.put({
-                id: event.id,
-                created_at: event.created_at,
-                text: decrypted.slice(0, decrypted.indexOf('{')),
-              });
-            }
-          }),
-        );
-      });
+      node.on(
+        (group) => {
+          const privKey = group.key;
+          const pubKey = getPublicKey(privKey);
+          setKeyPair({ privKey, pubKey });
+          subs.push(
+            PubSub.subscribe({ kinds: [4], '#p': [pubKey], authors: [pubKey] }, async (event) => {
+              const decrypted = await nip04.decrypt(privKey, pubKey, event.content);
+              messages.current.set(event.id, { ...event, text: decrypted });
+              setSortedMessages(Array.from(messages.current.values()));
+              const latest = node.get('latest');
+              const e = await latest.once(undefined, false, 1);
+              if (!e || !e.created_at || e.created_at < event.created_at) {
+                latest.put({
+                  id: event.id,
+                  created_at: event.created_at,
+                  text: decrypted.slice(0, decrypted.indexOf('{')),
+                });
+              }
+            }),
+          );
+        },
+        false,
+        1,
+      );
     };
 
     if (Key.toNostrHexAddress(chatId)) {

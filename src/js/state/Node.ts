@@ -237,7 +237,7 @@ export default class Node {
    * Same as on(), but will unsubscribe after the first callback
    * @param callback
    */
-  once(callback?: Callback, returnIfUndefined = false): Promise<any> {
+  once(callback?: Callback, returnIfUndefined = false, recursion = 0): Promise<any> {
     return new Promise((resolve) => {
       let resolved = false;
       const cb = (value, updatedAt, path, unsub) => {
@@ -247,7 +247,7 @@ export default class Node {
         callback?.(value, updatedAt, path, () => {});
         unsub();
       };
-      this.on(cb, returnIfUndefined);
+      this.on(cb, returnIfUndefined, recursion);
     });
   }
 }
