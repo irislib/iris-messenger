@@ -76,7 +76,7 @@ const About: React.FC<RouteProps> = () => (
 
         <h3>Iris docs</h3>
         <p>
-          Visit Iris <a href="https://docs.iris.to">docs</a> for features, explanations and
+          Visit Iris <a href="https://github.com/irislib/faq">FAQ</a> for features, explanations and
           troubleshooting.
         </p>
 
