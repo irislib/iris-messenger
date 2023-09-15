@@ -5,6 +5,7 @@ import EventDB from '@/nostr/EventDB';
 import getRelayPool from '@/nostr/relayPool';
 
 import Events from '../nostr/Events';
+import Snort from '../nostr/SnortSystem';
 import localState from '../state/LocalState.ts';
 
 import IndexedDB from './IndexedDB';
@@ -43,8 +44,6 @@ const PubSub = {
   subscribe(
     filter: Filter,
     callback?: (event: Event) => void,
-    sinceLastOpened = false,
-    mergeSubscriptions = true,
   ): Unsubscribe {
     let currentSubscriptionId;
     if (callback) {
@@ -67,10 +66,12 @@ const PubSub = {
       });
     }
 
-    const unsubRelays = this.subscribeRelayPool(filter, sinceLastOpened, mergeSubscriptions);
+    Snort.subscribe(filter, (event) => {
+      console.log('snort returned', event);
+      Events.handle(event);
+    });
 
     return () => {
-      unsubRelays?.();
       if (currentSubscriptionId) {
         this.subscriptions.delete(currentSubscriptionId);
       }
