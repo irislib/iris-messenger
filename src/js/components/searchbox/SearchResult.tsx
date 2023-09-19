@@ -15,7 +15,7 @@ export default function SearchResult({ item, onClick, onFocus, selected }) {
       followText = `${item.followers.size} ${t('followers')}`;
     }
   }
-  const npub = Key.toNostrBech32Address(item.key, 'npub');
+  const npub = Key.toNostrBech32Address(item.key, 'npub') || '';
   return (
     <a
       onFocus={onFocus}
