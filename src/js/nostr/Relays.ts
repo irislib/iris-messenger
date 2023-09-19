@@ -1,6 +1,5 @@
 import { sha256 } from '@noble/hashes/sha256';
-import throttle from 'lodash/throttle';
-import { Event, Filter, Sub } from 'nostr-tools';
+import { Event, Sub } from 'nostr-tools';
 
 import EventDB from '@/nostr/EventDB';
 import relayPool from '@/nostr/relayPool.ts';
@@ -10,7 +9,6 @@ import Helpers from '../utils/Helpers';
 
 import Events from './Events';
 import Key from './Key';
-import PubSub from './PubSub';
 
 type SavedRelays = {
   [key: string]: {
@@ -244,58 +242,6 @@ const Relays = {
       tags: existing?.tags || [],
     };
     Events.publish(event);
-  },
-  updateLastSeen: throttle(
-    (url) => {
-      const now = Math.floor(Date.now() / 1000);
-      localState.get('relays').get(url).get('lastSeen').put(now);
-    },
-    5 * 1000,
-    { leading: true },
-  ),
-  groupFilter(filter: Filter): { name: string; groupedFilter: Filter } {
-    // if filter has authors, add to subscribedAuthors and group by authors
-    if (filter.authors && filter.kinds?.length === 1 && filter.kinds[0] === 0) {
-      filter.authors.forEach((a) => {
-        this.subscribedProfiles.add(a);
-      });
-      return {
-        name: 'profiles',
-        groupedFilter: {
-          authors: Array.from(this.subscribedProfiles.values()),
-          kinds: [0],
-        },
-      };
-    }
-    if (filter.authors) {
-      filter.authors = Array.from(this.subscribedProfiles.values());
-      return {
-        name: 'authors',
-        groupedFilter: {
-          authors: Array.from(this.subscribedProfiles.values()),
-        },
-      };
-    }
-    if (filter.ids) {
-      return {
-        name: 'ids',
-        groupedFilter: { ids: Array.from(PubSub.subscribedEventIds.values()) },
-      };
-    }
-    if (filter['#e']) {
-      filter['#e'].forEach((e) => {
-        this.subscribedEventTags.add(e);
-      });
-      return {
-        name: 'eventsByTag',
-        groupedFilter: { '#e': Array.from(this.subscribedEventTags.values()) },
-      };
-    }
-    // do not bundle. TODO console.log, limit or sth
-    return {
-      name: JSON.stringify(filter),
-      groupedFilter: filter,
-    };
   },
 };
 
