@@ -17,7 +17,13 @@ export default class LocalStorageMemoryAdapter extends Adapter {
   private loadFromLocalStorage() {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i) as string;
-      const value = JSON.parse(localStorage.getItem(key) || '') as NodeValue;
+      let value;
+      try {
+        value = localStorage.getItem(key) || '';
+        value = JSON.parse(value);
+      } catch (e) {
+        // Ignore
+      }
       this.storage.set(key, value);
     }
     this.isLoaded = true;
