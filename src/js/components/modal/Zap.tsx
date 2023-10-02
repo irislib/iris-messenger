@@ -387,7 +387,7 @@ export default function SendSats(props: ZapProps) {
 
   return (
     <Modal showContainer={true} centerVertically={true} onClose={onClose}>
-      <div className="bg-black rounded-lg p-8 w-[400px] relative">
+      <div className="bg-black rounded-lg p-8 relative">
         <div className="lnurl-tip" onClick={(e) => e.stopPropagation()}>
           <div className="absolute top-2.5 right-2.5 cursor-pointer">
             <XMarkIcon width={20} height={20} />
