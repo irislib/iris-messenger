@@ -22,13 +22,13 @@ export default function NotificationsButton() {
         className={`relative inline-block rounded-full ${isMyProfile ? 'hidden md:flex' : ''}`}
       >
         <Show when={activeRoute === '/notifications'}>
-          <HeartIconFull width={28} />
+          <HeartIconFull class={unseenNotificationCount ? 'mr-3' : ''} width={28} />
         </Show>
         <Show when={activeRoute !== '/notifications'}>
-          <HeartIcon width={28} />
+          <HeartIcon class={unseenNotificationCount ? 'mr-3' : ''} width={28} />
         </Show>
         <Show when={unseenNotificationCount}>
-          <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-iris-purple text-white text-sm rounded-full h-5 w-5 flex items-center justify-center">
+          <span className="absolute top-1 right-3 transform translate-x-1/2 -translate-y-1/2 bg-iris-purple text-white text-sm rounded-full h-5 w-5 flex items-center justify-center">
             {unseenNotificationCount > 99 ? '' : unseenNotificationCount}
           </span>
         </Show>
