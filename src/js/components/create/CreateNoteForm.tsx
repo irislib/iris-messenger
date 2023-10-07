@@ -75,20 +75,47 @@ function CreateNoteForm({
   const handleFileAttachments = useCallback((files) => {
     if (!files) return;
 
+    const uploadApiUrl = 'https://nostr.build/api/v2/upload/files';
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
 
-      const formData = new FormData();
-      formData.append('fileToUpload', file);
+      const authEvent = {
+        kind: 27235,
+        created_at: Math.floor(Date.now() / 1000),
+        content: '',
+        tags: [
+          ['u', uploadApiUrl],
+          ['method', 'POST'],
+        ],
+        pubkey: Key.getPubKey(),
+        sig: '',
+        id: '',
+      };
 
-      fetch('https://nostr.build/api/upload/iris.php', {
-        method: 'POST',
-        body: formData,
-      })
+      Key.sign(authEvent)
+        .then((signature) => {
+          authEvent.sig = signature;
+          const authHeader = `Nostr ${btoa(JSON.stringify(authEvent))}`;
+
+          const formData = new FormData();
+          formData.append('file', file);
+
+          return fetch(uploadApiUrl, {
+            method: 'POST',
+            body: formData,
+            headers: {
+              Authorization: authHeader,
+            },
+          });
+        })
         .then(async (response) => {
-          const url = await response.json();
-          if (url) {
+          const uploadResult = await response.json();
+          if (response.status === 200 && uploadResult?.status === 'success') {
+            const url = uploadResult.data[0].url;
             setText((prevText) => (prevText ? `${prevText}\n\n${url}` : url));
+          } else {
+            console.error('Upload failed', uploadResult);
           }
         })
         .catch((error) => {
