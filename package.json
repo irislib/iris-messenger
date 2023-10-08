@@ -55,7 +55,7 @@
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "jsdom": "^22.1.0",
-    "postcss": "^8.4.29",
+    "postcss": "^8.4.31",
     "prettier": "^3.0.3",
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat",
