@@ -363,6 +363,7 @@ const Events = {
               innerEvent.tags[0][0] === 'p' &&
               innerEvent.tags[0][1] === pubKey
             ) {
+              // @ts-ignore
               innerEvent.text = innerEvent.content;
               this.saveDMToLocalState(innerEvent, localState.get('groups').get(groupId));
             }
