@@ -144,7 +144,7 @@ export default {
     if (this.followedByUser.get(myId)?.has(follower)) {
       if (!PubSub.subscribedAuthors.has(STR(followedUser))) {
         setTimeout(() => {
-          PubSub.subscribe({ authors: [STR(followedUser)] }, undefined, true);
+          PubSub.subscribe({ authors: [STR(followedUser)], kinds: [0, 3] }, undefined, true);
         }, 0);
       }
     }
