@@ -32,6 +32,7 @@
     "preact": "^10.17.1",
     "preact-async-route": "^2.2.1",
     "preact-router": "^4.1.2",
+    "react-force-graph-3d": "^1.23.1",
     "react-helmet": "^6.1.0",
     "react-string-replace": "^1.1.1"
   },

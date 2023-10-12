@@ -7,6 +7,7 @@ import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import localState from '../../state/LocalState.ts';
 import { translate as t } from '../../translations/Translation.mjs';
+import NetworkGraph from "../NetworkGraph";
 
 const SocialNetworkSettings = () => {
   const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
@@ -64,6 +65,7 @@ const SocialNetworkSettings = () => {
           {distance[0] || t('unknown')}: {distance[1].size} users
         </div>
       ))}
+      <NetworkGraph />
       <p>Filter incoming events by follow distance:</p>
       <select
         className="select"
