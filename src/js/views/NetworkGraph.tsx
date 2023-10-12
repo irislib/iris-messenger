@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'preact/hooks';
 import ForceGraph3D from 'react-force-graph-3d';
+import { useEffect, useState } from 'preact/hooks';
+
 import SocialNetwork from '../nostr/SocialNetwork';
-import { PUB, UserId } from '../nostr/UserIds';
+import { STR, UID } from '../utils/UniqueIds';
 
 interface GraphNode {
-  id: UserId;
+  id: UID;
   profile?: any;
   distance: number;
   val: number;
@@ -16,13 +17,13 @@ interface GraphNode {
 }
 
 interface GraphLink {
-  source: UserId;
-  target: UserId;
+  source: UID;
+  target: UID;
   distance: number;
 }
 
 interface GraphMetadata {
-  // usersByFollowDistance?: Map<number, Set<UserId>>;
+  // usersByFollowDistance?: Map<number, Set<UID>>;
   userCountByDistance: number[];
   nodes?: Map<number, GraphNode>;
 }
@@ -79,7 +80,7 @@ const NetworkGraph = () => {
     const { direction, renderLimit, showDistance } = newConfig ?? graphConfig;
     const nodes = new Map<number, GraphNode>();
     const links: GraphLink[] = [];
-    const nodesVisited = new Set<UserId>();
+    const nodesVisited = new Set<UID>();
     const userCountByDistance = Array.from(
       { length: 6 },
       (_, i) => SocialNetwork.usersByFollowDistance.get(i)?.size || 0,
@@ -89,14 +90,14 @@ const NetworkGraph = () => {
     for (let distance = 0; distance <= showDistance; ++distance) {
       const users = SocialNetwork.usersByFollowDistance.get(distance);
       if (!users) break;
-      for (const userID of users) {
+      for (const UID of users) {
         if (renderLimit && nodes.size >= renderLimit) break; // Temporary hack
-        const inboundCount = SocialNetwork.followersByUser.get(userID)?.size || 0;
-        const outboundCount = SocialNetwork.followedByUser.get(userID)?.size || 0;
+        const inboundCount = SocialNetwork.followersByUser.get(UID)?.size || 0;
+        const outboundCount = SocialNetwork.followedByUser.get(UID)?.size || 0;
         const node = {
-          id: userID,
-          address: PUB(userID),
-          profile: SocialNetwork.profiles.get(userID),
+          id: UID,
+          address: STR(UID),
+          profile: SocialNetwork.profiles.get(UID),
           distance,
           inboundCount,
           outboundCount,
@@ -110,7 +111,7 @@ const NetworkGraph = () => {
           node.val = 10; // they're always larger than life
           node.color = '#603285';
         }
-        nodes.set(userID, node);
+        nodes.set(UID, node);
       }
     }
 
