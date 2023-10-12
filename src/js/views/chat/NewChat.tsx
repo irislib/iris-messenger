@@ -32,7 +32,7 @@ export const getGroupId = (key) => {
 export const addGroup = (
   key,
   navigate = true,
-  inviter = null,
+  inviter = null as any,
   name = undefined as string | undefined,
 ) => {
   const groupId = getGroupId(key);

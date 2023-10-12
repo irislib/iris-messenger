@@ -41,6 +41,7 @@ const PrivateMessage = ({ event, selfAuthored, showName }: Props) => {
       if (validateEvent(e) && verifySignature(e)) {
         console.log(111, e.tags.length === 1, e.tags[0][0] === 'p', e.tags[0][1] === e.pubkey);
         if (e.tags.length === 1 && e.tags[0][0] === 'p' && e.tags[0][1] === event.pubkey) {
+          // @ts-ignore
           e.text = e.content;
           setInnerEvent(e);
           return;
