@@ -165,7 +165,7 @@ export default function SendSats(props: ZapProps) {
         created_at: Math.floor(Date.now() / 1000),
         kind: 9734,
         pubkey: Key.getPubKey(),
-        content: comment || '',
+        content: comment?.trim() || '',
         tags: [
           ['e', note],
           ['p', recipient],
