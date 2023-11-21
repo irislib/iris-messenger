@@ -158,3 +158,9 @@ The application is an unaudited proof-of-concept implementation, so don't use it
 ---
 
 <a href="https://opencollective.com/iris-social/donate" target="_blank"><img src="https://opencollective.com/iris-social/donate/button@2x.png?color=blue" width=200 /></a>
+
+## Contributors
+
+<a align="center" href="https://github.com/irislib/iris-messenger/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=irislib/iris-messenger" />
+</a>
