@@ -21,9 +21,10 @@ class MyDexie extends Dexie {
   constructor() {
     super('iris');
 
-    this.version(5).stores({
-      events: 'id, pubkey, kind, created_at, [pubkey+kind]',
-      tags: 'id, eventId, [type+value]',
+    this.version(6).stores({
+      // TODO use events multientry index for *tags
+      events: "++id, pubkey, kind, created_at, [pubkey+kind]",
+      tags: "&[type+value+eventId], [type+value], eventId",
     });
   }
 }
@@ -119,13 +120,13 @@ const IndexedDB = {
       .anyOf(authors)
       .limit(limit || 1000)
       .each(handleEvent);
-  }, 1000),
+  }, 100),
 
   subscribeToEventIds: throttle(async function (this: typeof IndexedDB) {
     const ids = [...this.subscribedEventIds];
     this.subscribedEventIds.clear();
     await db.events.where('id').anyOf(ids).each(handleEvent);
-  }, 1000),
+  }, 100),
 
   subscribeToTags: throttle(async function (this: typeof IndexedDB) {
     const tagPairs = [...this.subscribedTags].map((tag) => tag.split('|'));
@@ -136,7 +137,7 @@ const IndexedDB = {
       .each((tag) => this.subscribedEventIds.add(tag.eventId));
 
     await this.subscribeToEventIds();
-  }, 1000),
+  }, 100),
 
   async countEvents() {
     return await db.events.count();
