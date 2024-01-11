@@ -2,9 +2,10 @@ import { bech32 } from 'bech32';
 import {
   Event,
   generatePrivateKey,
+  getEventHash,
   getPublicKey,
+  getSignature,
   nip04,
-  signEvent,
   UnsignedEvent,
 } from 'nostr-tools';
 
@@ -124,8 +125,15 @@ export default {
   },
   sign: async function (event: Event | UnsignedEvent): Promise<string> {
     const priv = this.getPrivKey();
+    if ('id' in event) {
+      event.id = getEventHash(event);
+    } else {
+      const hash = getEventHash(event);
+      (event as Event).id = hash;
+    }
     if (priv) {
-      return signEvent(event, priv);
+      (event as Event).sig = getSignature(event, priv);
+      return JSON.stringify(event);
     } else if (window.nostr) {
       return new Promise((resolve) => {
         this.processWindowNostr({ op: 'sign', data: event, callback: resolve });

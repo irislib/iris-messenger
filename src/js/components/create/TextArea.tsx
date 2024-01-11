@@ -76,6 +76,7 @@ const TextArea: React.FC<TextAreaProps> = ({
             blob,
             (url) => setValue(value ? `${value}\n\n${url}` : url),
             (errorMsg) => console.error(errorMsg),
+            Key,
           );
         }
       }
