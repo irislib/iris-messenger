@@ -1,3 +1,7 @@
+19-10-2024 NOTE: Current [iris.to](https://iris.to) source code is at https://github.com/irislib/iris-client
+
+---
+
 ![git_banner_1200x200](https://user-images.githubusercontent.com/52623440/226903633-7902aa21-6041-4bad-979a-dc98bd0ad317.png)
 <div align="center">
 
