@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import Key from '@/nostr/Key';
 import { uploadFile } from '@/utils/uploadFile';
 
 const Upload = (props) => {
@@ -18,6 +19,7 @@ const Upload = (props) => {
         (errorMsg) => {
           setError(errorMsg);
         },
+        Key,
       );
     }
   };
